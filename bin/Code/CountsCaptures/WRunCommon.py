@@ -23,14 +23,14 @@ class WEdMove(QtWidgets.QWidget):
 
         self.owner = owner
 
-        self.origen = EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(32).alinCentrado()
+        self.origen = EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(32).align_center()
 
         self.arrow = arrow = Controles.LB(self).ponImagen(self.PM_MOVE)
         arrow.mousePressEvent = self.pulsa_flecha
 
-        self.destino = EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(32).alinCentrado()
+        self.destino = EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(32).align_center()
 
-        self.result = Controles.LB(self).ponWrap().ponImagen(self.PM_EMPTY)
+        self.result = Controles.LB(self).set_wrap().ponImagen(self.PM_EMPTY)
 
         ly = (
             Colocacion.H()
@@ -70,17 +70,17 @@ class WEdMove(QtWidgets.QWidget):
         return from_sq + to_sq
 
     def deshabilita(self):
-        self.origen.deshabilitado(True)
-        self.destino.deshabilitado(True)
+        self.origen.set_disabled(True)
+        self.destino.set_disabled(True)
 
     def habilita(self):
-        self.origen.deshabilitado(False)
-        self.destino.deshabilitado(False)
+        self.origen.set_disabled(False)
+        self.destino.set_disabled(False)
         self.result.ponImagen(self.PM_EMPTY)
 
     def limpia(self):
-        self.origen.ponTexto("")
-        self.destino.ponTexto("")
+        self.origen.set_text("")
+        self.destino.set_text("")
         self.result.ponImagen(self.PM_EMPTY)
         self.habilita()
         self.origen.setFocus()

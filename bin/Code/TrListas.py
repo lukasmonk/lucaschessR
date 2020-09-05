@@ -10903,7 +10903,7 @@ def list_std():
     )
 
 
-def dicNAGs():
+def dic_nags():
     lista = (
         "",
         _("Good move"),

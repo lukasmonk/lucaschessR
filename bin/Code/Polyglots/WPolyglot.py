@@ -2,7 +2,7 @@ import os
 
 import FasterCode
 
-from Code import Position
+from Code.Base import Position
 from Code.SQL import UtilSQL
 from Code import Util
 from Code.QT import Colocacion
@@ -10,7 +10,7 @@ from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import Tablero
+from Code.Board import Board
 from Code.QT import Delegados
 from Code.QT import Voyager
 from Code.QT import QTVarios
@@ -18,11 +18,11 @@ from Code.Polyglots import PolyglotImports
 
 
 class WPolyglot(QTVarios.WDialogo):
-    def __init__(self, wowner, configuracion, path_dbbin):
+    def __init__(self, wowner, configuration, path_dbbin):
         title = os.path.basename(path_dbbin)[:-6]
         QTVarios.WDialogo.__init__(self, wowner, title, Iconos.Book(), "polyglot")
 
-        self.configuracion = configuracion
+        self.configuration = configuration
         self.path_dbbin = path_dbbin
         self.path_mkbin = self.path_dbbin[:-6] + ".mkbin"
 
@@ -41,14 +41,14 @@ class WPolyglot(QTVarios.WDialogo):
 
         self.pol_imports = PolyglotImports.PolyglotImports(self)
 
-        conf_tablero = configuracion.config_board("WPOLYGLOT", 48)
-        self.tablero = Tablero.Tablero(self, conf_tablero)
-        self.tablero.crea()
-        self.tablero.set_dispatcher(self.mensajero)
-        self.siFigurines = configuracion.x_pgn_withfigurines
+        conf_board = configuration.config_board("WPOLYGLOT", 48)
+        self.board = Board.Board(self, conf_board)
+        self.board.crea()
+        self.board.set_dispatcher(self.mensajero)
+        self.with_figurines = configuration.x_pgn_withfigurines
 
         o_columnas = Columnas.ListaColumnas()
-        delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.configuracion.x_pgn_withfigurines else None
+        delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.configuration.x_pgn_withfigurines else None
         o_columnas.nueva("move", _("Move"), 80, centered=True, edicion=delegado, siEditable=False)
         o_columnas.nueva("%", "%", 60, siDerecha=True, siEditable=False)
         o_columnas.nueva("weight", _("weight"), 60, siDerecha=True, edicion=Delegados.LineaTexto(siEntero=True))
@@ -74,7 +74,7 @@ class WPolyglot(QTVarios.WDialogo):
 
         ly2 = Colocacion.V().control(self.tb).control(self.grid_moves)
 
-        layout = Colocacion.H().control(self.tablero).otro(ly2)
+        layout = Colocacion.H().control(self.board).otro(ly2)
         self.setLayout(layout)
 
         self.restore_video()
@@ -110,23 +110,23 @@ class WPolyglot(QTVarios.WDialogo):
 
         self.li_moves.sort(key=lambda x: x.weight(), reverse=True)
         self.grid_moves.refresh()
-        self.tablero.setposition(position)
-        self.tablero.activaColor(position.is_white)
+        self.board.set_position(position)
+        self.board.activate_side(position.is_white)
         if save_history:
             self.history.append(self.position.fen())
 
-    def grid_doble_click(self, grid, fila, col):
-        if col.clave == "move":
-            bin_move = self.li_moves[fila]
+    def grid_doble_click(self, grid, row, col):
+        if col.key == "move":
+            bin_move = self.li_moves[row]
             xfrom = bin_move.info_move.xfrom()
             xto = bin_move.info_move.xto()
             promotion = bin_move.info_move.promotion()
             self.mensajero(xfrom, xto, promotion)
 
-    def grid_cambiado_registro(self, grid, fila, oColumna):
-        if -1 < fila < len(self.li_moves):
-            bin_move = self.li_moves[fila]
-            self.tablero.ponFlechaSC(bin_move.info_move.xfrom(), bin_move.info_move.xto())
+    def grid_cambiado_registro(self, grid, row, o_column):
+        if -1 < row < len(self.li_moves):
+            bin_move = self.li_moves[row]
+            self.board.put_arrow_sc(bin_move.info_move.xfrom(), bin_move.info_move.xto())
 
     def terminar(self):
         self.finalizar()
@@ -135,12 +135,12 @@ class WPolyglot(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.li_moves)
 
-    def grid_dato(self, grid, fila, oColumna):
-        move = self.li_moves[fila]
-        key = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        move = self.li_moves[row]
+        key = o_column.key
         if key == "move":
             san = move.info_move.san()
-            if self.siFigurines:
+            if self.with_figurines:
                 is_white = self.position.is_white
                 return san, is_white, None, None, None, None, False, True
             else:
@@ -151,9 +151,9 @@ class WPolyglot(QTVarios.WDialogo):
             valor = move.get_field(key)
             return str(valor) if valor else ""
 
-    def grid_setvalue(self, grid, fila, columna, valor):
-        binmove = self.li_moves[fila]
-        field = columna.clave
+    def grid_setvalue(self, grid, row, column, valor):
+        binmove = self.li_moves[row]
+        field = column.key
         if valor == "":
             valor = 0
 

@@ -3,8 +3,9 @@ import time
 from PySide2 import QtCore, QtWidgets
 
 import Code
-from Code import Position
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, Tablero, QTUtil2
+from Code.Base import Position
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
+from Code.Board import Board
 from Code.Coordinates import CoordinatesBasic
 
 
@@ -13,7 +14,7 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
 
         QTVarios.WDialogo.__init__(self, owner, _("Coordinates"), Iconos.Blocks(), "runcoordinatesbasic")
 
-        self.configuracion = Code.configuracion
+        self.configuration = Code.configuration
         self.is_white = is_white
         self.db_coordinates = db_coordinates
         self.coordinates = None
@@ -21,17 +22,17 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
         self.working = False
         self.time_ini = None
 
-        conf_board = self.configuracion.config_board("RUNCOORDINATESBASIC", self.configuracion.size_base())
+        conf_board = self.configuration.config_board("RUNCOORDINATESBASIC", self.configuration.size_base())
 
-        self.board = Tablero.TableroEstaticoMensaje(self, conf_board, None, 0.6)
+        self.board = Board.BoardEstaticoMensaje(self, conf_board, None, 0.6)
         self.board.crea()
         self.board.bloqueaRotacion(True)
         self.cp_initial = Position.Position()
         self.cp_initial.set_pos_initial()
         self.board.ponerPiezasAbajo(self.is_white)
-        self.board.setposition(self.cp_initial)
+        self.board.set_position(self.cp_initial)
 
-        font = Controles.TipoLetra(puntos=self.configuracion.x_sizefont_infolabels)
+        font = Controles.TipoLetra(puntos=self.configuration.x_sizefont_infolabels)
 
         lb_score_k = Controles.LB(self, _("Score") + ":").ponFuente(font)
         self.lb_score = Controles.LB(self).ponFuente(font)
@@ -60,7 +61,7 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
         self.coordinates = CoordinatesBasic.CoordinatesBasic(self.is_white)
         self.coordinates.new_try()
         self.current_score = 0
-        self.lb_score.ponTexto("0")
+        self.lb_score.set_text("0")
         self.working = True
         self.time_ini = time.time()
         QtCore.QTimer.singleShot(1000, self.comprueba_time)
@@ -99,7 +100,7 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
     def pulsada_celda(self, celda):
         if celda == self.square_object and self.working:
             self.current_score += 1
-            self.lb_score.ponTexto("%d" % self.current_score)
+            self.lb_score.set_text("%d" % self.current_score)
             self.go_next()
 
     def closeEvent(self, event):
@@ -113,6 +114,6 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
         self.reject()
 
     def show_tb(self, *lista):
-        for opc in self.tb.dicTB:
+        for opc in self.tb.dic_toolbar:
             self.tb.setAccionVisible(opc, opc in lista)
         QTUtil.refresh_gui()

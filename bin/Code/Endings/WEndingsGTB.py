@@ -4,15 +4,14 @@ import FasterCode
 
 from PySide2 import QtWidgets, QtCore
 
-from Code import Game
-from Code import Move
+from Code.Base import Game, Move
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Columnas
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code.QT import Tablero
+from Code.Board import Board
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import Voyager
@@ -28,9 +27,9 @@ PLAY_STOP, PLAY_NEXT_SOLVED, PLAY_NEXT_BESTMOVES = range(3)
 class WEndingsGTB(QTVarios.WDialogo):
     def __init__(self, procesador):
         self.procesador = procesador
-        self.configuracion = procesador.configuracion
-        self.db = EndingsGTB.DBendings(self.configuracion)
-        self.t4 = LibChess.T4(self.configuracion)
+        self.configuration = procesador.configuration
+        self.db = EndingsGTB.DBendings(self.configuration)
+        self.t4 = LibChess.T4(self.configuration)
 
         QTVarios.WDialogo.__init__(
             self, procesador.main_window, _("Endings with Gaviota Tablebases"), Iconos.Finales(), "endings_gtb"
@@ -50,7 +49,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         tb = QTVarios.LCTB(self, li_acciones)
 
         ly_bt, self.bt_movs = QTVarios.lyBotonesMovimiento(
-            self, "", siTiempo=True, siLibre=False, rutina=self.run_botones, tamIcon=24
+            self, "", siTiempo=True, siLibre=False, rutina=self.run_botones, icon_size=24
         )
 
         self.chb_help = Controles.CHB(self, _("Help mode"), False)
@@ -77,7 +76,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             (" " + _("Remove"), Iconos.Remove1(), self.remove),
             None,
         )
-        self.tb_run = Controles.TBrutina(self, li_acciones, tamIcon=32, puntos=self.configuracion.x_tb_fontpoints)
+        self.tb_run = Controles.TBrutina(self, li_acciones, icon_size=32, puntos=self.configuration.x_tb_fontpoints)
 
         ly_top = Colocacion.H().control(tb).relleno().control(self.wpzs).relleno().control(self.tb_run)
         o_columns = Columnas.ListaColumnas()
@@ -88,26 +87,26 @@ class WEndingsGTB(QTVarios.WDialogo):
         o_columns.nueva("MOVES", _("Minimum moves"), 120, centered=True)
         o_columns.nueva("TIMEMS", _("Minimum time"), 120, centered=True)
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True)
-        self.grid.tipoLetra(puntos=self.configuracion.x_pgn_fontpoints)
-        self.grid.ponAltoFila(self.configuracion.x_pgn_rowheight)
+        self.grid.tipoLetra(puntos=self.configuration.x_pgn_fontpoints)
+        self.grid.ponAltoFila(self.configuration.x_pgn_rowheight)
         self.grid.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
 
         ly_pos = Colocacion.V().control(self.grid)
 
-        config_board = self.configuracion.config_board("ENDINGSGTB", 64)
-        self.tablero = TableroEndings(self, config_board)
-        self.tablero.set_startup_control(self.startup_control)
-        self.tablero.crea()
-        self.tablero.ponerPiezasAbajo(True)
-        self.tablero.set_dispatcher(self.mueve_humano)
+        config_board = self.configuration.config_board("ENDINGSGTB", 64)
+        self.board = BoardEndings(self, config_board)
+        self.board.set_startup_control(self.startup_control)
+        self.board.crea()
+        self.board.ponerPiezasAbajo(True)
+        self.board.set_dispatcher(self.player_has_moved)
 
-        self.pzs = self.tablero.piezas
+        self.pzs = self.board.piezas
         self.playing = False
 
-        ly_left_bottom = Colocacion.V().control(self.tablero).otro(ly_bt).relleno().margen(0)
+        ly_left_bottom = Colocacion.V().control(self.board).otro(ly_bt).relleno().margen(0)
         w = QtWidgets.QWidget(self)
         w.setLayout(ly_left_bottom)
-        w.setFixedWidth(self.tablero.ancho + 16)
+        w.setFixedWidth(self.board.ancho + 16)
 
         ly_bottom = Colocacion.H().control(w).otro(ly_pos)
 
@@ -116,10 +115,10 @@ class WEndingsGTB(QTVarios.WDialogo):
 
         self.restore_video()
 
-        dic = self.configuracion.leeVariables("endingsGTB")
+        dic = self.configuration.leeVariables("endingsGTB")
 
         self.key = key = dic.get("KEY")
-        if (not key) or len(key) > self.configuracion.piezas_gaviota():
+        if (not key) or len(key) > self.configuration.piezas_gaviota():
             key = "KPk"
         self.db.set_examples_auto(dic.get("EXAMPLES_AUTO", True))
         self.set_key(key)
@@ -135,11 +134,11 @@ class WEndingsGTB(QTVarios.WDialogo):
                 self.timer = time.time()
 
     def reset(self):
-        fila = self.grid.recno()
-        self.act_recno = fila
-        self.fen = self.db.get_current_fen(fila)
+        row = self.grid.recno()
+        self.act_recno = row
+        self.fen = self.db.get_current_fen(row)
         self.game.set_fen(self.fen)
-        self.tablero.setposition(self.game.first_position)
+        self.board.set_position(self.game.first_position)
         self.bt_movs.hide()
         self.replaying = False
         self.grid.setFocus()
@@ -162,12 +161,12 @@ class WEndingsGTB(QTVarios.WDialogo):
             self.grid.goto(pos, 0)
 
     def play(self):
-        fila = self.grid.recno()
-        if fila < 0:
+        row = self.grid.recno()
+        if row < 0:
             return
 
         if len(self.game) > 0 and not self.game.is_finished():
-            self.db.register_empty_try(fila)
+            self.db.register_empty_try(row)
             self.grid.refresh()
 
         if (
@@ -177,7 +176,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             return
 
         self.game.reset()
-        self.tablero.setposition(self.game.first_position)
+        self.board.set_position(self.game.first_position)
         self.test_help()
         self.bt_movs.hide()
         self.ms = 0
@@ -189,21 +188,21 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.sigueHumano()
 
     def play_next(self):
-        fila = self.grid.recno()
-        if 0 <= fila < (self.db.current_num_fens() - 1):
-            self.grid.goto(fila + 1, 0)
+        row = self.grid.recno()
+        if 0 <= row < (self.db.current_num_fens() - 1):
+            self.grid.goto(row + 1, 0)
             self.play()
 
     def remove(self):
-        fila = self.grid.recno()
-        if fila >= 0:
+        row = self.grid.recno()
+        if row >= 0:
             if QTUtil2.pregunta(self, "Do you want to remove this position?"):
-                self.db.remove(fila)
+                self.db.remove(row)
                 self.grid.refresh()
-                self.grid_cambiado_registro(None, fila, None)
+                self.grid_cambiado_registro(None, row, None)
 
     def configurar(self):
-        dic_vars = self.configuracion.leeVariables("endingsGTB")
+        dic_vars = self.configuration.leeVariables("endingsGTB")
 
         form = FormLayout.FormLayout(self, _("Configuration"), Iconos.Finales())
         form.separador()
@@ -234,14 +233,14 @@ class WEndingsGTB(QTVarios.WDialogo):
             dic_vars["ORDER"] = order
             dic_vars["EXAMPLES_AUTO"] = examples_auto
             self.db.examples_auto = examples_auto
-            self.configuracion.escVariables("endingsGTB", dic_vars)
+            self.configuration.escVariables("endingsGTB", dic_vars)
 
     def set_key(self, key):
         self.key = self.db.test_tipo(key)
-        dic = self.configuracion.leeVariables("endingsGTB")
+        dic = self.configuration.leeVariables("endingsGTB")
         order = dic.get("ORDER", "difficulty")
         dic["KEY"] = self.key
-        self.configuracion.escVariables("endingsGTB", dic)
+        self.configuration.escVariables("endingsGTB", dic)
         num_positions = self.db.read_key(self.key, order)
         self.grid.refresh()
 
@@ -267,64 +266,64 @@ class WEndingsGTB(QTVarios.WDialogo):
             self.act_recno = -1
             self.game = Game.Game()
 
-        self.tablero.setposition(self.game.first_position)
+        self.board.set_position(self.game.first_position)
 
     def grid_num_datos(self, grid):
         return self.db.current_num_fens()
 
-    def grid_dato(self, grid, fila, ocol):
-        clave = ocol.clave
-        if clave == "NUM":
-            return str(fila + 1)
+    def grid_dato(self, grid, row, ocol):
+        key = ocol.key
+        if key == "NUM":
+            return str(row + 1)
         else:
-            data = self.db.current_fen_field(fila, ocol.clave, None)
+            data = self.db.current_fen_field(row, ocol.key, None)
             if data is None:
                 return ""
-            if clave == "MATE":
-                tok = self.db.current_fen_field(fila, "TRIES_OK")
-                tr = self.db.current_fen_field(fila, "TRIES")
+            if key == "MATE":
+                tok = self.db.current_fen_field(row, "TRIES_OK")
+                tr = self.db.current_fen_field(row, "TRIES")
                 if data == 0:
                     return _("Draw")
                 else:
                     return str((data + 1) // 2)
-            elif clave == "TIMEMS":
-                mt = self.db.current_fen_field(fila, "MATE")
+            elif key == "TIMEMS":
+                mt = self.db.current_fen_field(row, "MATE")
                 if mt == 0:
-                    moves = self.db.current_fen_field(fila, "MOVES")
+                    moves = self.db.current_fen_field(row, "MOVES")
                 else:
                     moves = (mt + 1) // 2
                 factor = data / (moves * 1000)
                 return "%.1f (%.1f)" % (data / 1000, factor)
 
-            elif clave == "TRIES":
-                tok = self.db.current_fen_field(fila, "TRIES_OK")
+            elif key == "TRIES":
+                tok = self.db.current_fen_field(row, "TRIES_OK")
                 return "%d/%d" % (data, tok)
             return str(data)
 
-    def grid_cambiado_registro(self, grid, fila, columna):
-        if fila >= 0:
+    def grid_cambiado_registro(self, grid, row, column):
+        if row >= 0:
             self.reset()
             self.play()
 
-    def grid_bold(self, grid, fila, oColumna):
-        return fila == self.act_recno
+    def grid_bold(self, grid, row, o_column):
+        return row == self.act_recno
 
-    def grid_color_fondo(self, grid, fila, oColumna):
-        tok = self.db.current_fen_field(fila, "TRIES_OK")
+    def grid_color_fondo(self, grid, row, o_column):
+        tok = self.db.current_fen_field(row, "TRIES_OK")
         if tok > 0:
-            mt = self.db.current_fen_field(fila, "MATE")
-            if mt == 0 or ((mt + 1) // 2 == self.db.current_fen_field(fila, "MOVES")):
+            mt = self.db.current_fen_field(row, "MATE")
+            if mt == 0 or ((mt + 1) // 2 == self.db.current_fen_field(row, "MOVES")):
                 return self.color_done
 
-    def grid_doble_click(self, grid, fila, oColumna):
+    def grid_doble_click(self, grid, row, o_column):
         self.play()
 
-    def grid_boton_derecho(self, grid, fila, oColumna, modif):
+    def grid_boton_derecho(self, grid, row, o_column, modif):
         menu = QTVarios.LCMenu(self)
         menu.opcion("reset", _("Reset data to 0"), Iconos.Delete())
         resp = menu.lanza()
         if resp == "reset":
-            self.db.reset_data_pos(fila)
+            self.db.reset_data_pos(row)
             self.grid.refresh()
 
     def terminar(self):
@@ -356,7 +355,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         resp = menu.lanza()
         if resp:
             self.set_key(resp)
-            self.tablero.activaColor(self.game.last_position.is_white)
+            self.board.activate_side(self.game.last_position.is_white)
 
     def sigueHumano(self):
         ended, go_next = self.test_final()
@@ -364,12 +363,12 @@ class WEndingsGTB(QTVarios.WDialogo):
             if go_next:
                 self.play_next()
             return
-        self.tablero.activaColor(self.game.last_position.is_white)
+        self.board.activate_side(self.game.last_position.is_white)
         self.test_help()
 
     def test_final(self):
         if self.game.is_finished():
-            self.tablero.disable_all()
+            self.board.disable_all()
             self.playing = False
             recno = self.grid.recno()
             ok, mensaje = self.db.register_try(recno, self.game, self.ms, self.moves, self.is_helped)
@@ -411,19 +410,19 @@ class WEndingsGTB(QTVarios.WDialogo):
             return
         move = random.choice(lista)
         from_sq, to_sq, promotion = move[:2], move[2:4], move[4:]
-        siBien, mens, move = Move.dameJugada(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.game.add_move(move)
         for movim in move.liMovs:
             if movim[0] == "b":
-                self.tablero.borraPieza(movim[1])
+                self.board.borraPieza(movim[1])
             elif movim[0] == "m":
-                self.tablero.muevePieza(movim[1], movim[2])
+                self.board.muevePieza(movim[1], movim[2])
             elif movim[0] == "c":
-                self.tablero.cambiaPieza(movim[1], movim[2])
+                self.board.cambiaPieza(movim[1], movim[2])
         self.timer = time.time()
         self.sigueHumano()
 
-    def mueve_humano(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=None):
         if self.timer:
             self.ms += int((time.time() - self.timer) * 1000)
         self.moves += 1
@@ -433,17 +432,17 @@ class WEndingsGTB(QTVarios.WDialogo):
 
         # Peon coronando
         if not promotion and self.game.last_position.siPeonCoronando(from_sq, to_sq):
-            promotion = self.tablero.peonCoronando(self.game.last_position.is_white)
+            promotion = self.board.peonCoronando(self.game.last_position.is_white)
             if promotion is None:
                 self.sigueHumano()
                 return False
         if promotion:
             movimiento += promotion
 
-        ok, self.error, move = Move.dameJugada(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        ok, self.error, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         if ok:
             self.game.add_move(move)
-            self.tablero.setposition(move.position)
+            self.board.set_position(move.position)
             self.sigueMaquina()
             return True
         else:
@@ -456,7 +455,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         fen = self.game.last_position.fen()
         lif = [x[:2] for x in self.t4.best_mvs(fen)]
         if lif:
-            self.tablero.ponFlechaSCvar(lif, opacidad=1.0)
+            self.board.put_arrow_scvar(lif, opacidad=1.0)
 
     def pon_position(self):
         if self.pos_game == -1:
@@ -466,11 +465,11 @@ class WEndingsGTB(QTVarios.WDialogo):
         else:
             move = self.game.move(self.pos_game)
             position = move.position
-        self.tablero.setposition(position)
+        self.board.set_position(position)
 
         lif = [x[:2] for x in self.t4.best_mvs(position.fen())]
         if lif:
-            self.tablero.ponFlechaSCvar(lif, opacidad=1.0)
+            self.board.put_arrow_scvar(lif, opacidad=1.0)
             if (self.pos_game + 1) < len(self.game):
                 move = self.game.move(self.pos_game + 1)
                 ok = True
@@ -479,7 +478,7 @@ class WEndingsGTB(QTVarios.WDialogo):
                         ok = False
                         break
                 if ok:
-                    self.tablero.ponFlechaSC(move.from_sq, move.to_sq)
+                    self.board.put_arrow_sc(move.from_sq, move.to_sq)
 
     def mover_tiempo(self):
         if not self.replaying:
@@ -488,10 +487,10 @@ class WEndingsGTB(QTVarios.WDialogo):
         if self.pos_game == len(self.game):
             return
         self.pon_position()
-        QtCore.QTimer.singleShot(self.configuracion.x_interval_replay, self.mover_tiempo)
+        QtCore.QTimer.singleShot(self.configuration.x_interval_replay, self.mover_tiempo)
 
     def run_botones(self):
-        key = self.sender().clave
+        key = self.sender().key
         if key == "MoverTiempo":
             if self.replaying:
                 self.replaying = False
@@ -499,7 +498,7 @@ class WEndingsGTB(QTVarios.WDialogo):
                 self.replaying = True
                 self.pos_game = -1
                 self.pon_position()
-                QtCore.QTimer.singleShot(self.configuracion.x_interval_replay, self.mover_tiempo)
+                QtCore.QTimer.singleShot(self.configuration.x_interval_replay, self.mover_tiempo)
             return
         elif key == "MoverInicio":
             self.pos_game = -1
@@ -519,7 +518,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         submenu = menu.submenu(_("Import"), Iconos.Import8())
         submenu.opcion("examples", _("Examples"), Iconos.Gafas())
         submenu.separador()
-        submenu.opcion("pgn", _("PGN"), Iconos.Tablero())
+        submenu.opcion("pgn", _("PGN"), Iconos.Board())
         submenu.separador()
         submenu.opcion("database", _("Database"), Iconos.Database())
         submenu.separador()
@@ -566,7 +565,7 @@ class WEndingsGTB(QTVarios.WDialogo):
 
         self.mensaje_import(len(li))
         self.set_key(self.key)
-        self.tablero.activaColor(self.game.last_position.is_white)
+        self.board.activate_side(self.game.last_position.is_white)
 
     def mensaje_import(self, num):
         if num:
@@ -589,7 +588,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.import_lifens("pgn", li_fens, um)
 
     def import_db(self):
-        path_db = QTVarios.select_db(self, self.configuracion, True, False)
+        path_db = QTVarios.select_db(self, self.configuration, True, False)
         if not path_db:
             return
         um = QTUtil2.unMomento(self, _("Working..."))
@@ -620,7 +619,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             self.key = key
             self.mensaje_import(num)
             self.set_key(self.key)
-            self.tablero.activaColor(self.game.last_position.is_white)
+            self.board.activate_side(self.game.last_position.is_white)
 
     def import_fns(self):
         path_fich = QTUtil2.leeFichero(self, "", "*")
@@ -650,10 +649,10 @@ def train_gtb(procesador):
     w.exec_()
 
 
-class TableroEndings(Tablero.Tablero):
+class BoardEndings(Board.Board):
     def set_startup_control(self, startup_control):
         self.startup_control = startup_control
 
     def mousePressEvent(self, event):
         self.startup_control()
-        Tablero.Tablero.mousePressEvent(self, event)
+        Board.Board.mousePressEvent(self, event)

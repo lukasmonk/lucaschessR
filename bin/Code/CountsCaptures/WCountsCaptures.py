@@ -1,6 +1,6 @@
 import Code
 from Code import Util
-from Code.Databases import DBgames, PantallaDatabase
+from Code.Databases import DBgames, WindowDatabase
 from Code.QT import Colocacion, Columnas, Controles, Grid, Iconos, QTUtil2, QTVarios
 
 from Code.CountsCaptures import CountsCaptures, WRunCaptures, WRunCounts
@@ -8,15 +8,15 @@ from Code.CountsCaptures import CountsCaptures, WRunCaptures, WRunCounts
 
 class WCountsCaptures(QTVarios.WDialogo):
     def __init__(self, procesador, is_captures):
-        configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
         self.is_captures = is_captures
         if is_captures:
-            path = configuracion.file_captures()
+            path = self.configuration.file_captures()
             title = _("Captures and threats in a game")
             icon = Iconos.Captures()
             extconfig = "captures"
         else:
-            path = configuracion.file_counts()
+            path = self.configuration.file_counts()
             title = _("Count moves")
             icon = Iconos.Count()
             extconfig = "counts"
@@ -31,7 +31,7 @@ class WCountsCaptures(QTVarios.WDialogo):
         o_columns.nueva("CURRENT_MOVE", _("Current move"), 96, centered=True)
         o_columns.nueva("%", _("Success"), 90, centered=True)
         self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)
-        f = Controles.TipoLetra(puntos=configuracion.x_menu_points)
+        f = Controles.TipoLetra(puntos=self.configuration.x_menu_points)
         self.glista.ponFuente(f)
 
         li_acciones = (
@@ -45,6 +45,8 @@ class WCountsCaptures(QTVarios.WDialogo):
             None,
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
+            (_("Options"), Iconos.Opciones(), self.opciones),
+            None,
         )
         tb = QTVarios.LCTB(self, li_acciones)
 
@@ -56,7 +58,7 @@ class WCountsCaptures(QTVarios.WDialogo):
         self.restore_video(anchoDefecto=self.glista.anchoColumnas() + 20)
         self.glista.gotop()
 
-    def grid_doble_click(self, grid, fila, oColumna):
+    def grid_doble_click(self, grid, row, o_column):
         self.play()
 
     def repetir(self):
@@ -70,7 +72,7 @@ class WCountsCaptures(QTVarios.WDialogo):
         menu = QTVarios.LCMenu(self)
         menu.opcion("random", _("Random"), Iconos.SQL_RAW())
         menu.separador()
-        if not QTVarios.lista_db(Code.configuracion, True).is_empty():
+        if not QTVarios.lista_db(Code.configuration, True).is_empty():
             menu.opcion("db", _("Game in a database"), Iconos.Database())
             menu.separador()
         menu.opcion("pgn", _("Game in a pgn"), Iconos.Filtrar())
@@ -82,9 +84,9 @@ class WCountsCaptures(QTVarios.WDialogo):
         elif resp == "pgn":
             game = Code.procesador.select_1_pgn(self)
         elif resp == "db":
-            db = QTVarios.select_db(self, Code.configuracion, True, False)
+            db = QTVarios.select_db(self, Code.configuration, True, False)
             if db:
-                w = PantallaDatabase.WBDatabase(self, Code.procesador, db, False, True)
+                w = WindowDatabase.WBDatabase(self, Code.procesador, db, False, True)
                 resp = w.exec_()
                 if resp:
                     game = w.game
@@ -109,9 +111,9 @@ class WCountsCaptures(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.db)
 
-    def grid_dato(self, grid, fila, oColumna):
-        count_capture = self.db.count_capture(fila)
-        col = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        count_capture = self.db.count_capture(row)
+        col = o_column.key
         if col == "DATE":
             return Util.dtostr_hm(count_capture.date)
         elif col == "GAME":
@@ -142,3 +144,20 @@ class WCountsCaptures(QTVarios.WDialogo):
                 else:
                     w = WRunCounts.WRunCounts(self, self.db, count_capture)
                 w.exec_()
+
+    def opciones(self):
+        showall = self.configuration.x_captures_showall if self.is_captures else self.configuration.x_counts_showall
+        menu = QTVarios.LCMenu(self)
+        menu.opcion(True, _("Show all moves"), siChecked=showall)
+        menu.separador()
+        menu.opcion(False, _("Show last move"), siChecked=not showall)
+        showall = menu.lanza()
+        if showall is None:
+            return
+
+        if self.is_captures:
+            self.configuration.x_captures_showall = showall
+        else:
+            self.configuration.x_counts_showall = showall
+        self.configuration.graba()
+

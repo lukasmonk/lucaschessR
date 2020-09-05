@@ -1,7 +1,6 @@
 import datetime
 
 import Code
-from Code import Game, Util
 from Code.SQL import UtilSQL
 
 

@@ -1,21 +1,26 @@
-import collections
-
 import Code
 from Code import Util
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class ControlPGN:
-    def __init__(self, gestor):
-        self.gestor = gestor
-        self.siFigurines = Code.configuracion.x_pgn_withfigurines
-        # self.game = self.gestor.game
-        self.siMostrar = True
+    def __init__(self, manager):
+        self.manager = manager
+        self.with_figurines = Code.configuration.x_pgn_withfigurines
+        self.must_show = True
 
-    def numDatos(self):
-        if self.gestor.game:
-            n = len(self.gestor.game)
-            if self.gestor.game.if_starts_with_black:
+        self.pos_variation = None
+
+    @property
+    def variations_mode(self):
+        state = self.manager.state
+        game_type = self.manager.game_type
+        return game_type in (GT_ALONE,) or state == ST_ENDGAME
+
+    def num_rows(self):
+        if self.manager.game:
+            n = len(self.manager.game)
+            if self.manager.game.if_starts_with_black:
                 n += 1
             if n % 2 == 1:
                 n += 1
@@ -23,73 +28,50 @@ class ControlPGN:
         else:
             return 0
 
-    def soloJugada(self, fila, clave):
-        lj = self.gestor.game.li_moves
+    def only_move(self, row, key):
+        li_moves = self.manager.game.li_moves
 
-        pos = fila * 2
-        tam_lj = len(lj)
+        pos = row * 2
+        size_limoves = len(li_moves)
 
-        if clave == "BLANCAS":
-            if self.gestor.game.if_starts_with_black:
+        if key == "WHITE":
+            if self.manager.game.if_starts_with_black:
                 pos -= 1
         else:
-            if not self.gestor.game.if_starts_with_black:
+            if not self.manager.game.if_starts_with_black:
                 pos += 1
 
-        if 0 <= pos <= (tam_lj - 1):
-            return lj[pos]
+        if 0 <= pos <= (size_limoves - 1):
+            return li_moves[pos]
         else:
             return None
 
-    def dato(self, fila, clave):
-        if clave == "NUMERO":
-            return str(self.gestor.game.primeraJugada() + fila)
+    def dato(self, row, key):
+        if key == "NUMBER":
+            return str(self.manager.game.primeraJugada() + row)
 
-        move = self.soloJugada(fila, clave)
+        move = self.only_move(row, key)
         if move:
-            if self.siMostrar:
-                return move.pgnFigurinesSP() if self.siFigurines else move.pgn_translated()
+            if self.must_show:
+                return move.pgnFigurinesSP() if self.with_figurines else move.pgn_translated()
             else:
                 return "-"
         else:
             return " "
 
-    def conInformacion(self, fila, clave):
-        if clave == "NUMERO":
+    def analysis(self, row, key):
+        if key == "NUMBER":
             return None
-        move = self.soloJugada(fila, clave)
-        if move:
-            if move.in_the_opening or move.li_nags or move.comment or (len(move.varitions) > 0):
-                return move
-        return None
+        return self.only_move(row, key)
 
-    def analisis(self, fila, clave):
-        if clave == "NUMERO":
-            return None
-        return self.soloJugada(fila, clave)
-        # if move:
-        # return move.analysis
-        # else:
-        # return None
+    def mueve(self, row, is_white):
+        if_starts_with_black = self.manager.game.if_starts_with_black
 
-    def liVariantesPV(self, move):
-        li_resp = []
-        if len(move.variations) > 0:
-            for game in move.variations.list_games():
-                if len(game):
-                    move = game.move(0)
-                    li_resp.append((move.from_sq, move.to_sq))
-
-        return li_resp
-
-    def mueve(self, fila, is_white):
-        if_starts_with_black = self.gestor.game.if_starts_with_black
-
-        if fila == 0 and is_white and if_starts_with_black:
+        if row == 0 and is_white and if_starts_with_black:
             return
 
-        lj = self.gestor.game.li_moves
-        pos = fila * 2
+        lj = self.manager.game.li_moves
+        pos = row * 2
         if not is_white:
             pos += 1
         if if_starts_with_black:
@@ -98,62 +80,61 @@ class ControlPGN:
         tam_lj = len(lj)
         if tam_lj:
 
-            siUltimo = (pos + 1) >= tam_lj
-            if siUltimo:
+            is_last = (pos + 1) >= tam_lj
+            if is_last:
                 pos = tam_lj - 1
 
-            move = self.gestor.game.move(pos)
-            self.gestor.setposition(move.position)
+            move = self.manager.game.move(pos)
 
-            lipvvar = []
-            self.gestor.ponFlechaSC(move.from_sq, move.to_sq, lipvvar)
-
-            if siUltimo:
-                self.gestor.ponRevision(False)
-                if self.gestor.human_is_playing and self.gestor.state == ST_PLAYING:
-                    self.gestor.activaColor(self.gestor.is_human_side_white)
+            if is_last:
+                self.manager.set_position(move.position)
+                if self.manager.human_is_playing and self.manager.state == ST_PLAYING:
+                    self.manager.activate_side(self.manager.is_human_side_white)
             else:
-                self.gestor.ponRevision(self.gestor.state == ST_PLAYING)
-                self.gestor.disable_all()
-            self.gestor.refresh()
+                if self.variations_mode:
+                    self.manager.set_position(move.position, variation_history=str(pos))
+                else:
+                    self.manager.set_position(move.position)
+                    self.manager.disable_all()
 
-    def move(self, fila, clave):
-        is_white = clave != "NEGRAS"
+            self.manager.put_arrow_sc(move.from_sq, move.to_sq)
+            self.manager.refresh()
 
-        pos = fila * 2
+    def move(self, row, key):
+        is_white = key != "BLACK"
+
+        pos = row * 2
         if not is_white:
             pos += 1
-        if self.gestor.game.if_starts_with_black:
+        if self.manager.game.if_starts_with_black:
             pos -= 1
-        tam_lj = len(self.gestor.game)
+        tam_lj = len(self.manager.game)
         if tam_lj == 0:
             return None, None
 
-        if pos >= len(self.gestor.game):
-            pos = len(self.gestor.game) - 1
+        if pos >= len(self.manager.game):
+            pos = len(self.manager.game) - 1
 
-        return pos, self.gestor.game.move(pos)
+        return pos, self.manager.game.move(pos)
 
     def actual(self):
-        tipoJuego = self.gestor.game_type
+        game_type = self.manager.game_type
 
-        if tipoJuego == GT_AGAINST_GM:
-            return self.actualGM()
-        elif tipoJuego in (GT_AGAINST_PGN, GT_ALONE, GT_ROUTES, GT_TURN_ON_LIGHTS, GT_NOTE_DOWN):
-            return self.gestor.actualPGN()
+        if game_type in (GT_AGAINST_PGN, GT_ALONE, GT_ROUTES, GT_TURN_ON_LIGHTS, GT_NOTE_DOWN, GT_AGAINST_GM):
+            return self.manager.current_pgn()
 
-        if tipoJuego == GT_BOOK:
-            rival = self.gestor.libro.name
-        elif tipoJuego in (GT_FICS, GT_FIDE):
-            rival = self.gestor.nombreObj
-        elif self.gestor.xrival:  # foncap change
-            rival = self.gestor.xrival.name  # foncap change
+        if game_type == GT_BOOK:
+            rival = self.manager.libro.name
+        elif game_type in (GT_FICS, GT_FIDE):
+            rival = self.manager.nombreObj
+        elif self.manager.xrival:  # foncap change
+            rival = self.manager.xrival.name  # foncap change
         else:  # foncap change
             rival = ""  # foncap change
 
-        player = self.gestor.configuracion.nom_player()
-        resultado = self.gestor.resultado
-        is_human_side_white = self.gestor.is_human_side_white
+        player = self.manager.configuration.nom_player()
+        resultado = self.manager.resultado
+        is_human_side_white = self.manager.is_human_side_white
 
         if resultado == RS_WIN_PLAYER:
             r = "1-0" if is_human_side_white else "0-1"
@@ -180,94 +161,40 @@ class ControlPGN:
         resp += '[Black "%s"]\n' % negras
         resp += '[Result "%s"]\n' % r
 
-        if self.gestor.fen:
-            resp += '[FEN "%s"]\n' % self.gestor.fen
+        if self.manager.fen:
+            resp += '[FEN "%s"]\n' % self.manager.fen
 
-        xrival = getattr(self.gestor, "xrival", None)
-        if xrival and not (tipoJuego in [GT_BOOK]):
+        xrival = getattr(self.manager, "xrival", None)
+        if xrival and not (game_type in [GT_BOOK]):
             if xrival.motorProfundidad:
                 resp += '[Depth "%d"]\n' % xrival.motorProfundidad
 
             if xrival.motorTiempoJugada:
                 resp += '[TimeEngineMS "%d"]\n' % xrival.motorTiempoJugada
 
-            if self.gestor.categoria:
-                resp += '[Category "%s"]\n' % self.gestor.categoria.name()
+            if self.manager.categoria:
+                resp += '[Category "%s"]\n' % self.manager.categoria.name()
 
-        if not (tipoJuego in [GT_BOOK, GT_RESISTANCE]):
-            if self.gestor.ayudasPGN:
-                resp += '[Hints "%d"]\n' % self.gestor.ayudasPGN
+        if not (game_type in [GT_BOOK, GT_RESISTANCE]):
+            if self.manager.ayudasPGN:
+                resp += '[Hints "%d"]\n' % self.manager.ayudasPGN
 
-        if tipoJuego in (GT_ELO, GT_MICELO):
-            resp += '[WhiteElo "%d"]\n' % self.gestor.whiteElo
-            resp += '[BlackElo "%d"]\n' % self.gestor.blackElo
+        if game_type in (GT_ELO, GT_MICELO):
+            resp += '[WhiteElo "%d"]\n' % self.manager.whiteElo
+            resp += '[BlackElo "%d"]\n' % self.manager.blackElo
 
-        ap = self.gestor.game.opening
+        ap = self.manager.game.opening
         if ap:
             resp += '[ECO "%s"]\n' % ap.eco
             resp += '[Opening "%s"]\n' % ap.trNombre
 
-        dmore = getattr(self.gestor, "pgnLabelsAdded", None)
+        dmore = getattr(self.manager, "pgnLabelsAdded", None)
         if dmore:
             for k, v in dmore().items():
                 resp += '[%s "%s"]\n' % (k, v)
 
-        resp += "\n" + self.gestor.game.pgnBase()
+        resp += "\n" + self.manager.game.pgnBase()
         if not resp.endswith(r):
             resp += " %s" % r
 
         return resp
-
-    def actualGM(self):
-        gm = self.gestor.gm
-        motorGM = self.gestor.motorGM
-
-        partidaGM = motorGM.getLastGame()
-
-        if partidaGM:
-            event = partidaGM.event
-            oponent = partidaGM.oponent
-            fecha = partidaGM.date
-            result = partidaGM.result
-        else:
-            event = "?"
-            oponent = "?"
-            fecha = "????.??.??"
-            result = "*"
-
-        if self.gestor.is_white:
-            blancas = gm
-            negras = oponent
-        else:
-            blancas = oponent
-            negras = gm
-
-        resp = '[Event "%s"]\n' % event
-        resp += '[Date "%s"]\n' % fecha
-        resp += '[White "%s"]\n' % blancas
-        resp += '[Black "%s"]\n' % negras
-        resp += '[Result "%s"]\n' % result.strip()
-
-        ap = self.gestor.game.opening
-        if ap:
-            resp += '[ECO "%s"]\n' % ap.eco
-            resp += '[Opening "%s"]\n' % ap.trNombre
-
-        resp += "\n" + self.gestor.game.pgnBase() + " " + result.strip()
-
-        return resp
-
-    def dicCabeceraActual(self):
-        resp = self.actual()
-        dic = collections.OrderedDict()
-        for linea in resp.split("\n"):
-            linea = linea.strip()
-            if linea.startswith("["):
-                li = linea.split('"')
-                if len(li) == 3:
-                    clave = li[0][1:].strip()
-                    valor = li[1]
-                    dic[clave] = valor
-            else:
-                break
-        return dic

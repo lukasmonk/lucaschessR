@@ -1,7 +1,7 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
-from Code import Position
+from Code.Base import Position
 from Code.Engines import EngineRun
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -9,7 +9,7 @@ from Code.QT import Iconos
 from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.QT import Tablero
+from Code.Board import Board
 from Code.QT import Delegados
 
 
@@ -24,7 +24,7 @@ class WStEval(QtWidgets.QDialog):
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.siShowTablero = dicVideo.get("SHOW_TABLERO", True)
+        self.siShowBoard = dicVideo.get("SHOW_BOARD", True)
         self.position = Position.Position()
 
         self.fen = ""
@@ -45,15 +45,15 @@ class WStEval(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuracion = cpu.configuracion
+        Code.configuration = cpu.configuration
 
         Code.todasPiezas = Piezas.TodasPiezas()
-        config_board = cpu.configuracion.config_board("kib" + cpu.kibitzer.huella, 24)
-        self.tablero = Tablero.Tablero(self, config_board)
-        self.tablero.crea()
-        Delegados.generaPM(self.tablero.piezas)
+        config_board = cpu.configuration.config_board("kib" + cpu.kibitzer.huella, 24)
+        self.board = Board.Board(self, config_board)
+        self.board.crea()
+        Delegados.generaPM(self.board.piezas)
 
-        self.em = Controles.EM(self, siHTML=False).soloLectura()
+        self.em = Controles.EM(self, siHTML=False).read_only()
         f = Controles.TipoLetra(name="Courier New", puntos=10)
         self.em.ponFuente(f)
 
@@ -61,17 +61,17 @@ class WStEval(QtWidgets.QDialog):
             (_("Quit"), Iconos.Kibitzer_Terminar(), self.terminar),
             (_("Continue"), Iconos.Kibitzer_Continuar(), self.play),
             (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
-            (_("Board"), Iconos.Tablero(), self.config_board),
+            (_("Board"), Iconos.Board(), self.config_board),
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, siTexto=False, tamIcon=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
         self.tb.setAccionVisible(self.play, False)
 
         ly1 = Colocacion.H().control(self.tb)
         ly2 = Colocacion.V().otro(ly1).control(self.em)
 
-        layout = Colocacion.H().control(self.tablero).otro(ly2)
+        layout = Colocacion.H().control(self.board).otro(ly2)
         self.setLayout(layout)
 
         self.engine = self.lanzaMotor()
@@ -80,8 +80,8 @@ class WStEval(QtWidgets.QDialog):
         self.timer.timeout.connect(self.cpu.compruebaInput)
         self.timer.start(200)
 
-        if not self.siShowTablero:
-            self.tablero.hide()
+        if not self.siShowBoard:
+            self.board.hide()
         self.restore_video(dicVideo)
         self.ponFlags()
 
@@ -163,7 +163,7 @@ class WStEval(QtWidgets.QDialog):
         tam = self.size()
         dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
 
-        dic["SHOW_TABLERO"] = self.siShowTablero
+        dic["SHOW_BOARD"] = self.siShowBoard
 
         dic["SITOP"] = self.siTop
 
@@ -202,18 +202,18 @@ class WStEval(QtWidgets.QDialog):
     def config_board(self):
         self.pause()
         menu = QTVarios.LCMenu(self)
-        if self.siShowTablero:
+        if self.siShowBoard:
             menu.opcion("hide", _("Hide"), Iconos.PuntoNaranja())
         else:
             menu.opcion("show", _("Show"), Iconos.PuntoNaranja())
         resp = menu.lanza()
         if resp:
             if resp == "hide":
-                self.siShowTablero = False
-                self.tablero.hide()
+                self.siShowBoard = False
+                self.board.hide()
             elif resp == "show":
-                self.siShowTablero = True
-                self.tablero.show()
+                self.siShowBoard = True
+                self.board.show()
             self.save_video()
         self.play()
 
@@ -230,7 +230,7 @@ class WStEval(QtWidgets.QDialog):
         if fen:
             position = Position.Position()
             position.read_fen(fen)
-            self.tablero.setposition(position)
+            self.board.set_position(position)
             if self.fen and fen != self.fen:
                 txt = self.em.texto()
                 if self.fen and txt:
@@ -248,4 +248,4 @@ class WStEval(QtWidgets.QDialog):
                 if ok:
                     txt = "".join(li)
 
-        self.em.ponTexto(txt)
+        self.em.set_text(txt)

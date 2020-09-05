@@ -17,18 +17,27 @@ dicNG = {}
 
 def generaPM(piezas):
     dicPM["V"] = Iconos.pmComentario()
-    dicPM["R"] = Iconos.pmApertura()
+    dicPM["R"] = Iconos.pmOpening()
     dicPM["M"] = Iconos.pmComentarioMas()
-    dicPM["S"] = Iconos.pmAperturaComentario()
+    dicPM["S"] = Iconos.pmOpeningComentario()
+
+    dicPM["O"] = Iconos.pmOpening()
+    dicPM["C"] = Iconos.pmComment()
+    dicPM["V"] = Iconos.pmVariation()
+    dicPM["OC"] = Iconos.pmOpeningComment()
+    dicPM["OV"] = Iconos.pmOpeningVariation()
+    dicPM["VC"] = Iconos.pmVariationComment()
+    dicPM["OVC"] = Iconos.pmOpeningVariationComment()
+
     for k in "KQRNBkqrnb":
         dicPZ[k] = piezas.render(k)
 
-    carpNAGs = Code.path_resource("IntFiles", "NAGs")
-    for f in os.listdir(carpNAGs):
+    nags_folder = Code.path_resource("IntFiles", "NAGs")
+    for f in os.listdir(nags_folder):
         if f.endswith(".svg") and f.startswith("$") and len(f) > 5:
             nag = f[1:-4]
             if nag.isdigit():
-                fsvg = carpNAGs + "/" + f
+                fsvg = nags_folder + "/" + f
                 dicNG[nag] = QtSvg.QSvgRenderer(fsvg)
 
 
@@ -121,8 +130,8 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
         self.siFondo = siFondo
         QtWidgets.QStyledItemDelegate.__init__(self, None)
 
-    def setWhite(self, isWhite):
-        self.is_white = isWhite
+    def setWhite(self, is_white):
+        self.is_white = is_white
 
     def rehazPosicion(self):
         position = self.bloquePieza.position
@@ -131,20 +140,20 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
     def paint(self, painter, option, index):
         data = index.model().data(index, QtCore.Qt.DisplayRole)
         if type(data) == tuple:
-            pgn, color, info, indicadorInicial, liNAGs = data
-            if liNAGs:
+            pgn, color, info, indicadorInicial, li_nags = data
+            if li_nags:
                 li = []
                 st = set()
-                for x in liNAGs:
+                for x in li_nags:
                     x = str(x)
                     if x in st:
                         continue
                     st.add(x)
                     if x in dicNG:
                         li.append(dicNG[x])
-                liNAGs = li
+                li_nags = li
         else:
-            pgn, color, info, indicadorInicial, liNAGs = data, None, None, None, None
+            pgn, color, info, indicadorInicial, li_nags = data, None, None, None, None
 
         iniPZ = None
         finPZ = None
@@ -177,7 +186,7 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
 
         if option.state & QtWidgets.QStyle.State_Selected:
             painter.fillRect(
-                rect, QtGui.QColor(Code.configuracion.pgn_selbackground())
+                rect, QtGui.QColor(Code.configuration.pgn_selbackground())
             )  # sino no se ve en CDE-Motif-Windows
         elif self.siFondo:
             fondo = index.model().getFondo(index)
@@ -215,8 +224,8 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
             ancho += wpz + salto_finPZ
         if info:
             ancho += wINFO
-        if liNAGs:
-            ancho += wpz * len(liNAGs)
+        if li_nags:
+            ancho += wpz * len(li_nags)
 
         x = xTotal + (wTotal - ancho) / 2
         if self.siAlineacion:
@@ -226,6 +235,7 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
             elif alineacion == "d":
                 x = xTotal + (wTotal - ancho - 3)
 
+        x = xTotal + 20
         y = yTotal + (hTotal - hPGN * 0.9) / 2
 
         if iniPZ:
@@ -259,8 +269,8 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
             painter.restore()
             x += wINFO
 
-        if liNAGs:
-            for rndr in liNAGs:
+        if li_nags:
+            for rndr in li_nags:
                 painter.save()
                 painter.translate(x - 0.2 * wpz, y)
                 pmRect = QtCore.QRectF(0, 0, hx, hx)
@@ -439,8 +449,8 @@ class MultiEditor(QtWidgets.QItemDelegate):
 
 
 class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
-    def __init__(self, siFigurines, siFondo=False, siLineas=True):
-        self.si_figurines_pgn = siFigurines
+    def __init__(self, with_figurines, siFondo=False, siLineas=True):
+        self.si_figurines_pgn = with_figurines
         self.siAlineacion = False
         self.siLineas = siLineas
         self.siFondo = siFondo
@@ -452,18 +462,18 @@ class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         data = index.model().data(index, QtCore.Qt.DisplayRole)
-        pgn, is_white, color, info, indicadorInicial, liNAGs, agrisar, siLine = data
-        if liNAGs:
+        pgn, is_white, color, info, indicadorInicial, li_nags, agrisar, siLine = data
+        if li_nags:
             li = []
             st = set()
-            for x in liNAGs:
+            for x in li_nags:
                 x = str(x)
                 if x in st:
                     continue
                 st.add(x)
                 if x in dicNG:
                     li.append(dicNG[x])
-            liNAGs = li
+            li_nags = li
 
         iniPZ = None
         finPZ = None
@@ -486,7 +496,7 @@ class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
         y0 = rect.y()
         if option.state & QtWidgets.QStyle.State_Selected:
             painter.fillRect(
-                rect, QtGui.QColor(Code.configuracion.pgn_selbackground())
+                rect, QtGui.QColor(Code.configuration.pgn_selbackground())
             )  # sino no se ve en CDE-Motif-Windows
         elif self.siFondo:
             fondo = index.model().getFondo(index)
@@ -527,8 +537,8 @@ class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
             ancho += wpz
         if info:
             ancho += wINFO
-        if liNAGs:
-            ancho += wpz * len(liNAGs)
+        if li_nags:
+            ancho += wpz * len(li_nags)
 
         x = x0 + (width - ancho) / 2
         if self.siAlineacion:
@@ -571,8 +581,8 @@ class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
             painter.restore()
             x += wINFO
 
-        if liNAGs:
-            for rndr in liNAGs:
+        if li_nags:
+            for rndr in li_nags:
                 painter.save()
                 painter.translate(x - 0.2 * wpz, y)
                 pmRect = QtCore.QRectF(0, 0, hx, hx)

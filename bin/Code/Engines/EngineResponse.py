@@ -1,8 +1,7 @@
 import random
 
-from Code import Position
-from Code import Game
-from Code.Constantes import *
+from Code.Base import Game, Position
+from Code.Base.Constantes import *
 
 
 class EngineResponse:
@@ -423,7 +422,7 @@ class MultiEngineResponse:
             if not rm.mate:  # stockfish mate 0
                 rm.mate = -1
 
-    def agregaRM(self, rm):  # Para los analisis MultiPV donde no han considerado una move
+    def agregaRM(self, rm):  # Para los analysis MultiPV donde no han considerado una move
         n = 1
         while True:
             if not (str(n) in self.dicMultiPV):
@@ -650,7 +649,7 @@ class MultiEngineResponse:
         dbg = x("DEBUG")
         if dbg:
             fdbg = open(dbg, "at", encoding="utf-8", errors="ignore")
-            fdbg.write("\n%s\n" % cp.tablero())
+            fdbg.write("\n%s\n" % cp.board())
             dpr = _("In the expected moves")
         else:
             fdbg = None
@@ -1070,7 +1069,7 @@ class MultiEngineResponse:
                 elif dif < minpuntos:  # primeras depths ya se sabia que era buena move
                     return
 
-    def set_nag_color(self, configuracion, rm):
+    def set_nag_color(self, configuration, rm):
         # NAG_1=Jugada buena NAG_2=Jugada mala NAG_3=Muy buena move NAG_4=Muy mala move
         NORMAL, GOOD, BAD, VERYGOOD, VERYBAD = range(5)
         if rm.level_brilliant():
@@ -1078,7 +1077,7 @@ class MultiEngineResponse:
         mj_pts = self.li_rm[0].centipawns_abs()
         rm_pts = rm.centipawns_abs()
         nb = mj_pts - rm_pts
-        perf = configuracion.perfomance
+        perf = configuration.perfomance
         if nb:
             if nb > perf.very_bad_lostp:
                 return VERYBAD, VERYBAD

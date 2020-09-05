@@ -5,7 +5,8 @@ from PySide2 import QtCore
 import FasterCode
 
 import Code
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, Tablero, QTUtil2
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
+from Code.Board import Board
 
 from Code.CountsCaptures import WRunCommon
 
@@ -15,19 +16,19 @@ class WRunCaptures(QTVarios.WDialogo):
 
         QTVarios.WDialogo.__init__(self, owner, _("Captures and threats in a game"), Iconos.Captures(), "runcaptures")
 
-        self.configuracion = Code.configuracion
+        self.configuration = Code.configuration
         self.capture = capture
         self.db_captures = db_captures
 
-        conf_board = self.configuracion.config_board("RUNCAPTURES", 64)
+        conf_board = self.configuration.config_board("RUNCAPTURES", 64)
 
-        self.board = Tablero.TableroEstaticoMensaje(self, conf_board, None)
+        self.board = Board.BoardEstaticoMensaje(self, conf_board, None)
         self.board.crea()
 
         # Rotulo informacion
         self.lb_info_game = Controles.LB(
             self, self.capture.game.titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")
-        ).ponTipoLetra(puntos=self.configuracion.x_pgn_fontpoints)
+        ).ponTipoLetra(puntos=self.configuration.x_pgn_fontpoints)
 
         # Movimientos
         self.liwm_captures = []
@@ -39,7 +40,7 @@ class WRunCaptures(QTVarios.WDialogo):
             self.liwm_captures.append(wm)
             ly.control(wm, f, c)
 
-        self.gb_captures = Controles.GB(self, _("Captures"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=75))
+        self.gb_captures = Controles.GB(self, _("Captures"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=750))
 
         self.liwm_threats = []
         ly = Colocacion.G().margen(4)
@@ -50,11 +51,11 @@ class WRunCaptures(QTVarios.WDialogo):
             self.liwm_threats.append(wm)
             ly.control(wm, f, c)
 
-        self.gb_threats = Controles.GB(self, _("Threats"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=75))
+        self.gb_threats = Controles.GB(self, _("Threats"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=750))
 
-        self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).ponWrap()
+        self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).set_wrap()
         self.lb_info = (
-            Controles.LB(self).ponTipoLetra(puntos=14, peso=500).anchoFijo(254).ponColorFondoN("white", "#496075").alinCentrado()
+            Controles.LB(self).anchoFijo(254).set_foreground_backgound("white", "#496075").align_center().ponTipoLetra(puntos=14, peso=500)
         )
 
         # Botones
@@ -65,7 +66,7 @@ class WRunCaptures(QTVarios.WDialogo):
             (_("Check"), Iconos.Check(), self.check),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
-        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, tamIcon=32)
+        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, icon_size=32)
         self.show_tb(self.terminar, self.begin)
 
         ly_right = (
@@ -105,17 +106,17 @@ class WRunCaptures(QTVarios.WDialogo):
     def set_position(self):
         self.move_base = self.capture.game.move(self.capture.current_posmove)
         self.move_obj = self.capture.game.move(self.capture.current_posmove + self.capture.current_depth)
-        self.board.setposition(self.move_base.position_before)
+        self.board.set_position(self.move_base.position_before)
 
     def pon_info_posic(self):
-        self.lb_info.ponTexto(
+        self.lb_info.set_text(
             "%d+%d / %d"
             % (self.capture.current_posmove + 1, self.capture.current_depth, len(self.capture.game), )
         )
 
     def pulsada_celda(self, celda):
         if self.ultimaCelda:
-            self.ultimaCelda.ponTexto(celda)
+            self.ultimaCelda.set_text(celda)
 
             ucld = self.ultimaCelda
             for liwm in (self.liwm_captures, self.liwm_threats):
@@ -146,8 +147,9 @@ class WRunCaptures(QTVarios.WDialogo):
         self.reject()
 
     def show_tb(self, *lista):
-        for opc in self.tb.dicTB:
+        for opc in self.tb.dic_toolbar:
             self.tb.setAccionVisible(opc, opc in lista)
+        self.tb.setEnabled(True)
         QTUtil.refresh_gui()
 
     def begin(self):
@@ -155,21 +157,24 @@ class WRunCaptures(QTVarios.WDialogo):
 
     def seguir(self):
         self.set_position()
-        self.lb_result.ponTexto("")
+        self.lb_result.set_text("")
         for wm in self.liwm_captures:
             wm.limpia()
         for wm in self.liwm_threats:
             wm.limpia()
 
-        self.show_tb()
+        self.tb.setEnabled(False)
 
         # Mostramos los movimientos según depth
         depth = self.capture.current_depth
         if depth:
             txt_ant = ""
             for x in range(depth):
+                if not self.configuration.x_captures_showall:
+                    if x != depth - 1:
+                        continue
                 move = self.capture.game.move(self.capture.current_posmove + x)
-                txt = move.pgnBaseSP()
+                txt = move.pgn_translated()
                 if txt == txt_ant:
                     self.board.pon_texto("", 1)
                     QTUtil.refresh_gui()
@@ -237,8 +242,8 @@ class WRunCaptures(QTVarios.WDialogo):
                 self.db_captures.change_count_capture(self.capture)
                 self.terminar()
                 return
-            self.lb_result.ponTexto("%s (%d)" % (_("Right, go to the next level of depth"), self.capture.current_depth))
-            self.lb_result.ponColorN("green")
+            self.lb_result.set_text("%s (%d)" % (_("Right, go to the next level of depth"), self.capture.current_depth))
+            self.lb_result.set_foreground("green")
 
         else:
             if self.capture.current_depth >= 1:
@@ -246,14 +251,14 @@ class WRunCaptures(QTVarios.WDialogo):
                 if self.capture.current_posmove < 0:
                     self.capture.current_posmove = 0
                 self.capture.current_depth = 0
-                self.lb_result.ponTexto(
+                self.lb_result.set_text(
                     "%s (%d)" % (_("Wrong, you advance to the last position solved"), self.capture.current_posmove + 1)
                 )
-                self.lb_result.ponColorN("red")
+                self.lb_result.set_foreground("red")
             else:
-                self.lb_result.ponTexto(_("Wrong, you must repeat this position"))
-                self.lb_result.ponColorN("red")
-            self.board.setposition(position_obj)
+                self.lb_result.set_text(_("Wrong, you must repeat this position"))
+                self.lb_result.set_foreground("red")
+            self.board.set_position(position_obj)
 
         self.db_captures.change_count_capture(self.capture)
         self.pon_info_posic()

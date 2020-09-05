@@ -395,11 +395,11 @@ class DBWorkMap(SQLBase.DBBase):
             self.conexion.commit()
             cursor.close()
 
-    def numDatos(self):
+    def num_rows(self):
         return len(self.listaRaws)
 
-    def dato(self, fila, key):
-        return self.listaRaws[fila][key]
+    def dato(self, row, key):
+        return self.listaRaws[row][key]
 
     def releer(self):
         cursor = self.conexion.cursor()
@@ -433,8 +433,8 @@ class DBWorkMap(SQLBase.DBBase):
         cursor.close()
         return raw
 
-    def activaROWID(self, fila):
-        rowid = self.listaRaws[fila]["ROWID"]
+    def activaROWID(self, row):
+        rowid = self.listaRaws[row]["ROWID"]
         cursor = self.conexion.cursor()
         cursor.execute("UPDATE %s SET ACTIVE=0" % self.tabla)
         self.conexion.commit()
@@ -495,7 +495,7 @@ class WorkMap:
 
         self.svg, self.lineasSVG = self.leeSVG()
 
-        self.db = DBWorkMap("%s/%s.db" % (Code.configuracion.carpeta_results, mapa))
+        self.db = DBWorkMap("%s/%s.db" % (Code.configuration.carpeta_results, mapa))
 
         self.current = None
         self.aim = None
@@ -607,17 +607,17 @@ class WorkMap:
 
         self.resetListaGrid()
 
-    def numDatos(self):
+    def num_rows(self):
         return len(self.listaGrid)
 
-    def dato(self, fila, columna):
-        if columna == "TIPO":
-            return "5" if self.listaGrid[fila].donePV else "1"  # 5 = Azul 1 = Gris
+    def dato(self, row, column):
+        if column == "TIPO":
+            return "5" if self.listaGrid[row].donePV else "1"  # 5 = Azul 1 = Gris
         else:
-            return self.listaGrid[fila].name
+            return self.listaGrid[row].name
 
-    def setAimFila(self, fila):
-        self.aim = self.listaGrid[fila].iso
+    def setAimFila(self, row):
+        self.aim = self.listaGrid[row].iso
         siHecho = self.isoHecho(self.aim)
         if siHecho:
             self.current = self.aim
@@ -698,8 +698,8 @@ class WorkMap:
     def endDate(self):
         return str(self.DEND) if self.DEND else ""
 
-    def activaRowID(self, fila):
-        self.db.activaROWID(fila)
+    def activaRowID(self, row):
+        self.db.activaROWID(row)
         self.dataActivo()
 
     def genSTS(self):

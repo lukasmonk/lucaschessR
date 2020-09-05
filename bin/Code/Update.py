@@ -121,5 +121,5 @@ def test_update(current_version, procesador):
     if nresp == 1:
         procesador.actualiza()
     elif nresp == 3:
-        procesador.configuracion.x_check_for_update = False
-        procesador.configuracion.graba()
+        procesador.configuration.x_check_for_update = False
+        procesador.configuration.graba()

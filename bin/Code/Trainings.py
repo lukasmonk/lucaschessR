@@ -9,31 +9,29 @@ from Code.QT import Controles
 from Code import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
-from Code.Constantes import *
+from Code.Base.Constantes import *
 from Code import Resistance
-from Code import GestorFindAllMoves
-from Code import GestorResistance
-from Code import GestorTurnOnLights
-from Code import GestorGM
-from Code import GestorMate
-from Code import TurnOnLights
-from Code import Memoria
+from Code import ManagerFindAllMoves
+from Code import ManagerResistance
+from Code.TurnOnLights import ManagerTurnOnLights, WindowTurnOnLights
+from Code.GM import ManagerGM, WindowGM
+from Code import ManagerMate
+from Code.TurnOnLights import TurnOnLights
+from Code import Memory
 from Code import CompetitionWithTutor
 from Code.QT import WCompetitionWithTutor
 from Code.QT import Iconos
-from Code.QT import PantallaBMT
-from Code.QT import PantallaResistance
-from Code.QT import PantallaDailyTest
-from Code.QT import PantallaEverest
-from Code.QT import PantallaGM
-from Code.QT import PantallaHorses
-from Code.QT import PantallaLearnPGN
-from Code.QT import PantallaPotencia
-from Code.QT import PantallaPuente
-from Code.QT import PantallaVisualiza
-from Code.QT import PantallaTurnOnLights
+from Code.QT import WindowBMT
+from Code.QT import WindowResistance
+from Code.QT import WindowDailyTest
+from Code.QT import WindowEverest
+from Code.QT import WindowHorses
+from Code.QT import WindowLearnPGN
+from Code.QT import WindowPotencia
+from Code.QT import WindowPuente
+from Code.QT import WindowVisualiza
 from Code.CountsCaptures import WCountsCaptures
-from Code.Tactics import Tactics, GestorTacticas, PantallaTacticas
+from Code.Tactics import Tactics, ManagerTactics, WindowTactics
 from Code.Mate15 import WMate15
 from Code.Coordinates import WCoordinatesBlocks, WCoordinatesBasic
 
@@ -98,14 +96,14 @@ class Entrenamientos:
     def __init__(self, procesador):
         self.procesador = procesador
         self.parent = procesador.main_window
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
         self.menu = None
         self.dicMenu = None
 
-    def menuFNS(self, menu, rotulo, xopcion):
+    def menuFNS(self, menu, label, xopcion):
         td = TrainingDir(Code.path_resource("Trainings"))
-        td.addOtherFolder(self.procesador.configuracion.dirPersonalTraining)
-        bmenu = menu.submenu(rotulo, Iconos.Carpeta())
+        td.addOtherFolder(self.procesador.configuration.personal_training_folder)
+        bmenu = menu.submenu(label, Iconos.Carpeta())
         td.reduce()  # Elimina carpetas vacias
         td.menu(bmenu, xopcion)
 
@@ -113,7 +111,7 @@ class Entrenamientos:
         dicMenu = {}
         menu = QTVarios.LCMenu(self.parent)
 
-        talpha = Controles.TipoLetra("Chess Alpha 2", self.configuracion.x_menu_points + 4)
+        talpha = Controles.TipoLetra("Chess Alpha 2", self.configuration.x_menu_points + 4)
 
         def xopcion(menu, key, texto, icono, is_disabled=False):
             if "KP" in texto:
@@ -187,7 +185,7 @@ class Entrenamientos:
 
         menu_tacticas(menu1, TACTICS_BASIC, Code.path_resource("Tactics"), [])
         lista = []
-        carpetaTacticasP = os.path.join(self.configuracion.dirPersonalTraining, "Tactics")
+        carpetaTacticasP = self.configuration.folder_tactics()
         if os.path.isdir(carpetaTacticasP):
             submenu1 = menu1.submenu(_("Personal tactics"), nico.otro())
             lista = menu_tacticas(submenu1, TACTICS_PERSONAL, carpetaTacticasP, lista)
@@ -244,7 +242,7 @@ class Entrenamientos:
         # menu1 = menu.submenu(_("Resources for zebras"), Iconos.Cebra())
         menu2 = menu.submenu(_("Check your memory on a chessboard"), Iconos.Memoria())
 
-        mem = Memoria.Memoria(self.procesador)
+        mem = Memory.Memoria(self.procesador)
         categorias = CompetitionWithTutor.Categorias()
 
         for x in range(6):
@@ -414,7 +412,7 @@ class Entrenamientos:
                         pos = 1
                         jump = False
                     else:
-                        db = UtilSQL.DictSQL(self.configuracion.ficheroTrainings)
+                        db = UtilSQL.DictSQL(self.configuration.ficheroTrainings)
                         data = db[entreno]
                         jump = False
                         tipo = "s"
@@ -481,7 +479,7 @@ class Entrenamientos:
             else:
                 if resp <= -100:
                     self.menu = None  # ya que puede cambiar y la etiqueta es diferente
-                    mem = Memoria.Memoria(self.procesador)
+                    mem = Memory.Memoria(self.procesador)
                     mem.lanza(abs(resp) - 100)
 
     def tacticas(self, tipo, name, carpeta, ini):
@@ -521,7 +519,7 @@ class Entrenamientos:
             um.final()
             return
 
-        tactica = tacticas.eligeTactica(resp, self.configuracion.carpeta_results)
+        tactica = tacticas.eligeTactica(resp, self.configuration.carpeta_results)
 
         um.final()
         if tactica:
@@ -534,7 +532,7 @@ class Entrenamientos:
 
     def entrenaTactica(self, tactica):
         icono = Iconos.PuntoMagenta()
-        resp = PantallaTacticas.consultaHistorico(self.procesador.main_window, tactica, icono)
+        resp = WindowTactics.consultaHistorico(self.procesador.main_window, tactica, icono)
         if resp:
             if resp != "seguir":
                 if resp != "auto":
@@ -542,40 +540,40 @@ class Entrenamientos:
                         ncopia = int(resp[5:])
                     else:
                         ncopia = None
-                    if not PantallaTacticas.edita1tactica(self.procesador.main_window, tactica, ncopia):
+                    if not WindowTactics.edit1tactica(self.procesador.main_window, tactica, ncopia):
                         return
                 um = self.procesador.unMomento()
                 tactica.genera()
                 um.final()
             self.procesador.game_type = GT_TACTICS
             self.procesador.state = ST_PLAYING
-            self.procesador.gestor = GestorTacticas.GestorTacticas(self.procesador)
-            self.procesador.gestor.inicio(tactica)
+            self.procesador.manager = ManagerTactics.ManagerTacticas(self.procesador)
+            self.procesador.manager.inicio(tactica)
 
     def entrenaGM(self):
-        w = PantallaGM.WGM(self.procesador)
+        w = WindowGM.WGM(self.procesador)
         if w.exec_():
             self.procesador.game_type = GT_AGAINST_GM
             self.procesador.state = ST_PLAYING
-            self.procesador.gestor = GestorGM.GestorGM(self.procesador)
-            self.procesador.gestor.inicio(w.record)
+            self.procesador.manager = ManagerGM.ManagerGM(self.procesador)
+            self.procesador.manager.inicio(w.record)
 
     def find_all_moves(self, siJugador):
-        self.procesador.gestor = GestorFindAllMoves.GestorFindAllMoves(self.procesador)
-        self.procesador.gestor.inicio(siJugador)
+        self.procesador.manager = ManagerFindAllMoves.ManagerFindAllMoves(self.procesador)
+        self.procesador.manager.inicio(siJugador)
 
     def jugarMate(self, tipo):
-        self.procesador.gestor = GestorMate.GestorMate(self.procesador)
-        self.procesador.gestor.inicio(tipo)
+        self.procesador.manager = ManagerMate.ManagerMate(self.procesador)
+        self.procesador.manager.inicio(tipo)
 
     def dailyTest(self):
-        PantallaDailyTest.dailyTest(self.procesador)
+        WindowDailyTest.dailyTest(self.procesador)
 
     def potencia(self):
-        PantallaPotencia.pantallaPotencia(self.procesador)
+        WindowPotencia.windowPotencia(self.procesador)
 
     def visualiza(self):
-        PantallaVisualiza.pantallaVisualiza(self.procesador)
+        WindowVisualiza.windowVisualiza(self.procesador)
 
     def anotar(self):
         self.procesador.show_anotar()
@@ -584,28 +582,28 @@ class Entrenamientos:
         self.procesador.gaviota_endings()
 
     def puente(self, nivel):
-        PantallaPuente.pantallaPuente(self.procesador, nivel)
+        WindowPuente.windowPuente(self.procesador, nivel)
 
     def horses(self, test, titulo, icono):
-        PantallaHorses.pantallaHorses(self.procesador, test, titulo, icono)
+        WindowHorses.windowHorses(self.procesador, test, titulo, icono)
 
     def bmt(self):
-        PantallaBMT.pantallaBMT(self.procesador)
+        WindowBMT.windowBMT(self.procesador)
 
     def resistance(self, tipo):
         resistance = Resistance.Resistance(self.procesador, tipo)
-        resp = PantallaResistance.pantallaResistance(self.procesador.main_window, resistance)
+        resp = WindowResistance.windowResistance(self.procesador.main_window, resistance)
         if resp is not None:
             numEngine, key = resp
-            self.procesador.gestor = GestorResistance.GestorResistance(self.procesador)
-            self.procesador.gestor.inicio(resistance, numEngine, key)
+            self.procesador.manager = ManagerResistance.ManagerResistance(self.procesador)
+            self.procesador.manager.inicio(resistance, numEngine, key)
 
     def learnPGN(self):
-        w = PantallaLearnPGN.WLearnBase(self.procesador)
+        w = WindowLearnPGN.WLearnBase(self.procesador)
         w.exec_()
 
     def everest(self):
-        PantallaEverest.everest(self.procesador)
+        WindowEverest.everest(self.procesador)
 
     def turn_on_lights(self, name):
         one_line = False
@@ -621,8 +619,8 @@ class Entrenamientos:
             li_tam_blocks = (6, 12, 20, 30, 60)
         elif name.startswith("uwe_easy"):
             title = "%s (%s)" % (_("Uwe Auerswald"), _("Initial"))
-            TurnOnLights.compruebaUweEasy(self.configuracion, name)
-            folder = self.configuracion.carpetaTemporal()
+            TurnOnLights.compruebaUweEasy(self.configuration, name)
+            folder = self.configuration.carpetaTemporal()
             icono = Iconos.Uwe()
             li_tam_blocks = (4, 6, 9, 12, 18, 36)
         elif name.startswith("uwe"):
@@ -637,15 +635,15 @@ class Entrenamientos:
             li_tam_blocks = None
             one_line = True
 
-        resp = PantallaTurnOnLights.pantallaTurnOnLigths(
+        resp = WindowTurnOnLights.windowTurnOnLigths(
             self.procesador, name, title, icono, folder, li_tam_blocks, one_line
         )
         if resp:
             num_theme, num_block, tol = resp
             self.procesador.game_type = GT_TURN_ON_LIGHTS
             self.procesador.state = ST_PLAYING
-            self.procesador.gestor = GestorTurnOnLights.GestorTurnOnLights(self.procesador)
-            self.procesador.gestor.inicio(num_theme, num_block, tol)
+            self.procesador.manager = ManagerTurnOnLights.ManagerTurnOnLights(self.procesador)
+            self.procesador.manager.inicio(num_theme, num_block, tol)
 
     def washing_machine(self):
         self.procesador.showWashing()
@@ -672,7 +670,7 @@ class Entrenamientos:
 
 
 def selectOneFNS(owner, procesador):
-    tpirat = Controles.TipoLetra("Chess Alpha 2", procesador.configuracion.x_menu_points + 4)
+    tpirat = Controles.TipoLetra("Chess Alpha 2", procesador.configuration.x_menu_points + 4)
 
     def xopcion(menu, key, texto, icono, is_disabled=False):
         if "KP" in texto:
@@ -684,7 +682,7 @@ def selectOneFNS(owner, procesador):
 
     menu = QTVarios.LCMenu(owner)
     td = TrainingDir(Code.path_resource("Trainings"))
-    td.addOtherFolder(procesador.configuracion.dirPersonalTraining)
+    td.addOtherFolder(procesador.configuration.personal_training_folder)
     td.reduce()
     td.menu(menu, xopcion)
     resp = menu.lanza()

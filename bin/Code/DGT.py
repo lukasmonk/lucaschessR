@@ -52,15 +52,13 @@ def envia(quien, dato):
     return 1
 
 
-def setposition(game):
+def set_position(game):
     if Code.dgt:
-        if Code.configuracion.x_digital_board == "Novag UCB":
-            if Code.configuracion.x_digital_board_version >= 2:
-                writePosition(game.last_position.fen())
-            else:
-                writePosition(game.last_position.fenDGT())
-        else:
+        if (Code.configuration.x_digital_board == "DGT") or \
+           (Code.configuration.x_digital_board == "Novag UCB" and Code.configuration.x_digital_board_version == 0):
             writePosition(game.last_position.fenDGT())
+        else:
+            writePosition(game.last_position.fen())
 
 
 def quitarDispatch():
@@ -100,14 +98,21 @@ def activar():
     dgt = None
     for path in (
         "",
-        Code.folder_OS,
+        os.path.join(Code.folder_OS, "DigitalBoards"),
         "C:/Program Files (x86)/DGT Projects/",
         "C:/Program Files (x86)/Common Files/DGT Projects/",
         "C:/Program Files/DGT Projects/",
         "C:/Program Files/Common Files/DGT Projects/",
     ):
         try:
-            path_dll = os.path.join(path, "DGTEBDLL.dll" if Code.configuracion.x_digital_board == "DGT" else "UCB_DLL.dll")
+            if Code.configuration.x_digital_board == "DGT":
+                path_dll = os.path.join(path, "DGTEBDLL.dll")
+            elif Code.configuration.x_digital_board == "Certabo":
+                path_dll = os.path.join(path, "CER_DLL.dll")
+            elif Code.configuration.x_digital_board == "Millennium":
+                path_dll = os.path.join(path, "MCL_DLL.dll")
+            else:
+                path_dll = os.path.join(path, "UCB_DLL.dll")
             if os.path.isfile(path_dll):
                 dgt = ctypes.WinDLL(path_dll)
                 break
@@ -157,13 +162,10 @@ def activar():
     dgt._DGTDLL_WriteDebug.restype = ctypes.c_int
 
     # Added by GON
-    if Code.configuracion.x_digital_board == "Novag UCB":
-        dgt._DGTDLL_Exit.argtype = []
-        dgt._DGTDLL_Exit.restype = ctypes.c_int
-
+    if Code.configuration.x_digital_board != "DGT":
         dgt._DGTDLL_GetVersion.argtype = []
         dgt._DGTDLL_GetVersion.restype = ctypes.c_int
-        Code.configuracion.x_digital_board_version = dgt._DGTDLL_GetVersion()
+        Code.configuration.x_digital_board_version = dgt._DGTDLL_GetVersion()
     # ------------
 
     dgt._DGTDLL_SetNRun.argtype = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int]
@@ -176,9 +178,6 @@ def desactivar():
     if Code.dgt:
         # log( "desactivar" )
         hideDialog()
-        if Code.configuracion.x_digital_board == "Novag UCB":
-            dgt = Code.dgt
-            dgt._DGTDLL_Exit()
         del Code.dgt
         Code.dgt = None
         Code.dgtDispatch = None
@@ -217,14 +216,6 @@ def writeClocks(wclock, bclock):
         dgt = Code.dgt
         dgt._DGTDLL_SetNRun(wclock, bclock, 0)
 
-
-# Added by GON
-def close():
-    if Code.dgt:
-        # log( "DGT", "Exiting DGT board" )
-        dgt = Code.dgt
-        dgt._DGTDLL_Exit()
-# ------------
 
 # Utilidades para la trasferencia de datos
 

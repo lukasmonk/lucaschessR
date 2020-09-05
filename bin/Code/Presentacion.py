@@ -3,19 +3,19 @@ import time
 
 import Code
 from Code import Util
-from Code import Position
+from Code.Base import Position
 from Code.QT import Iconos
 from Code.QT import Controles
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 
 
-class GestorChallenge101:
+class ManagerChallenge101:
     def __init__(self, procesador):
         self.main_window = procesador.main_window
-        self.tablero = self.main_window.tablero
+        self.board = self.main_window.board
         self.procesador = procesador
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
         self.cod_variables = "challenge101"
         self.puntos_totales = 0
         self.puntos_ultimo = 0
@@ -48,25 +48,25 @@ class GestorChallenge101:
         self.cp.read_fen(self.fen)
 
         self.is_white = " w " in self.fen
-        self.tablero.bloqueaRotacion(False)
-        self.tablero.set_dispatcher(self.mueve_humano)
-        self.tablero.setposition(self.cp)
-        self.tablero.ponerPiezasAbajo(self.is_white)
-        self.tablero.activaColor(self.is_white)
-        self.tablero.ponIndicador(self.is_white)
+        self.board.bloqueaRotacion(False)
+        self.board.set_dispatcher(self.player_has_moved)
+        self.board.set_position(self.cp)
+        self.board.ponerPiezasAbajo(self.is_white)
+        self.board.activate_side(self.is_white)
+        self.board.set_side_indicator(self.is_white)
 
         self.intentos = 0
         self.max_intentos = (self.difficult + 1) // 2 + 4
         self.iniTime = time.time()
 
     def lee_results(self):
-        dic = self.configuracion.leeVariables(self.cod_variables)
+        dic = self.configuration.leeVariables(self.cod_variables)
         results = dic.get("RESULTS", [])
         results.sort(key=lambda x: -x[1])
         return results
 
     def guarda_puntos(self):
-        dic = self.configuracion.leeVariables(self.cod_variables)
+        dic = self.configuration.leeVariables(self.cod_variables)
         results = dic.get("RESULTS", [])
         if len(results) >= 10:
             ok = False
@@ -89,15 +89,15 @@ class GestorChallenge101:
             if len(results) > 10:
                 results = results[:10]
             dic["RESULTS"] = results
-            self.configuracion.escVariables(self.cod_variables, dic)
+            self.configuration.escVariables(self.cod_variables, dic)
 
     def menu(self):
         main_window = self.procesador.main_window
-        main_window.cursorFueraTablero()
+        main_window.cursorFueraBoard()
         menu = QTVarios.LCMenu(main_window)
         f = Controles.TipoLetra(name="Courier", puntos=12)
         fbold = Controles.TipoLetra(name="Courier", puntos=12, peso=700)
-        fbolds = Controles.TipoLetra(name="Courier", puntos=12, peso=500, siSubrayado=True)
+        fbolds = Controles.TipoLetra(name="Courier", puntos=12, peso=500, is_underlined=True)
         menu.ponFuente(f)
 
         li_results = self.lee_results()
@@ -156,15 +156,15 @@ class GestorChallenge101:
 
         return not (resp == "close" or self.pendientes == 0)
 
-    def mueve_humano(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=None):
         self.savePosition()  # Solo cuando ha hecho un intento
         self.puntos_ultimo = 0
         if from_sq + to_sq == self.result:  # No hay coronaciones
             tm = time.time() - self.iniTime
-            self.tablero.disable_all()
+            self.board.disable_all()
             self.cp.mover(from_sq, to_sq, promotion)
-            self.tablero.setposition(self.cp)
-            self.tablero.ponFlechaSC(from_sq, to_sq)
+            self.board.set_position(self.cp)
+            self.board.put_arrow_sc(from_sq, to_sq)
 
             puntos = int(1000 - (1000 / self.max_intentos) * self.intentos)
             puntos -= int(tm * 7)
@@ -185,8 +185,8 @@ class GestorChallenge101:
                     self.main_window, str(self.max_intentos - self.intentos), 0.5, puntos=24, background="#ffd985"
                 )
             else:
-                self.tablero.setposition(self.cp)
-                self.tablero.ponFlechaSC(self.result[:2], self.result[2:])
+                self.board.set_position(self.cp)
+                self.board.put_arrow_sc(self.result[:2], self.result[2:])
                 self.pendientes = 0
                 self.menu()
                 return True
@@ -196,7 +196,7 @@ class GestorChallenge101:
         line = "%s|%s|%s|%s\n" % (self.fen, str(self.key)[:19], self.pgn_result, self.pgn)
         if not (line in self.st_lines):
             self.st_lines.add(line)
-            fich = self.configuracion.ficheroPresentationPositions
+            fich = self.configuration.ficheroPresentationPositions
             existe = Util.exist_file(fich)
             with open(fich, "at") as q:
                 line = "%s|%s|%s|%s\n" % (self.fen, str(self.key)[:19], self.pgn_result, self.pgn)
@@ -244,7 +244,7 @@ class GestorChallenge101:
 #     hx = m(primer, 2.0 * factor)
 #     for uno in li:
 #         m(uno)
-#     return procesador.cpu.setposition(procesador.posicionInicial)
+#     return procesador.cpu.set_position(procesador.posicionInicial)
 #
 #
 # def partidaDia(procesador, hx):
@@ -257,7 +257,7 @@ class GestorChallenge101:
 #
 #     cpu = procesador.cpu
 #
-#     padre = cpu.setposition(procesador.posicionInicial)
+#     padre = cpu.set_position(procesador.posicionInicial)
 #     padre = cpu.duerme(0.6, padre=padre, siExclusiva=True)
 #
 #     for txt in liMovs:

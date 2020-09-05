@@ -4,7 +4,7 @@ import datetime
 
 import Code
 from Code import Util
-from Code import Game
+from Code.Base import Game
 from Code.SQL import UtilSQL
 
 INACTIVE, CREATING, REPLAY, TACTICS, ENDED = range(5)
@@ -141,9 +141,9 @@ class Washing:
     def num_engines(self):
         return len(self.liEngines)
 
-    def total_engines(self, configuracion):
+    def total_engines(self, configuration):
         n = 0
-        for k, m in configuracion.dic_engines.items():
+        for k, m in configuration.dic_engines.items():
             if m.elo < 3000:
                 n += 2
         return n
@@ -156,7 +156,7 @@ class Washing:
             g += eng.games
         return h, t, g
 
-    def last_engine(self, configuracion):
+    def last_engine(self, configuration):
         st = set()
         if self.liEngines:
             eng = self.liEngines[-1]
@@ -166,11 +166,11 @@ class Washing:
                 st.add((eng.key, eng.color))
 
         li = []
-        for k, m in configuracion.dic_engines.items():
+        for k, m in configuration.dic_engines.items():
             if m.elo < 3000:
                 for color in (True, False):
-                    if not ((m.clave, color) in st):
-                        engine = WEngine(m.clave, m.name, m.elo, color)
+                    if not ((m.key, color) in st):
+                        engine = WEngine(m.key, m.name, m.elo, color)
                         li.append(engine)
         li.sort(key=lambda x: "%4d%s" % (x.elo, "0" if x.color else "1"))
         if li:
@@ -303,10 +303,10 @@ class Washing:
 
 
 class DBWashing:
-    def __init__(self, configuracion):
-        self.configuracion = configuracion
+    def __init__(self, configuration):
+        self.configuration = configuration
         self.filename = "washing.wsm"
-        self.file = os.path.join(configuracion.carpeta_results, self.filename)
+        self.file = os.path.join(configuration.carpeta_results, self.filename)
         self.washing = self.restore()
 
     def new(self, tactic):

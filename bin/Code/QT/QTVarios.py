@@ -49,11 +49,11 @@ class WDialogo(QtWidgets.QDialog):
         for sp, name in self.liSplitters:
             dic["SP_%s" % name] = sp.sizes()
 
-        Code.configuracion.save_video(self.key_video, dic)
+        Code.configuration.save_video(self.key_video, dic)
         return dic
 
     def restore_dicvideo(self):
-        return Code.configuracion.restore_video(self.key_video)
+        return Code.configuration.restore_video(self.key_video)
 
     def restore_video(self, siTam=True, anchoDefecto=None, altoDefecto=None, dicDef=None):
         dic = self.restore_dicvideo()
@@ -140,8 +140,8 @@ class BlancasNegras(QtWidgets.QDialog):
         self.setWindowTitle(_("Choose Color"))
         self.setWindowIcon(icoP)
 
-        btBlancas = Controles.PB(self, "", rutina=self.accept, plano=False).ponIcono(icoP, tamIcon=64)
-        btNegras = Controles.PB(self, "", rutina=self.negras, plano=False).ponIcono(icop, tamIcon=64)
+        btBlancas = Controles.PB(self, "", rutina=self.accept, plano=False).ponIcono(icoP, icon_size=64)
+        btNegras = Controles.PB(self, "", rutina=self.negras, plano=False).ponIcono(icop, icon_size=64)
 
         self.resultado = True
 
@@ -171,8 +171,8 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         self.setWindowTitle(_("Choose Color"))
         self.setWindowIcon(icoP)
 
-        btBlancas = Controles.PB(self, "", rutina=self.blancas, plano=False).ponIcono(icoP, tamIcon=64)
-        btNegras = Controles.PB(self, "", rutina=self.negras, plano=False).ponIcono(icop, tamIcon=64)
+        btBlancas = Controles.PB(self, "", rutina=self.blancas, plano=False).ponIcono(icoP, icon_size=64)
+        btNegras = Controles.PB(self, "", rutina=self.negras, plano=False).ponIcono(icop, icon_size=64)
 
         # Tiempo
         self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(self, 5, 0, 999, maxTam=50, etiqueta=_("Total minutes"))
@@ -182,7 +182,7 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         ly = Colocacion.G()
         ly.controld(self.lbMinutos, 0, 0).control(self.edMinutos, 0, 1)
         ly.controld(self.lbSegundos, 0, 2).control(self.edSegundos, 0, 3)
-        self.gbT = Controles.GB(self, _("Time"), ly).conectar(self.cambiaTiempo)
+        self.gbT = Controles.GB(self, _("Time"), ly).to_connect(self.cambiaTiempo)
         self.cambiaTiempo()
 
         # Fast moves
@@ -278,7 +278,7 @@ def lyBotonesMovimiento(
     siGrabarTodos=False,
     siJugar=False,
     rutina=None,
-    tamIcon=16,
+    icon_size=16,
     liMasAcciones=None,
 ):
     li_acciones = []
@@ -318,7 +318,7 @@ def lyBotonesMovimiento(
             li_acciones.append(None)
             li_acciones.append((trad, icono, key + tit))
 
-    tb = Controles.TB(owner, li_acciones, False, tamIcon=tamIcon, rutina=rutina)
+    tb = Controles.TB(owner, li_acciones, False, icon_size=icon_size, rutina=rutina)
     ly = Colocacion.H().relleno().control(tb).relleno()
     return ly, tb
 
@@ -409,10 +409,10 @@ def fsvg2pm(fsvg, tam):
 
 
 class LBPieza(Controles.LB):
-    def __init__(self, owner, pieza, tablero, tam):
+    def __init__(self, owner, pieza, board, tam):
         self.pieza = pieza
         self.owner = owner
-        pixmap = tablero.piezas.pixmap(pieza, tam=tam)
+        pixmap = board.piezas.pixmap(pieza, tam=tam)
         self.dragpixmap = pixmap
         Controles.LB.__init__(self, owner)
         self.ponImagen(pixmap).anchoFijo(tam).altoFijo(tam)
@@ -423,24 +423,24 @@ class LBPieza(Controles.LB):
 
 
 class ListaPiezas(QtWidgets.QWidget):
-    def __init__(self, owner, lista, tablero, tam=None, margen=None):
+    def __init__(self, owner, lista, board, tam=None, margen=None):
         QtWidgets.QWidget.__init__(self)
 
         self.owner = owner
-        # self.tablero = tablero = owner.tablero
+        # self.board = board = owner.board
 
         if tam is None:
-            tam = tablero.anchoPieza
+            tam = board.anchoPieza
 
         liLB = []
-        for fila, valor in enumerate(lista.split(";")):
-            for columna, pieza in enumerate(valor.split(",")):
-                lb = LBPieza(self, pieza, tablero, tam)
-                liLB.append((lb, fila, columna))
+        for row, valor in enumerate(lista.split(";")):
+            for column, pieza in enumerate(valor.split(",")):
+                lb = LBPieza(self, pieza, board, tam)
+                liLB.append((lb, row, column))
 
         layout = Colocacion.G()
-        for lb, fila, columna in liLB:
-            layout.control(lb, fila, columna)
+        for lb, row, column in liLB:
+            layout.control(lb, row, column)
         if margen is not None:
             layout.margen(margen)
 
@@ -498,10 +498,10 @@ def rondoColores(shuffle=True):
 
 class LCMenu(Controles.Menu):
     def __init__(self, parent, puntos=None):
-        configuracion = Code.configuracion
+        configuration = Code.configuration
         if not puntos:
-            puntos = configuracion.x_menu_points
-        bold = configuracion.x_menu_bold
+            puntos = configuration.x_menu_points
+        bold = configuration.x_menu_bold
         Controles.Menu.__init__(self, parent, puntos=puntos, siBold=bold)
 
 
@@ -510,15 +510,15 @@ class LCMenuRondo(LCMenu):
         LCMenu.__init__(self, parent, puntos)
         self.rondo = rondoPuntos()
 
-    def opcion(self, key, rotulo, icono=None, is_disabled=False, tipoLetra=None, siChecked=None):
+    def opcion(self, key, label, icono=None, is_disabled=False, tipoLetra=None, siChecked=None):
         if icono is None:
             icono = self.rondo.otro()
-        LCMenu.opcion(self, key, rotulo, icono, is_disabled, tipoLetra, siChecked)
+        LCMenu.opcion(self, key, label, icono, is_disabled, tipoLetra, siChecked)
 
-    # def submenu(self, rotulo, icono=None, is_disabled=False):
+    # def submenu(self, label, icono=None, is_disabled=False):
     #     if icono is None:
     #         icono = self.rondo.otro()
-    #     return LCMenu.submenu(self, rotulo, icono, is_disabled)
+    #     return LCMenu.submenu(self, label, icono, is_disabled)
     #
 
 
@@ -527,30 +527,11 @@ class LCMenuPiezas(Controles.Menu):
         Controles.Menu.__init__(self, parent, titulo, icono, is_disabled, puntos, siBold)
         self.ponTipoLetra("Chess Alpha 2", 16)
 
-    def alpha2(self, key):
-        # d = {
-        #     "K": "n",
-        #     "Q": "m",
-        #     "R": "l",
-        #     "B": "j",
-        #     "N": "k",
-        #     "P": "i",
-        #     "k": "N",
-        #     "q": "M",
-        #     "r": "L",
-        #     "b": "J",
-        #     "n": "K",
-        #     "p": "I",
-        # }
-        return key  # "".join([d[c] for c in key])
+    def opcion(self, key, label, icono=None, is_disabled=False, tipo_letra=None, siChecked=False):
+        Controles.Menu.opcion(self, key, label, icono=icono, is_disabled=is_disabled, siChecked=siChecked)
 
-    def opcion(self, clave, rotulo, icono=None, is_disabled=False, tipo_letra=None, siChecked=False):
-        Controles.Menu.opcion(
-            self, clave, self.alpha2(rotulo), icono=icono, is_disabled=is_disabled, siChecked=siChecked
-        )
-
-    def submenu(self, rotulo, icono=None, is_disabled=False):
-        menu = LCMenuPiezas(self, self.alpha2(rotulo), icono, is_disabled)
+    def submenu(self, label, icono=None, is_disabled=False):
+        menu = LCMenuPiezas(self, label, icono, is_disabled)
         self.addMenu(menu)
         return menu
 
@@ -622,18 +603,18 @@ class ImportarFichero(QtWidgets.QDialog):
         self.ponContinuar()
 
     def ponExportados(self):
-        self.lbRotImportados.ponTexto(_("Exported") + ":")
+        self.lbRotImportados.set_text(_("Exported") + ":")
 
     def ponSaving(self):
         self.btCancelarSeguir.setDisabled(True)
-        self.btCancelarSeguir.ponTexto(_("Saving..."))
+        self.btCancelarSeguir.set_text(_("Saving..."))
         self.btCancelarSeguir.ponFuente(self.fontB)
         self.btCancelarSeguir.ponIcono(Iconos.Grabar())
         QTUtil.refresh_gui()
 
     def ponContinuar(self):
-        self.btCancelarSeguir.ponTexto(_("Continue"))
-        self.btCancelarSeguir.conectar(self.continuar)
+        self.btCancelarSeguir.set_text(_("Continue"))
+        self.btCancelarSeguir.to_connect(self.continuar)
         self.btCancelarSeguir.ponFuente(self.fontB)
         self.btCancelarSeguir.ponIcono(Iconos.Aceptar())
         self.btCancelarSeguir.setDisabled(False)
@@ -646,13 +627,13 @@ class ImportarFichero(QtWidgets.QDialog):
         def pts(x):
             return "{:,}".format(x).replace(",", ".")
 
-        self.lbLeidos.ponTexto(pts(leidos))
+        self.lbLeidos.set_text(pts(leidos))
         if self.siErroneos:
-            self.lbErroneos.ponTexto(pts(erroneos))
-        self.lbDuplicados.ponTexto(pts(duplicados))
-        self.lbImportados.ponTexto(pts(importados))
+            self.lbErroneos.set_text(pts(erroneos))
+        self.lbDuplicados.set_text(pts(duplicados))
+        self.lbImportados.set_text(pts(importados))
         if self.siWorkDone:
-            self.lbWorkDone.ponTexto("%d%%" % int(workdone))
+            self.lbWorkDone.set_text("%d%%" % int(workdone))
         QTUtil.refresh_gui()
         return not self.is_canceled
 
@@ -696,7 +677,7 @@ class MensajeFics(QtWidgets.QDialog):
         self.setLayout(ly)
 
     def continua(self):
-        self.bt.ponTexto(_("Continue"))
+        self.bt.set_text(_("Continue"))
         self.bt.ponPlano(False)
         self.bt.setDisabled(False)
         self.mostrar()
@@ -743,7 +724,7 @@ class MensajeFide(QtWidgets.QDialog):
         self.setLayout(ly)
 
     def continua(self):
-        self.bt.ponTexto(_("Continue"))
+        self.bt.set_text(_("Continue"))
         self.bt.ponPlano(False)
         self.bt.setDisabled(False)
         self.mostrar()
@@ -768,32 +749,32 @@ class MensajeFide(QtWidgets.QDialog):
 
 
 def select_pgn(wowner):
-    configuracion = Code.configuracion
-    path = QTUtil2.leeFichero(wowner, configuracion.pgn_folder(), "pgn")
+    configuration = Code.configuration
+    path = QTUtil2.leeFichero(wowner, configuration.pgn_folder(), "pgn")
     if path:
         carpeta, fichero = os.path.split(path)
-        configuracion.save_pgn_folder(carpeta)
+        configuration.save_pgn_folder(carpeta)
     return path
 
 
 def select_pgns(wowner):
-    configuracion = Code.configuracion
-    files = QTUtil2.leeFicheros(wowner, configuracion.pgn_folder(), "pgn")
+    configuration = Code.configuration
+    files = QTUtil2.leeFicheros(wowner, configuration.pgn_folder(), "pgn")
     if files:
         path = files[0]
         carpeta, fichero = os.path.split(path)
-        configuracion.save_pgn_folder(carpeta)
+        configuration.save_pgn_folder(carpeta)
     return files
 
 
 def select_ext(wowner, ext):
-    configuracion = Code.configuracion
-    path = QTUtil2.leeFichero(wowner, configuracion.x_save_folder, ext)
+    configuration = Code.configuration
+    path = QTUtil2.leeFichero(wowner, configuration.x_save_folder, ext)
     if path:
         carpeta, fichero = os.path.split(path)
-        if configuracion.x_save_folder != carpeta:
-            configuracion.x_save_folder = carpeta
-            configuracion.graba()
+        if configuration.x_save_folder != carpeta:
+            configuration.x_save_folder = carpeta
+            configuration.graba()
     return path
 
 
@@ -872,16 +853,16 @@ class ElemDB:
                 submenu.opcion(previo + elem.path, elem.name, rondo.otro())
 
 
-def lista_db(configuracion, siAll):
-    lista = ElemDB(configuracion.folder_databases(), True)
+def lista_db(configuration, siAll):
+    lista = ElemDB(configuration.folder_databases(), True)
     if not siAll:
-        lista.remove(configuracion.get_last_database())
+        lista.remove(configuration.get_last_database())
     lista.remove_empties()
     return None if lista.is_empty() else lista
 
 
-def select_db(owner, configuracion, siAll, siNew):
-    lista = lista_db(configuracion, siAll)
+def select_db(owner, configuration, siAll, siNew):
+    lista = lista_db(configuration, siAll)
     if lista is None and not siNew:
         return None
 
@@ -895,8 +876,8 @@ def select_db(owner, configuracion, siAll, siNew):
     return menu.lanza()
 
 
-def menuDB(submenu, configuracion, siAll, indicador_previo=None):
-    lista = lista_db(configuracion, siAll)
+def menuDB(submenu, configuration, siAll, indicador_previo=None):
+    lista = lista_db(configuration, siAll)
     if lista is None:
         return None
 
@@ -929,7 +910,7 @@ class ReadAnnotation(QtWidgets.QDialog):
             .margen(3)
         )
         self.setLayout(layout)
-        self.move(parent.x() + parent.tablero.width() - 212, parent.y() + parent.tablero.y() - 3)
+        self.move(parent.x() + parent.board.width() - 212, parent.y() + parent.board.y() - 3)
 
     def aceptar(self):
         txt = self.edAnotacion.texto()
@@ -948,28 +929,28 @@ class ReadAnnotation(QtWidgets.QDialog):
 
     def ayuda(self):
         self.conAyuda = True
-        self.edAnotacion.ponTexto(self.objetivo)
+        self.edAnotacion.set_text(self.objetivo)
 
 
 class LCTB(Controles.TBrutina):
-    def __init__(self, parent, li_acciones=None, siTexto=True, tamIcon=None, puntos=None, background=None, style=None):
-        configuracion = Code.configuracion
+    def __init__(self, parent, li_acciones=None, with_text=True, icon_size=None, puntos=None, background=None, style=None):
+        configuration = Code.configuration
         Controles.TBrutina.__init__(
             self,
             parent,
             li_acciones=li_acciones,
-            siTexto=siTexto,
-            tamIcon=tamIcon,
-            puntos=configuracion.x_tb_fontpoints if puntos is None else puntos,
+            with_text=with_text,
+            icon_size=icon_size,
+            puntos=configuration.x_tb_fontpoints if puntos is None else puntos,
             background=background,
-            style=configuracion.tipoIconos() if style is None else style,
+            style=configuration.tipoIconos() if style is None else style,
         )
 
 
-def change_interval(owner, configuracion):
+def change_interval(owner, configuration):
     form = FormLayout.FormLayout(owner, _("Replay game"), Iconos.Pelicula_Repetir(), anchoMinimo=250)
     form.separador()
-    form.float(_("Duration of interval (secs)"), configuracion.x_interval_replay / 1000)
+    form.float(_("Duration of interval (secs)"), configuration.x_interval_replay / 1000)
     form.separador()
     resultado = form.run()
     if resultado is None:
@@ -977,5 +958,5 @@ def change_interval(owner, configuracion):
     accion, liResp = resultado
     vtime = liResp[0]
     if vtime > 0.01:
-        configuracion.x_interval_replay = int(vtime * 1000)
-        configuracion.graba()
+        configuration.x_interval_replay = int(vtime * 1000)
+        configuration.graba()

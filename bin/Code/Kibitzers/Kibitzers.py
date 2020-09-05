@@ -6,7 +6,7 @@ import Code
 from Code.Engines import Priorities
 from Code.QT import Iconos
 
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class Tipos:
@@ -85,7 +85,7 @@ class Kibitzer(Engines.Engine):
 
 class Kibitzers:
     def __init__(self):
-        self.fichero = Code.configuracion.file_kibitzers()
+        self.fichero = Code.configuration.file_kibitzers()
         self.lista, self.lastfolder = self.read()
 
     def read(self):
@@ -110,9 +110,9 @@ class Kibitzers:
     def nuevo_engine(self, name, engine, tipo, prioridad):
         kib = Kibitzer()
         kib.pon_huella(self.lista)
-        eng = Code.configuracion.buscaRival(engine)
+        eng = Code.configuration.buscaRival(engine)
         kib.restore(eng.save())
-        kib.clave = name
+        kib.key = name
         kib.name = name
         kib.tipo = tipo
         kib.prioridad = prioridad
@@ -124,7 +124,7 @@ class Kibitzers:
         kib = Kibitzer()
         kib.pon_huella(self.lista)
         kib.name = "%s: %s" % (_("Book"), book.name)
-        kib.clave = book.name
+        kib.key = book.name
         kib.tipo = KIB_POLYGLOT
         kib.path_exe = book.path
         self.lista.append(kib)
@@ -138,7 +138,7 @@ class Kibitzers:
         kib = Kibitzer()
         kib.pon_huella(self.lista)
         kib.name = _("Gaviota Tablebases")
-        kib.clave = kib.name
+        kib.key = kib.name
         kib.tipo = KIB_GAVIOTA
         kib.autor = "Miguel A. Ballicora"
         self.lista.append(kib)
@@ -150,11 +150,11 @@ class Kibitzers:
             if kib.tipo == KIB_INDEXES:
                 return
         kib = Kibitzer()
-        eng = Code.configuracion.buscaRival("rodentII")
+        eng = Code.configuration.buscaRival("rodentII")
         kib.restore(eng.save())
         kib.pon_huella(self.lista)
         kib.name = _("Indexes") + " - RodentII"
-        kib.clave = kib.name
+        kib.key = kib.name
         kib.tipo = KIB_INDEXES
         kib.autor = "Michele Tumbarello"
         self.lista.append(kib)

@@ -3,11 +3,11 @@ Aplicacion64 lucas peon64r.png
 
 Datos nuvola make.png
 Tutor nuvola edu_miscellaneous.png
-Tablero nuvola make.png
+Board nuvola make.png
 PartidaOriginal nuvola package_games_strategy.png
 DGT lucas dgt.png
 FindAllMoves qt4 fit-page-32.png
-TamTablero qt4 fit-page-32.png
+ResizeBoard qt4 fit-page-32.png
 
 MensEspera windows8 icons8_Automation_64px.png
 
@@ -164,7 +164,7 @@ MoverAdelante windows8 icons8_Fast_Forward_16px.png
 #           MoverAtras silk control_rewind.png
 MoverAtras windows8 icons8_Rewind_16px.png
 #           MoverLibre silk control_eject.png
-MoverLibre windows8 icons8_Tree_Structure_16px.png
+MoverLibre windows8 icons8_tree_structure_16px.png
 #           MoverTiempo silk clock.png
 MoverTiempo windows8 icons8_Restart_16px.png
 MoverMas nuvola viewmagfit.png
@@ -247,8 +247,8 @@ PuntoEstrella silk bullet_star.png
 Comentario silk comment.png
 ComentarioMas silk comments.png
 ComentarioEditar silk comment_edit.png
-Apertura silk book_key.png
-AperturaComentario silk book_comment.png
+# Opening silk book_key.png
+OpeningComentario silk book_comment.png
 
 Mas qt4 addtab(3).png
 MasR qt4 addtab(3)R.png
@@ -265,8 +265,8 @@ Ocultar silk lightbulb_delete.png
 Mostrar silk lightbulb.png
 Blog lucas blog.png
 
-Variantes silk arrow_divide.png
-VariantesG silk arrow_divide32.png
+Variations silk arrow_divide.png
+VariationsG silk arrow_divide32.png
 
 Cambiar woocons Button_Eject.png
 Anterior woocons Button_Previous.png
@@ -293,7 +293,7 @@ Director gnome 64px-Gnome-preferences-desktop.png
 
 Torneos gnome 32px-Gnome-application-x-executable.png
 
-Aperturas silk book.png
+Openings silk book.png
 
 V_Blancas lucas w.png
 V_Blancas_Mas lucas w_p.png
@@ -608,3 +608,12 @@ Correcto windows8 icons8_Checked_32px.png
 Blocks windows8 icons8_Grid_2_32px.png
 
 West windows8 icons8_West_Direction_32px.png
+
+Opening windows8 icons8_read_16px.png
+Variation windows8 icons8_tree_structure_16px.png
+Comment windows8 icons8_chat_room_16px.png
+
+VariationComment windows8 icons8_tree_structure_16px_2.png
+OpeningVariation windows8 icons8_books_16px.png
+OpeningComment windows8 icons8_book_16px.png
+OpeningVariationComment windows8 icons8_books_16px.png

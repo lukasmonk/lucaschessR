@@ -1,15 +1,15 @@
 from PySide2 import QtWidgets, QtCore
 from PySide2.QtCore import Qt
 
-from Code import Position
+from Code.Base import Position
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import QTVarios
-from Code.QT import Tablero
+from Code.Board import Board
 import Code
 
 
-class TableroKey(Tablero.Tablero):
+class BoardKey(Board.Board):
     def keyPressEvent(self, event):
         k = event.key()
         self.main_window.tecla_pulsada(k)
@@ -28,24 +28,24 @@ class WInfomove(QtWidgets.QWidget):
         self.wb_database = wb_database
         self.movActual = None
 
-        configuracion = Code.configuracion
-        config_board = configuracion.config_board("INFOMOVE", 32)
-        self.tablero = TableroKey(self, config_board)
-        self.tablero.dispatchSize(self.cambiado_tablero)
-        self.tablero.crea()
-        self.tablero.ponerPiezasAbajo(True)
-        self.tablero.disable_hard_focus()  # Para que los movimientos con el teclado from_sq grid wgames no cambien el foco
+        configuration = Code.configuration
+        config_board = configuration.config_board("INFOMOVE", 32)
+        self.board = BoardKey(self, config_board)
+        self.board.dispatchSize(self.cambiado_board)
+        self.board.crea()
+        self.board.ponerPiezasAbajo(True)
+        self.board.disable_hard_focus()  # Para que los movimientos con el teclado from_sq grid wgames no cambien el foco
         self.cpActual = Position.Position()
         self.historia = None
         self.posHistoria = None
 
-        self.intervalo = configuracion.x_interval_replay
+        self.intervalo = configuration.x_interval_replay
 
-        lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, tamIcon=24)
+        lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
-        self.lbPGN = LBKey(self).anchoFijo(self.tablero.ancho).ponWrap()
+        self.lbPGN = LBKey(self).anchoFijo(self.board.ancho).set_wrap()
         self.lbPGN.colocate = self.colocatePartida
-        self.lbPGN.ponTipoLetra(puntos=configuracion.x_pgn_fontpoints + 2)
+        self.lbPGN.ponTipoLetra(puntos=configuration.x_pgn_fontpoints + 2)
         self.lbPGN.setStyleSheet(
             "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 2px 16px 6px 2px;}"
         )
@@ -66,16 +66,16 @@ class WInfomove(QtWidgets.QWidget):
         w.setLayout(ly)
         scroll.setWidget(w)
 
-        self.siFigurines = configuracion.x_pgn_withfigurines
+        self.with_figurines = configuration.x_pgn_withfigurines
 
-        self.lbOpening = Controles.LB(self).alinCentrado().anchoFijo(self.tablero.ancho).ponWrap()
-        self.lbOpening.ponTipoLetra(puntos=10, peso=200)
-        lyO = Colocacion.H().relleno().control(self.lbOpening).relleno()
+        self.lb_opening = Controles.LB(self).align_center().anchoFijo(self.board.ancho).set_wrap()
+        self.lb_opening.ponTipoLetra(puntos=10, peso=200)
+        lyO = Colocacion.H().relleno().control(self.lb_opening).relleno()
 
         lya = Colocacion.H().relleno().control(scroll).relleno()
 
         layout = Colocacion.G()
-        layout.controlc(self.tablero, 0, 0)
+        layout.controlc(self.board, 0, 0)
         layout.otroc(lybt, 1, 0)
         layout.otro(lyO, 2, 0)
         layout.otro(lya, 3, 0)
@@ -85,12 +85,12 @@ class WInfomove(QtWidgets.QWidget):
 
         self.siReloj = False
 
-    def cambiado_tablero(self):
-        self.lbPGN.anchoFijo(self.tablero.ancho)
-        self.lbOpening.anchoFijo(self.tablero.ancho)
+    def cambiado_board(self):
+        self.lbPGN.anchoFijo(self.board.ancho)
+        self.lb_opening.anchoFijo(self.board.ancho)
 
     def process_toolbar(self):
-        getattr(self, self.sender().clave)()
+        getattr(self, self.sender().key)()
 
     def modoNormal(self):
         self.usoNormal = True
@@ -103,20 +103,20 @@ class WInfomove(QtWidgets.QWidget):
             txt = game.opening.trNombre
             if game.pending_opening:
                 txt += " ..."
-            self.lbOpening.ponTexto(txt)
+            self.lb_opening.set_text(txt)
         else:
-            self.lbOpening.ponTexto("")
+            self.lb_opening.set_text("")
         self.colocatePartida(move)
 
     def modoFEN(self, game, fen, move):
         self.usoNormal = False
         self.game = game
-        self.lbOpening.ponTexto(fen)
+        self.lb_opening.set_text(fen)
         self.colocatePartida(move)
 
     def colocate(self, pos):
         if not self.historia:
-            self.tablero.activaColor(True)
+            self.board.activate_side(True)
             return
         lh = len(self.historia) - 1
         if pos >= lh:
@@ -129,15 +129,15 @@ class WInfomove(QtWidgets.QWidget):
 
         move = self.historia[self.posHistoria]
         self.cpActual.read_fen(move.fen())
-        self.tablero.setposition(self.cpActual)
+        self.board.set_position(self.cpActual)
         pv = move.pv()
         if pv:
-            self.tablero.ponFlechaSC(pv[:2], pv[2:4])
+            self.board.put_arrow_sc(pv[:2], pv[2:4])
 
         if self.posHistoria != lh:
-            self.tablero.disable_all()
+            self.board.disable_all()
         else:
-            self.tablero.activaColor(self.cpActual.is_white)
+            self.board.activate_side(self.cpActual.is_white)
 
         nh = len(self.historia)
         li = []
@@ -151,12 +151,12 @@ class WInfomove(QtWidgets.QWidget):
                 xp = '<span style="color:blue">%s</span>' % xp
             li.append(xp)
         pgn = " ".join(li)
-        self.lbPGN.ponTexto(pgn)
+        self.lbPGN.set_text(pgn)
 
     def colocatePartida(self, pos):
         if not len(self.game):
-            self.lbPGN.ponTexto("")
-            self.tablero.setposition(self.game.first_position)
+            self.lbPGN.set_text("")
+            self.board.set_position(self.game.first_position)
             return
         lh = len(self.game) - 1
         if pos >= lh:
@@ -181,7 +181,7 @@ class WInfomove(QtWidgets.QWidget):
                 pgn += '<span style="%s">%d.</span>' % (style_number, numJugada)
                 numJugada += 1
 
-            xp = move.pgn_html(self.siFigurines)
+            xp = move.pgn_html(self.with_figurines)
             if n == pos:
                 xp = '<span style="%s">%s</span>' % (style_select, xp)
             else:
@@ -189,21 +189,21 @@ class WInfomove(QtWidgets.QWidget):
 
             pgn += '<a href="%d" style="text-decoration:none;">%s</a> ' % (n, xp)
 
-        self.lbPGN.ponTexto(pgn)
+        self.lbPGN.set_text(pgn)
 
         self.pos_move = pos
 
         if pos < 0:
-            self.tablero.setposition(self.game.first_position)
+            self.board.set_position(self.game.first_position)
             return
 
         move = self.game.move(self.pos_move)
         position = move.position
 
-        self.tablero.setposition(position)
-        self.tablero.ponFlechaSC(move.from_sq, move.to_sq)
+        self.board.set_position(position)
+        self.board.put_arrow_sc(move.from_sq, move.to_sq)
 
-        self.tablero.disable_all()
+        self.board.disable_all()
 
     def tecla_pulsada(self, k):
         if k in (Qt.Key_Left, Qt.Key_Up):
@@ -223,7 +223,7 @@ class WInfomove(QtWidgets.QWidget):
             # self.colocatePartida(-1)
             self.pos_move = -1
             position = self.game.first_position
-        self.tablero.setposition(position)
+        self.board.set_position(position)
 
     def MoverAtras(self):
         if self.usoNormal:
@@ -252,9 +252,9 @@ class WInfomove(QtWidgets.QWidget):
             self.lanzaReloj()
 
     def toolbar_rightmouse(self):
-        configuracion = Code.configuracion
-        QTVarios.change_interval(self, configuracion)
-        self.intervalo = configuracion.x_interval_replay
+        configuration = Code.configuration
+        QTVarios.change_interval(self, configuration)
+        self.intervalo = configuration.x_interval_replay
 
     def lanzaReloj(self):
         if self.siReloj:

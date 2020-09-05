@@ -1,16 +1,16 @@
 import random
 
 import Code
-from Code import Position
+from Code.Base import Position
 from Code.SQL import UtilSQL
 
-from Code.Constantes import RESULT_DRAW, RESULT_WIN_WHITE, RESULT_WIN_BLACK
+from Code.Base.Constantes import RESULT_DRAW, RESULT_WIN_WHITE, RESULT_WIN_BLACK
 
 
 class DBendings:
-    def __init__(self, configuracion):
-        self.configuracion = configuracion
-        self.db_data = UtilSQL.DictRawSQL(self.configuracion.file_endings_gtb())
+    def __init__(self, configuration):
+        self.configuration = configuration
+        self.db_data = UtilSQL.DictRawSQL(self.configuration.file_endings_gtb())
         self.db_examples = UtilSQL.DictRawSQL(Code.path_resource("IntFiles", "gtb5.db"))
 
         self.current_key = None
@@ -29,7 +29,7 @@ class DBendings:
         return key
 
     def keylist(self, examples=True, own=True):
-        pzs_gaviota = Code.configuracion.piezas_gaviota()
+        pzs_gaviota = Code.configuration.piezas_gaviota()
         lst = []
         if examples:
             lst.extend(self.db_examples.keys())
@@ -48,7 +48,7 @@ class DBendings:
                 d = {}
                 for mt, fen in lista:
                     cp.read_fen(fen)
-                    d[fen] = {"MATE": mt, "XFEN": cp.rotulo(), "ORIGIN": "example"}
+                    d[fen] = {"MATE": mt, "XFEN": cp.label(), "ORIGIN": "example"}
                 self.db_data[key] = d
         self.current_dicfen = self.db_data.get(key, {})
         self.current_key = key
@@ -105,26 +105,26 @@ class DBendings:
             dic_fen["TRIES_OK"] = dic_fen.get("TRIES_OK", 0) + 1
             ms_previo = dic_fen.get("TIMEMS")
             if (ms_previo is None) or (ms < ms_previo):
-                rotulo = _("New best time")
+                label = _("New best time")
                 dic_fen["TIMEMS"] = ms
             else:
-                rotulo = _("Time")
+                label = _("Time")
 
             dif = " (%.1f)" % ((ms - ms_previo) / 1000,) if ms_previo is not None else ""
-            mensaje += "%s: %.1f%s\n" % (rotulo, ms / 1000, dif)
+            mensaje += "%s: %.1f%s\n" % (label, ms / 1000, dif)
 
             moves_previo = dic_fen.get("MOVES")
             if (moves_previo is None) or (moves < moves_previo):
-                rotulo = _("New best moves")
+                label = _("New best moves")
                 dic_fen["MOVES"] = moves
             else:
-                rotulo = _("Moves")
+                label = _("Moves")
             if moves_previo:
                 xdif = moves - moves_previo
                 dif = " (%d)" % (xdif,) if xdif > 0 else " (=)"
             else:
                 dif = ""
-            mensaje += "%s: %d%s\n" % (rotulo, moves, dif)
+            mensaje += "%s: %d%s\n" % (label, moves, dif)
         self.db_data[self.current_key] = self.current_dicfen
         return success, mensaje
 
@@ -152,7 +152,7 @@ class DBendings:
         fen_m2 = cp.fenm2()
         self.read_key(key, "initial")
         if fen_m2 not in self.current_dicfen:
-            self.current_dicfen[fen_m2] = {"MATE": mt, "XFEN": cp.rotulo(), "ORIGIN": "manual"}
+            self.current_dicfen[fen_m2] = {"MATE": mt, "XFEN": cp.label(), "ORIGIN": "manual"}
             self.db_data[key] = self.current_dicfen
             self.current_listfen.append(fen_m2)
         return key, fen_m2
@@ -166,7 +166,7 @@ class DBendings:
             for mt, fen_m2 in lista:
                 if fen_m2 not in d:
                     cp.read_fen(fen_m2)
-                    d[fen_m2] = {"MATE": mt, "XFEN": cp.rotulo(), "ORIGIN": "example"}
+                    d[fen_m2] = {"MATE": mt, "XFEN": cp.label(), "ORIGIN": "example"}
                     num_imported += 1
             self.db_data[key] = d
             return num_imported
@@ -184,7 +184,7 @@ class DBendings:
             if fen_m2 in dic:
                 dic[fen_m2]["ORIGIN"] = tipo
             else:
-                dic[fen_m2] = {"MATE": mt, "XFEN": cp.rotulo(), "ORIGIN": tipo}
+                dic[fen_m2] = {"MATE": mt, "XFEN": cp.label(), "ORIGIN": tipo}
             self.db_data[key] = dic
         self.db_data.set_normal_mode()
 

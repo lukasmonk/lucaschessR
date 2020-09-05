@@ -11,37 +11,20 @@ from PySide2 import QtCore
 
 import Code
 from Code.Engines import Priorities
-from Code.Constantes import prlk
 from Code.Engines import EngineResponse
 from Code import Util
 from Code.QT import QTUtil2
 
 
-def xpr(exe, line):
-    if Code.DEBUG_ENGINE:
-        t = time.time()
-        prlk("%0.04f %s" % (t - tdbg[0], line))
-        tdbg[0] = t
-    return True
-
-
-def xprli(li):
-    if Code.DEBUG_ENGINE:
-        t = time.time()
-        dif = t - tdbg[0]
-        for line in li:
-            prlk("%0.04f %s" % (dif, line))
-        tdbg[0] = t
-    return True
-
-
-if Code.DEBUG_ENGINE:
-    tdbg = [time.time()]
-    xpr("", "DEBUG XMOTOR")
-
-
 class RunEngine:
     def __init__(self, name, exe, liOpcionesUCI=None, nMultiPV=0, priority=None, args=None):
+        if Code.DEBUG_ENGINE:
+            self.put_line = self.put_line_debug
+            self.xstdout_thread = self.xstdout_thread_debug
+        else:
+            self.put_line = self.put_line_base
+            self.xstdout_thread = self.xstdout_thread_base
+
         self.name = name
 
         self.ponder = False
@@ -116,9 +99,19 @@ class RunEngine:
     def cerrar(self):
         self.working = False
 
-    def put_line(self, line: str):
+    def put_line_debug(self, line: str):
         if self.working:
-            assert xpr(self.exe, "put>>> %s\n" % line)
+            Code.xpr(self.name, "put>>> %s\n" % line)
+            self.stdin_lock.acquire()
+            line = line.encode()
+            if self.log:
+                self.log_write(">>> %s\n" % line)
+            self.stdin.write(line + b"\n")
+            self.stdin.flush()
+            self.stdin_lock.release()
+
+    def put_line_base(self, line: str):
+        if self.working:
             self.stdin_lock.acquire()
             line = line.encode()
             if self.log:
@@ -145,13 +138,31 @@ class RunEngine:
         self.mrm = EngineResponse.MultiEngineResponse(self.name, self.is_white)
         self.stdout_lock.release()
 
-    def xstdout_thread(self, stdout, lock):
+    def xstdout_thread_base(self, stdout, lock):
         try:
             while self.working:
                 line = stdout.readline().decode()
-                assert xpr(self.exe, line)
                 if not line:
                     break
+                lock.acquire()
+                self.liBuffer.append(line)
+                if self.direct_dispatch:
+                    self.mrm.dispatch(line)
+                lock.release()
+                if self.direct_dispatch and "bestmove" in line:
+                    self.direct_dispatch()
+        except:
+            pass
+        finally:
+            stdout.close()
+
+    def xstdout_thread_debug(self, stdout, lock):
+        try:
+            while self.working:
+                line = stdout.readline().decode()
+                if not line:
+                    break
+                xpr(self.name, line)
                 lock.acquire()
                 self.liBuffer.append(line)
                 if self.direct_dispatch:
@@ -184,7 +195,6 @@ class RunEngine:
         self.stdin = self.process.stdin
         self.stdout = self.process.stdout
 
-
     def start(self):
         self.start_engine()
 
@@ -215,7 +225,6 @@ class RunEngine:
                 sys.stderr.write("INFO X CLOSE: except - the engine %s won't close properly.\n" % self.exe)
 
             self.pid = None
-
 
     def log_open(self, fichero):
         self.log = open(fichero, "at", encoding="utf-8")
@@ -268,8 +277,8 @@ class RunEngine:
                     return False
                 time.sleep(0.001)
 
-    def wait_list(self, txt, msStop):
-        iniTiempo = time.time()
+    def wait_list(self, txt, ms_stop):
+        ini_tiempo = time.time()
         stop = False
         ok = False
         li = []
@@ -284,25 +293,25 @@ class RunEngine:
                 if ok:
                     return li, True
 
-            queda = msStop - int((time.time() - iniTiempo) * 1000)
+            queda = ms_stop - int((time.time() - ini_tiempo) * 1000)
             if queda <= 0:
                 if stop:
                     return li, False
                 self.put_line("stop")
-                msStop += 2000
+                ms_stop += 2000
                 stop = True
             if not self.hay_datos():
                 time.sleep(0.001)
 
     def wait_txt(self, seektxt, msStop):
-        iniTiempo = time.time()
+        ini_tiempo = time.time()
         while True:
             lt = self.get_lines()
             for line in lt:
                 if seektxt in line:
                     return True
 
-            queda = msStop - int((time.time() - iniTiempo) * 1000)
+            queda = msStop - int((time.time() - ini_tiempo) * 1000)
             if queda <= 0:
                 return False
             if not self.hay_datos():

@@ -152,7 +152,7 @@ class Scanner(QtWidgets.QDialog):
         k = event.key()
         m = int(event.modifiers())
         siCtrl = (m & QtCore.Qt.ControlModifier) > 0
-        siAlt = (m & QtCore.Qt.AltModifier) > 0
+        is_alt = (m & QtCore.Qt.AltModifier) > 0
         x = self.x
         y = self.y
         width = self.width
@@ -181,7 +181,7 @@ class Scanner(QtWidgets.QDialog):
                 if siCtrl:
                     width += 8
                     height += 8
-                elif siAlt:
+                elif is_alt:
                     width += 8
                 else:
                     x += 1
@@ -189,7 +189,7 @@ class Scanner(QtWidgets.QDialog):
                 if siCtrl:
                     width -= 8
                     height -= 8
-                elif siAlt:
+                elif is_alt:
                     width -= 8
                 else:
                     x -= 1
@@ -197,7 +197,7 @@ class Scanner(QtWidgets.QDialog):
                 if siCtrl:
                     height -= 8
                     width -= 8
-                elif siAlt:
+                elif is_alt:
                     height -= 8
                 else:
                     y -= 1
@@ -205,7 +205,7 @@ class Scanner(QtWidgets.QDialog):
                 if siCtrl:
                     height += 8
                     width += 8
-                elif siAlt:
+                elif is_alt:
                     height += 8
                 else:
                     y += 1

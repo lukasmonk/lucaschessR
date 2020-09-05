@@ -3,12 +3,12 @@ import random
 
 from Code.Engines import Engines
 
-from Code import Game
+from Code.Base import Game
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
 
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class EngineTournament(Engines.Engine):
@@ -46,7 +46,7 @@ class EngineTournament(Engines.Engine):
         otro = EngineTournament()
         otro.restore(self.save())
         otro.pon_huella(torneo)
-        otro.clave += "-1"
+        otro.key += "-1"
         return otro
 
     def book(self, valor=None):
@@ -70,7 +70,7 @@ class EngineTournament(Engines.Engine):
         return self.time
 
     def read_exist_engine(self, resp):
-        cm = Code.configuracion.buscaRival(resp)
+        cm = Code.configuration.buscaRival(resp)
         self.restore(cm.save())
 
     def add_result(self, game):
@@ -221,7 +221,7 @@ class Tournament:
         return self.config("adjudicator_active", valor, False)
 
     def adjudicator(self, valor=None):
-        return self.config("adjudicator", valor, Code.configuracion.tutor_inicial)
+        return self.config("adjudicator", valor, Code.configuration.tutor_inicial)
 
     def adjudicator_time(self, valor=None):
         return self.config("adjudicator_time", valor, 5.0)
@@ -349,12 +349,13 @@ class Tournament:
         lista.sort(reverse=True)
         for pos in lista:
             game = self.game_finished(pos)
-            eng_white = self.db_engines.get(game.hwhite)
-            eng_black = self.db_engines.get(game.hblack)
-            eng_white.remove_result(game)
-            eng_black.remove_result(game)
-            self.save_engine(eng_white)  # reemplaza
-            self.save_engine(eng_black)  # reemplaza
+            if game:
+                eng_white = self.db_engines.get(game.hwhite)
+                eng_black = self.db_engines.get(game.hblack)
+                eng_white.remove_result(game)
+                eng_black.remove_result(game)
+                self.save_engine(eng_white)  # reemplaza
+                self.save_engine(eng_black)  # reemplaza
 
             del self.db_games_finished[pos]
 

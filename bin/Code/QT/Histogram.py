@@ -163,7 +163,7 @@ class GraphToolTip(QtWidgets.QGraphicsItem):
     def setDispatch(self, dispatch):
         self.dispatch = dispatch
 
-    def ponTextoPos(self, txt, x, y, dr):
+    def set_textPos(self, txt, x, y, dr):
         self.font = self.scene().font()
         self.font.setPointSize(12)
         self.metrics = QtGui.QFontMetrics(self.font)
@@ -260,7 +260,7 @@ class Histogram(QtWidgets.QGraphicsView):
         self.owner.grid_doble_click(self.grid, gridPos, 0)
 
     def show_tooltip(self, txt, x, y, dr):
-        self.tooltip.ponTextoPos(txt, x, y, dr)
+        self.tooltip.set_textPos(txt, x, y, dr)
 
     def hide_tooltip(self):
         self.tooltip.hide()
@@ -419,14 +419,14 @@ class Histogram(QtWidgets.QGraphicsView):
                 if resp == "clip":
                     QTUtil.ponPortapapeles(pm, tipo="p")
                 else:
-                    configuracion = Code.configuracion
+                    configuration = Code.configuration
                     path = QTUtil2.salvaFichero(
-                        self, _("File to save"), configuracion.x_save_folder, "%s PNG (*.png)" % _("File"), False
+                        self, _("File to save"), configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
                     )
                     if path:
                         pm.save(path, "png")
-                        configuracion.x_save_folder = os.path.dirname(path)
-                        configuracion.graba()
+                        configuration.x_save_folder = os.path.dirname(path)
+                        configuration.graba()
 
     def mouseDoubleClickEvent(self, event):
         super(Histogram, self).mouseDoubleClickEvent(event)
@@ -480,15 +480,15 @@ def genHistograms(game):
             lostp = abs(pts0 - pts)
 
             nj = num / 2.0 + 1.0
-            rotulo = "%d." % int(nj)
+            label = "%d." % int(nj)
             if not is_white:
-                rotulo += ".."
-            move.xnum = rotulo
-            rotulo += move.pgn_translated()
+                label += ".."
+            move.xnum = label
+            label += move.pgn_translated()
 
             move.xsiW = is_white
 
-            tooltip = rotulo + " %+0.02f" % pts
+            tooltip = label + " %+0.02f" % pts
             if lostp:
                 tooltip += " ?%0.02f" % lostp
             else:

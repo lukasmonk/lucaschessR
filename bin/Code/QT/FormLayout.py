@@ -63,11 +63,14 @@ class FormLayout:
     def eddefault(self, label: str, init_value):
         self.li_gen.append((label + ":", init_value))
 
+    def edit_np(self, label: str, init_value):
+        self.li_gen.append((label, init_value))
+
     def edit(self, label: str, init_value: str):
         self.eddefault(label, init_value)
 
-    def combobox(self, label, lista, init_value, si_editable=False, tooltip=None):
-        self.li_gen.append((Combobox(label, lista, si_editable, tooltip), init_value))
+    def combobox(self, label, lista, init_value, is_editable=False, tooltip=None):
+        self.li_gen.append((Combobox(label, lista, is_editable, tooltip), init_value))
 
     def checkbox(self, label: str, init_value: bool):
         self.eddefault(label, init_value)
@@ -99,6 +102,9 @@ class FormLayout:
 
     def apart(self, title):
         self.li_gen.append((None, title + ":"))
+
+    def apart_np(self, title):
+        self.li_gen.append((None, title))
 
     def apart_simple(self, title):
         self.li_gen.append((None, "$" + title + ":"))
@@ -147,11 +153,11 @@ class CHSpinbox:
 
 
 class Combobox:
-    def __init__(self, label, lista, si_editable=False, tooltip=None):
+    def __init__(self, label, lista, is_editable=False, tooltip=None):
         self.tipo = COMBOBOX
-        self.lista = lista  # (clave,titulo),....
+        self.lista = lista  # (key,titulo),....
         self.label = label + ":"
-        self.si_editable = si_editable
+        self.is_editable = is_editable
         self.tooltip = tooltip
 
 
@@ -328,11 +334,11 @@ class LBotonCarpeta(QtWidgets.QHBoxLayout):
         carpeta = QTUtil2.leeCarpeta(self.parent, self.carpeta, self.config.label)
         if carpeta:
             self.carpeta = os.path.abspath(carpeta)
-            self.boton.ponTexto(carpeta)
+            self.boton.set_text(carpeta)
 
     def cancelar(self):
         self.carpeta = self.config.carpetaDefecto
-        self.boton.ponTexto(self.carpeta)
+        self.boton.set_text(self.carpeta)
 
 
 class BotonColor(QtWidgets.QPushButton):
@@ -349,7 +355,7 @@ class BotonColor(QtWidgets.QPushButton):
 
         self.dispatch = dispatch
 
-    def put_color(self, xcolor):
+    def set_color_foreground(self, xcolor):
 
         self.xcolor = xcolor
 
@@ -374,9 +380,9 @@ class BotonColor(QtWidgets.QPushButton):
         )
         if color.isValid():
             if self.siSTR:
-                self.put_color(color.name())
+                self.set_color_foreground(color.name())
             else:
-                self.put_color(color.rgba())
+                self.set_color_foreground(color.rgba())
         if self.dispatch:
             self.dispatch()
 
@@ -399,14 +405,14 @@ class BotonCheckColor(QtWidgets.QHBoxLayout):
         self.addWidget(self.checkbox)
         self.addWidget(self.boton)
 
-    def put_color(self, ncolor):
+    def set_color_foreground(self, ncolor):
         if ncolor == -1:
             self.boton.hide()
             self.checkbox.setChecked(False)
         else:
             self.boton.show()
             self.checkbox.setChecked(True)
-            self.boton.put_color(ncolor)
+            self.boton.set_color_foreground(ncolor)
 
     def value(self):
         if self.checkbox.isChecked():
@@ -417,10 +423,10 @@ class BotonCheckColor(QtWidgets.QHBoxLayout):
     def pulsado(self):
         if self.checkbox.isChecked():
             if self.boton.xcolor == -1:
-                self.boton.put_color(0)
+                self.boton.set_color_foreground(0)
                 self.boton.pulsado()
             else:
-                self.boton.put_color(self.boton.xcolor)
+                self.boton.set_color_foreground(self.boton.xcolor)
             self.boton.show()
         else:
             self.boton.hide()
@@ -551,7 +557,7 @@ class FormWidget(QtWidgets.QWidget):
                             field.valueChanged.connect(dispatch)
                     elif tipo == COMBOBOX:
                         field = Controles.CB(self, config.lista, value)
-                        if config.si_editable:
+                        if config.is_editable:
                             field.setEditable(True)
                         if config.tooltip:
                             field.setToolTip(config.tooltip)
@@ -579,7 +585,7 @@ class FormWidget(QtWidgets.QWidget):
                             field = BotonCheckColor(self, config.ancho, config.alto, dispatch)
                         else:
                             field = BotonColor(self, config.ancho, config.alto, config.siSTR, dispatch)
-                        field.put_color(value)
+                        field.set_color_foreground(value)
 
                     elif tipo == DIAL:
                         field = DialNum(self, config, dispatch)
@@ -590,7 +596,7 @@ class FormWidget(QtWidgets.QWidget):
                             field = Edit(self, config, dispatch)
                             tp = config.tipoCampo
                             if tp == str:
-                                field.ponTexto(value)
+                                field.set_text(value)
                             elif tp == int:
                                 field.tipoInt()
                                 field.ponInt(value)
@@ -599,7 +605,7 @@ class FormWidget(QtWidgets.QWidget):
                                 field.ponFloat(value)
                         else:
                             field = TextEdit(self, config, dispatch)
-                            field.ponTexto(value)
+                            field.set_text(value)
 
                     elif tipo == FICHERO:
                         field = LBotonFichero(self, config, value)

@@ -23,7 +23,7 @@ class ED(QtWidgets.QLineEdit):
 
         self.menu = None
 
-    def soloLectura(self, sino):
+    def read_only(self, sino):
         self.setReadOnly(sino)
         return self
 
@@ -31,30 +31,30 @@ class ED(QtWidgets.QLineEdit):
         self.setEchoMode(QtWidgets.QLineEdit.Password)
         return self
 
-    def deshabilitado(self, sino):
+    def set_disabled(self, sino):
         self.setDisabled(sino)
         return self
 
-    def capturaIntro(self, rutina):
+    def capture_enter(self, rutina):
         self.returnPressed.connect(rutina)
         return self
 
-    def capturaCambiado(self, rutina):
+    def capture_changes(self, rutina):
         self.textEdited.connect(rutina)
         return self
 
-    def ponTexto(self, texto):
+    def set_text(self, texto):
         self.setText(texto)
 
     def texto(self):
         txt = self.text()
         return txt
 
-    def alinCentrado(self):
+    def align_center(self):
         self.setAlignment(QtCore.Qt.AlignHCenter)
         return self
 
-    def alinDerecha(self):
+    def align_right(self):
         self.setAlignment(QtCore.Qt.AlignRight)
         return self
 
@@ -81,26 +81,26 @@ class ED(QtWidgets.QLineEdit):
         self.setValidator(validator)
         return self
 
-    def invalid_characters(self, c_invalid):
-        def validador(x):
-            for c in x:
-                if c in c_invalid:
-                    return False
-            return True
-
-        self.setValidator(validador)
-        return self
+    # def invalid_characters(self, c_invalid):
+    #     def validador(x):
+    #         for c in x:
+    #             if c in c_invalid:
+    #                 return False
+    #         return True
+    #
+    #     self.setValidator(validador)
+    #     return self
 
     def ponFuente(self, f):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
-    def tipoFloat(self, valor=0.0, from_sq=0.0, to_sq=36000.0, decimales=None):
+    def tipoFloat(self, valor: float = 0.0, from_sq: float = 0.0, to_sq: float = 36000.0, decimales: int = None) -> object:
         """
         Valida los caracteres suponiendo que es un tipo decimal con unas condiciones
         @param valor: valor inicial
@@ -122,7 +122,7 @@ class ED(QtWidgets.QLineEdit):
 
     def ponFloat(self, valor):
         fm = "%0." + str(self.decimales) + "f"
-        self.ponTexto(fm % valor)
+        self.set_text(fm % valor)
         return self
 
     def textoFloat(self):
@@ -140,7 +140,7 @@ class ED(QtWidgets.QLineEdit):
         return self
 
     def ponInt(self, valor):
-        self.ponTexto(str(valor))
+        self.set_text(str(valor))
         return self
 
     def textoInt(self):
@@ -174,7 +174,7 @@ class SB(QtWidgets.QSpinBox):
     def ponValor(self, valor):
         self.setValue(int(valor) if valor else 0)
 
-    def capturaCambiado(self, rutina):
+    def capture_changes(self, rutina):
         self.valueChanged.connect(rutina)
         return self
 
@@ -185,12 +185,12 @@ class SB(QtWidgets.QSpinBox):
 
 class CB(QtWidgets.QComboBox):
     """
-    ComboBox : entrada de una lista de opciones = etiqueta,clave[,icono]
+    ComboBox : entrada de una lista de opciones = etiqueta,key[,icono]
     """
 
     def __init__(self, parent, li_options, valorInicial):
         """
-        @param li_options: lista de (etiqueta,clave)
+        @param li_options: lista de (etiqueta,key)
         @param valorInicial: valor inicial
         """
         QtWidgets.QComboBox.__init__(self, parent)
@@ -209,37 +209,37 @@ class CB(QtWidgets.QComboBox):
         nindex = 0
         for n, opcion in enumerate(li_options):
             if len(opcion) == 2:
-                etiqueta, clave = opcion
-                self.addItem(etiqueta, clave)
+                etiqueta, key = opcion
+                self.addItem(etiqueta, key)
             else:
-                etiqueta, clave, icono = opcion
-                self.addItem(icono, etiqueta, clave)
-            if clave == valorInicial:
+                etiqueta, key, icono = opcion
+                self.addItem(icono, etiqueta, key)
+            if key == valorInicial:
                 nindex = n
         self.setCurrentIndex(nindex)
 
     def ponValor(self, valor):
         for n, opcion in enumerate(self.li_options):
-            clave = opcion[1]
-            if clave == valor:
+            key = opcion[1]
+            if key == valor:
                 self.setCurrentIndex(n)
                 break
 
-    def ponAncho(self, px):
+    def set_width(self, px):
         r = self.geometry()
         r.setWidth(px)
         self.setGeometry(r)
         return self
 
-    def ponAnchoFijo(self, px):
+    def set_widthFijo(self, px):
         self.setFixedWidth(px)
         return self
 
-    def ponAnchoMinimo(self):
+    def set_widthMinimo(self):
         self.setSizeAdjustPolicy(self.AdjustToMinimumContentsLengthWithIcon)
         return self
 
-    def capturaCambiado(self, rutina):
+    def capture_changes(self, rutina):
         self.currentIndexChanged.connect(rutina)
         return self
 
@@ -251,7 +251,7 @@ class CHB(QtWidgets.QCheckBox):
 
     def __init__(self, parent, etiqueta, valorInicial):
         """
-        @param etiqueta: rotulo mostrado
+        @param etiqueta: label mostrado
         @param valorInicial: valor inicial : True/False
         """
         QtWidgets.QCheckBox.__init__(self, etiqueta, parent)
@@ -268,7 +268,7 @@ class CHB(QtWidgets.QCheckBox):
         self.setFont(f)
         return self
 
-    def capturaCambiado(self, owner, rutina):
+    def capture_changes(self, owner, rutina):
         self.clicked.connect(rutina)
         return self
 
@@ -294,7 +294,7 @@ class LB(QtWidgets.QLabel):
         self.setOpenExternalLinks(True)
         self.setTextInteractionFlags(QtCore.Qt.TextBrowserInteraction | QtCore.Qt.TextSelectableByMouse)
 
-    def ponTexto(self, texto):
+    def set_text(self, texto):
         self.setText(texto)
 
     def texto(self):
@@ -304,16 +304,16 @@ class LB(QtWidgets.QLabel):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
-    def alinCentrado(self):
+    def align_center(self):
         self.setAlignment(QtCore.Qt.AlignCenter)
         return self
 
-    def alinDerecha(self):
+    def align_right(self):
         self.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         return self
 
@@ -353,29 +353,29 @@ class LB(QtWidgets.QLabel):
         self.setPixmap(pm)
         return self
 
-    def ponFondo(self, color):
-        return self.ponFondoN(color.name())
+    def set_color_background(self, color):
+        return self.set_background(color.name())
 
-    def ponFondoN(self, color):
-        self.setStyleSheet("QWidget { background-color: %s }" % color)
+    def set_background(self, txt_color: str):
+        self.setStyleSheet("QWidget { background-color: %s }" % txt_color)
         return self
 
-    def put_color(self, color):
-        return self.ponColorN(color.name())
+    def set_color_foreground(self, color):
+        return self.set_foreground(color.name())
 
-    def ponColorN(self, color):
-        self.setStyleSheet("QWidget { color: %s }" % color)
+    def set_foreground(self, txt_color: str):
+        self.setStyleSheet("QWidget { color: %s }" % txt_color)
         return self
 
-    def ponColorFondoN(self, color, fondo):
+    def set_foreground_backgound(self, color, fondo):
         self.setStyleSheet("QWidget { color: %s; background-color: %s}" % (color, fondo))
         return self
 
-    def ponWrap(self):
+    def set_wrap(self):
         self.setWordWrap(True)
         return self
 
-    def ponAncho(self, px):
+    def set_width(self, px):
         r = self.geometry()
         r.setWidth(px)
         self.setGeometry(r)
@@ -393,27 +393,27 @@ class PB(QtWidgets.QPushButton):
 
     def __init__(self, parent, texto, rutina=None, plano=True):
         """
-        @param parent: ventana propietaria, necesario para conectar una rutina.
+        @param parent: ventana propietaria, necesario para to_connect una rutina.
         @param texto: etiqueta inicial.
         @param rutina: rutina a la que se conecta el boton.
         """
         QtWidgets.QPushButton.__init__(self, texto, parent)
-        self.wParent = parent
+        self.w_parent = parent
         self.setFlat(plano)
         if rutina:
-            self.conectar(rutina)
+            self.to_connect(rutina)
 
-    def ponIcono(self, icono, tamIcon=16):
+    def ponIcono(self, icono, icon_size=16):
         self.setIcon(icono)
-        self.setIconSize(QtCore.QSize(tamIcon, tamIcon))
+        self.setIconSize(QtCore.QSize(icon_size, icon_size))
         return self
 
     def ponFuente(self, f):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
@@ -433,16 +433,12 @@ class PB(QtWidgets.QPushButton):
         self.setMinimumWidth(px)
         return self
 
-    def conectar(self, rutina):
+    def to_connect(self, rutina):
         self.clicked.connect(rutina)
         return self
 
-    def ponFondo(self, txtFondo):
+    def set_background(self, txtFondo):
         self.setStyleSheet("QWidget { background: %s }" % txtFondo)
-        return self
-
-    def ponFondoN(self, ncolor):
-        self.setStyleSheet("QWidget { background-color: %d }" % ncolor)
         return self
 
     def ponPlano(self, siPlano):
@@ -453,7 +449,7 @@ class PB(QtWidgets.QPushButton):
         self.setToolTip(txt)
         return self
 
-    def ponTexto(self, txt):
+    def set_text(self, txt):
         self.setText(txt)
 
 
@@ -462,8 +458,8 @@ class RB(QtWidgets.QRadioButton):
     RadioButton: lista de alternativas
     """
 
-    def __init__(self, wParent, texto, rutina=None):
-        QtWidgets.QRadioButton.__init__(self, texto, wParent)
+    def __init__(self, w_parent, texto, rutina=None):
+        QtWidgets.QRadioButton.__init__(self, texto, w_parent)
         if rutina:
             self.clicked.connect(rutina)
 
@@ -477,32 +473,32 @@ class GB(QtWidgets.QGroupBox):
     GroupBox: Recuadro para agrupamiento de controles
     """
 
-    def __init__(self, wParent, texto, layout):
-        QtWidgets.QGroupBox.__init__(self, texto, wParent)
+    def __init__(self, w_parent, texto, layout):
+        QtWidgets.QGroupBox.__init__(self, texto, w_parent)
         self.setLayout(layout)
-        self.wParent = wParent
+        self.w_parent = w_parent
 
     def ponFuente(self, f):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
-    def alinCentrado(self):
+    def align_center(self):
         self.setAlignment(QtCore.Qt.AlignHCenter)
         return self
 
-    def conectar(self, rutina):
+    def to_connect(self, rutina):
         self.setCheckable(True)
         self.setChecked(False)
         self.clicked.connect(rutina)
         return self
 
-    def ponTexto(self, texto):
-        self.setTitle(texto)
+    def set_text(self, text):
+        self.setTitle(text)
         return self
 
 
@@ -541,21 +537,21 @@ class EM(QtWidgets.QTextEdit):
         self.insertPlainText(texto)
         return self
 
-    def soloLectura(self):
+    def read_only(self):
         self.setReadOnly(True)
         return self
 
     def texto(self):
         return self.toPlainText()
 
-    def ponTexto(self, txt):
+    def set_text(self, txt):
         self.setText("")
         self.insertarTexto(txt)
 
     def html(self):
         return self.toHtml()
 
-    def ponAncho(self, px):
+    def set_width(self, px):
         r = self.geometry()
         r.setWidth(px)
         self.setGeometry(r)
@@ -581,12 +577,12 @@ class EM(QtWidgets.QTextEdit):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
-    def ponWrap(self, siPoner):
+    def set_wrap(self, siPoner):
         self.setWordWrapMode(QtGui.QTextOption.WordWrap if siPoner else QtGui.QTextOption.NoWrap)
         return self
 
@@ -660,17 +656,17 @@ class Menu(QtWidgets.QMenu):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
-    def opcion(self, clave, rotulo, icono=None, is_disabled=False, tipoLetra=None, siChecked=False):
+    def opcion(self, key, label, icono=None, is_disabled=False, tipoLetra=None, siChecked=False):
         if icono:
-            accion = QtWidgets.QAction(icono, rotulo, self)
+            accion = QtWidgets.QAction(icono, label, self)
         else:
-            accion = QtWidgets.QAction(rotulo, self)
-        accion.clave = clave
+            accion = QtWidgets.QAction(label, self)
+        accion.key = key
         if is_disabled:
             accion.setDisabled(True)
         if tipoLetra:
@@ -682,8 +678,8 @@ class Menu(QtWidgets.QMenu):
         self.addAction(accion)
         return accion
 
-    def submenu(self, rotulo, icono=None, is_disabled=False):
-        menu = Menu(self, rotulo, icono, is_disabled)
+    def submenu(self, label, icono=None, is_disabled=False):
+        menu = Menu(self, label, icono, is_disabled)
         menu.setFont(self.font())
         self.addMenu(menu)
         return menu
@@ -703,7 +699,7 @@ class Menu(QtWidgets.QMenu):
         QtWidgets.QApplication.processEvents()
         resp = self.exec_(QtGui.QCursor.pos())
         if resp:
-            return resp.clave
+            return resp.key
         else:
             return None
 
@@ -712,24 +708,24 @@ class TB(QtWidgets.QToolBar):
     """
     Crea una barra de tareas simple.
 
-    @param li_acciones: lista de acciones, en forma de tupla = titulo, icono, clave
-    @param siTexto: si muestra texto
-    @param tamIcon: tama_o del icono
+    @param li_acciones: lista de acciones, en forma de tupla = titulo, icono, key
+    @param with_text: si muestra texto
+    @param icon_size: tama_o del icono
     @param rutina: rutina que se llama al pulsar una opcion. Por defecto sera parent.process_toolbar().
-        Y la clave enviada se obtiene de self.sender().clave
+        Y la key enviada se obtiene de self.sender().key
     """
 
-    def __init__(self, parent, li_acciones, siTexto=True, tamIcon=32, rutina=None, puntos=None, background=None):
+    def __init__(self, parent, li_acciones, with_text=True, icon_size=32, rutina=None, puntos=None, background=None):
 
-        QtWidgets.QToolBar.__init__(self, "BASICO", parent)
+        QtWidgets.QToolBar.__init__(self, "BASIC", parent)
 
-        self.setIconSize(QtCore.QSize(tamIcon, tamIcon))
+        self.setIconSize(QtCore.QSize(icon_size, icon_size))
 
         self.parent = parent
 
         self.rutina = parent.process_toolbar if rutina is None else rutina
 
-        if siTexto:
+        if with_text:
             self.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
         self.f = TipoLetra(puntos=puntos) if puntos else None
@@ -740,24 +736,24 @@ class TB(QtWidgets.QToolBar):
         self.ponAcciones(li_acciones)
 
     def ponAcciones(self, li_acciones):
-        self.dicTB = {}
+        self.dic_toolbar = {}
         lista = []
         for datos in li_acciones:
             if datos:
                 if type(datos) == int:
                     self.addWidget(LB("").anchoFijo(datos))
                 else:
-                    titulo, icono, clave = datos
+                    titulo, icono, key = datos
                     accion = QtWidgets.QAction(titulo, self.parent)
                     accion.setIcon(icono)
                     accion.setIconText(titulo)
                     accion.triggered.connect(self.rutina)
-                    accion.clave = clave
+                    accion.key = key
                     if self.f:
                         accion.setFont(self.f)
                     lista.append(accion)
                     self.addAction(accion)
-                    self.dicTB[clave] = accion
+                    self.dic_toolbar[key] = accion
             else:
                 self.addSeparator()
         self.li_acciones = lista
@@ -773,7 +769,7 @@ class TB(QtWidgets.QToolBar):
 
     def setAccionVisible(self, key, value):
         for accion in self.li_acciones:
-            if accion.clave == key:
+            if accion.key == key:
                 accion.setVisible(value)
 
     def mousePressEvent(self, event: QtGui.QMouseEvent):
@@ -788,25 +784,24 @@ class TBrutina(QtWidgets.QToolBar):
     """
     Crea una barra de tareas simple.
 
-    @param li_acciones: lista de acciones, en forma de tupla = titulo, icono, clave
-    @param siTexto: si muestra texto
-    @param tamIcon: tama_o del icono
-    @param rutina: rutina que se llama al pulsar una opcion. Por defecto sera parent.process_toolbar().
-        Y la clave enviada se obtiene de self.sender().clave
+    @param li_acciones: lista de acciones, en forma de tupla = titulo, icono, key
+    @param with_text: si muestra texto
+    @param icon_size: tama_o del icono
+        Y la key enviada se obtiene de self.sender().key
     """
 
-    def __init__(self, parent, li_acciones=None, siTexto=True, tamIcon=None, puntos=None, background=None, style=None):
+    def __init__(self, parent, li_acciones=None, with_text=True, icon_size=None, puntos=None, background=None, style=None):
 
-        QtWidgets.QToolBar.__init__(self, "BASICO", parent)
+        QtWidgets.QToolBar.__init__(self, "BASIC", parent)
 
         if style:
             self.setToolButtonStyle(style)
-            if style != QtCore.Qt.ToolButtonTextUnderIcon and tamIcon is None:
-                tamIcon = 16
-        elif siTexto:
+            if style != QtCore.Qt.ToolButtonTextUnderIcon and icon_size is None:
+                icon_size = 16
+        elif with_text:
             self.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 
-        tam = 32 if tamIcon is None else tamIcon
+        tam = 32 if icon_size is None else icon_size
         self.setIconSize(QtCore.QSize(tam, tam))
 
         self.parent = parent
@@ -820,37 +815,37 @@ class TBrutina(QtWidgets.QToolBar):
             self.ponAcciones(li_acciones)
 
         else:
-            self.dicTB = {}
+            self.dic_toolbar = {}
             self.li_acciones = []
 
-    def new(self, titulo, icono, clave, sep=True, toolTip=None):
+    def new(self, titulo, icono, key, sep=True, toolTip=None):
         accion = QtWidgets.QAction(titulo, self.parent)
         accion.setIcon(icono)
         accion.setIconText(titulo)
         if toolTip:
             accion.setToolTip(toolTip)
-        accion.triggered.connect(clave)
+        accion.triggered.connect(key)
         if self.f:
             accion.setFont(self.f)
         self.li_acciones.append(accion)
         self.addAction(accion)
-        self.dicTB[clave] = accion
+        self.dic_toolbar[key] = accion
         if sep:
             self.addSeparator()
 
     def ponAcciones(self, liAcc):
-        self.dicTB = {}
+        self.dic_toolbar = {}
         self.li_acciones = []
         for datos in liAcc:
             if datos:
                 if type(datos) == int:
                     self.addWidget(LB("").anchoFijo(datos))
                 elif len(datos) == 3:
-                    titulo, icono, clave = datos
-                    self.new(titulo, icono, clave, False)
+                    titulo, icono, key = datos
+                    self.new(titulo, icono, key, False)
                 else:
-                    titulo, icono, clave, toolTip = datos
-                    self.new(titulo, icono, clave, False, toolTip=toolTip)
+                    titulo, icono, key, toolTip = datos
+                    self.new(titulo, icono, key, False, toolTip=toolTip)
             else:
                 self.addSeparator()
 
@@ -867,18 +862,23 @@ class TBrutina(QtWidgets.QToolBar):
         self.li_acciones[pos].setVisible(value)
 
     def setAccionVisible(self, key, value):
-        accion = self.dicTB.get(key, None)
+        accion = self.dic_toolbar.get(key, None)
         if accion:
             accion.setVisible(value)
 
+    def set_action_enabled(self, key, value):
+        accion = self.dic_toolbar.get(key, None)
+        if accion:
+            accion.setEnabled(value)
+
 
 class TipoLetra(QtGui.QFont):
-    def __init__(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
+    def __init__(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
         QtGui.QFont.__init__(self)
         if txt is None:
-            cursiva = 1 if siCursiva else 0
-            subrayado = 1 if siSubrayado else 0
-            tachado = 1 if siTachado else 0
+            cursiva = 1 if is_italic else 0
+            subrayado = 1 if is_underlined else 0
+            tachado = 1 if is_striked else 0
             if not name:
                 name = self.defaultFamily()
             txt = "%s,%d,-1,5,%d,%d,%d,%d,0,0" % (name, puntos, peso, cursiva, subrayado, tachado)
@@ -901,7 +901,7 @@ class Tab(QtWidgets.QTabWidget):
     def activa(self, cual):
         self.setCurrentIndex(cual)
 
-    def setposition(self, pos):
+    def set_position(self, pos):
         rpos = self.North
         if pos == "S":
             rpos = self.South
@@ -919,8 +919,8 @@ class Tab(QtWidgets.QTabWidget):
         self.setFont(f)
         return self
 
-    def ponTipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
-        f = TipoLetra(name, puntos, peso, siCursiva, siSubrayado, siTachado, txt)
+    def ponTipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
+        f = TipoLetra(name, puntos, peso, is_italic, is_underlined, is_striked, txt)
         self.setFont(f)
         return self
 
@@ -959,7 +959,7 @@ class SL(QtWidgets.QSlider):
     def valor(self):
         return self.value()
 
-    def ponAncho(self, px):
+    def set_width(self, px):
         self.setFixedWidth(px)
         return self
 

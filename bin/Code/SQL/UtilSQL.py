@@ -531,7 +531,7 @@ class DictBig(object):
 
 class DictBigDB(object):
     def __init__(self):
-        self.conexion = sqlite3.connect(Code.configuracion.ficheroTemporal("dbdb"))
+        self.conexion = sqlite3.connect(Code.configuration.ficheroTemporal("dbdb"))
         self.conexion.execute("CREATE TABLE IF NOT EXISTS DATA( KEY TEXT PRIMARY KEY, VALUE BLOB );")
         self.conexion.execute("PRAGMA journal_mode=REPLACE")
         self.conexion.execute("PRAGMA synchronous=OFF")

@@ -6,8 +6,8 @@ from Code.Mate15 import Mate15, WRunMate15
 
 class WMate15(QTVarios.WDialogo):
     def __init__(self, procesador):
-        configuracion = procesador.configuracion
-        path = configuracion.file_mate15()
+        configuration = procesador.configuration
+        path = configuration.file_mate15()
         title = _("Mate in 1½")
         icon = Iconos.Mate15()
         extconfig = "mate15"
@@ -21,8 +21,8 @@ class WMate15(QTVarios.WDialogo):
         o_columns.nueva("INFO", _("Information"), 360)
         o_columns.nueva("TRIES", _("Tries"), 70, centered=True)
         o_columns.nueva("RESULT", _("Result"), 70, centered=True)
-        self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, altoFila=configuracion.x_pgn_rowheight)
-        f = Controles.TipoLetra(puntos=configuracion.x_pgn_fontpoints)
+        self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, altoFila=configuration.x_pgn_rowheight)
+        f = Controles.TipoLetra(puntos=configuration.x_pgn_fontpoints)
         self.glista.ponFuente(f)
 
         li_acciones = (
@@ -48,7 +48,7 @@ class WMate15(QTVarios.WDialogo):
 
         self.glista.gotop()
 
-    def grid_doble_click(self, grid, fila, oColumna):
+    def grid_doble_click(self, grid, row, o_column):
         self.play()
 
     def repetir(self):
@@ -78,9 +78,9 @@ class WMate15(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.db)
 
-    def grid_dato(self, grid, fila, oColumna):
-        m15 = self.db.mate15(fila)
-        col = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        m15 = self.db.mate15(row)
+        col = o_column.key
         if col == "DATE":
             return Util.dtostr_hm(m15.date)
         elif col == "POS":

@@ -4,12 +4,12 @@ import FasterCode
 import chess
 import chess.gaviota
 
-from Code.Position import Position
+from Code.Base.Position import Position
 
 
 class T4:
-    def __init__(self, configuracion):
-        self.tb = chess.gaviota.open_tablebase(configuracion.carpeta_gaviota())
+    def __init__(self, configuration):
+        self.tb = chess.gaviota.open_tablebase(configuration.carpeta_gaviota())
 
     def better_moves(self, fen, move):
         dic = self.checkFen(fen)

@@ -1,6 +1,6 @@
 import sqlite3
 
-from Code import Game
+from Code.Base import Game
 from Code import Util
 
 import FasterCode
@@ -197,7 +197,7 @@ class TreeSTAT:
             dic["number"] = ""
             dic["pvmove"] = pvmove
             dic["pv"] = pv
-            dic["analisis"] = dic_analysis.get(pvmove, None)
+            dic["analysis"] = dic_analysis.get(pvmove, None)
             dic["games"] = t
             tt += t
             dic["white"] = win
@@ -221,7 +221,7 @@ class TreeSTAT:
                     pv = pv.strip()
                     dic["pvmove"] = pvmove
                     dic["pv"] = pv
-                    dic["analisis"] = dic_analysis[pvmove]
+                    dic["analysis"] = dic_analysis[pvmove]
                     dic["games"] = 0
                     dic["white"] = 0
                     dic["draw"] = 0

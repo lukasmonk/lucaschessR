@@ -4,12 +4,14 @@ import time
 
 from PySide2 import QtWidgets, QtCore
 
-from Code import Analisis
-from Code import Game
+from Code.Analysis import Analysis, WindowAnalysisParam
+from Code.Base import Game
+from Code.Base.Constantes import *
+from Code.GM import GM
 from Code.Databases import DBgames, WDB_Utils
 from Code import TrListas
 from Code import Util
-from Code import AperturasStd
+from Code.Openings import OpeningsStd
 from Code.SQL import UtilSQL
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -19,11 +21,11 @@ from Code.QT import Iconos
 from Code.Polyglots import PolyglotImports
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import PantallaSavePGN
-from Code.QT import PantallaAnalisisParam
+from Code.QT import WindowSavePGN
 from Code.QT import GridEditCols
 from Code.QT import Delegados
-from Code.QT import PantallaPlayGame
+from Code.QT import WindowPlayGame
+from Code.QT import FormLayout
 
 
 class WGames(QtWidgets.QWidget):
@@ -33,7 +35,7 @@ class WGames(QtWidgets.QWidget):
         self.wb_database = wb_database
         self.dbGames = dbGames  # <--setdbGames
         self.procesador = procesador
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
 
         self.wsummary = wsummary
         self.infoMove = None  # <-- setInfoMove
@@ -44,7 +46,7 @@ class WGames(QtWidgets.QWidget):
 
         self.terminado = False  # singleShot
 
-        self.ap = AperturasStd.ap
+        self.ap = OpeningsStd.ap
 
         self.liFiltro = []
         self.where = None
@@ -77,7 +79,7 @@ class WGames(QtWidgets.QWidget):
             liAccionesWork = [
                 (_("Close"), Iconos.MainMenu(), wb_database.tw_terminar),
                 None,
-                (_("Edit"), Iconos.Modificar(), self.tw_editar),
+                (_("Edit"), Iconos.Modificar(), self.tw_edit),
                 None,
                 (_("New"), Iconos.Nuevo(), self.tw_nuevo, _("Add a new game")),
                 None,
@@ -130,7 +132,7 @@ class WGames(QtWidgets.QWidget):
             recno = li[0]
             game = self.dbGames.leePartidaRecno(recno)
             h = hash(game.xpv())
-            dbPlay = PantallaPlayGame.DBPlayGame(self.configuracion.file_play_game())
+            dbPlay = WindowPlayGame.DBPlayGame(self.configuration.file_play_game())
             recplay = dbPlay.recnoHash(h)
             if recplay is None:
                 reg = {"GAME": game.save()}
@@ -148,12 +150,12 @@ class WGames(QtWidgets.QWidget):
         li_tags = self.dbGames.li_tags()
         st100 = {"Event", "Site", "White", "Black"}
         for tag in li_tags:
-            rotulo = TrListas.pgnLabel(tag)
-            if rotulo == tag:
-                rotulo = dcabs.get(rotulo, rotulo)
+            label = TrListas.pgnLabel(tag)
+            if label == tag:
+                label = dcabs.get(label, label)
             centered = not (tag in ("Event", "Site"))
             ancho = 100 if tag in st100 else 80
-            o_columns.nueva(tag, rotulo, ancho, centered=centered)
+            o_columns.nueva(tag, label, ancho, centered=centered)
         o_columns.nueva("rowid", _("Row ID"), 60, centered=True)
         return o_columns
 
@@ -163,25 +165,25 @@ class WGames(QtWidgets.QWidget):
         si_cambios = False
 
         li_remove = []
-        for n, col in enumerate(o_columns.liColumnas):
-            clave = col.clave
-            if not (clave in li_tags) and not (clave in ("__num__", "rowid")):
+        for n, col in enumerate(o_columns.li_columns):
+            key = col.key
+            if not (key in li_tags) and not (key in ("__num__", "rowid")):
                 li_remove.append(n)
         if li_remove:
             si_cambios = True
             li_remove.sort(reverse=True)
             for n in li_remove:
-                del o_columns.liColumnas[n]
+                del o_columns.li_columns[n]
 
         dcabs = self.dbGames.recuperaConfig("dcabs", DBgames.drots.copy())
         st100 = {"Event", "Site", "White", "Black"}
-        stActual = {col.clave for col in self.grid.o_columns.liColumnas}
+        stActual = {col.key for col in self.grid.o_columns.li_columns}
         for tag in li_tags:
             if not (tag in stActual):
-                rotulo = TrListas.pgnLabel(tag)
-                if rotulo == tag:
-                    rotulo = dcabs.get(rotulo, rotulo)
-                o_columns.nueva(tag, rotulo, 100 if tag in st100 else 70, centered=not (tag in ("Event", "Site")))
+                label = TrListas.pgnLabel(tag)
+                if label == tag:
+                    label = dcabs.get(label, label)
+                o_columns.nueva(tag, label, 100 if tag in st100 else 70, centered=not (tag in ("Event", "Site")))
                 si_cambios = True
 
         if si_cambios:
@@ -224,7 +226,7 @@ class WGames(QtWidgets.QWidget):
         return self.dbGames.reccount()
 
     def grid_dato(self, grid, nfila, ocol):
-        key = ocol.clave
+        key = ocol.key
         if key == "__num__":
             return str(nfila + 1)
         elif key == "rowid":
@@ -240,11 +242,11 @@ class WGames(QtWidgets.QWidget):
         if self.si_select:
             self.wb_database.tw_aceptar()
         else:
-            self.tw_editar()
+            self.tw_edit()
 
     def grid_doble_clickCabecera(self, grid, col):
         liOrden = self.dbGames.dameOrden()
-        key = col.clave
+        key = col.key
         if key in ("__num__"):
             return
         if key == "opening":
@@ -255,36 +257,36 @@ class WGames(QtWidgets.QWidget):
                 siEsta = True
                 if tp == "ASC":
                     liOrden[n] = (key, "DESC")
-                    col.cabecera = col.antigua + "-"
+                    col.head = col.antigua + "-"
                     if n:
                         del liOrden[n]
                         liOrden.insert(0, (key, "DESC"))
 
                 elif tp == "DESC":
                     del liOrden[n]
-                    col.cabecera = col.cabecera[:-1]
+                    col.head = col.head[:-1]
                 break
         if not siEsta:
             liOrden.insert(0, (key, "ASC"))
-            col.antigua = col.cabecera
-            col.cabecera = col.antigua + "+"
+            col.antigua = col.head
+            col.head = col.antigua + "+"
         self.dbGames.ponOrden(liOrden)
         self.grid.refresh()
         self.updateStatus()
 
-    def grid_tecla_control(self, grid, k, siShift, siControl, siAlt):
+    def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
         if k in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
-            self.tw_editar()
+            self.tw_edit()
         elif k in (QtCore.Qt.Key_Left, QtCore.Qt.Key_Right):
             self.infoMove.tecla_pulsada(k)
-            fila, col = self.grid.posActualN()
+            row, col = self.grid.posActualN()
             if QtCore.Qt.Key_Right:
                 if col > 0:
                     col -= 1
             elif QtCore.Qt.Key_Left:
-                if col < len(self.grid.columnas().liColumnas) - 1:
+                if col < len(self.grid.columnas().li_columns) - 1:
                     col += 1
-            self.grid.goto(fila, col)
+            self.grid.goto(row, col)
         elif k == QtCore.Qt.Key_Home:
             self.tw_gotop()
         elif k == QtCore.Qt.Key_End:
@@ -334,11 +336,11 @@ class WGames(QtWidgets.QWidget):
         if recno >= 0:
             self.grid_cambiado_registro(None, recno, None)
 
-    def grid_cambiado_registro(self, grid, fila, oCol):
-        if self.grid_num_datos(grid) > fila >= 0:
+    def grid_cambiado_registro(self, grid, row, oCol):
+        if self.grid_num_datos(grid) > row >= 0:
             self.setFocus()
             self.grid.setFocus()
-            fen, pv = self.dbGames.damePV(fila)
+            fen, pv = self.dbGames.damePV(row)
             if fen:
                 p = Game.Game(fen=fen)
                 p.read_pv(pv)
@@ -358,21 +360,21 @@ class WGames(QtWidgets.QWidget):
         self.grid.gotop()
 
     def tw_up(self):
-        fila = self.grid.recno()
-        filaNueva = self.dbGames.intercambia(fila, True)
+        row = self.grid.recno()
+        filaNueva = self.dbGames.intercambia(row, True)
         if filaNueva is not None:
             self.grid.goto(filaNueva, 0)
             self.grid.refresh()
 
     def tw_down(self):
-        fila = self.grid.recno()
-        filaNueva = self.dbGames.intercambia(fila, False)
+        row = self.grid.recno()
+        filaNueva = self.dbGames.intercambia(row, False)
         if filaNueva is not None:
             self.grid.goto(filaNueva, 0)
             self.grid.refresh()
 
-    def editar(self, recno, game):
-        game = self.procesador.gestorPartida(self, game, not self.dbGames.allows_positions, self.infoMove.tablero)
+    def edit(self, recno, game):
+        game = self.procesador.managerPartida(self, game, not self.dbGames.allows_positions, False, self.infoMove.board)
         if game:
             resp = self.dbGames.guardaPartidaRecno(recno, game)
             if resp.ok:
@@ -399,12 +401,12 @@ class WGames(QtWidgets.QWidget):
     def tw_nuevo(self):
         recno = None
         pc = self.dbGames.blankPartida()
-        self.editar(recno, pc)
+        self.edit(recno, pc)
 
-    def tw_editar(self):
+    def tw_edit(self):
         game, recno = self.current_game()
         if game:
-            self.editar(recno, game)
+            self.edit(recno, game)
         elif recno is not None:
             QTUtil2.message_bold(self, _("This game is wrong and can not be edited"))
 
@@ -449,9 +451,9 @@ class WGames(QtWidgets.QWidget):
 
         def opening():
             me = QTUtil2.unMomento(self)
-            import Code.Openings.PantallaOpenings as PantallaAperturas
+            import Code.Openings.WindowOpenings as WindowOpenings
 
-            w = PantallaAperturas.WAperturas(self, self.configuracion, self.last_opening)
+            w = WindowOpenings.WOpenings(self, self.configuration, self.last_opening)
             me.final()
             if w.exec_():
                 self.last_opening = ap = w.resultado()
@@ -472,7 +474,7 @@ class WGames(QtWidgets.QWidget):
         menu.separador()
         menu.opcion(raw_sql, _("Advanced"), Iconos.SQL_RAW())
         menu.separador()
-        menu.opcion(opening, _("Opening"), Iconos.Apertura())
+        menu.opcion(opening, _("Opening"), Iconos.Opening())
         if self.dbGames.filter is not None and self.dbGames.filter:
             menu.separador()
             menu.opcion(remove_filter, _("Remove filter"), Iconos.Cancelar())
@@ -577,7 +579,7 @@ class WGames(QtWidgets.QWidget):
             resp()
 
     def tw_options(self):
-        dic_data = modify_database(self, self.configuracion, self.dbGames)
+        dic_data = modify_database(self, self.configuration, self.dbGames)
         if dic_data is None:
             return
 
@@ -592,7 +594,7 @@ class WGames(QtWidgets.QWidget):
         old_path = self.dbGames.nom_fichero
         if not Util.same_path(new_path, old_path):
             self.dbGames.close()
-            self.configuracion.set_last_database(new_path)
+            self.configuration.set_last_database(new_path)
             shutil.move(old_path, new_path)
             shutil.move(old_path + ".st1", new_path + ".st1")
             self.wb_database.reinit_sinsalvar()  # para que no cree de nuevo al salvar configuración
@@ -641,7 +643,7 @@ class WGames(QtWidgets.QWidget):
                 self.grid.refresh()
 
     def tw_edit_columns(self):
-        w = GridEditCols.EditCols(self.grid, self.configuracion, "columns_database")
+        w = GridEditCols.EditCols(self.grid, self.configuration, "columns_database")
         if w.exec_():
             self.grid.releerColumnas()
 
@@ -653,8 +655,8 @@ class WGames(QtWidgets.QWidget):
     def graphicBoardReset(self):
         showAllways, specific = self.readVarsConfig()
         fichGraphic = self.dbGames.nom_fichero if specific else None
-        self.infoMove.tablero.dbVisual_setFichero(fichGraphic)
-        self.infoMove.tablero.dbVisual_setShowAllways(showAllways)
+        self.infoMove.board.dbVisual_setFichero(fichGraphic)
+        self.infoMove.board.dbVisual_setShowAllways(showAllways)
 
     def tw_dir_show_yes(self):
         self.dbGames.guardaConfig("GRAPHICS_SHOW_ALLWAYS", True)
@@ -678,22 +680,121 @@ class WGames(QtWidgets.QWidget):
         um.final()
 
     def tw_utilities(self):
+        si_games = len(self.dbGames) > 0
+
         menu = QTVarios.LCMenu(self)
-        menu.opcion(self.tw_massive_analysis, _("Mass analysis"), Iconos.Analizar())
-        menu.separador()
-        menu.opcion(self.tw_polyglot, _("Create a polyglot book"), Iconos.Book())
-        menu.separador()
+        if si_games:
+            menu.opcion(self.tw_massive_analysis, _("Mass analysis"), Iconos.Analizar())
+            menu.separador()
+            menu.opcion(self.tw_polyglot, _("Create a polyglot book"), Iconos.Book())
+            menu.separador()
+            eti = _("Play like a Grandmaster")
+            menu.opcion(self.tw_gm, _X(_("Create training to %1"), eti), Iconos.GranMaestro())
+            menu.separador()
         menu.opcion(self.tw_pack, _("Pack database"), Iconos.Pack())
+
         resp = menu.lanza()
         if resp:
             resp()
 
-    def tw_uti_tactic(self):
+    def tw_gm(self):
+        name = ""
+        player = ""
+        li_selected = self.grid.recnosSeleccionados()
+        selected = len(li_selected) > 1
+        side = ""
+        result = ""
 
+        while True:
+            title = _("Play like a Grandmaster")
+            title = _X(_("Create training to %1"), title)
+            form = FormLayout.FormLayout(self, title, Iconos.GranMaestro(), anchoMinimo=640)
+
+            form.separador()
+
+            form.edit(_("Training name"), name)
+            form.separador()
+
+            form.edit_np('<div align="right">%s:<br>%s</div>' %  (
+                    _("Only player moves"),
+                    _("(You can add multiple aliases separated by ; and wildcards with * )"),
+                ), player
+            )
+            form.separador()
+
+            form.checkbox( _("Only selected games"), selected)
+            form.separador()
+
+            li = [(_("Both sides"), None),
+                  (_("White"), WHITE),
+                  (_("Black"), BLACK)]
+            form.combobox(_("Which side"), li, side)
+            form.separador()
+
+            li = [(_("Any"), None),
+                  (_("Win"), ("Win")),
+                  (_("Win+Draw"), "Win+Draw"),
+                  (_("Lost"), "Lost"),
+                  (_("Lost+Draw"), "Lost+Draw")]
+            form.combobox(_("Result"), li, result)
+            form.separador()
+
+            resultado = form.run()
+
+            if resultado is None:
+                return
+
+            accion, liGen = resultado
+            name, player, selected, side, result = liGen
+
+            if not name:
+                QTUtil2.message_error(self, _("Name is missing"))
+                continue
+
+            name = Util.valid_filename(name)
+
+            li_players = player.upper().split(";") if player else None
+
+            fgm = GM.FabGM(name, li_players, side, result)
+
+            if not selected:
+                li_selected = range(self.dbGames.reccount())
+            nregs = len(li_selected)
+            mensaje = _("Game") + "  %d/" + str(nregs)
+            tmpBP = QTUtil2.BarraProgreso(self, title, "", nregs).mostrar()
+
+            for n, recno in enumerate(li_selected):
+                if tmpBP.is_canceled():
+                    break
+
+                game = self.dbGames.leePartidaRecno(recno)
+                if n:
+                    tmpBP.pon(n)
+                tmpBP.mensaje(mensaje % (n + 1,))
+
+                fgm.other_game(game)
+
+            is_canceled = tmpBP.is_canceled()
+            tmpBP.cerrar()
+
+            if not is_canceled:
+                is_created = fgm.xprocesa()
+
+                if is_created:
+                    li_created = [name]
+                    li_not_created = None
+                else:
+                    li_not_created = [name]
+                    li_created = None
+                WDB_Utils.mensajeEntrenamientos(self, li_created, li_not_created)
+
+            return
+
+    def tw_uti_tactic(self):
         def rutinaDatos(recno):
             dic = {}
-            for clave in self.dbGames.li_fields:
-                dic[clave] = self.dbGames.field(recno, clave)
+            for key in self.dbGames.li_fields:
+                dic[key] = self.dbGames.field(recno, key)
             p = self.dbGames.leePartidaRecno(recno)
             dic["PGN"] = p.pgn()
             dic["PLIES"] = len(p)
@@ -703,7 +804,7 @@ class WGames(QtWidgets.QWidget):
         if len(liRegistros) < 2:
             liRegistros = range(self.dbGames.reccount())
 
-        WDB_Utils.crearTactic(self.procesador, self, liRegistros, rutinaDatos)
+        WDB_Utils.crearTactic(self.procesador, self, liRegistros, rutinaDatos, self.dbGames.get_name())
 
     def tw_pack(self):
         um = QTUtil2.unMomento(self)
@@ -714,7 +815,7 @@ class WGames(QtWidgets.QWidget):
         liSeleccionadas = self.grid.recnosSeleccionados()
         nSeleccionadas = len(liSeleccionadas)
 
-        alm = PantallaAnalisisParam.paramAnalisisMasivo(self, self.configuracion, nSeleccionadas > 1, siDatabase=True)
+        alm = WindowAnalysisParam.paramAnalisisMasivo(self, self.configuration, nSeleccionadas > 1, siDatabase=True)
         if alm:
 
             if alm.siVariosSeleccionados:
@@ -728,7 +829,7 @@ class WGames(QtWidgets.QWidget):
             tmpBP.ponRotulo(2, _("Moves"))
             tmpBP.mostrar()
 
-            ap = Analisis.AnalizaPartida(self.procesador, alm, True)
+            ap = Analysis.AnalizaPartida(self.procesador, alm, True)
 
             for n in range(nregs):
 
@@ -786,11 +887,11 @@ class WGames(QtWidgets.QWidget):
 
     def tw_polyglot(self):
         titulo = self.dbGames.get_name() + ".bin"
-        resp = PolyglotImports.export_polyglot_config(self, self.configuracion, titulo)
+        resp = PolyglotImports.export_polyglot_config(self, self.configuration, titulo)
         if resp is None:
             return
         path_bin, uniform = resp
-        resp = PolyglotImports.import_polyglot_config(self, self.configuracion, os.path.basename(path_bin))
+        resp = PolyglotImports.import_polyglot_config(self, self.configuration, os.path.basename(path_bin))
         if resp is None:
             return
         plies, st_side, st_results, ru, min_games, min_score, calc_weight, save_score = resp
@@ -812,11 +913,11 @@ class WGames(QtWidgets.QWidget):
             PolyglotImports.create_bin_from_dbbig(self, path_bin, db, min_games, min_score, calc_weight, save_score)
 
     def tw_exportar_db(self, lista):
-        dbpath = QTVarios.select_db(self, self.configuracion, False, True)
+        dbpath = QTVarios.select_db(self, self.configuration, False, True)
         if not dbpath:
             return
         if dbpath == ":n":
-            dbpath = new_database(self, self.configuracion)
+            dbpath = new_database(self, self.configuration)
             if dbpath is None:
                 return
 
@@ -830,9 +931,9 @@ class WGames(QtWidgets.QWidget):
         dbn.appendDB(self.dbGames, lista, dlTmp)
 
     def tw_exportar_pgn(self, only_selected):
-        w = PantallaSavePGN.WSaveVarios(self, self.configuracion)
+        w = WindowSavePGN.WSaveVarios(self, self.configuration)
         if w.exec_():
-            ws = PantallaSavePGN.FileSavePGN(self, w.dic_result)
+            ws = WindowSavePGN.FileSavePGN(self, w.dic_result)
             if ws.open():
                 sp = "\r\n" if ws.crlf else "\n"
                 pb = QTUtil2.BarraProgreso1(self, _("Saving..."), formato1="%p%")
@@ -874,7 +975,7 @@ class WGames(QtWidgets.QWidget):
             self.wsummary.reset()
 
     def tw_importar_DB(self):
-        path = QTVarios.select_db(self, self.configuracion, False, False)
+        path = QTVarios.select_db(self, self.configuration, False, False)
         if not path:
             return None
 
@@ -893,7 +994,7 @@ class WGames(QtWidgets.QWidget):
 
 
 class WOptionsDatabase(QtWidgets.QDialog):
-    def __init__(self, owner, configuracion, dic_data):
+    def __init__(self, owner, configuration, dic_data):
         super(WOptionsDatabase, self).__init__(owner)
 
         self.new = len(dic_data) == 0
@@ -915,7 +1016,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.setWindowIcon(Iconos.DatabaseMas())
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
 
-        self.configuracion = configuracion
+        self.configuration = configuration
         self.resultado = None
 
         valid_rx = r'^[^<>:;,?"*|/\\]+'
@@ -926,7 +1027,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         ly_name = Colocacion.H().control(lb_name).control(self.ed_name)
 
         folder = os.path.dirname(Util.relative_path(d_str("FILEPATH")))
-        folder = folder[len(configuracion.folder_databases()):]
+        folder = folder[len(configuration.folder_databases()):]
         if folder.strip():
             folder = folder.strip(os.sep)
             li = folder.split(os.sep)
@@ -1034,7 +1135,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         folder = QTUtil2.leeCarpeta(self, self.external_folder, _("Use an external folder"))
         if folder:
             folder = os.path.realpath(folder)
-            default = os.path.realpath(self.configuracion.folder_databases())
+            default = os.path.realpath(self.configuration.folder_databases())
             if folder.startswith(default):
                 QTUtil2.message_error(
                     self, "%s:\n%s\n\n%s" % (_("The folder must be outside the default folder"), default, folder)
@@ -1042,7 +1143,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
                 return
             self.external_folder = folder
 
-        self.bt_external.ponTexto(self.external_folder)
+        self.bt_external.set_text(self.external_folder)
 
     def menu_groups(self, carpeta):
         if Util.exist_folder(carpeta):
@@ -1056,27 +1157,27 @@ class WOptionsDatabase(QtWidgets.QDialog):
                 return menu.lanza()
 
     def mira_group(self):
-        resp = self.menu_groups(self.configuracion.folder_databases())
+        resp = self.menu_groups(self.configuration.folder_databases())
         if resp:
-            self.ed_group.ponTexto(resp)
+            self.ed_group.set_text(resp)
 
     def mira_subgroup_l1(self):
         group = self.ed_group.texto().strip()
         if group:
-            carpeta = os.path.join(self.configuracion.folder_databases(), group)
+            carpeta = os.path.join(self.configuration.folder_databases(), group)
             resp = self.menu_groups(carpeta)
             if resp:
-                self.ed_subgroup_l1.ponTexto(resp)
+                self.ed_subgroup_l1.set_text(resp)
 
     def mira_subgroup_l2(self):
         group = self.ed_group.texto().strip()
         if group:
             subgroup = self.ed_subgroup_l1.texto().strip()
             if subgroup:
-                carpeta = os.path.join(self.configuracion.folder_databases(), group, subgroup)
+                carpeta = os.path.join(self.configuration.folder_databases(), group, subgroup)
                 resp = self.menu_groups(carpeta)
                 if resp:
-                    self.ed_subgroup_l2.ponTexto(resp)
+                    self.ed_subgroup_l2.set_text(resp)
 
     def save(self):
         name = self.ed_name.texto().strip()
@@ -1084,7 +1185,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
             QTUtil2.message_error(self, _("You must indicate a name"))
             return
 
-        folder = self.configuracion.folder_databases()
+        folder = self.configuration.folder_databases()
         group = self.ed_group.texto()
         if group:
             folder = os.path.join(folder, group)
@@ -1142,16 +1243,16 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.accept()
 
 
-def new_database(owner, configuracion):
+def new_database(owner, configuration):
     dic_data = {}
-    w = WOptionsDatabase(owner, configuracion, dic_data)
+    w = WOptionsDatabase(owner, configuration, dic_data)
     if w.exec_():
         return w.dic_data_resp["FILEPATH"]
     else:
         return None
 
 
-def modify_database(owner, configuracion, db):
+def modify_database(owner, configuration, db):
     dic_data = {
         "NAME": db.get_name(),
         "FILEPATH": db.nom_fichero,
@@ -1162,7 +1263,7 @@ def modify_database(owner, configuracion, db):
         "ALLOWS_COMPLETE_GAMES": db.recuperaConfig("ALLOWS_COMPLETE_GAMES", True),
         "ALLOWS_ZERO_MOVES": db.recuperaConfig("ALLOWS_ZERO_MOVES", False),
     }
-    w = WOptionsDatabase(owner, configuracion, dic_data)
+    w = WOptionsDatabase(owner, configuration, dic_data)
     if w.exec_():
         return w.dic_data_resp
     else:
@@ -1226,23 +1327,23 @@ class WTags(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.li_data)
 
-    def grid_dato(self, grid, fila, ocol):
-        return self.li_data[fila][ocol.clave]
+    def grid_dato(self, grid, row, ocol):
+        return self.li_data[row][ocol.key]
 
-    def grid_setvalue(self, grid, fila, oColumna, value):
-        clave = oColumna.clave
-        dic = self.li_data[fila]
+    def grid_setvalue(self, grid, row, o_column, value):
+        key = o_column.key
+        dic = self.li_data[row]
         value = value.strip()
-        if clave == "VALUE" and value:
+        if key == "VALUE" and value:
             dic["ACTION"] = self.fill_column
-        elif clave == "ACTION" and value != self.fill_column:
+        elif key == "ACTION" and value != self.fill_column:
             dic["VALUE"] = ""
-        elif clave == "LABEL":
+        elif key == "LABEL":
             new = dic["NEW"]
             if new:
                 newkey = value.upper()
                 for xfila, xdic in enumerate(self.li_data):
-                    if xfila != fila:
+                    if xfila != row:
                         if xdic["KEY"] == newkey or xdic["PREV_LABEL"] == newkey:
                             QTUtil2.message_error(self, _("This tag is repeated"))
                             return
@@ -1251,7 +1352,7 @@ class WTags(QTVarios.WDialogo):
             else:
                 if len(value) == 0:
                     return
-        dic[clave] = value
+        dic[key] = value
         self.gtags.refresh()
 
     def aceptar(self):

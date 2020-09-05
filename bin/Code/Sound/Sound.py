@@ -51,7 +51,7 @@ class RunSound:
 
     def playBeep(self):
         if self.replayBeep is None:
-            db = UtilSQL.DictSQL(Code.configuracion.file_sounds(), "general")
+            db = UtilSQL.DictSQL(Code.configuration.file_sounds(), "general")
             keys = db.keys()
             self.replayBeep = "MC" in keys
 
@@ -207,7 +207,7 @@ class Replay:
 
         orden = Orden()
         orden.key = DATABASE
-        orden.ponVar("FICHERO", Code.configuracion.file_sounds())
+        orden.ponVar("FICHERO", Code.configuration.file_sounds())
         orden.ponVar("TABLA", "general")
 
         self.push(orden)

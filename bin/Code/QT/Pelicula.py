@@ -1,12 +1,12 @@
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
-def paramPelicula(configuracion, parent):
+def paramPelicula(configuration, parent):
 
     nomVar = "PARAMPELICULA"
-    dicVar = configuracion.leeVariables(nomVar)
+    dicVar = configuration.leeVariables(nomVar)
 
     # Datos
     liGen = [(None, None)]
@@ -31,19 +31,19 @@ def paramPelicula(configuracion, parent):
         dicVar["SECONDS"] = segundos
         dicVar["START"] = siPrincipio
         dicVar["PGN"] = siPGN
-        configuracion.escVariables(nomVar, dicVar)
+        configuration.escVariables(nomVar, dicVar)
         return segundos, siPrincipio, siPGN
     else:
         return None
 
 
 class Pelicula:
-    def __init__(self, gestor, segundos, siInicio, siPGN):
-        self.gestor = gestor
-        self.procesador = gestor.procesador
-        self.main_window = gestor.main_window
-        self.if_starts_with_black = gestor.game.if_starts_with_black
-        self.tablero = gestor.tablero
+    def __init__(self, manager, segundos, siInicio, siPGN):
+        self.manager = manager
+        self.procesador = manager.procesador
+        self.main_window = manager.main_window
+        self.if_starts_with_black = manager.game.if_starts_with_black
+        self.board = manager.board
         self.segundos = segundos
         self.siInicio = siInicio
         self.rapidez = 1.0
@@ -55,16 +55,16 @@ class Pelicula:
 
         li_acciones = (TB_END, TB_SLOW, TB_PAUSE, TB_CONTINUE, TB_FAST, TB_REPEAT, TB_PGN)
 
-        self.antAcciones = self.main_window.dameToolBar()
+        self.antAcciones = self.main_window.get_toolbar()
         self.main_window.pon_toolbar(li_acciones)
 
-        self.gestor.ponRutinaAccionDef(self.process_toolbar)
+        self.manager.ponRutinaAccionDef(self.process_toolbar)
 
         self.muestraPausa(True)
 
-        self.num_moves, self.jugInicial, self.filaInicial, self.is_white = self.gestor.jugadaActual()
+        self.num_moves, self.jugInicial, self.filaInicial, self.is_white = self.manager.jugadaActual()
 
-        self.li_moves = self.gestor.game.li_moves
+        self.li_moves = self.manager.game.li_moves
         self.current_position = 0 if siInicio else self.jugInicial
 
         self.siStop = False
@@ -76,7 +76,7 @@ class Pelicula:
             return
 
         move = self.li_moves[self.current_position]
-        self.tablero.setposition(move.position_before)
+        self.board.set_position(move.position_before)
         liMovs = [("b", move.to_sq), ("m", move.from_sq, move.to_sq)]
         if move.position.li_extras:
             liMovs.extend(move.position.li_extras)
@@ -93,8 +93,8 @@ class Pelicula:
         num = self.current_position
         if self.if_starts_with_black:
             num += 1
-        fila = int(num / 2)
-        self.main_window.pgnColocate(fila, move.position_before.is_white)
+        row = int(num / 2)
+        self.main_window.pgnColocate(row, move.position_before.is_white)
         self.main_window.base.pgnRefresh()
 
         # primero los movimientos
@@ -125,19 +125,19 @@ class Pelicula:
             if movim[0] == "c":
                 cpu.cambiaPieza(movim[1], movim[2], siExclusiva=True)
         cpu.runLineal()
-        self.gestor.ponFlechaSC(move.from_sq, move.to_sq)
+        self.manager.put_arrow_sc(move.from_sq, move.to_sq)
 
-        self.tablero.setposition(move.position)
+        self.board.set_position(move.position)
 
-        self.gestor.put_view()
+        self.manager.put_view()
 
         cpu.reset()
         cpu.duerme(self.segundos / self.rapidez)
         cpu.runLineal()
 
     def muestraPausa(self, siPausa):
-        self.main_window.mostrarOpcionToolbar(TB_PAUSE, siPausa)
-        self.main_window.mostrarOpcionToolbar(TB_CONTINUE, not siPausa)
+        self.main_window.show_option_toolbar(TB_PAUSE, siPausa)
+        self.main_window.show_option_toolbar(TB_CONTINUE, not siPausa)
 
     def process_toolbar(self, key):
         if key == TB_END:
@@ -162,8 +162,8 @@ class Pelicula:
     def terminar(self):
         self.siStop = True
         self.main_window.pon_toolbar(self.antAcciones)
-        self.gestor.ponRutinaAccionDef(None)
-        self.gestor.xpelicula = None
+        self.manager.ponRutinaAccionDef(None)
+        self.manager.xpelicula = None
         if not self.siPGN:
             self.w_pgn.show()
 
@@ -178,7 +178,7 @@ class Pelicula:
         self.muestraPausa(False)
 
     def seguir(self):
-        num_moves, self.current_position, filaInicial, is_white = self.gestor.jugadaActual()
+        num_moves, self.current_position, filaInicial, is_white = self.manager.jugadaActual()
         self.siStop = False
         self.muestraPausa(True)
         self.muestraActual()

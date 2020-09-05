@@ -19,6 +19,7 @@ class ThanksTo:
             "engines-2": "%s/2" % _("Engines"),
             "engines-3": "%s/3" % _("Engines"),
             "engines-4": "%s/4" % _("Engines"),
+            "engines-5": "%s/5" % _("Engines"),
             "games": _("Games"),
             "programming": _("Programming"),
             "dedicated": _("Dedicated to"),
@@ -26,12 +27,14 @@ class ThanksTo:
 
     @staticmethod
     def list_engines(bloque):
-        li = Code.configuracion.list_engines(si_externos=False)
+        li = Code.configuration.list_engines(si_externos=False)
         li.sort(key=lambda xt: xt[0])
+        for n, x in enumerate(li, 1):
+            x[0] = "%d. %s" % (n, x[0])
         nli = len(li)
-        x = nli // 4
-        bl = [x, x, x, x]
-        resto = nli - x * 4
+        x = nli // 5
+        bl = [x, x, x, x, x]
+        resto = nli - x * 5
         if resto:
             for x in range(resto):
                 bl[x] += 1
@@ -49,7 +52,7 @@ class ThanksTo:
     @staticmethod
     def table_ini(center=True, border="1"):
         txt = "<center>" if center else ""
-        txt += '<table border="%s" cellpadding="3" cellspacing="0">' % border
+        txt += '<table border="%s" cellpadding="3" cellspacing="0" width="90%%">' % border
         return txt
 
     @staticmethod
@@ -99,7 +102,7 @@ class ThanksTo:
             return mtxt
 
         # Version R
-        li_base = ["Alfonso Solbes", "Alan Lee", "Graham O'Neill"]
+        li_base = ["Alfonso Solbes", "Alan Lee", '<a href="https://goneill.co.nz/index.php">Graham O\'Neill</a>']
         li_resto = []
         txt += version("R0", li_base, li_resto, False)
 
@@ -206,7 +209,6 @@ class ThanksTo:
         return txt
 
     def translators(self):
-
         txt = self.table_ini(center=False, border="0")
         txt += "<tr><td>"
         txt += self.dl_ini()
@@ -306,6 +308,9 @@ class ThanksTo:
             ("Red Hood", _("Permission of author")),
             ("Michael Byrne", _("Permission of author")),
             ("Ben Citak", _("Permission of author")),
+            ("Xpdnc", _("Permission of author")),
+            ("Alexander", _("Permission of author")),
+            ("Dan Brad", _("Permission of author")),
         ]
         for autor, licencia in li:
             txt += "<tr>"
@@ -482,8 +487,9 @@ class ThanksTo:
         for name, autor, url in self.list_engines(orden):
             txt += "<tr>"
             if "honey" in name.lower():
-                txt += '<th><font color="darkred">%s (%s)</font></th>' % (name, _("default"))
-                txt += '<td><font color="darkred">%s</font></td>' % autor
+                style = 'style="color:darkred;font-weight:bold">'
+                txt += '<td %s%s (%s)</td>' % (style, name, _("default"))
+                txt += '<td %s%s</font></td>' % (style, autor)
             else:
                 txt += "<td>%s</td>" % name
                 txt += "<td>%s</td>" % autor
@@ -516,14 +522,10 @@ class ThanksTo:
         txt += "</table><center>"
         return txt
 
-    # chardet==3.0.4
-    # sortedcontainers==2.1.0 http://www.grantjenks.com/docs/sortedcontainers/
-    # cython=0.29.14
-
     def programming(self):
         li = (
             (_("Programming language"), "Python 3.7", "http://www.python.org/"),
-            (_("GUI"), "PySide2 - GPL", "http://www.riverbankcomputing.co.uk"),
+            (_("GUI"), "PySide2", "https://wiki.qt.io/Qt_for_Python"),
             ("PyAudio", "PyAudio v0.2.11 - MIT License", "http://people.csail.mit.edu/hubert/pyaudio/"),
             ("psutil", _X(_("Created by %1"), "Giampaolo Rodola"), "http://code.google.com/p/psutil/"),
             ("chardet", _X(_("Created by %1"), "Ian Cordasco"), "https://github.com/chardet/chardet"),
@@ -531,11 +533,6 @@ class ThanksTo:
                 _("Polyglot books"),
                 _X(_("Based on work by %1"), "Michel Van den Bergh"),
                 "https://hardy.uhasselt.be/personal/vdbergh/Members/michel_id.html",
-            ),
-            (
-                "Polyglot1.4w",
-                _X(_("Created by %1"), "Fabien Letouzy") + ". " + _X(_("Modified by %1"), "Fonzy Bluemers"),
-                "http://www.geenvis.net/",
             ),
             ("python-chess", _X(_("Created by %1"), "Niklas Fiekas"), "https://github.com/niklasf/python-chess"),
             (

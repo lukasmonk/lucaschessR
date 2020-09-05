@@ -4,9 +4,9 @@ import time
 import random
 
 import FasterCode
-from Code.Constantes import STANDARD_TAGS, FEN_INITIAL
+from Code.Base.Constantes import STANDARD_TAGS, FEN_INITIAL
 
-from Code import Game
+from Code.Base import Game
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
@@ -141,7 +141,7 @@ class DBgames:
 
     def addcache(self, rowid, reg):
         if len(self.cache) > self.maxcache:
-            keys = self.cache.keys()
+            keys = list(self.cache.keys())
             rkeys = random.sample(keys, self.mincache)
             ncache = {}
             for k in rkeys:
@@ -270,7 +270,7 @@ class DBgames:
             self.rowidReader.stopnow()
             self.rowidReader = None
 
-    def rotulo(self):
+    def label(self):
         return Util.relative_path(self.nom_fichero)
 
     def depthStat(self):
@@ -284,8 +284,8 @@ class DBgames:
         pv = xpv_pv(xpv) if xpv else ""
         return fen, pv
 
-    def damePV(self, fila):
-        xpv = self.field(fila, "XPV")
+    def damePV(self, row):
+        xpv = self.field(row, "XPV")
         return self.read_xpv(xpv)
 
     def ponOrden(self, liOrden):
@@ -476,6 +476,7 @@ class DBgames:
 
         p.set_tags(litags)
         p.assign_opening()
+        p.resultado()
         return p
 
     def leePGNRecno(self, recno, sp):
@@ -584,8 +585,8 @@ class DBgames:
 
         for fichero in ficheros:
             nomfichero = os.path.basename(fichero)
-            fich_erroneos = os.path.join(Code.configuracion.carpetaTemporal(), nomfichero[:-3] + "errors.pgn")
-            fich_duplicados = os.path.join(Code.configuracion.carpetaTemporal(), nomfichero[:-3] + "duplicates.pgn")
+            fich_erroneos = os.path.join(Code.configuration.carpetaTemporal(), nomfichero[:-3] + "errors.pgn")
+            fich_duplicados = os.path.join(Code.configuration.carpetaTemporal(), nomfichero[:-3] + "duplicates.pgn")
             dlTmp.pon_titulo(nomfichero)
             next_n = random.randint(1000, 2000)
 

@@ -2,36 +2,36 @@ import os
 
 import FasterCode
 
-from Code import Analisis
-from Code import Game
-from Code.QT import PantallaTutor
+from Code.Analysis import Analysis
+from Code.Base import Game
+from Code.QT import WindowTutor
 from Code.QT import QTUtil2
 from Code import Util
 
 
 class Tutor:
-    def __init__(self, procesador, gestor, move, from_sq, to_sq, siEntrenando):
+    def __init__(self, procesador, manager, move, from_sq, to_sq, siEntrenando):
         self.procesador = procesador
-        self.gestor = gestor
+        self.manager = manager
 
-        self.difpts = procesador.configuracion.x_tutor_difpoints
-        self.difporc = procesador.configuracion.x_tutor_difporc
+        self.difpts = procesador.configuration.x_tutor_difpoints
+        self.difporc = procesador.configuration.x_tutor_difporc
 
-        self.game = gestor.game
+        self.game = manager.game
 
         self.main_window = procesador.main_window
-        self.gestorTutor = gestor.xtutor
+        self.managerTutor = manager.xtutor
         self.last_position = self.game.last_position
         self.move = move
         self.from_sq = from_sq
         self.to_sq = to_sq
-        self.mrmTutor = gestor.mrmTutor
-        self.rm_rival = gestor.rm_rival
-        self.is_white = gestor.is_human_side_white
+        self.mrmTutor = manager.mrmTutor
+        self.rm_rival = manager.rm_rival
+        self.is_white = manager.is_human_side_white
         self.siEntrenando = siEntrenando
         self.list_rm = None  # necesario
 
-        self.x_save_csv = gestor.configuracion.x_save_csv
+        self.x_save_csv = manager.configuration.x_save_csv
 
         self.is_moving_time = False
 
@@ -41,10 +41,10 @@ class Tutor:
         if self.rmUsuario is None:
             # Elegimos si la opcion del tutor es mejor que la del usuario
             # Ponemos un mensaje mientras piensa
-            me = QTUtil2.mensEspera.inicio(self.main_window, _("Analyzing the move...."), position="ad")
+            me = QTUtil2.mensEspera.inicio(self.main_window, _("Analyzing the move...."), physical_pos="ad")
 
             fen = self.move.position.fen()
-            mrmUsuario = self.gestorTutor.analiza(fen)
+            mrmUsuario = self.managerTutor.analiza(fen)
             if len(mrmUsuario.li_rm) == 0:
                 self.rmUsuario = self.mrmTutor.li_rm[0].copia()
                 self.rmUsuario.from_sq = self.move.from_sq
@@ -78,7 +78,7 @@ class Tutor:
         if in_the_opening:
             siRival = False
 
-        self.w = w = PantallaTutor.PantallaTutor(self, self, siRival, in_the_opening, self.is_white, siPuntos)
+        self.w = w = WindowTutor.WindowTutor(self, self, siRival, in_the_opening, self.is_white, siPuntos)
 
         self.cambiadoRM(0)
 
@@ -87,7 +87,7 @@ class Tutor:
         self.partidaUsuario.read_pv(self.rmUsuario.getPV())
         self.posUsuario = 0
         self.maxUsuario = len(self.partidaUsuario.li_moves)
-        self.tableroUsuario.setposition(self.move.position)
+        self.boardUsuario.set_position(self.move.position)
         w.ponPuntuacionUsuario(self.rmUsuario.texto())
 
         if siRival:
@@ -105,7 +105,7 @@ class Tutor:
                 self.posRival = 0
                 self.maxRival = len(self.partidaRival.li_moves) - 1
                 if self.maxRival >= 0:
-                    self.tableroRival.setposition(self.partidaRival.li_moves[0].position)
+                    self.boardRival.set_position(self.partidaRival.li_moves[0].position)
                     self.mueve_rival(True)
                     w.ponPuntuacionRival(self.rm_rival.texto())
 
@@ -113,9 +113,9 @@ class Tutor:
         self.moving_user(True)
 
         if w.exec_():
-            if w.siElegidaApertura:
-                from_sq = self.partidaAperturas.move(0).from_sq
-                to_sq = self.partidaAperturas.move(0).to_sq
+            if w.siElegidaOpening:
+                from_sq = self.partidaOpenings.move(0).from_sq
+                to_sq = self.partidaOpenings.move(0).to_sq
                 if from_sq == self.from_sq and to_sq == self.to_sq:
                     return False
                 self.from_sq = from_sq
@@ -131,7 +131,7 @@ class Tutor:
             return True
         return False
 
-    def ponVariantes(self, move, numJugada):
+    def ponVariations(self, move, numJugada):
         if self.list_rm:
             rm, name = self.list_rm[0]
             game = Game.Game(self.move.position_before)
@@ -203,7 +203,7 @@ class Tutor:
 
         def otrosTB(siHabilitar):
             for accion in tb.li_acciones:
-                if not accion.clave.endswith("MoverTiempo"):
+                if not accion.key.endswith("MoverTiempo"):
                     accion.setEnabled(siHabilitar)
 
         self.time_function = funcion
@@ -243,10 +243,10 @@ class Tutor:
 
         move = self.partidaUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
         if is_base:
-            self.tableroUsuario.setposition(move.position_before)
+            self.boardUsuario.set_position(move.position_before)
         else:
-            self.tableroUsuario.setposition(move.position)
-            self.tableroUsuario.ponFlechaSC(move.from_sq, move.to_sq)
+            self.boardUsuario.set_position(move.position)
+            self.boardUsuario.put_arrow_sc(move.from_sq, move.to_sq)
 
     def moving_tutor(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
         if nSaltar:
@@ -264,10 +264,10 @@ class Tutor:
 
         move = self.game_tutor.move(self.pos_tutor if self.pos_tutor > -1 else 0)
         if is_base:
-            self.tableroTutor.setposition(move.position_before)
+            self.boardTutor.set_position(move.position_before)
         else:
-            self.tableroTutor.setposition(move.position)
-            self.tableroTutor.ponFlechaSC(move.from_sq, move.to_sq)
+            self.boardTutor.set_position(move.position)
+            self.boardTutor.put_arrow_sc(move.from_sq, move.to_sq)
 
     def mueve_rival(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
         if nSaltar:
@@ -285,48 +285,48 @@ class Tutor:
 
         move = self.partidaRival.move(self.posRival if self.posRival > -1 else 0)
         if is_base:
-            self.tableroRival.setposition(move.position_before)
+            self.boardRival.set_position(move.position_before)
         else:
-            self.tableroRival.setposition(move.position)
-            self.tableroRival.ponFlechaSC(move.from_sq, move.to_sq)
+            self.boardRival.set_position(move.position)
+            self.boardRival.put_arrow_sc(move.from_sq, move.to_sq)
 
-    def mueveApertura(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
+    def mueveOpening(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
         if nSaltar:
-            pos = self.posApertura + nSaltar
-            if 0 <= pos < self.maxApertura:
-                self.posApertura = pos
+            pos = self.posOpening + nSaltar
+            if 0 <= pos < self.maxOpening:
+                self.posOpening = pos
             else:
                 return
         elif siInicio:
-            self.posApertura = 0
+            self.posOpening = 0
         elif is_base:
-            self.posApertura = -1
+            self.posOpening = -1
         else:
-            self.posApertura = self.maxApertura - 1
+            self.posOpening = self.maxOpening - 1
 
-        move = self.partidaAperturas.move(self.posApertura if self.posApertura > -1 else 0)
+        move = self.partidaOpenings.move(self.posOpening if self.posOpening > -1 else 0)
         if is_base:
-            self.tableroAperturas.setposition(move.position_before)
+            self.boardOpenings.set_position(move.position_before)
         else:
-            self.tableroAperturas.setposition(move.position)
-            self.tableroAperturas.ponFlechaSC(move.from_sq, move.to_sq)
+            self.boardOpenings.set_position(move.position)
+            self.boardOpenings.put_arrow_sc(move.from_sq, move.to_sq)
 
-    def ponTablerosGUI(self, tableroTutor, tableroUsuario, tableroRival, tableroAperturas):
-        self.tableroTutor = tableroTutor
-        self.tableroTutor.exePulsadoNum = self.exePulsadoNumTutor
-        self.tableroUsuario = tableroUsuario
-        self.tableroUsuario.exePulsadoNum = self.exePulsadoNumUsuario
-        self.tableroRival = tableroRival
-        self.tableroAperturas = tableroAperturas
+    def ponBoardsGUI(self, boardTutor, boardUsuario, boardRival, boardOpenings):
+        self.boardTutor = boardTutor
+        self.boardTutor.exePulsadoNum = self.exePulsadoNumTutor
+        self.boardUsuario = boardUsuario
+        self.boardUsuario.exePulsadoNum = self.exePulsadoNumUsuario
+        self.boardRival = boardRival
+        self.boardOpenings = boardOpenings
 
-    def cambiarApertura(self, number):
-        self.partidaAperturas = Game.Game(self.last_position)
-        self.partidaAperturas.read_pv(self.liApPosibles[number].a1h8)
-        self.tableroAperturas.setposition(self.partidaAperturas.move(0).position)
-        self.maxApertura = len(self.partidaAperturas)
-        self.mueveApertura(siInicio=True)
+    def cambiarOpening(self, number):
+        self.partidaOpenings = Game.Game(self.last_position)
+        self.partidaOpenings.read_pv(self.liApPosibles[number].a1h8)
+        self.boardOpenings.set_position(self.partidaOpenings.move(0).position)
+        self.maxOpening = len(self.partidaOpenings)
+        self.mueveOpening(siInicio=True)
 
-    def opcionesAperturas(self):
+    def opcionesOpenings(self):
         return [(ap.trNombre, num) for num, ap in enumerate(self.liApPosibles)]
 
     def analiza(self, quien):
@@ -338,12 +338,12 @@ class Tutor:
             move = self.partidaUsuario.move(self.posUsuario)
             pts = self.rmUsuario.texto()
 
-        Analisis.AnalisisVariantes(self.w, self.gestor.xtutor, move, self.is_white, pts)
+        Analysis.AnalisisVariations(self.w, self.manager.xtutor, move, self.is_white, pts)
 
     def exePulsadoNumTutor(self, siActivar, number):
         if number in [1, 8]:
             if siActivar:
-                # Que move esta en el tablero
+                # Que move esta en el board
                 move = self.game_tutor.move(self.pos_tutor if self.pos_tutor > -1 else 0)
                 if self.pos_tutor == -1:
                     fen = move.position_before.fen()
@@ -354,23 +354,23 @@ class Tutor:
                     siMB = number == 1
                 else:
                     siMB = number == 8
-                self.tableroTutor.quitaFlechas()
-                if self.tableroTutor.flechaSC:
-                    self.tableroTutor.flechaSC.hide()
+                self.boardTutor.remove_arrows()
+                if self.boardTutor.flechaSC:
+                    self.boardTutor.flechaSC.hide()
                 li = FasterCode.get_captures(fen, siMB)
                 for m in li:
                     d = m.from_sq()
                     h = m.to_sq()
-                    self.tableroTutor.creaFlechaMov(d, h, "c")
+                    self.boardTutor.creaFlechaMov(d, h, "c")
             else:
-                self.tableroTutor.quitaFlechas()
-                if self.tableroTutor.flechaSC:
-                    self.tableroTutor.flechaSC.show()
+                self.boardTutor.remove_arrows()
+                if self.boardTutor.flechaSC:
+                    self.boardTutor.flechaSC.show()
 
     def exePulsadoNumUsuario(self, siActivar, number):
         if number in [1, 8]:
             if siActivar:
-                # Que move esta en el tablero
+                # Que move esta en el board
                 move = self.partidaUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
                 if self.posUsuario == -1:
                     fen = move.position_before.fen()
@@ -381,18 +381,18 @@ class Tutor:
                     siMB = number == 1
                 else:
                     siMB = number == 8
-                self.tableroUsuario.quitaFlechas()
-                if self.tableroUsuario.flechaSC:
-                    self.tableroUsuario.flechaSC.hide()
+                self.boardUsuario.remove_arrows()
+                if self.boardUsuario.flechaSC:
+                    self.boardUsuario.flechaSC.hide()
                 li = FasterCode.get_captures(fen, siMB)
                 for m in li:
                     d = m.from_sq()
                     h = m.to_sq()
-                    self.tableroUsuario.creaFlechaMov(d, h, "c")
+                    self.boardUsuario.creaFlechaMov(d, h, "c")
             else:
-                self.tableroUsuario.quitaFlechas()
-                if self.tableroUsuario.flechaSC:
-                    self.tableroUsuario.flechaSC.show()
+                self.boardUsuario.remove_arrows()
+                if self.boardUsuario.flechaSC:
+                    self.boardUsuario.flechaSC.show()
 
     def guardaEstadisticas(self):
         date = str(Util.today())
@@ -407,8 +407,8 @@ class Tutor:
         player_move = self.rmUsuario.from_sq + self.rmUsuario.to_sq + self.rmUsuario.promotion
         player_move_puntos = self.rmUsuario.puntos
         player_move_mate = self.rmUsuario.mate
-        tutor = self.gestorTutor.name.replace('"', "").replace(";", "")
-        tutor_tiempo = self.gestorTutor.motorTiempoJugada
+        tutor = self.managerTutor.name.replace('"', "").replace(";", "")
+        tutor_tiempo = self.managerTutor.motorTiempoJugada
 
         try:
             if not os.path.isfile(self.x_save_csv):

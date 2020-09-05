@@ -1,37 +1,37 @@
 import copy
 import time
 
-from Code.QT import TabTipos
+from Code.Board import BoardTypes
 from Code import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
 
 
-class PFlecha(TabTipos.Flecha):
+class PFlecha(BoardTypes.Flecha):
     def __init__(self):
-        TabTipos.Flecha.__init__(self)
+        BoardTypes.Flecha.__init__(self)
         self.name = ""
         self.id = None
 
 
-class PMarco(TabTipos.Marco):
+class PMarco(BoardTypes.Marco):
     def __init__(self):
-        TabTipos.Marco.__init__(self)
+        BoardTypes.Marco.__init__(self)
         self.name = ""
         self.id = None
 
 
-class PSVG(TabTipos.SVG):
+class PSVG(BoardTypes.SVG):
     def __init__(self):
-        TabTipos.SVG.__init__(self)
+        BoardTypes.SVG.__init__(self)
         self.name = ""
         self.id = None
 
 
-class PMarker(TabTipos.Marker):
+class PMarker(BoardTypes.Marker):
     def __init__(self):
-        TabTipos.Marker.__init__(self)
+        BoardTypes.Marker.__init__(self)
         self.name = ""
         self.id = None
 
@@ -147,7 +147,7 @@ class GT_Item(GTarea):
                 self.xitemSCOwner.update()
             else:
                 bf = copy.deepcopy(self._itemSC.bloqueDatos)
-                bf.anchoCasilla = self.xitemSCOwner.bloqueDatos.anchoCasilla
+                bf.width_square = self.xitemSCOwner.bloqueDatos.width_square
                 self.xitemSCOwner.bloqueDatos = bf
                 self.xitemSCOwner.reset()
             self.xitemSCOwner.escena.update()
@@ -202,7 +202,7 @@ class GT_Flecha(GT_Item):
         return bd.a1h8
 
     def run(self):
-        sc = self.guion.tablero.creaFlecha(self._bloqueDatos)
+        sc = self.guion.board.creaFlecha(self._bloqueDatos)
         sc.ponRutinaPulsada(None, self.id())
         self.itemSC(sc)
         self.marcado(True)
@@ -225,7 +225,7 @@ class GT_Marco(GT_Item):
         if self._itemSC:
             self._itemSC.show()
 
-        sc = self.guion.tablero.creaMarco(self._bloqueDatos)
+        sc = self.guion.board.creaMarco(self._bloqueDatos)
         sc.ponRutinaPulsada(None, self.id())
         self.itemSC(sc)
         self.marcado(True)
@@ -243,19 +243,19 @@ class GT_SVG(GT_Item):
 
     def get_datos(self):
         bd = self._itemSC.bloqueDatos
-        p = bd.position
+        p = bd.physical_pos
 
         def f(n):
-            return float(n * 1.0 / bd.anchoCasilla)
+            return float(n * 1.0 / bd.width_square)
 
         return (f(p.x), f(p.y), f(p.ancho), f(p.alto))
 
     def set_datos(self, col, fil, ancho, alto):
         bd = self._itemSC.bloqueDatos
-        p = bd.position
+        p = bd.physical_pos
 
         def f(n):
-            return float(n * bd.anchoCasilla)
+            return float(n * bd.width_square)
 
         p.x = f(col)
         p.y = f(fil)
@@ -268,9 +268,9 @@ class GT_SVG(GT_Item):
 
         siEditando = self.guion.siEditando()
 
-        sc = self.guion.tablero.creaSVG(self._bloqueDatos, siEditando=siEditando)
+        sc = self.guion.board.creaSVG(self._bloqueDatos, siEditando=siEditando)
         sc.ponRutinaPulsada(None, self.id())
-        sc.bloqueDatos = self._bloqueDatos  # necesario para svg con position no ajustado a squares
+        sc.bloqueDatos = self._bloqueDatos  # necesario para svg con physical_pos no ajustado a squares
         sc.update()
         self.itemSC(sc)
         self.marcado(True)
@@ -292,7 +292,7 @@ class GT_Marker(GT_Item):
             self._itemSC.show()
 
         siEditando = self.guion.siEditando()
-        sc = self.guion.tablero.creaMarker(self._bloqueDatos, siEditando=siEditando)
+        sc = self.guion.board.creaMarker(self._bloqueDatos, siEditando=siEditando)
         self.itemSC(sc)
         self.marcado(True)
 
@@ -306,7 +306,7 @@ class GT_Action(GTarea):
         "PR",
     )
     dicTxt = {
-        GTA_INICIO: _("Initial position"),
+        GTA_INICIO: _("Initial physical_pos"),
         GTA_MAINARROW_REMOVE: _("Remove main arrow"),
         GTA_PIECES_REMOVEALL: _("Remove all pieces"),
         GTA_GRAPHICS_REMOVEALL: _("Remove all graphics"),
@@ -330,16 +330,16 @@ class GT_Action(GTarea):
 
     def run(self):
         guion = self.guion
-        tablero = guion.tablero
+        board = guion.board
         if self._action == self.GTA_INICIO:
-            guion.restoreTablero()
+            guion.restoreBoard()
         elif self._action == self.GTA_MAINARROW_REMOVE:
-            if tablero.flechaSC:
-                tablero.flechaSC.hide()
+            if board.flechaSC:
+                board.flechaSC.hide()
         elif self._action == self.GTA_PIECES_REMOVEALL:
-            tablero.removePieces()
+            board.removePieces()
         elif self._action == self.GTA_GRAPHICS_REMOVEALL:
-            tablero.borraMovibles()
+            board.borraMovibles()
         elif self._action == self.GTA_PIZARRA_REMOVE:
             guion.cierraPizarra()
 
@@ -353,9 +353,9 @@ class GT_Configuration(GTarea):
         self._configuration = None
         self._value = 0
 
-    def configuracion(self, configuracion=None):
-        if configuracion:
-            self._configuration = configuracion
+    def configuration(self, configuration=None):
+        if configuration:
+            self._configuration = configuration
         return self._configuration
 
     def value(self, value=None):
@@ -384,10 +384,10 @@ class GT_PiezaMueve(GTarea):
         self._hasta = None
         self._borra = None
 
-    def setPosicion(self, position):
-        self._posicion = position
+    def setPosicion(self, physical_pos):
+        self._posicion = physical_pos
 
-    def position(self):
+    def physical_pos(self):
         return self._posicion
 
     def desdeHastaBorra(self, from_sq=None, to_sq=None, pieza_borra=None):
@@ -455,55 +455,55 @@ class GT_PiezaBorra(GTarea):
 
 
 class Guion:
-    def __init__(self, tablero, winDirector=None):
+    def __init__(self, board, winDirector=None):
         self.liGTareas = []
         self.pizarra = None
         self.anchoPizarra = 250
         self.posPizarra = "R"
-        self.tablero = tablero
+        self.board = board
         self.winDirector = winDirector
-        self.saveTablero()
+        self.saveBoard()
         self.cerrado = False
 
     def siEditando(self):
         return self.winDirector is not None
 
-    def saveTablero(self):
-        self.tablero_ultPosicion = self.tablero.last_position
-        self.tablero_is_white_bottom = self.tablero.is_white_bottom
-        if self.tablero.flechaSC and self.tablero.flechaSC.isVisible():
-            a1h8 = self.tablero.flechaSC.bloqueDatos.a1h8
-            self.tablero_flechaSC = a1h8[:2], a1h8[2:]
+    def saveBoard(self):
+        self.board_ultPosicion = self.board.last_position
+        self.board_is_white_bottom = self.board.is_white_bottom
+        if self.board.flechaSC and self.board.flechaSC.isVisible():
+            a1h8 = self.board.flechaSC.bloqueDatos.a1h8
+            self.board_flechaSC = a1h8[:2], a1h8[2:]
         else:
-            self.tablero_flechaSC = None
+            self.board_flechaSC = None
 
         if self.winDirector:
-            if not hasattr(self, "tablero_mensajero") or self.tablero_mensajero != self.winDirector.muevePieza:
-                self.tablero_mensajero = self.tablero.mensajero
-                self.tablero.mensajero = self.winDirector.muevePieza
+            if not hasattr(self, "board_mensajero") or self.board_mensajero != self.winDirector.muevePieza:
+                self.board_mensajero = self.board.mensajero
+                self.board.mensajero = self.winDirector.muevePieza
 
-        self.tablero_activasPiezas = self.tablero.siActivasPiezas, self.tablero.siActivasPiezasColor
+        self.board_activasPiezas = self.board.siActivasPiezas, self.board.siActivasPiezasColor
 
-    def restoreTablero(self):
-        self.tablero.dirvisual = None
-        self.tablero.setposition(self.tablero_ultPosicion, siBorraMoviblesAhora=False)
-        if self.tablero_flechaSC:
-            from_sq, to_sq = self.tablero_flechaSC
-            self.tablero.ponFlechaSC(from_sq, to_sq)
+    def restoreBoard(self):
+        self.board.dirvisual = None
+        self.board.set_position(self.board_ultPosicion, siBorraMoviblesAhora=False)
+        if self.board_flechaSC:
+            from_sq, to_sq = self.board_flechaSC
+            self.board.put_arrow_sc(from_sq, to_sq)
         if self.winDirector:
-            self.tablero.mensajero = self.tablero_mensajero
-        if self.tablero_activasPiezas[0]:
-            self.tablero.activaColor(self.tablero_activasPiezas[1])
-        self.tablero.siDirector = True
+            self.board.mensajero = self.board_mensajero
+        if self.board_activasPiezas[0]:
+            self.board.activate_side(self.board_activasPiezas[1])
+        self.board.siDirector = True
         self.cierraPizarra()
 
-    def nuevaTarea(self, tarea, fila=-1):
-        if fila == -1:
+    def nuevaTarea(self, tarea, row=-1):
+        if row == -1:
             self.liGTareas.append(tarea)
-            fila = len(self.liGTareas) - 1
+            row = len(self.liGTareas) - 1
         else:
-            self.liGTareas.insert(fila, tarea)
-        return fila
+            self.liGTareas.insert(row, tarea)
+        return row
 
     def savedPizarra(self):
         self.winDirector.refresh_guion()
@@ -511,12 +511,12 @@ class Guion:
 
     def writePizarra(self, tarea):
         if self.pizarra is None:
-            self.pizarra = TabTipos.Pizarra(
+            self.pizarra = BoardTypes.Pizarra(
                 self,
-                self.tablero,
+                self.board,
                 self.anchoPizarra,
-                editMode=self.winDirector is not None,
-                withContinue=tarea.continuar(),
+                edit_mode=self.winDirector is not None,
+                with_continue=tarea.continuar(),
             )
             self.pizarra.mensaje.setFocus()
         self.pizarra.write(tarea)
@@ -631,16 +631,16 @@ class Guion:
     def __len__(self):
         return len(self.liGTareas)
 
-    def txt_tipo(self, fila):
-        tarea = self.liGTareas[fila]
+    def txt_tipo(self, row):
+        tarea = self.liGTareas[row]
         return tarea.txt_tipo()
 
-    def name(self, fila):
-        tarea = self.liGTareas[fila]
+    def name(self, row):
+        tarea = self.liGTareas[row]
         return tarea.name()
 
-    def info(self, fila):
-        tarea = self.liGTareas[fila]
+    def info(self, row):
+        tarea = self.liGTareas[row]
         return tarea.info()
 
     def guarda(self):
@@ -667,10 +667,10 @@ class Guion:
         self.nuevaTarea(tarea, -1)
         return tarea
 
-    def recuperaMoviblesTablero(self):
+    def recuperaMoviblesBoard(self):
         stPrevios = set()
-        if self.tablero.dicMovibles:
-            for k, item in self.tablero.dicMovibles.items():
+        if self.board.dicMovibles:
+            for k, item in self.board.dicMovibles.items():
                 bd = item.bloqueDatos
                 if hasattr(bd, "tpid"):
                     tp, xid = bd.tpid
@@ -691,10 +691,10 @@ class Guion:
         return stPrevios
 
     def recupera(self):
-        fenm2 = self.tablero.last_position.fenm2()
-        lista = self.tablero.dbVisual_lista(fenm2)
+        fenm2 = self.board.last_position.fenm2()
+        lista = self.board.dbVisual_lista(fenm2)
         self.liGTareas = []
-        stPrevios = self.recuperaMoviblesTablero()
+        stPrevios = self.recuperaMoviblesBoard()
         if lista is not None:
             for reg in lista:
                 bd = reg["_bloqueDatos"]
@@ -717,24 +717,24 @@ class Guion:
             if not tarea.itemSC():
                 tarea.run()
             if tarea.tp() == TP_TEXTO and tarea.continuar():
-                while self.pizarra is not None and self.pizarra.siBloqueada():
+                while self.pizarra is not None and self.pizarra.is_blocked():
                     time.sleep(0.05)
             if self.cerrado:
                 return
 
 
-class DBGestorVisual:
+class DBManagerVisual:
     def __init__(self, fichero, showAllways=False, saveAllways=False):
         self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = None
         self._showAllways = showAllways
         self._saveAllways = saveAllways
         self.setFichero(fichero)
 
-    def saveMoviblesTablero(self, tablero):
-        fenm2 = tablero.lastFenM2
+    def saveMoviblesBoard(self, board):
+        fenm2 = board.lastFenM2
         if not fenm2:
             return
-        dicMovibles = tablero.dicMovibles
+        dicMovibles = board.dicMovibles
         n = 0
         for k, v in dicMovibles.items():
             if hasattr(v, "bloqueDatos") and hasattr(v.bloqueDatos, "tpid"):
@@ -743,8 +743,8 @@ class DBGestorVisual:
             if fenm2 in self.dbFEN:
                 del self.dbFEN[fenm2]
             return
-        guion = Guion(tablero)
-        guion.recuperaMoviblesTablero()
+        guion = Guion(board)
+        guion.recuperaMoviblesBoard()
         self.dbFEN[fenm2] = guion.guarda()
 
     def saveAllways(self, yesno=None):
@@ -765,13 +765,13 @@ class DBGestorVisual:
 
     def setFichero(self, fichero):
         self.close()
-        self._fichero = fichero if fichero is not None else Code.configuracion.ficheroRecursos
+        self._fichero = fichero if fichero is not None else Code.configuration.ficheroRecursos
         if not Util.exist_file(self._fichero):
             Util.file_copy(Code.path_resource("IntFiles", "recursos.dbl"), self._fichero)
 
         # li = self.dbConfig[b"SELECTBANDA"]
         # if li is None:
-        #     dbr = DBGestorVisual("Code..resources/IntFiles/recursos.dbl", False)
+        #     dbr = DBManagerVisual("Code..resources/IntFiles/recursos.dbl", False)
         #     li = dbr.dbConfig["SELECTBANDA"]
         #     self.dbConfig["SELECTBANDA"] = li
         #     for xid, pos in li:
@@ -833,8 +833,8 @@ class DBGestorVisual:
         self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = None
 
 
-# def readGraphLive(configuracion):
-#     db = DBGestorVisual(configuracion.ficheroRecursos, False)
+# def readGraphLive(configuration):
+#     db = DBManagerVisual(configuration.ficheroRecursos, False)
 #     rel = {0: "MR", 1: "ALTMR", 2: "SHIFTMR", 6: "MR1", 7: "ALTMR1", 8: "SHIFTMR1" }
 #     dic = {}
 #     li = db.dbConfig["SELECTBANDA"]
@@ -861,10 +861,10 @@ class DBGestorVisual:
 #     db.close()
 #     return dic
 
-# def leeGraficos(configuracion):
+# def leeGraficos(configuration):
 #     dicResp = {}
 
-#     fdb = configuracion.ficheroRecursos
+#     fdb = configuration.ficheroRecursos
 #     dbConfig = UtilSQL.DictSQL(fdb, tabla="Config")
 #     li = dbConfig["SELECTBANDA"]
 #     dbConfig.close()

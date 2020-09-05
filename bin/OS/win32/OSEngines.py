@@ -9,11 +9,14 @@ from Code.Engines import Engines
 def read_engines(folder_engines):
     dic_engines = {}
 
-    def mas(clave, autor, version, url, exe, elo):
-        path_exe = os.path.join(folder_engines, clave, exe)
-        engine = Engines.Engine(clave, autor, version, url, path_exe)
+    def mas(alias, autor, version, url, exe, elo, folder=None):
+        if folder is None:
+            folder = alias
+
+        path_exe = os.path.join(folder_engines, folder, exe)
+        engine = Engines.Engine(alias, autor, version, url, path_exe)
         engine.elo = elo
-        dic_engines[clave] = engine
+        dic_engines[alias] = engine
         return engine
 
     mas("acqua", "Giovanni Di Maria", "2.0", "http://www.elektrosoft.it/scacchi/acqua/acqua.asp", "acqua.exe", 844)
@@ -106,8 +109,8 @@ def read_engines(folder_engines):
     cm.ponMultiPV(20, 100)
 
     cm = mas("critter", "Richard Vida", "1.6a 32bit", "http://www.vlasak.biz/critter/", "Critter_1.6a_32bit.exe", 3091)
-    cm.ordenUCI("Hash", "32")
     cm.ordenUCI("Threads", "1")
+    cm.ordenUCI("Hash", "32")
     cm.ponMultiPV(20, 100)
 
     cm = mas("texel", "Peter Österlund", "1.07 32bit", "http://hem.bredband.net/petero2b/javachess/index.html#texel", "texel32old.exe", 3100)
@@ -116,8 +119,8 @@ def read_engines(folder_engines):
     cm.ponMultiPV(20, 256)
 
     cm = mas("gull", "Vadim Demichev", "3 32bit", "https://sourceforge.net/projects/gullchess/", "Gull 3 w32 XP.exe", 3125)
-    cm.ordenUCI("Hash", "32")
     cm.ordenUCI("Threads", "1")
+    cm.ordenUCI("Hash", "32")
     # cm.ponMultiPV(20, 64) Da problemas
 
     mas("irina", "Lucas Monge", "0.15", "https://github.com/lukasmonk/irina", "irina.exe", 1200)
@@ -145,7 +148,7 @@ def read_engines(folder_engines):
 
     mas("monarch", "Steve Maughan", "1.7", "http://www.monarchchess.com/", "Monarch(v1.7).exe", 2100)
 
-    mas("andscacs", "Daniel José Queraltó", "0.9532n", "http://www.andscacs.com/", "andscacs_32_no_popcnt.exe", 3240)
+    mas("andscacs", "Daniel José Queraltó", "0.9532n", "http://www.amateurschach.de/main/_download.htm", "andscacs_32_no_popcnt.exe", 3240)
 
     mas("arminius", "Volker Annus", "2017-01-01", "http://www.nnuss.de/Hermann/Arminius2017-01-01.zip", "Arminius2017-01-01-32Bit.exe", 2662)
 
@@ -172,23 +175,26 @@ def read_engines(folder_engines):
     is64 = platform.machine().endswith("64")
     t32_64 = "64" if is64 else "32"
 
-    cm = mas("honey", "Michael Byrne", f"XI {t32_64}bit", "https://github.com/MichaelB7/Stockfish/tree/honey", f"Honey-XI_x{t32_64}.exe", 3300)
-    cm.ordenUCI("Hash", "64")
-    cm.ordenUCI("UCI_ShowWDL", "false")
-    cm.ponMultiPV(20, 256)
-
-    if is64:
-        mas("lc0", "The LCZero Authors", "v0.25.1", "https://github.com/LeelaChessZero", "lc0.exe", 3240)
-
     cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"11.01 {t32_64}bit", "http://komodochess.com/", f"komodo-11.01-{t32_64}bit.exe", 3240)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 218)
 
-    cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"11 {t32_64}bits", "http://stockfishchess.org/", f"Windows/stockfish_20011801_{t32_64}bit.exe", 3300)
-    cm.ordenUCI("Ponder", "false")
+    cm = mas("honey", "Michael Byrne", f"12 {t32_64}bit", "https://github.com/MichaelB7/Stockfish/tree/honey",
+             f"Honey-12_x{t32_64}.exe", 3400, folder="stockfish")
     cm.ordenUCI("Hash", "64")
+    cm.ordenUCI("UCI_ShowWDL", "false")
+    cm.ponMultiPV(20, 256)
+
+    if is64:
+        mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3240)
+
+    cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"12 {t32_64}bits", "http://stockfishchess.org/",
+             f"Stockfish-12_x{t32_64}.exe", 3400)
+    cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Threads", "1")
+    cm.ordenUCI("Hash", "64")
+    cm.ordenUCI("EvalFile", "eval.bin")
     cm.ponMultiPV(20, 500)
 
     return dic_engines
@@ -217,6 +223,6 @@ def dict_engines_fixed_elo(folder_engines):
             cm.ordenUCI("UCI_Elo", str(elo))
             cm.ordenUCI("UCI_LimitStrength", "true")
             cm.name += " (%d)" % elo
-            cm.clave += " (%d)" % elo
+            cm.key += " (%d)" % elo
             dic[elo].append(cm)
     return dic

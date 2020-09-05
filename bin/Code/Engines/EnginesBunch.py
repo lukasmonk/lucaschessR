@@ -17,11 +17,11 @@ def bunch(key_engine, tam_bunch, dic_engines):
     def selecciona(dic_relac, no_incluir):
         minimo = 999
         selec = None
-        for clave, puntos in dic_relac.items():
-            if not (clave in no_incluir):
+        for key, puntos in dic_relac.items():
+            if not (key in no_incluir):
                 if puntos < minimo:
                     minimo = puntos
-                    selec = clave
+                    selec = key
 
         return selec
 

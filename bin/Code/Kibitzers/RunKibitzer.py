@@ -3,9 +3,10 @@ import time
 
 from PySide2 import QtWidgets
 
+from Code.Config import Configuration
+
 from Code import Util
-from Code import AperturasStd
-from Code import Configuracion
+from Code.Openings import OpeningsStd
 from Code.Engines import Priorities
 from Code.SQL import UtilSQL
 import Code
@@ -18,7 +19,7 @@ from Code.Kibitzers import WKibStEval
 from Code.Kibitzers import WKibGaviota
 from Code.QT import QTUtil
 
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class Orden:
@@ -33,7 +34,7 @@ class CPU:
 
         self.ipc = UtilSQL.IPC(fdb, False)
 
-        self.configuracion = None
+        self.configuration = None
         self.configMotor = None
         self.titulo = None
 
@@ -62,13 +63,13 @@ class CPU:
 
     def procesa(self, orden):
         key = orden.key
-        if key == KIBRUN_CONFIGURACION:
+        if key == KIBRUN_CONFIGURATION:
             user = orden.dv["USER"]
-            self.configuracion = Configuracion.Configuracion(user)
-            self.configuracion.lee()
-            self.configuracion.leeConfTableros()
-            Code.configuracion = self.configuracion
-            AperturasStd.reset()
+            self.configuration = Configuration.Configuration(user)
+            self.configuration.lee()
+            self.configuration.leeConfBoards()
+            Code.configuration = self.configuration
+            OpeningsStd.reset()
             self.numkibitzer = orden.dv["NUMKIBITZER"]
             kibitzers = Kibitzers.Kibitzers()
             self.kibitzer = kibitzers.kibitzer(self.numkibitzer)
@@ -84,7 +85,7 @@ class CPU:
             self.titulo = self.kibitzer.name
 
             self.key_video = "Kibitzers%s" % self.kibitzer.huella
-            self.dic_video = self.configuracion.restore_video(self.key_video)
+            self.dic_video = self.configuration.restore_video(self.key_video)
 
             self.tipo = self.kibitzer.tipo
             self.position_before = self.kibitzer.position_before
@@ -109,15 +110,15 @@ class CPU:
             self.ventana.reject()
 
     def save_video(self, dic):
-        self.configuracion.save_video(self.key_video, dic)
+        self.configuration.save_video(self.key_video, dic)
 
     def lanzaVentana(self):
         app = QtWidgets.QApplication([])
 
-        app.setStyle(QtWidgets.QStyleFactory.create(self.configuracion.x_style))
+        app.setStyle(QtWidgets.QStyleFactory.create(self.configuration.x_style))
         QtWidgets.QApplication.setPalette(QtWidgets.QApplication.style().standardPalette())
 
-        self.configuracion.releeTRA()
+        self.configuration.releeTRA()
 
         if self.tipo == KIB_BESTMOVE:
             self.ventana = WKibBase.WKibBase(self)
@@ -157,7 +158,7 @@ class CPU:
 
     def dispatch(self, texto):
         if texto:
-            self.ventana.ponTexto(texto)
+            self.ventana.set_text(texto)
         QTUtil.refresh_gui()
 
         return True

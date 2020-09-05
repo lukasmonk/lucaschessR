@@ -21,10 +21,10 @@ from Code import Util
 
 
 class WEngines(QTVarios.WDialogo):
-    def __init__(self, owner, configuracion):
+    def __init__(self, owner, configuration):
 
-        self.lista_motores = configuracion.lista_motores_externos()
-        self.configuracion = configuracion
+        self.lista_motores = configuration.lista_motores_externos()
+        self.configuration = configuration
         self.changed = False
 
         # Dialogo ---------------------------------------------------------------
@@ -77,8 +77,8 @@ class WEngines(QTVarios.WDialogo):
 
     def grabar(self):
         li = [eng.save() for eng in self.lista_motores]
-        Util.save_pickle(self.configuracion.file_external_engines(), li)
-        self.configuracion.relee_engines()
+        Util.save_pickle(self.configuration.file_external_engines(), li)
+        self.configuration.relee_engines()
 
     def terminar(self):
         self.save_video()
@@ -87,13 +87,13 @@ class WEngines(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.lista_motores)
 
-    def grid_dato(self, grid, fila, oColumna):
-        me = self.lista_motores[fila]
-        key = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        me = self.lista_motores[row]
+        key = o_column.key
         if key == "AUTOR":
             return me.autor
         elif key == "ALIAS":
-            return me.clave
+            return me.key
         elif key == "MOTOR":
             return me.name
         elif key == "INFO":
@@ -156,10 +156,10 @@ class WEngines(QTVarios.WDialogo):
     def grid_doble_click(self, grid, fil, col):
         self.modificar()
 
-    def grid_doble_clickCabecera(self, grid, oColumna):
-        key = oColumna.clave
+    def grid_doble_clickCabecera(self, grid, o_column):
+        key = o_column.key
         if key == "ALIAS":
-            key = "clave"
+            key = "key"
         elif key == "MOTOR":
             key = "name"
         elif key == "ELO":
@@ -173,9 +173,9 @@ class WEngines(QTVarios.WDialogo):
 
     def modificar(self):
         if len(self.lista_motores):
-            fila = self.grid.recno()
-            if fila >= 0:
-                me = self.lista_motores[fila]
+            row = self.grid.recno()
+            if row >= 0:
+                me = self.lista_motores[row]
                 # Editamos, y graba si hace falta
                 w = WEngine(self, self.lista_motores, me)
                 if w.exec_():
@@ -183,37 +183,37 @@ class WEngines(QTVarios.WDialogo):
                     self.grabar()
 
     def arriba(self):
-        fila = self.grid.recno()
-        if fila > 0:
+        row = self.grid.recno()
+        if row > 0:
             li = self.lista_motores
-            a, b = li[fila], li[fila - 1]
-            li[fila], li[fila - 1] = b, a
-            self.grid.goto(fila - 1, 0)
+            a, b = li[row], li[row - 1]
+            li[row], li[row - 1] = b, a
+            self.grid.goto(row - 1, 0)
             self.grid.refresh()
             self.grabar()
 
     def abajo(self):
-        fila = self.grid.recno()
+        row = self.grid.recno()
         li = self.lista_motores
-        if fila < len(li) - 1:
-            a, b = li[fila], li[fila + 1]
-            li[fila], li[fila + 1] = b, a
-            self.grid.goto(fila + 1, 0)
+        if row < len(li) - 1:
+            a, b = li[row], li[row + 1]
+            li[row], li[row + 1] = b, a
+            self.grid.goto(row + 1, 0)
             self.grid.refresh()
             self.grabar()
 
     def borrar(self):
-        fila = self.grid.recno()
-        if fila >= 0:
-            if QTUtil2.pregunta(self, _X(_("Delete %1?"), self.lista_motores[fila].clave)):
-                del self.lista_motores[fila]
+        row = self.grid.recno()
+        if row >= 0:
+            if QTUtil2.pregunta(self, _X(_("Delete %1?"), self.lista_motores[row].key)):
+                del self.lista_motores[row]
                 self.grid.refresh()
                 self.grabar()
 
     def copiar(self):
-        fila = self.grid.recno()
-        if fila >= 0:
-            me = self.lista_motores[fila].copy()
+        row = self.grid.recno()
+        if row >= 0:
+            me = self.lista_motores[row].copy()
             w = WEngine(self, self.lista_motores, me)
             if w.exec_():
                 self.lista_motores.append(me)
@@ -223,7 +223,7 @@ class WEngines(QTVarios.WDialogo):
 
     def importar(self):
         menu = QTVarios.LCMenu(self)
-        lista = Code.configuracion.comboMotores()
+        lista = Code.configuration.comboMotores()
         nico = QTVarios.rondoPuntos()
         for name, key in lista:
             menu.opcion(key, name, nico.otro())
@@ -232,7 +232,7 @@ class WEngines(QTVarios.WDialogo):
         if not resp:
             return
 
-        me = Code.configuracion.buscaRival(resp)
+        me = Code.configuration.buscaRival(resp)
         w = WEngine(self, self.lista_motores, me)
         if w.exec_():
             self.lista_motores.append(me)
@@ -242,9 +242,9 @@ class WEngines(QTVarios.WDialogo):
 
 
 class WEngine(QtWidgets.QDialog):
-    def __init__(self, wParent, listaMotores, engine, siTorneo=False):
+    def __init__(self, w_parent, listaMotores, engine, siTorneo=False):
 
-        super(WEngine, self).__init__(wParent)
+        super(WEngine, self).__init__(w_parent)
 
         self.setWindowTitle(engine.version)
         self.setWindowIcon(Iconos.Motor())
@@ -266,7 +266,7 @@ class WEngine(QtWidgets.QDialog):
         tb = QTUtil2.tbAcceptCancel(self)
 
         lbAlias = Controles.LB2P(self, _("Alias"))
-        self.edAlias = Controles.ED(self, engine.clave).anchoMinimo(360)
+        self.edAlias = Controles.ED(self, engine.key).anchoMinimo(360)
 
         lbNombre = Controles.LB2P(self, _("Name"))
         self.edNombre = Controles.ED(self, engine.name).anchoMinimo(360)
@@ -287,7 +287,7 @@ class WEngine(QtWidgets.QDialog):
             self.sbTime = Controles.SB(self, engine.max_time, 0, 9999)
 
             lbBook = Controles.LB(self, _("Opening book") + ": ")
-            fvar = Code.configuracion.ficheroBooks
+            fvar = Code.configuration.ficheroBooks
             self.listaLibros = Books.ListaLibros()
             self.listaLibros.restore_pickle(fvar)
             # # Comprobamos que todos esten accesibles
@@ -296,7 +296,7 @@ class WEngine(QtWidgets.QDialog):
             li.insert(0, ("* " + _("None"), "-"))
             li.insert(0, ("* " + _("Default"), "*"))
             self.cbBooks = Controles.CB(self, li, engine.book)
-            btNuevoBook = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), tamIcon=16)
+            btNuevoBook = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), icon_size=16)
             # # Respuesta rival
             li = (
                 (_("Uniform random"), "au"),
@@ -346,7 +346,7 @@ class WEngine(QtWidgets.QDialog):
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
             self.listaLibros.nuevo(b)
-            fvar = Code.configuracion.ficheroBooks
+            fvar = Code.configuration.ficheroBooks
             self.listaLibros.save_pickle(fvar)
             li = [(x.name, x.path) for x in self.listaLibros.lista]
             li.insert(0, ("* " + _("Engine book"), "-"))
@@ -361,7 +361,7 @@ class WEngine(QtWidgets.QDialog):
 
         # Comprobamos que no se repita el alias
         for engine in self.liMotores:
-            if (self.motorExterno != engine) and (engine.clave == alias):
+            if (self.motorExterno != engine) and (engine.key == alias):
                 QTUtil2.message_error(
                     self,
                     _(
@@ -369,7 +369,7 @@ class WEngine(QtWidgets.QDialog):
                     ),
                 )
                 return
-        self.motorExterno.clave = alias
+        self.motorExterno.key = alias
         name = self.edNombre.texto().strip()
         self.motorExterno.name = name if name else alias
         self.motorExterno.id_info = self.emInfo.texto()
@@ -394,12 +394,12 @@ def wgen_options_engine(owner, engine):
     layout = Colocacion.G()
     for opcion in engine.li_uci_options_editable():
         tipo = opcion.tipo
-        lb = Controles.LB(owner, opcion.name + ":").alinDerecha()
+        lb = Controles.LB(owner, opcion.name + ":").align_right()
         if tipo == "spin":
             control = QTUtil2.spinBoxLB(
                 owner, opcion.valor, opcion.minimo, opcion.maximo, maxTam=50 if opcion.maximo < 1000 else 80
             )
-            lb.ponTexto("%s [%d-%d] :" % (opcion.name, opcion.minimo, opcion.maximo))
+            lb.set_text("%s [%d-%d] :" % (opcion.name, opcion.minimo, opcion.maximo))
         elif tipo == "check":
             control = Controles.CHB(owner, " ", opcion.valor)
         elif tipo == "combo":
@@ -459,14 +459,14 @@ def selectEngine(wowner):
     :return: MotorExterno / None=error
     """
     # Pedimos el ejecutable
-    folderEngines = Code.configuracion.leeVariables("FOLDER_ENGINES")
+    folderEngines = Code.configuration.leeVariables("FOLDER_ENGINES")
     exeMotor = QTUtil2.leeFichero(
         wowner, folderEngines if folderEngines else ".", "%s EXE (*.exe)" % _("File"), _("Engine")
     )
     if not exeMotor:
         return None
     folderEngines = Util.dirRelativo(os.path.dirname(exeMotor))
-    Code.configuracion.escVariables("FOLDER_ENGINES", folderEngines)
+    Code.configuration.escVariables("FOLDER_ENGINES", folderEngines)
 
     # Leemos el UCI
     um = QTUtil2.unMomento(wowner)
@@ -479,14 +479,14 @@ def selectEngine(wowner):
 
 
 class WSelectEngineElo(QTVarios.WDialogo):
-    def __init__(self, gestor, elo, titulo, icono, tipo):
-        QTVarios.WDialogo.__init__(self, gestor.main_window, titulo, icono, tipo.lower())
+    def __init__(self, manager, elo, titulo, icono, tipo):
+        QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, tipo.lower())
 
         self.siMicElo = tipo == "MICELO"
         self.siMicPer = tipo == "MICPER"
         self.siMic = self.siMicElo or self.siMicPer
 
-        self.gestor = gestor
+        self.manager = manager
 
         self.colorNoJugable = QTUtil.qtColorRGB(241, 226, 226)
         self.colorMenor = QTUtil.qtColorRGB(245, 245, 245)
@@ -509,7 +509,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
 
         self.tb = QTVarios.LCTB(self, li_acciones)
 
-        self.liMotores = self.gestor.list_engines(elo)
+        self.liMotores = self.manager.list_engines(elo)
         self.liMotoresActivos = self.liMotores
 
         liFiltro = (
@@ -522,7 +522,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
             ("+-800", "800"),
         )
 
-        self.cbElo = Controles.CB(self, liFiltro, None).capturaCambiado(self.filtrar)
+        self.cbElo = Controles.CB(self, liFiltro, None).capture_changes(self.filtrar)
 
         minimo = 9999
         maximo = 0
@@ -533,7 +533,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
                 if mt.elo > maximo:
                     maximo = mt.elo
         self.sbElo, lbElo = QTUtil2.spinBoxLB(self, elo, minimo, maximo, maxTam=50, etiqueta=_("Elo"))
-        self.sbElo.capturaCambiado(self.filtrar)
+        self.sbElo.capture_changes(self.filtrar)
 
         if self.siMic:
             liCaract = []
@@ -547,7 +547,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
                         liCaract.append((_F(x), x))
             liCaract.sort(key=lambda x: x[1])
             liCaract.insert(0, ("---", None))
-            self.cbCaract = Controles.CB(self, liCaract, None).capturaCambiado(self.filtrar)
+            self.cbCaract = Controles.CB(self, liCaract, None).capture_changes(self.filtrar)
 
         ly = Colocacion.H().control(lbElo).control(self.cbElo).control(self.sbElo)
         if self.siMic:
@@ -557,7 +557,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
 
         # Lista
         o_columns = Columnas.ListaColumnas()
-        o_columns.nueva("NUMERO", _("N."), 35, centered=True)
+        o_columns.nueva("NUMBER", _("N."), 35, centered=True)
         o_columns.nueva("MOTOR", _("Name"), 140)
         o_columns.nueva("ELO", _("Elo"), 60, siDerecha=True)
         if not self.siMicPer:
@@ -614,7 +614,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
         if not QTUtil2.pregunta(self, _("Are you sure you want to set the original elo of all engines?")):
             return
 
-        self.gestor.configuracion.escVariables("DicMicElos", {})
+        self.manager.configuration.escVariables("DicMicElos", {})
         self.cancelar()
 
     def cancelar(self):
@@ -645,30 +645,30 @@ class WSelectEngineElo(QTVarios.WDialogo):
         else:
             QTUtil2.message_error(self, _("There is not a playable engine between these values"))
 
-    def grid_doble_click(self, grid, fila, oColumna):
+    def grid_doble_click(self, grid, row, o_column):
         self.elegir()
 
     def grid_num_datos(self, grid):
         return len(self.liMotoresActivos)
 
-    def grid_wheel_event(self, quien, siAdelante):
+    def grid_wheel_event(self, quien, forward):
         n = len(self.liMotoresActivos)
         f, c = self.grid.posActualN()
-        f += -1 if siAdelante else +1
+        f += -1 if forward else +1
         if 0 <= f < n:
             self.grid.goto(f, c)
 
-    def grid_color_fondo(self, grid, fila, oColumna):
-        mt = self.liMotoresActivos[fila]
+    def grid_color_fondo(self, grid, row, o_column):
+        mt = self.liMotoresActivos[row]
         if mt.siOut:
             return self.colorNoJugable
         else:
             return self.colorMenor if mt.elo < self.elo else self.colorMayor
 
-    def grid_dato(self, grid, fila, oColumna):
-        mt = self.liMotoresActivos[fila]
-        key = oColumna.clave
-        if key == "NUMERO":
+    def grid_dato(self, grid, row, o_column):
+        mt = self.liMotoresActivos[row]
+        key = o_column.key
+        if key == "NUMBER":
             valor = "%2d" % mt.number
         elif key == "MOTOR":
             valor = " " + mt.alias
@@ -691,20 +691,20 @@ class WSelectEngineElo(QTVarios.WDialogo):
         return valor
 
 
-def select_engine_elo(gestor, elo):
+def select_engine_elo(manager, elo):
     titulo = _("Lucas-Elo") + ". " + _("Choose the opponent")
     icono = Iconos.Elo()
-    w = WSelectEngineElo(gestor, elo, titulo, icono, "ELO")
+    w = WSelectEngineElo(manager, elo, titulo, icono, "ELO")
     if w.exec_():
         return w.resultado
     else:
         return None
 
 
-def select_engine_micelo(gestor, elo):
+def select_engine_micelo(manager, elo):
     titulo = _("Club players competition") + ". " + _("Choose the opponent")
     icono = Iconos.EloTimed()
-    w = WSelectEngineElo(gestor, elo, titulo, icono, "MICELO")
+    w = WSelectEngineElo(manager, elo, titulo, icono, "MICELO")
     if w.exec_():
         return w.resultado
     else:
@@ -715,10 +715,10 @@ def select_engine_entmaq(main_window):
     titulo = _("Choose the opponent")
     icono = Iconos.EloTimed()
 
-    class GestorTmp:
+    class ManagerTmp:
         def __init__(self):
             self.main_window = main_window
-            self.configuracion = Code.configuracion
+            self.configuration = Code.configuration
 
         def list_engines(self, elo):
             li = EnginesMicElo.all_engines()
@@ -729,7 +729,7 @@ def select_engine_entmaq(main_window):
                 mt.number = numX - num
             return li
 
-    w = WSelectEngineElo(GestorTmp(), 1600, titulo, icono, "MICPER")
+    w = WSelectEngineElo(ManagerTmp(), 1600, titulo, icono, "MICPER")
     if w.exec_():
         return w.resultado
     else:

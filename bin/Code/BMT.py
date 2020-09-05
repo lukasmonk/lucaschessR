@@ -44,7 +44,7 @@ class BMTUno:
     def __init__(self, fen, mrm, max_puntos, cl_game):
         self.fen = fen
         self.mrm = mrm
-        self.put_color()
+        self.set_color_foreground()
 
         self.puntos = max_puntos
         self.max_puntos = max_puntos
@@ -53,7 +53,7 @@ class BMTUno:
         self.finished = False
         self.cl_game = cl_game
 
-    def put_color(self):
+    def set_color_foreground(self):
         is_white = "w" in self.fen
         self.mrm.is_white = is_white
         for rm in self.mrm.li_rm:
@@ -87,7 +87,7 @@ class BMTLista:
 
     def check_color(self):
         for uno in self.li_bmt_uno:
-            uno.put_color()
+            uno.set_color_foreground()
 
     def nuevo(self, bmt_uno):
         self.li_bmt_uno.append(bmt_uno)

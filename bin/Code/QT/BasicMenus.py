@@ -8,39 +8,39 @@ from Code.QT import QTVarios
 from Code.QT import Iconos
 from Code.QT import Delegados
 
-from Code.Constantes import MENU_PLAY_ANY_ENGINE, MENU_PLAY_YOUNG_PLAYERS
+from Code.Base.Constantes import MENU_PLAY_ANY_ENGINE, MENU_PLAY_YOUNG_PLAYERS
 
 
 class SaveMenu:
-    def __init__(self, dic_datos, launcher, rotulo=None, icono=None):
+    def __init__(self, dic_datos, launcher, label=None, icono=None):
         self.liopciones = []
-        self.rotulo = rotulo
+        self.label = label
         self.icono = icono
         self.dic_data = {} if dic_datos is None else dic_datos
         self.launcher = launcher
 
-    def opcion(self, key, rotulo, icono, is_disabled=None):
-        self.liopciones.append(("opc", (key, rotulo, icono, is_disabled)))
-        self.dic_data[key] = (self.launcher, rotulo, icono, is_disabled)
+    def opcion(self, key, label, icono, is_disabled=None):
+        self.liopciones.append(("opc", (key, label, icono, is_disabled)))
+        self.dic_data[key] = (self.launcher, label, icono, is_disabled)
 
     def separador(self):
         self.liopciones.append(("sep", None))
 
-    def submenu(self, rotulo, icono):
-        sm = SaveMenu(self.dic_data, self.launcher, rotulo, icono)
+    def submenu(self, label, icono):
+        sm = SaveMenu(self.dic_data, self.launcher, label, icono)
         self.liopciones.append(("sub", sm))
         return sm
 
     def xmenu(self, menu):
         for tipo, datos in self.liopciones:
             if tipo == "opc":
-                (key, rotulo, icono, is_disabled) = datos
-                menu.opcion(key, rotulo, icono, is_disabled=is_disabled)
+                (key, label, icono, is_disabled) = datos
+                menu.opcion(key, label, icono, is_disabled=is_disabled)
             elif tipo == "sep":
                 menu.separador()
             elif tipo == "sub":
                 sm = datos
-                submenu = menu.submenu(sm.rotulo, sm.icono)
+                submenu = menu.submenu(sm.label, sm.icono)
                 sm.xmenu(submenu)
 
     def lanza(self, procesador):
@@ -56,7 +56,7 @@ def menu_tools_savemenu(procesador, dic_data=None):
     savemenu.separador()
 
     menu_database = savemenu.submenu(_("Databases"), Iconos.Database())
-    QTVarios.menuDB(menu_database, procesador.configuracion, True, indicador_previo="dbase_R_")
+    QTVarios.menuDB(menu_database, procesador.configuration, True, indicador_previo="dbase_R_")
     menu_database.separador()
     submenu_database = menu_database.submenu(_("Maintenance"), Iconos.DatabaseMaintenance())
     submenu_database.opcion("dbase_N", _("Create new database"), Iconos.DatabaseMas())
@@ -67,10 +67,10 @@ def menu_tools_savemenu(procesador, dic_data=None):
         submenu_database.opcion("dbase_M", _("Direct maintenance"), Iconos.Configurar())
     savemenu.separador()
 
-    menu1 = savemenu.submenu(_("Openings"), Iconos.Aperturas())
+    menu1 = savemenu.submenu(_("Openings"), Iconos.Openings())
     menu1.opcion("openings", _("Opening lines"), Iconos.OpeningLines())
     menu1.separador()
-    menu1.opcion("aperturaspers", _("Custom openings"), Iconos.Apertura())
+    menu1.opcion("aperturaspers", _("Custom openings"), Iconos.Opening())
     savemenu.separador()
 
     menu1 = savemenu.submenu(_("Engines"), Iconos.Motores())
@@ -148,8 +148,8 @@ def menuplay_savemenu(procesador, dic_data=None):
 
 def menuplay(procesador, extended=False):
     if not extended:
-        configuracion = procesador.configuracion
-        opcion = configuracion.x_menu_play
+        configuration = procesador.configuration
+        opcion = configuration.x_menu_play
         if opcion == MENU_PLAY_ANY_ENGINE:
             return "free", None
         elif opcion == MENU_PLAY_YOUNG_PLAYERS:
@@ -167,23 +167,23 @@ def menucompete_savemenu(procesador, dic_data=None):
     savemenu.separador()
 
     submenu = savemenu.submenu(_("Elo-Rating"), Iconos.Elo())
-    submenu.opcion(("lucaselo", 0), "%s (%d)" % (_("Lucas-Elo"), procesador.configuracion.x_elo), Iconos.Elo())
+    submenu.opcion(("lucaselo", 0), "%s (%d)" % (_("Lucas-Elo"), procesador.configuration.x_elo), Iconos.Elo())
     submenu.separador()
-    submenu.opcion(("micelo", 0), "%s (%d)" % (_("Tourney-Elo"), procesador.configuracion.x_michelo), Iconos.EloTimed())
+    submenu.opcion(("micelo", 0), "%s (%d)" % (_("Tourney-Elo"), procesador.configuration.x_michelo), Iconos.EloTimed())
     submenu.separador()
-    fics = procesador.configuracion.x_fics
+    fics = procesador.configuration.x_fics
     menuf = submenu.submenu("%s (%d)" % (_("Fics-Elo"), fics), Iconos.Fics())
     rp = QTVarios.rondoPuntos()
     for elo in range(900, 2800, 100):
         if (elo == 900) or (0 <= (elo + 99 - fics) <= 400 or 0 <= (fics - elo) <= 400):
             menuf.opcion(("fics", elo / 100), "%d-%d" % (elo, elo + 99), rp.otro())
     submenu.separador()
-    fide = procesador.configuracion.x_fide
+    fide = procesador.configuration.x_fide
     menuf = submenu.submenu("%s (%d)" % (_("Fide-Elo"), fide), Iconos.Fide())
     for elo in range(1500, 2700, 100):
         if (elo == 1500) or (0 <= (elo + 99 - fide) <= 400 or 0 <= (fide - elo) <= 400):
             menuf.opcion(("fide", elo / 100), "%d-%d" % (elo, elo + 99), rp.otro())
-    lichess = procesador.configuracion.x_lichess
+    lichess = procesador.configuration.x_lichess
     submenu.separador()
     menuf = submenu.submenu("%s (%d)" % (_("Lichess-Elo"), lichess), Iconos.Lichess())
     rp = QTVarios.rondoPuntos()
@@ -210,7 +210,7 @@ class WAtajos(QTVarios.WDialogo):
         entrenamientos.comprueba()
         self.entrenamientos = entrenamientos
         self.procesador = procesador
-        self.li_favoritos = self.procesador.configuracion.get_favoritos()
+        self.li_favoritos = self.procesador.configuration.get_favoritos()
         self.dic_data = dic_data
 
         QTVarios.WDialogo.__init__(self, self.procesador.main_window, _("Shortcuts"), Iconos.Atajos(), "atajos")
@@ -229,7 +229,7 @@ class WAtajos(QTVarios.WDialogo):
             (_("Down"), Iconos.Abajo(), self.abajo),
             None,
         ]
-        tb = Controles.TBrutina(self, li_acciones, puntos=procesador.configuracion.x_tb_fontpoints)
+        tb = Controles.TBrutina(self, li_acciones, puntos=procesador.configuration.x_tb_fontpoints)
 
         # Lista
         o_columnas = Columnas.ListaColumnas()
@@ -268,17 +268,17 @@ class WAtajos(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.li_favoritos)
 
-    def grid_dato(self, grid, fila, oColumna):
-        dic = self.li_favoritos[fila]
+    def grid_dato(self, grid, row, o_column):
+        dic = self.li_favoritos[row]
         opcion = dic["OPCION"]
         if opcion in self.dic_data:
             menu_run, name, icono, is_disabled = self.dic_data[opcion]
         else:
             name = "???"
-        return dic.get("LABEL", name) if oColumna.clave == "LABEL" else name
+        return dic.get("LABEL", name) if o_column.key == "LABEL" else name
 
-    def grid_setvalue(self, grid, fila, oColumna, valor):  # ? necesario al haber delegados
-        dic = self.li_favoritos[fila]
+    def grid_setvalue(self, grid, row, o_column, valor):  # ? necesario al haber delegados
+        dic = self.li_favoritos[row]
         dato = self.dic_data.get(dic["OPCION"], None)
         if dato is not None:
             if valor:
@@ -287,45 +287,45 @@ class WAtajos(QTVarios.WDialogo):
                 if "LABEL" in dic:
                     del dic["LABEL"]
 
-            self.graba(fila)
+            self.graba(row)
 
-    def graba(self, fila):
-        self.procesador.configuracion.save_favoritos(self.li_favoritos)
+    def graba(self, row):
+        self.procesador.configuration.save_favoritos(self.li_favoritos)
         self.grid.refresh()
-        if fila >= len(self.li_favoritos):
-            fila = len(self.li_favoritos) - 1
-        self.grid.goto(fila, 0)
+        if row >= len(self.li_favoritos):
+            row = len(self.li_favoritos) - 1
+        self.grid.goto(row, 0)
 
     def nuevo(self, resp):
         if resp:
             resp = {"OPCION": resp}
-            fila = self.grid.recno()
+            row = self.grid.recno()
             tam = len(self.li_favoritos)
-            if fila < tam - 1:
-                fila += 1
+            if row < tam - 1:
+                row += 1
                 self.li_favoritos.insert(0, resp)
             else:
                 self.li_favoritos.append(resp)
-                fila = len(self.li_favoritos) - 1
-            self.graba(fila)
+                row = len(self.li_favoritos) - 1
+            self.graba(row)
 
     def borrar(self):
-        fila = self.grid.recno()
-        if fila >= 0:
-            del self.li_favoritos[fila]
-            self.graba(fila)
+        row = self.grid.recno()
+        if row >= 0:
+            del self.li_favoritos[row]
+            self.graba(row)
 
     def arriba(self):
-        fila = self.grid.recno()
-        if fila >= 1:
-            self.li_favoritos[fila], self.li_favoritos[fila - 1] = self.li_favoritos[fila - 1], self.li_favoritos[fila]
-            self.graba(fila - 1)
+        row = self.grid.recno()
+        if row >= 1:
+            self.li_favoritos[row], self.li_favoritos[row - 1] = self.li_favoritos[row - 1], self.li_favoritos[row]
+            self.graba(row - 1)
 
     def abajo(self):
-        fila = self.grid.recno()
-        if fila < len(self.li_favoritos) - 1:
-            self.li_favoritos[fila], self.li_favoritos[fila + 1] = self.li_favoritos[fila + 1], self.li_favoritos[fila]
-            self.graba(fila + 1)
+        row = self.grid.recno()
+        if row < len(self.li_favoritos) - 1:
+            self.li_favoritos[row], self.li_favoritos[row + 1] = self.li_favoritos[row + 1], self.li_favoritos[row]
+            self.graba(row + 1)
 
 
 def atajos(procesador):
@@ -334,15 +334,15 @@ def atajos(procesador):
     menuplay_savemenu(procesador, dic_data)
     menucompete_savemenu(procesador, dic_data)
     menu_tools_savemenu(procesador, dic_data)
-    li_favoritos = procesador.configuracion.get_favoritos()
+    li_favoritos = procesador.configuration.get_favoritos()
 
     menu = QTVarios.LCMenu(procesador.main_window)
     nx = 1
     for dic in li_favoritos:
         key = dic["OPCION"]
         if key in dic_data:
-            launcher, rotulo, icono, is_disabled = dic_data[key]
-            label = dic.get("LABEL", rotulo)
+            launcher, label, icono, is_disabled = dic_data[key]
+            label = dic.get("LABEL", label)
             if nx <= 9:
                 label += "  [%s-%d]" % (_("Alt"), nx)
             menu.opcion(key, label, icono, is_disabled)
@@ -355,7 +355,7 @@ def atajos(procesador):
         w = WAtajos(procesador, dic_data)
         w.exec_()
     elif resp is not None and resp in dic_data:
-        launcher, rotulo, icono, is_disabled = dic_data[resp]
+        launcher, label, icono, is_disabled = dic_data[resp]
         launcher(resp)
 
 
@@ -365,13 +365,13 @@ def atajosALT(procesador, num):
     menuplay_savemenu(procesador, dic_data)
     menucompete_savemenu(procesador, dic_data)
     menu_tools_savemenu(procesador, dic_data)
-    li_favoritos = procesador.configuracion.get_favoritos()
+    li_favoritos = procesador.configuration.get_favoritos()
 
     nx = 1
     for dic in li_favoritos:
         key = dic["OPCION"]
         if key in dic_data:
-            launcher, rotulo, icono, is_disabled = dic_data[key]
+            launcher, label, icono, is_disabled = dic_data[key]
             if nx == num:
                 launcher(key)
                 return
@@ -389,7 +389,7 @@ def menuInformacion(procesador):
     menu.separador()
     menu.opcion("mail", _("Contact") + " (%s)" % "lukasmonk@gmail.com", Iconos.Mail())
     menu.separador()
-    if procesador.configuracion.is_main:
+    if procesador.configuration.is_main:
         menu.opcion("actualiza", _("Search for updates"), Iconos.Actualiza())
         menu.separador()
 

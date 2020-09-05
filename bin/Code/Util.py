@@ -793,3 +793,12 @@ def memory_python():
     return process.memory_info().rss
 
 
+def unique_list(lista):
+    st = set()
+    li = []
+    for x in lista:
+        if x not in st:
+            li.append(x)
+            st.add(x)
+    return li
+

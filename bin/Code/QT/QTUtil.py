@@ -75,7 +75,7 @@ def backgroundGUIlight(factor):
 
 def refresh_gui():
     """
-    Procesa eventos pendientes para que se muestren correctamente las pantallas
+    Procesa eventos pendientes para que se muestren correctamente las windows
     """
     QtCore.QCoreApplication.processEvents()
     QtWidgets.QApplication.processEvents()
@@ -83,7 +83,7 @@ def refresh_gui():
 
 def xrefresh_gui():
     """
-    Procesa eventos pendientes para que se muestren correctamente las pantallas
+    Procesa eventos pendientes para que se muestren correctamente las windows
     """
     QtCore.QCoreApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
 
@@ -201,7 +201,7 @@ def shrink(widget):
 
 def kbdPulsado():
     modifiers = QtWidgets.QApplication.keyboardModifiers()
-    siShift = modifiers == QtCore.Qt.ShiftModifier
-    siControl = modifiers == QtCore.Qt.ControlModifier
-    siAlt = modifiers == QtCore.Qt.AltModifier
-    return siShift, siControl, siAlt
+    is_shift = modifiers == QtCore.Qt.ShiftModifier
+    is_control = modifiers == QtCore.Qt.ControlModifier
+    is_alt = modifiers == QtCore.Qt.AltModifier
+    return is_shift, is_control, is_alt

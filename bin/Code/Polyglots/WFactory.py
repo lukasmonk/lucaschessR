@@ -18,7 +18,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
     def __init__(self, procesador):
 
         self.procesador = procesador
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
         self.resultado = None
         self.lista_names, self.dict_data = self.lee_lista()
 
@@ -58,7 +58,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
 
     def lee_lista(self):
         d = {}
-        with os.scandir(self.configuracion.folder_polyglots_factory()) as it:
+        with os.scandir(self.configuration.folder_polyglots_factory()) as it:
             for entry in it:
                 if entry.is_file():
                     name = entry.name
@@ -80,7 +80,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
         if recno >= 0:
             self.run_edit(self.dict_data[self.lista_names[recno]][0].path)
 
-    def grid_doble_click(self, grid, fila, o_columna):
+    def grid_doble_click(self, grid, row, o_columna):
         self.edit()
 
     def run_edit(self, path):
@@ -97,7 +97,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
             resp = form.run()
             if resp:
                 name = resp[1][0]
-                path = os.path.join(self.configuracion.folder_polyglots_factory(), name + ".dbbin")
+                path = os.path.join(self.configuration.folder_polyglots_factory(), name + ".dbbin")
                 if os.path.isfile(path):
                     QTUtil2.message_error(self, "%s/n%s" % (_("This file already exists"), path))
                 else:
@@ -119,12 +119,12 @@ class WFactoryPolyglots(QTVarios.WDialogo):
                 self.glista.refresh()
 
     def renombrar(self):
-        fila = self.glista.recno()
-        if fila >= 0:
-            op = self.listaOpenings[fila]
+        row = self.glista.recno()
+        if row >= 0:
+            op = self.listaOpenings[row]
             name = self.get_nombre(op["title"])
             if name:
-                self.listaOpenings.change_title(fila, name)
+                self.listaOpenings.change_title(row, name)
                 self.glista.refresh()
 
     def borrar(self):
@@ -132,25 +132,25 @@ class WFactoryPolyglots(QTVarios.WDialogo):
         if len(li) > 0:
             mens = _("Do you want to delete all selected records?")
             mens += "\n"
-            for num, fila in enumerate(li, 1):
-                mens += "\n%d. %s" % (num, self.lista_names[fila])
+            for num, row in enumerate(li, 1):
+                mens += "\n%d. %s" % (num, self.lista_names[row])
             if QTUtil2.pregunta(self, mens):
                 li.sort(reverse=True)
-                for fila in li:
-                    name = self.lista_names[fila]
+                for row in li:
+                    name = self.lista_names[row]
                     entry_dbbin, entry_mkbin, ms = self.dict_data[name]
                     Util.remove_file(entry_dbbin.path)
                     if entry_mkbin:
                         Util.remove_file(entry_mkbin.path)
-                    del self.lista_names[fila]
+                    del self.lista_names[row]
                 self.glista.refresh()
 
     def grid_num_datos(self, grid):
         return len(self.lista_names)
 
-    def grid_dato(self, grid, fila, o_columna):
-        col = o_columna.clave
-        name = self.lista_names[fila]
+    def grid_dato(self, grid, row, o_columna):
+        col = o_columna.key
+        name = self.lista_names[row]
         entry_dbbin, entry_mkbin, ms = self.dict_data[name]
         if col == "NAME":
             return name
@@ -174,5 +174,5 @@ def polyglots_factory(procesador):
 
 
 def edit_polyglot(procesador, path_dbbin):
-    w = WPolyglot.WPolyglot(procesador.main_window, procesador.configuracion, path_dbbin)
+    w = WPolyglot.WPolyglot(procesador.main_window, procesador.configuration, path_dbbin)
     w.exec_()

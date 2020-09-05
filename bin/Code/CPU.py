@@ -10,7 +10,7 @@ from Code import Tareas
 class CPU:
     def __init__(self, main_window):
         self.main_window = main_window
-        self.tablero = main_window.tablero
+        self.board = main_window.board
         self.junks = 1000.0 / 36.0
         self.reset()
 
@@ -40,8 +40,8 @@ class CPU:
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
-    def muevePieza(self, desdeA1H8, hastaA1H8, segundos=1.0, padre=0, siExclusiva=False):
-        tarea = Tareas.TareaMuevePieza(desdeA1H8, hastaA1H8, segundos)
+    def muevePieza(self, from_a1h8, to_a1h8, segundos=1.0, padre=0, siExclusiva=False):
+        tarea = Tareas.TareaMuevePieza(from_a1h8, to_a1h8, segundos)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
@@ -60,7 +60,7 @@ class CPU:
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
-    def setposition(self, position, padre=0):
+    def set_position(self, position, padre=0):
         tarea = Tareas.TareaPonPosicion(position)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, True)

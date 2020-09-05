@@ -16,20 +16,20 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import FormLayout
 
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class PolyglotImports:
     def __init__(self, wpolyglot):
         self.wpolyglot = wpolyglot
-        self.configuracion = wpolyglot.configuracion
+        self.configuration = wpolyglot.configuration
         self.db_entries = wpolyglot.db_entries
         self.pol_mkbin = wpolyglot.pol_mkbin
         self.path_mkbin = wpolyglot.path_mkbin
 
     def importar(self):
         menu = QTVarios.LCMenu(self.wpolyglot)
-        menu.opcion("pgn", _("PGN"), Iconos.Tablero())
+        menu.opcion("pgn", _("PGN"), Iconos.Board())
         menu.separador()
         menu.opcion("database", _("Database"), Iconos.Database())
         menu.separador()
@@ -45,7 +45,7 @@ class PolyglotImports:
 
     def exportar(self):
         file_def = os.path.basename(self.path_mkbin)[:-5] + "bin"
-        resp = export_polyglot_config(self.wpolyglot, self.configuracion, file_def)
+        resp = export_polyglot_config(self.wpolyglot, self.configuration, file_def)
         if resp is None:
             return None
         path_bin, uniform = resp
@@ -54,10 +54,10 @@ class PolyglotImports:
 
     def import_config(self, titulo):
         titulo = "%s %s" % (_("Import"), titulo)
-        return import_polyglot_config(self.wpolyglot, self.configuracion, titulo)
+        return import_polyglot_config(self.wpolyglot, self.configuration, titulo)
 
     def import_db(self):
-        path_db = QTVarios.select_db(self.wpolyglot, self.configuracion, True, False)
+        path_db = QTVarios.select_db(self.wpolyglot, self.configuration, True, False)
         if not path_db:
             return
 
@@ -123,7 +123,7 @@ class PolyglotImports:
         n_key, n_data = next(g_nueva)
         o_key, o_data = next(g_origen)
 
-        ftemporal = self.configuracion.ficheroTemporal("bin")
+        ftemporal = self.configuration.ficheroTemporal("bin")
         um = QTUtil2.unMomento(self.wpolyglot, _("Saving..."))
         wpoly = FasterCode.PolyglotWriter(ftemporal)
 
@@ -267,7 +267,7 @@ class PolyglotImports:
         yield None, None
 
     def import_polyglot(self):
-        dic = self.configuracion.leeVariables("POLYGLOT_IMPORT")
+        dic = self.configuration.leeVariables("POLYGLOT_IMPORT")
 
         folder = dic.get("FOLDER_BIN", "")
 
@@ -276,7 +276,7 @@ class PolyglotImports:
             return
 
         dic["FOLDER_BIN"] = os.path.dirname(path_bin)
-        self.configuracion.escVariables("POLYGLOT_IMPORT", dic)
+        self.configuration.escVariables("POLYGLOT_IMPORT", dic)
 
         g_bin = iter(self.fuente_bin(path_bin))
         g_origen = iter(self.fuente_origen_acum())
@@ -284,7 +284,7 @@ class PolyglotImports:
         n_key, n_data = next(g_bin)
         o_key, o_data = next(g_origen)
 
-        ftemporal = self.configuracion.ficheroTemporal("bin")
+        ftemporal = self.configuration.ficheroTemporal("bin")
         um = QTUtil2.unMomento(self.wpolyglot, _("Saving..."))
         wpoly = FasterCode.PolyglotWriter(ftemporal)
 
@@ -398,7 +398,7 @@ class ImportarPGNDB(QtWidgets.QDialog):
             self.total = valor
         elif valor > 0:
             self.bp.setValue(valor)
-            self.lbgames_readed.ponTexto("%s: %d" % (_("Games read"), num_games))
+            self.lbgames_readed.set_text("%s: %d" % (_("Games read"), num_games))
             tm = time.time() - self.time_inicial
 
             tm1 = tm / valor
@@ -410,7 +410,7 @@ class ImportarPGNDB(QtWidgets.QDialog):
                 minutos = previsto // 60
                 segundos = previsto % 60
                 lb_min = _("minutes") if minutos > 1 else _("minute")
-                self.lb_previsto.ponTexto(
+                self.lb_previsto.set_text(
                     "%s: %d %s %d %s" % (_("Pending time"), minutos, lb_min, segundos, _("seconds"))
                 )
 
@@ -524,8 +524,8 @@ def add_pgn(path_pgn, plies, st_results, st_side, bunknown_convert, ftime, time_
     return not cancelled
 
 
-def import_polyglot_config(owner, configuracion, titulo):
-    dic = configuracion.leeVariables("POLYGLOT_IMPORT")
+def import_polyglot_config(owner, configuration, titulo):
+    dic = configuration.leeVariables("POLYGLOT_IMPORT")
 
     form = FormLayout.FormLayout(owner, titulo, Iconos.Import8(), anchoMinimo=440)
     form.separador()
@@ -588,13 +588,13 @@ def import_polyglot_config(owner, configuracion, titulo):
     dic["MINSCORE"] = min_score
     dic["CALCWEIGHT"] = calc_weight
     dic["SAVESCORE"] = save_score
-    configuracion.escVariables("POLYGLOT_IMPORT", dic)
+    configuration.escVariables("POLYGLOT_IMPORT", dic)
 
     return plies, st_side, st_results, ru, min_games, min_score, calc_weight, save_score
 
 
-def export_polyglot_config(owner, configuracion, file_nom_def):
-    dic = configuracion.leeVariables("POLYGLOT_EXPORT")
+def export_polyglot_config(owner, configuration, file_nom_def):
+    dic = configuration.leeVariables("POLYGLOT_EXPORT")
     form = FormLayout.FormLayout(owner, _("Export to"), Iconos.Export8(), anchoMinimo=440)
     form.separador()
 
@@ -617,7 +617,7 @@ def export_polyglot_config(owner, configuracion, file_nom_def):
     path_bin = os.path.realpath(path_bin)
     dic["FOLDER"] = os.path.dirname(path_bin)
     dic["UNIFORM"] = uniform
-    configuracion.escVariables("POLYGLOT_EXPORT", dic)
+    configuration.escVariables("POLYGLOT_EXPORT", dic)
 
     return path_bin, uniform
 

@@ -4,7 +4,7 @@ import Code
 from Code import Util
 from Code.Engines import EnginesMicElo
 from Code.Engines import Engines
-from Code import GestorElo
+from Code import ManagerElo
 from Code.QT import Iconos
 from Code.QT import QTVarios
 
@@ -12,8 +12,8 @@ INTERNO, EXTERNO, MICGM, MICPER, FIXED, IRINA, ELO = range(7)
 
 
 class SelectEngines:
-    def __init__(self, configuracion):
-        self.configuracion = configuracion
+    def __init__(self, configuration):
+        self.configuration = configuration
         self.dicIconos = {
             INTERNO: Iconos.Motor(),
             EXTERNO: Iconos.MotoresExternos(),
@@ -24,8 +24,8 @@ class SelectEngines:
             ELO: Iconos.Elo(),
         }
         self.liMotoresGM = EnginesMicElo.only_gm_engines()
-        self.liMotoresInternos = configuracion.listaMotoresInternos()
-        self.dict_engines_fixed_elo = configuracion.dict_engines_fixed_elo()
+        self.liMotoresInternos = configuration.listaMotoresInternos()
+        self.dict_engines_fixed_elo = configuration.dict_engines_fixed_elo()
         self.rehazMotoresExternos()
 
         self.liIrina = self.genEnginesIrina()
@@ -35,11 +35,11 @@ class SelectEngines:
         self.dic_huellas = {}  # se crea para no repetir la lectura de opciones uci
 
     def rehazMotoresExternos(self):
-        self.liMotoresExternos = self.configuracion.lista_motores_externos()
-        self.liMotoresClavePV = self.configuracion.comboMotoresMultiPV10()
+        self.liMotoresExternos = self.configuration.lista_motores_externos()
+        self.liMotoresClavePV = self.configuration.comboMotoresMultiPV10()
 
     def genEnginesIrina(self):
-        cmbase = self.configuracion.buscaRival("irina")
+        cmbase = self.configuration.buscaRival("irina")
         li = []
         for name, trans, ico in QTVarios.list_irina():
             cm = Engines.Engine(name, cmbase.autor, cmbase.version, cmbase.url, cmbase.path_exe)
@@ -52,11 +52,11 @@ class SelectEngines:
     def genEnginesElo(self):
         d = OSEngines.read_engines(Code.folder_engines)
         li = []
-        for elo, key, depth in GestorElo.listaMotoresElo():
+        for elo, key, depth in ManagerElo.listaMotoresElo():
             if key in d:
                 cm = d[key].clona()
                 cm.name = "%d - %s (%s %d)" % (elo, cm.name, _("depth"), depth)
-                cm.clave = cm.name
+                cm.key = cm.name
                 cm.fixed_depth = depth
                 cm.elo = elo
                 li.append(cm)
@@ -73,17 +73,17 @@ class SelectEngines:
 
         li_m_i = sorted(self.liMotoresInternos, key=lambda x: x.elo)
 
-        def haz(from_sq, to_sq, rotulo):
+        def haz(from_sq, to_sq, label):
             smn = None
             for cm in li_m_i:
                 elo = cm.elo
                 if from_sq < elo <= to_sq:
                     if smn is None:
-                        smn = submenu.submenu(rotulo, rc.otro())
-                    clave = INTERNO, cm
+                        smn = submenu.submenu(label, rc.otro())
+                    key = INTERNO, cm
                     texto = cm.name
                     icono = rp.otro()
-                    smn.opcion(clave, "%s (%d)" % (texto, elo), icono)
+                    smn.opcion(key, "%s (%d)" % (texto, elo), icono)
 
         haz(0, 1500, _("Up to 1500"))
         haz(1500, 2000, "1500 - 2000")
@@ -95,23 +95,23 @@ class SelectEngines:
         menu.separador()
         submenu = menu.submenu(_("External engines"), self.dicIconos[EXTERNO])
         for cm in self.liMotoresExternos:
-            clave = EXTERNO, cm
-            texto = cm.clave
+            key = EXTERNO, cm
+            texto = cm.key
             icono = rp.otro()
-            submenu.opcion(clave, texto, icono)
+            submenu.opcion(key, texto, icono)
         submenu.separador()
-        clave = EXTERNO, None
+        key = EXTERNO, None
         texto = _("Edition")
         icono = Iconos.Mas()
-        submenu.opcion(clave, texto, icono)
+        submenu.opcion(key, texto, icono)
 
         menu.separador()
         submenu = menu.submenu(_("GM engines"), self.dicIconos[MICGM])
         for cm in self.liMotoresGM:
             icono = rp.otro()
-            clave = MICGM, cm
+            key = MICGM, cm
             texto = Util.primera_mayuscula(cm.name)
-            submenu.opcion(clave, texto, icono)
+            submenu.opcion(key, texto, icono)
             submenu.separador()
 
         menu.separador()
@@ -126,9 +126,9 @@ class SelectEngines:
             lien = self.dict_engines_fixed_elo[elo]
             lien.sort(key=lambda x: x.name)
             for cm in lien:
-                clave = FIXED, cm
+                key = FIXED, cm
                 texto = cm.name
-                submenuElo.opcion(clave, texto, icono)
+                submenuElo.opcion(key, texto, icono)
             submenuElo.separador()
 
         menu.separador()
@@ -158,10 +158,10 @@ class SelectEngines:
 
         return menu.lanza()
 
-    def busca(self, tipo, clave):
+    def busca(self, tipo, key):
         if tipo is None:
-            if clave.startswith("*"):
-                clave = clave[1:]
+            if key.startswith("*"):
+                key = key[1:]
                 tipo = EXTERNO
             else:
                 tipo = INTERNO
@@ -169,36 +169,36 @@ class SelectEngines:
         rival = None
         if tipo == EXTERNO:
             for cm in self.liMotoresExternos:
-                if cm.clave == clave:
+                if cm.key == key:
                     rival = cm
                     break
             if not rival:
                 tipo = INTERNO
-                clave = self.configuracion.x_rival_inicial
+                key = self.configuration.x_rival_inicial
 
         if tipo == MICGM:
             for cm in self.liMotoresGM:
-                if cm.clave == clave:
+                if cm.key == key:
                     rival = cm
                     break
             if not rival:
                 tipo = INTERNO
-                clave = self.configuracion.x_rival_Inicial
+                key = self.configuration.x_rival_Inicial
 
         if tipo == MICPER:
             liMotores = EnginesMicElo.all_engines()
 
             for cm in liMotores:
-                if cm.clave == clave:
+                if cm.key == key:
                     rival = cm
                     break
             if not rival:
                 tipo = INTERNO
-                clave = self.configuracion.x_rival_Inicial
+                key = self.configuration.x_rival_Inicial
 
         if tipo == INTERNO:
             for cm in self.liMotoresInternos:
-                if cm.clave == clave:
+                if cm.key == key:
                     rival = cm
                     break
             if not rival:
@@ -208,7 +208,7 @@ class SelectEngines:
             rival = None
             for elo, lista in self.dict_engines_fixed_elo.items():
                 for cm in lista:
-                    if cm.clave == clave:
+                    if cm.key == key:
                         rival = cm
                         break
                 if rival:
@@ -220,7 +220,7 @@ class SelectEngines:
         if tipo == IRINA:
             rival = None
             for cm in self.liIrina:
-                if cm.clave == clave:
+                if cm.key == key:
                     rival = cm
                     break
             if not rival:
@@ -230,7 +230,7 @@ class SelectEngines:
         if tipo == ELO:
             rival = None
             for cm in self.liElo:
-                if cm.clave == clave:
+                if cm.key == key:
                     rival = cm
                     break
             if not rival:

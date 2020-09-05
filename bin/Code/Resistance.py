@@ -7,16 +7,16 @@ from Code.SQL import UtilSQL
 class Resistance:
     def __init__(self, procesador, tipo):
         # Variables
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
         self.tipo = tipo
 
-        self.fichDB = self.configuracion.ficheroBoxing + tipo
+        self.fichDB = self.configuration.ficheroBoxing + tipo
         self.db = UtilSQL.DictSQL(self.fichDB)
         self.conf = self.db["CONFIG"]
         if self.conf is None:
             self.conf = {"SEGUNDOS": 5, "PUNTOS": 100, "NIVELHECHO": 0, "MAXERROR": 0}
 
-        self.liMotores = self.configuracion.comboMotores()  # name, key
+        self.liMotores = self.configuration.comboMotores()  # name, key
         self.claveActual = self.calcClaveActual()
         self.dicActual = self.dameDicActual()
 
@@ -36,11 +36,11 @@ class Resistance:
     def num_engines(self):
         return len(self.liMotores)
 
-    def dameEtiEngine(self, fila):
-        return self.liMotores[fila][0]
+    def dameEtiEngine(self, row):
+        return self.liMotores[row][0]
 
-    def dameClaveEngine(self, fila):
-        return self.liMotores[fila][1]
+    def dameClaveEngine(self, row):
+        return self.liMotores[row][1]
 
     def dameResultado(self, campo, numEngine):
         engine = self.liMotores[numEngine][1]
@@ -80,8 +80,8 @@ class Resistance:
 
         return "%s -> %s" % (Util.localDate(fecha), mv)
 
-    def dameEtiRecord(self, campo, fila):
-        fecha, moves = self.dameResultado(campo, fila)
+    def dameEtiRecord(self, campo, row):
+        fecha, moves = self.dameResultado(campo, row)
         return self.dameEti(fecha, moves)
 
     def dameDicActual(self):

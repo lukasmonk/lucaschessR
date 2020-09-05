@@ -9,19 +9,18 @@ import FasterCode
 
 from Code import Util
 from Code.SQL import UtilSQL
-from Code import Game
-from Code import Position
+from Code.Base import Game, Position
 from Code.Databases import DBgamesST
-from Code import AperturasStd
+from Code.Openings import OpeningsStd
 from Code.Engines import EnginesBunch
 from Code.QT import QTUtil2
 
 
 class ListaOpenings:
-    def __init__(self, configuracion):
-        self.folder = configuracion.folder_openings()
+    def __init__(self, configuration):
+        self.folder = configuration.folder_openings()
         if not self.folder or not os.path.isdir(self.folder):
-            self.folder = configuracion.folderBaseOpenings
+            self.folder = configuration.folderBaseOpenings
 
         self.fichero = os.path.join(self.folder, "openinglines.pk")
 
@@ -193,7 +192,7 @@ class Opening:
         self.basePV = self.getconfig("BASEPV", "")
         self.title = self.getconfig("TITLE", os.path.basename(nom_fichero).split(".")[0])
 
-        self.tablero = None
+        self.board = None
 
     def open_cache_engines(self):
         if self.db_cache_engines is None:
@@ -232,11 +231,11 @@ class Opening:
         cursor.close()
         return li_xpv
 
-    def setdbVisual_Tablero(self, tablero):
-        self.tablero = tablero
+    def setdbVisual_Board(self, board):
+        self.board = board
 
-    def getOtras(self, configuracion, game):
-        liOp = ListaOpenings(configuracion)
+    def getOtras(self, configuration, game):
+        liOp = ListaOpenings(configuration)
         fich = os.path.basename(self.nom_fichero)
         pvbase = game.pv()
         liOp = [
@@ -441,11 +440,11 @@ class Opening:
                 d[fen] = dicPV
         return d
 
-    def preparaTrainingEngines(self, configuracion, reg):
+    def preparaTrainingEngines(self, configuration, reg):
         reg["DICFENM2"] = self.recalcFenM2()
         reg["TIMES"] = [500, 1000, 2000, 4000, 8000]
 
-        reg["ENGINES"] = EnginesBunch.bunch(reg["KEY_ENGINE"], reg["NUM_ENGINES"], configuracion.dic_engines)
+        reg["ENGINES"] = EnginesBunch.bunch(reg["KEY_ENGINE"], reg["NUM_ENGINES"], configuration.dic_engines)
 
     def updateTrainingEngines(self):
         reg = self.trainingEngines()
@@ -459,18 +458,18 @@ class Opening:
         self.setconfig("TRAINING", reg)
         self.setconfig("ULT_PACK", 100)  # Se le obliga al VACUUM
 
-        lo = ListaOpenings(procesador.configuracion)
+        lo = ListaOpenings(procesador.configuration)
         lo.add_training_file(os.path.basename(self.nom_fichero))
 
     def createTrainingEngines(self, reg, procesador):
-        self.preparaTrainingEngines(procesador.configuracion, reg)
+        self.preparaTrainingEngines(procesador.configuration, reg)
         reg["DATECREATION"] = Util.today()
         self.setTrainingEngines(reg)
 
         self.setconfig("ENG_LEVEL", 0)
         self.setconfig("ENG_ENGINE", 0)
 
-        lo = ListaOpenings(procesador.configuracion)
+        lo = ListaOpenings(procesador.configuration)
         lo.add_training_engines_file(os.path.basename(self.nom_fichero))
         self.reinit_cache_engines()
 
@@ -593,7 +592,7 @@ class Opening:
 
     def add_cache(self, xpv, game):
         if len(self.cache) >= self.max_cache:
-            li = self.cache.keys()
+            li = list(self.cache.keys())
             for n, xpv in enumerate(li):
                 del self.cache[xpv]
                 if n > self.del_cache:
@@ -762,9 +761,9 @@ class Opening:
                 self.db_cache_engines.close()
                 self.db_cache_engines = None
 
-            if self.tablero:
-                self.tablero.dbVisual_close()
-                self.tablero = None
+            if self.board:
+                self.board.dbVisual_close()
+                self.board = None
 
             if si_pack:
                 if len(self.db_history) > 70:
@@ -961,14 +960,20 @@ class Opening:
         make_move = FasterCode.make_move
         get_fen = FasterCode.get_fen
 
+        st_history_fen_m2 = set()
+
         def hazFEN(fen, lipv_ant, control):
+            fen_m2 = FasterCode.fen_fenm2(fen)
+            if fen_m2 in st_history_fen_m2:
+                return
+            st_history_fen_m2.add(fen_m2)
             if bp.is_canceled():
                 return
             siWhite1 = " w " in fen
             book = bookW if siWhite1 else bookB
-            liPV = book.miraListaPV(fen, siWhite1 == siWhite, onlyone=onlyone)
-            if liPV and len(lipv_ant) < depth:
-                for pv in liPV:
+            li_pv = book.miraListaPV(fen, siWhite1 == siWhite, onlyone=onlyone)
+            if li_pv and len(lipv_ant) < depth:
+                for pv in li_pv:
                     set_fen(fen)
                     make_move(pv)
                     fenN = get_fen()
@@ -983,7 +988,7 @@ class Opening:
                 bp.ponTotal(control.num_partidas)
                 bp.pon(control.num_partidas)
                 if control.num_partidas and control.num_partidas % 1000 == 0:
-                    self.guardaPartidas(control.rotulo, control.liPartidas, minMoves, with_history=control.with_history)
+                    self.guardaPartidas(control.label, control.liPartidas, minMoves, with_history=control.with_history)
                     control.liPartidas = []
                     control.with_history = False
 
@@ -991,14 +996,14 @@ class Opening:
         control.liPartidas = []
         control.num_partidas = 0
         control.with_history = True
-        control.rotulo = "%s,%s,%s" % (_("Polyglot book"), bookW.name, bookB.name)
+        control.label = "%s,%s,%s" % (_("Polyglot book"), bookW.name, bookB.name)
 
         hazFEN(cp.fen(), game.lipv(), control)
 
         bp.ponRotulo(_("Writing..."))
 
         if control.liPartidas:
-            self.guardaPartidas(control.rotulo, control.liPartidas, minMoves, with_history=control.with_history)
+            self.guardaPartidas(control.label, control.liPartidas, minMoves, with_history=control.with_history)
         bp.cerrar()
 
         return True
@@ -1119,7 +1124,7 @@ class Opening:
 
     def totree(self):
         parent = ItemTree(None, None, None, None)
-        dic = AperturasStd.ap.dic_fenm2
+        dic = OpeningsStd.ap.dic_fenm2
         for xpv in self.li_xpv:
             lipv = FasterCode.xpv_pv(xpv).split(" ")
             lipgn = FasterCode.xpv_pgn(xpv).replace("\n", " ").strip().split(" ")

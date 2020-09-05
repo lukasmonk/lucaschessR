@@ -1,10 +1,9 @@
-from Code import Game
-from Code import Position
+from Code.Base import Game, Position
 
 
 class FNSLine:
     def __init__(self, line):
-        self.line = line  # Se usa en GestorEntPos
+        self.line = line  # Se usa en ManagerEntPos
         self.position = Position.Position()
         self.label = ""
         self.game_obj = None

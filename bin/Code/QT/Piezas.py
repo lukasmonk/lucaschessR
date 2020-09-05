@@ -11,7 +11,7 @@ from Code.QT import Iconos
 from Code.QT import QTVarios
 from Code import TrListas
 import Code
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class ConjuntoPiezas:
@@ -147,19 +147,19 @@ class BlindfoldConfig:
         return Code.path_resource("IntFiles/Svg", "blind_%s.svg" % fich)
 
     def restore(self):
-        self.dicPiezas = Code.configuracion.leeVariables("BLINDFOLD")
+        self.dicPiezas = Code.configuration.leeVariables("BLINDFOLD")
         if not self.dicPiezas:
             for pieza in "rnbqkpRNBQKP":
                 self.dicPiezas[pieza] = HIDE
 
     def save(self):
-        Code.configuracion.escVariables("BLINDFOLD", self.dicPiezas)
+        Code.configuration.escVariables("BLINDFOLD", self.dicPiezas)
 
 
 class Blindfold(ConjuntoPiezas):
     def __init__(self, nomPiezasOri, tipo=BLINDFOLD_CONFIG):
         self.name = "BlindFold"
-        self.carpetaBF = os.path.join(Code.configuracion.carpeta, "BlindFoldPieces")
+        self.carpetaBF = os.path.join(Code.configuration.carpeta, "BlindFoldPieces")
         self.carpetaPZ = Code.path_resource("IntFiles")
         self.tipo = tipo
         self.reset(nomPiezasOri)
@@ -224,10 +224,10 @@ class WBlindfold(QTVarios.WDialogo):
             tpW = self.config.dicPiezas[pz.upper()]
             tpB = self.config.dicPiezas[pz]
             lbPZw = Controles.LB(self)
-            cbPZw = Controles.CB(self, li_options, tpW).capturaCambiado(self.reset)
+            cbPZw = Controles.CB(self, li_options, tpW).capture_changes(self.reset)
             lbPZ = Controles.LB(self, dicNomPiezas[pz.upper()]).ponTipoLetra(peso=75, puntos=10)
             lbPZb = Controles.LB(self)
-            cbPZb = Controles.CB(self, li_options, tpB).capturaCambiado(self.reset)
+            cbPZb = Controles.CB(self, li_options, tpB).capture_changes(self.reset)
             self.dicWidgets[pz] = [lbPZw, cbPZw, lbPZ, lbPZb, cbPZb, None, None]
 
         for pz in "kqrbnp":
@@ -251,23 +251,23 @@ class WBlindfold(QTVarios.WDialogo):
 
         ly = Colocacion.G()
         ly.controlc(lbWhite, 0, 1).controlc(lbBlack, 0, 3)
-        fila = 1
+        row = 1
         for pz in "kqrbnp":
             lbPZw, cbPZw, lbPZ, lbPZb, cbPZb, tipoW, tipoB = self.dicWidgets[pz]
-            ly.control(cbPZw, fila, 0)
-            ly.controlc(lbPZw, fila, 1)
-            ly.controlc(lbPZ, fila, 2)
-            ly.controlc(lbPZb, fila, 3)
-            ly.control(cbPZb, fila, 4)
-            fila += 1
+            ly.control(cbPZw, row, 0)
+            ly.controlc(lbPZw, row, 1)
+            ly.controlc(lbPZ, row, 2)
+            ly.controlc(lbPZb, row, 3)
+            ly.control(cbPZb, row, 4)
+            row += 1
 
-        ly.filaVacia(fila, 20)
-        fila += 1
+        ly.filaVacia(row, 20)
+        row += 1
 
-        ly.controld(btAllW, fila, 0, 1, 2)
-        ly.control(self.cbAll, fila, 2)
-        ly.control(btAllB, fila, 3, 1, 2)
-        ly.controlc(btSwap, fila + 1, 0, 1, 5)
+        ly.controld(btAllW, row, 0, 1, 2)
+        ly.control(self.cbAll, row, 2)
+        ly.control(btAllB, row, 3, 1, 2)
+        ly.controlc(btSwap, row + 1, 0, 1, 5)
         ly.margen(20)
 
         layout = Colocacion.V().control(tb).otro(ly)
@@ -277,7 +277,7 @@ class WBlindfold(QTVarios.WDialogo):
         self.reset()
 
     def process_toolbar(self):
-        getattr(self, self.sender().clave)()
+        getattr(self, self.sender().key)()
 
     def closeEvent(self):
         self.save_video()
@@ -292,7 +292,7 @@ class WBlindfold(QTVarios.WDialogo):
         self.reject()
 
     def configurations(self):
-        dic = Code.configuracion.leeVariables("BLINDFOLD")
+        dic = Code.configuration.leeVariables("BLINDFOLD")
         dicConf = collections.OrderedDict()
         for k in dic:
             if k.startswith("_"):
@@ -343,10 +343,10 @@ class WBlindfold(QTVarios.WDialogo):
                 if not name:
                     return None
                 dic["_%s" % name] = self.config.dicPiezas
-                Code.configuracion.escVariables("BLINDFOLD", dic)
+                Code.configuration.escVariables("BLINDFOLD", dic)
         else:
             del dic["_%s" % cual]
-            Code.configuracion.escVariables("BLINDFOLD", dic)
+            Code.configuration.escVariables("BLINDFOLD", dic)
 
     def allWhite(self):
         tp = self.cbAll.valor()

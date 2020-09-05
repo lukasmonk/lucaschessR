@@ -7,8 +7,8 @@ from Code.Coordinates import WRunCoordinatesBlocks
 
 class WCoordinatesBlocks(QTVarios.WDialogo):
     def __init__(self, procesador):
-        configuracion = procesador.configuracion
-        path = configuracion.file_coordinates()
+        configuration = procesador.configuration
+        path = configuration.file_coordinates()
         title = _("Coordinates by blocks")
         icon = Iconos.Blocks()
         extconfig = "coordinatesbyblocks"
@@ -23,7 +23,7 @@ class WCoordinatesBlocks(QTVarios.WDialogo):
         o_columns.nueva("TRIES", _("Tries"), 90, centered=True)
         o_columns.nueva("SCORE", _("Score"), 90, centered=True)
         self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)
-        f = Controles.TipoLetra(puntos=configuracion.x_menu_points)
+        f = Controles.TipoLetra(puntos=configuration.x_menu_points)
         self.glista.ponFuente(f)
 
         li_acciones = (
@@ -45,7 +45,7 @@ class WCoordinatesBlocks(QTVarios.WDialogo):
 
         self.glista.gotop()
 
-    def grid_doble_click(self, grid, fila, oColumna):
+    def grid_doble_click(self, grid, row, o_column):
         self.play()
 
     def borrar(self):
@@ -62,9 +62,9 @@ class WCoordinatesBlocks(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.db)
 
-    def grid_dato(self, grid, fila, oColumna):
-        coordinate : CoordinatesBlocks.CoordinatesBlocks = self.db.coordinate(fila)
-        col = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        coordinate : CoordinatesBlocks.CoordinatesBlocks = self.db.coordinate(row)
+        col = o_column.key
         if col == "DATE_INI":
             return Util.dtostr_hm(coordinate.date_ini)
         elif col == "DATE_END":

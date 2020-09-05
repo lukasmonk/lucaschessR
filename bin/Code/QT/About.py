@@ -19,27 +19,27 @@ class WAbout(QtWidgets.QDialog):
 
         f = Controles.TipoLetra(puntos=10)  # 0, peso=75 )
 
-        cabecera = (
+        head = (
             '<span style="font-size:30pt; font-weight="700"; font-family:arial; color:#2D2B2B">%s</span><br>'
             % Code.lucas_chess
         )
-        cabecera += '<span style="font-size:15pt;">%s</span><br>' % _X(_("version %1"), procesador.version)
-        cabecera += '<span style="font-size:10pt;color:2D2B2B">%s: %s</span>' % (
+        head += '<span style="font-size:15pt;">%s</span><br>' % _X(_("version %1"), procesador.version)
+        head += '<span style="font-size:10pt;color:2D2B2B">%s: %s</span>' % (
             _("Author"),
             '<a href="mailto:lukasmonk@gmail.com">Lucas Monge</a>',
         )
-        cabecera += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">%s</a>' % (procesador.web, procesador.web)
-        cabecera += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Blog : Fresh news</a>' % (procesador.blog,)
-        cabecera += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Sources: github</a><br>' % (
+        head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">%s</a>' % (procesador.web, procesador.web)
+        head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Blog : Fresh news</a>' % (procesador.blog,)
+        head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Sources: github</a><br>' % (
             procesador.github,
         )
-        cabecera += (
+        head += (
             '%s <a style="font-size:10pt; color:2D2B2B" href="http://www.gnu.org/copyleft/gpl.html"> GPL</a>'
             % _("License")
         )
 
         lb_ico = Controles.LB(self).ponImagen(Iconos.pmAplicacion64())
-        lb_titulo = Controles.LB(self, cabecera)
+        lb_titulo = Controles.LB(self, head)
 
         # Tabs
         tab = Controles.Tab()
@@ -51,17 +51,17 @@ class WAbout(QtWidgets.QDialog):
         for n, (k, titulo) in enumerate(ib.dic.items()):
             txt = ib.texto(k)
             lb = Controles.LB(self, txt)
-            lb.ponFondoN("#F6F3EE")
+            lb.set_background("#F6F3EE")
             lb.ponFuente(f)
             if "-" in k:
                 base, num = k.split("-")
                 if num == "1":
                     sub_tab = Controles.Tab()
                     sub_tab.ponFuente(f)
-                    sub_tab.setposition("S")
+                    sub_tab.set_position("S")
                     tab.addTab(sub_tab, _("Engines"))
                 lm = ib.list_engines(num)
-                titulo = lm[0][0].split(" ")[0] + " - " + lm[-1][0].split(" ")[0]
+                titulo = lm[0][0].split(" ")[1] + " - " + lm[-1][0].split(" ")[1]
                 sub_tab.addTab(lb, titulo)
             else:
                 tab.addTab(lb, titulo)
@@ -73,7 +73,7 @@ class WAbout(QtWidgets.QDialog):
 
 
 class WInfo(QtWidgets.QDialog):
-    def __init__(self, wparent, titulo, cabecera, txt, min_tam, pm_icon):
+    def __init__(self, wparent, titulo, head, txt, min_tam, pm_icon):
         super(WInfo, self).__init__(wparent)
 
         self.setWindowTitle(titulo)
@@ -83,7 +83,7 @@ class WInfo(QtWidgets.QDialog):
         f = Controles.TipoLetra(puntos=20)
 
         lb_ico = Controles.LB(self).ponImagen(pm_icon)
-        lb_titulo = Controles.LB(self, cabecera).alinCentrado().ponFuente(f)
+        lb_titulo = Controles.LB(self, head).align_center().ponFuente(f)
         lb_texto = Controles.LB(self, txt)
         lb_texto.setMinimumWidth(min_tam - 84)
         lb_texto.setWordWrap(True)
@@ -100,6 +100,6 @@ class WInfo(QtWidgets.QDialog):
         self.close()
 
 
-def info(parent, titulo, cabecera, txt, min_tam, pm_icon):
-    w = WInfo(parent, titulo, cabecera, txt, min_tam, pm_icon)
+def info(parent, titulo, head, txt, min_tam, pm_icon):
+    w = WInfo(parent, titulo, head, txt, min_tam, pm_icon)
     w.exec_()

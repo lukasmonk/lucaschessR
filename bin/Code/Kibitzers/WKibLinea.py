@@ -3,8 +3,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 import struct
 import psutil
 
-from Code import Position
-from Code import Game
+from Code.Base import Game, Position
 import Code
 from Code.Engines import EngineRun
 from Code.QT import Colocacion
@@ -12,7 +11,7 @@ from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.Kibitzers import PantallaKibitzers
+from Code.Kibitzers import WindowKibitzers
 
 
 class EDP(Controles.ED):
@@ -54,7 +53,7 @@ class WKibLinea(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuracion = cpu.configuracion
+        Code.configuration = cpu.configuration
 
         self.setStyleSheet(
             """QLineEdit {
@@ -74,7 +73,7 @@ class WKibLinea(QtWidgets.QDialog):
             (_("Change window position"), Iconos.TamTablero(), self.mover),
             (_("Options"), Iconos.Opciones(), self.changeOptions),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, siTexto=False, tamIcon=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
         self.tb.setFixedSize(120, 24)
         self.tb.setPosVisible(1, False)
         self.em = EDP(self)
@@ -125,7 +124,7 @@ class WKibLinea(QtWidgets.QDialog):
 
     def changeOptions(self):
         self.pause()
-        w = PantallaKibitzers.WKibitzerLive(self, self.cpu.configuracion, self.cpu.numkibitzer)
+        w = WindowKibitzers.WKibitzerLive(self, self.cpu.configuration, self.cpu.numkibitzer)
         if w.exec_():
             xprioridad = w.result_xprioridad
             if xprioridad is not None:

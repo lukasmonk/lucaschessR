@@ -7,8 +7,8 @@ from Code.Engines import EngineRunDirect
 
 
 class Engine:
-    def __init__(self, clave="", autor="", version="", url="", path_exe="", args=None):
-        self.clave = clave
+    def __init__(self, key="", autor="", version="", url="", path_exe="", args=None):
+        self.key = key
         self.autor = autor
         self.args = [] if args is None else args
         self.version = version
@@ -25,7 +25,7 @@ class Engine:
         self.id_info = ""
         self.max_depth = 0
         self.max_time = 0
-        self.id_name = clave
+        self.id_name = key
         self.id_author = autor
 
         self.__li_uci_options = None
@@ -55,7 +55,7 @@ class Engine:
 
     def debug(self, txt):
         self.siDebug = True
-        self.nomDebug = self.clave + "-" + txt
+        self.nomDebug = self.key + "-" + txt
 
     def ordenUCI(self, comando, valor):
         if valor in ("true", "false"):
@@ -109,7 +109,7 @@ class Engine:
     def name(self):
         if self._nombre:
             return self._nombre
-        return Util.primera_mayuscula(self.clave) + " " + self.version
+        return Util.primera_mayuscula(self.key) + " " + self.version
 
     @name.setter
     def name(self, value):
@@ -313,8 +313,8 @@ def engine_from_txt(pk_txt):
     return engine
 
 
-def lee_external_engines(configuracion):
-    fichero = configuracion.file_external_engines()
+def lee_external_engines(configuration):
+    fichero = configuration.file_external_engines()
     db = UtilSQL.DictRawSQL(fichero)
     dic = db.as_dictionary()
     db.close()

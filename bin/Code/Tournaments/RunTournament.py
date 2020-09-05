@@ -1,25 +1,28 @@
+import sys
 from PySide2 import QtWidgets
 
 import Code
-from Code import Configuracion, AperturasStd
+from Code import Util
+from Code.Config import Configuration
+from Code.Openings import OpeningsStd
 from Code.QT import Piezas
 from Code.Tournaments import WTournamentRun
 
 
 def run(user, file_tournament, file_work):
-    # sys.stderr = Util.Log("./bug.tournaments")
+    sys.stderr = Util.Log("./bug.tournaments")
 
     app = QtWidgets.QApplication([])
 
-    configuracion = Configuracion.Configuracion(user)
-    configuracion.lee()
-    configuracion.leeConfTableros()
-    configuracion.releeTRA()
-    Code.configuracion = configuracion
-    AperturasStd.reset()
+    configuration = Configuration.Configuration(user)
+    configuration.lee()
+    configuration.leeConfBoards()
+    configuration.releeTRA()
+    Code.configuration = configuration
+    OpeningsStd.reset()
     Code.todasPiezas = Piezas.TodasPiezas()
 
-    app.setStyle(QtWidgets.QStyleFactory.create(configuracion.x_style))
+    app.setStyle(QtWidgets.QStyleFactory.create(configuration.x_style))
     QtWidgets.QApplication.setPalette(QtWidgets.QApplication.style().standardPalette())
 
     w = WTournamentRun.WTournamentRun(file_tournament, file_work)

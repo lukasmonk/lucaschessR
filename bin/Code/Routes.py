@@ -3,7 +3,7 @@ import os.path
 import random
 
 import Code
-from Code import Game
+from Code.Base import Game
 from Code import Util
 from Code import TrListas
 
@@ -96,8 +96,8 @@ class Line:
 
 
 class Transsiberian:
-    def __init__(self, configuracion):
-        self.configuracion = configuracion
+    def __init__(self, configuration):
+        self.configuration = configuration
 
         self.base = base = Code.path_resource("IntFiles", "Routes", "Transsiberian")
 
@@ -225,7 +225,7 @@ class Transsiberian:
             self._dpos_endings = dic.get("DPOS_ENDINGS", self._dpos_endings)
 
     def read_with_level(self, nlevel):
-        dic = self.configuracion.leeVariables("TRANSSIBERIAN%s" % nlevel)
+        dic = self.configuration.leeVariables("TRANSSIBERIAN%s" % nlevel)
         if dic:
             self.read_dic(dic)
         else:
@@ -237,7 +237,7 @@ class Transsiberian:
         # self._level = 5
         # self._is_miles = True
         # self.write_current()
-        dic = self.configuracion.leeVariables("TRANSSIBERIAN")
+        dic = self.configuration.leeVariables("TRANSSIBERIAN")
         self.read_dic(dic)
 
     def write_dic(self):
@@ -258,10 +258,10 @@ class Transsiberian:
         return dic
 
     def write_current(self):
-        self.configuracion.escVariables("TRANSSIBERIAN", self.write_dic())
+        self.configuration.escVariables("TRANSSIBERIAN", self.write_dic())
 
     def write_with_level(self):
-        self.configuracion.escVariables("TRANSSIBERIAN%s" % self._level, self.write_dic())
+        self.configuration.escVariables("TRANSSIBERIAN%s" % self._level, self.write_dic())
 
     def get_line(self):
         km = self._km

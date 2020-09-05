@@ -5,7 +5,7 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 def dicTeclas():
@@ -85,7 +85,7 @@ class MensEspera(QtWidgets.QWidget):
         siCancelar,
         siMuestraYa,
         opacity,
-        position,
+        physical_pos,
         fixedSize,
         titCancelar,
         background,
@@ -106,17 +106,17 @@ class MensEspera(QtWidgets.QWidget):
 
         self.owner = parent
 
-        self.position = position
+        self.physical_pos = physical_pos
         self.is_canceled = False
 
-        if position == "tb":
+        if physical_pos == "tb":
             fixedSize = parent.width()
 
         self.lb = lb = (
-            Controles.LB(parent, resalta(mensaje)).ponFuente(Controles.TipoLetra(puntos=puntos)).alinCentrado()
+            Controles.LB(parent, resalta(mensaje)).ponFuente(Controles.TipoLetra(puntos=puntos)).align_center()
         )
         if fixedSize is not None:
-            lb.ponWrap().anchoFijo(fixedSize - 60)
+            lb.set_wrap().anchoFijo(fixedSize - 60)
 
         if siCancelar:
             if not titCancelar:
@@ -164,8 +164,8 @@ class MensEspera(QtWidgets.QWidget):
         QtWidgets.QWidget.keyPressEvent(self, event)
         self.teclaPulsada = event.key()
 
-    def rotulo(self, nuevo):
-        self.lb.ponTexto(resalta(nuevo))
+    def label(self, nuevo):
+        self.lb.set_text(resalta(nuevo))
         QTUtil.refresh_gui()
 
     def muestra(self):
@@ -173,13 +173,13 @@ class MensEspera(QtWidgets.QWidget):
 
         v = self.owner
         s = self.size()
-        if self.position == "c":
+        if self.physical_pos == "c":
             x = v.x() + (v.width() - self.width()) // 2
             y = v.y() + (v.height() - self.height()) // 2
-        elif self.position == "ad":
+        elif self.physical_pos == "ad":
             x = v.x() + v.width() - s.width()
             y = v.y() + 4
-        elif self.position == "tb":
+        elif self.physical_pos == "tb":
             x = v.x() + 4
             y = v.y() + 4
         self.move(x, y)
@@ -205,7 +205,7 @@ class ControlMensEspera:
         siCancelar=False,
         siMuestraYa=True,
         opacity=0.90,
-        position="c",
+        physical_pos="c",
         fixedSize=None,
         titCancelar=None,
         background=None,
@@ -224,7 +224,7 @@ class ControlMensEspera:
             siCancelar,
             siMuestraYa,
             opacity,
-            position,
+            physical_pos,
             fixedSize,
             titCancelar,
             background,
@@ -240,8 +240,8 @@ class ControlMensEspera:
             self.me.final()
             self.me = None
 
-    def rotulo(self, txt):
-        self.me.rotulo(txt)
+    def label(self, txt):
+        self.me.label(txt)
 
     def cancelado(self):
         if self.me:
@@ -282,7 +282,7 @@ def mensajeTemporal(
     segundos,
     background=None,
     pmImagen=None,
-    position="c",
+    physical_pos="c",
     fixedSize=None,
     siCancelar=None,
     titCancelar=None,
@@ -298,7 +298,7 @@ def mensajeTemporal(
         pmImagen=pmImagen,
         siCancelar=siCancelar,
         titCancelar=titCancelar,
-        position=position,
+        physical_pos=physical_pos,
         fixedSize=fixedSize,
     )
     if segundos:
@@ -306,9 +306,9 @@ def mensajeTemporal(
     return me
 
 
-def mensajeTemporalSinImagen(main_window, mensaje, segundos, background=None, puntos=12, position="c"):
+def mensajeTemporalSinImagen(main_window, mensaje, segundos, background=None, puntos=12, physical_pos="c"):
     me = mensEspera.inicio(
-        main_window, mensaje, position=position, conImagen=False, puntos=puntos, fixedSize=None, background=background
+        main_window, mensaje, physical_pos=physical_pos, conImagen=False, puntos=puntos, fixedSize=None, background=background
     )
     if segundos:
         me.time(segundos)
@@ -373,7 +373,7 @@ class BarraProgreso2(QtWidgets.QDialog):
 
     def ponRotulo(self, cual, texto):
         gb = self.gb1 if cual == 1 else self.gb2
-        gb.ponTexto(texto)
+        gb.set_text(texto)
 
     def ponTotal(self, cual, maximo):
         bp = self.bp1 if cual == 1 else self.bp2
@@ -439,7 +439,7 @@ class BarraProgreso1(QtWidgets.QDialog):
         self.cerrar()
 
     def ponRotulo(self, texto):
-        self.gb1.ponTexto(texto)
+        self.gb1.set_text(texto)
 
     def ponTotal(self, maximo):
         self.bp1.setRange(0, maximo)
@@ -591,7 +591,7 @@ def unMomento(owner, mensaje=None):
 
 
 def analizando(owner):
-    return mensEspera.inicio(owner, _("Analyzing the move...."), position="ad")
+    return mensEspera.inicio(owner, _("Analyzing the move...."), physical_pos="ad")
 
 
 def ponIconosMotores(lista):
@@ -608,7 +608,7 @@ def message(owner, texto, explanation=None, titulo=None, pixmap=None, px=None, p
     else:
         msg.setIconPixmap(pixmap)
     msg.setText(texto)
-    msg.setFont(Controles.TipoLetra(puntos=Code.configuracion.x_menu_points, peso=300 if si_bold else 50))
+    msg.setFont(Controles.TipoLetra(puntos=Code.configuration.x_menu_points, peso=300 if si_bold else 50))
     if explanation:
         msg.setInformativeText(explanation)
     if titulo is None:
@@ -654,7 +654,7 @@ def pregunta(parent, mens, label_yes=None, label_no=None, si_top=False):
     if label_no is None:
         label_no = _("No")
     si_button = msg_box.addButton(label_yes, QtWidgets.QMessageBox.YesRole)
-    msg_box.setFont(Controles.TipoLetra(puntos=Code.configuracion.x_menu_points))
+    msg_box.setFont(Controles.TipoLetra(puntos=Code.configuration.x_menu_points))
     msg_box.addButton(label_no, QtWidgets.QMessageBox.NoRole)
     if si_top:
         msg_box.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
@@ -668,7 +668,7 @@ def preguntaCancelar(parent, mens, si, no):
     si_button = msg_box.addButton(si, QtWidgets.QMessageBox.YesRole)
     no_button = msg_box.addButton(no, QtWidgets.QMessageBox.NoRole)
     msg_box.addButton(_("Cancel"), QtWidgets.QMessageBox.RejectRole)
-    msg_box.setFont(Controles.TipoLetra(puntos=Code.configuracion.x_menu_points))
+    msg_box.setFont(Controles.TipoLetra(puntos=Code.configuration.x_menu_points))
     msg_box.exec_()
     cb = msg_box.clickedButton()
     if cb == si_button:

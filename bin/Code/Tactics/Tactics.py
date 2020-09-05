@@ -1,7 +1,8 @@
 import os
 import random
 
-from Code import Util, Game, Position
+from Code import Util
+from Code.Base import Game, Position
 from Code.SQL import UtilSQL
 
 
@@ -639,7 +640,7 @@ class Tactic:
         fen = li[0]
         if fen.endswith(" 0"):
             fen = fen[:-1] + "1"
-        rotulo = li[1]
+        label = li[1]
         solucion = li[2]
         ok, game_obj = Game.pgn_game('[FEN "%s"]\n%s' % (fen, solucion))
 
@@ -664,7 +665,7 @@ class Tactic:
         if game_base:
             game_base.set_unknown()
 
-        self.w_label = rotulo
+        self.w_label = label
 
         return game_obj, game_base
 

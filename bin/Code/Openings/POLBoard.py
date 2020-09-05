@@ -2,17 +2,16 @@ import collections
 
 from PySide2 import QtWidgets, QtCore, QtGui
 
-from Code import Move
-from Code import Game
+from Code.Base import Game, Move
 from Code import TrListas
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code.QT import Tablero
-from Code.QT import PantallaColores
+from Code.Board import Board
+from Code.QT import WindowColores
 
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_MAS, V_NEGRAS_MAS_MAS = (
     0,
@@ -27,39 +26,39 @@ V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_
 
 
 class BoardLines(QtWidgets.QWidget):
-    def __init__(self, panelOpening, configuracion):
+    def __init__(self, panelOpening, configuration):
         QtWidgets.QWidget.__init__(self)
 
         self.panelOpening = panelOpening
         self.dbop = panelOpening.dbop
 
-        self.configuracion = configuracion
+        self.configuration = configuration
 
         self.partidabase = panelOpening.partidabase
         self.num_jg_inicial = len(self.partidabase)
         self.pos_move = self.num_jg_inicial
 
-        config_board = configuracion.config_board("POSLINES", 32)
-        self.tablero = Tablero.Tablero(self, config_board)
-        self.tablero.crea()
-        self.tablero.ponerPiezasAbajo(True)
-        self.tablero.set_dispatcher(self.mueve_humano)
-        self.tablero.dispatchSize(self.ajustaAncho)
-        self.tablero.dbVisual_setFichero(self.dbop.nom_fichero)
-        self.tablero.dbVisual_setShowAllways(True)
-        self.tablero.dbVisual_setSaveAllways(True)
+        config_board = configuration.config_board("POSLINES", 32)
+        self.board = Board.Board(self, config_board)
+        self.board.crea()
+        self.board.ponerPiezasAbajo(True)
+        self.board.set_dispatcher(self.player_has_moved)
+        self.board.dispatchSize(self.ajustaAncho)
+        self.board.dbVisual_setFichero(self.dbop.nom_fichero)
+        self.board.dbVisual_setShowAllways(True)
+        self.board.dbVisual_setSaveAllways(True)
 
-        self.tablero.ponerPiezasAbajo(self.dbop.getconfig("WHITEBOTTOM", True))
+        self.board.ponerPiezasAbajo(self.dbop.getconfig("WHITEBOTTOM", True))
 
-        self.dbop.setdbVisual_Tablero(self.tablero)  # To close
+        self.dbop.setdbVisual_Board(self.board)  # To close
 
-        self.intervalo = configuracion.x_interval_replay
+        self.intervalo = configuration.x_interval_replay
 
-        tipoLetra = Controles.TipoLetra(puntos=configuracion.x_pgn_fontpoints)
+        tipoLetra = Controles.TipoLetra(puntos=configuration.x_pgn_fontpoints)
 
-        lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, tamIcon=24)
+        lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
-        self.lbPGN = Controles.LB(self).ponWrap()
+        self.lbPGN = Controles.LB(self).set_wrap()
         self.lbPGN.colocate = self.colocatePartida
         self.lbPGN.setStyleSheet(
             "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}"
@@ -72,49 +71,49 @@ class BoardLines(QtWidgets.QWidget):
 
         self.lbPGN.linkActivated.connect(muestraPos)
 
-        self.siFigurines = configuracion.x_pgn_withfigurines
+        self.with_figurines = configuration.x_pgn_withfigurines
 
-        dicNAGs = TrListas.dicNAGs()
+        dic_nags = TrListas.dic_nags()
         self.dicValoracion = collections.OrderedDict()
-        self.dicValoracion[GOOD_MOVE] = (dicNAGs[1], PantallaColores.nag2ico(1, 16))
-        self.dicValoracion[BAD_MOVE] = (dicNAGs[2], PantallaColores.nag2ico(2, 16))
-        self.dicValoracion[VERY_GOOD_MOVE] = (dicNAGs[3], PantallaColores.nag2ico(3, 16))
-        self.dicValoracion[VERY_POOR_MOVE] = (dicNAGs[4], PantallaColores.nag2ico(4, 16))
-        self.dicValoracion[SPECULATIVE_MOVE] = (dicNAGs[5], PantallaColores.nag2ico(5, 16))
-        self.dicValoracion[QUESTIONABLE_MOVE] = (dicNAGs[6], PantallaColores.nag2ico(6, 16))
+        self.dicValoracion[GOOD_MOVE] = (dic_nags[1], WindowColores.nag2ico(1, 16))
+        self.dicValoracion[BAD_MOVE] = (dic_nags[2], WindowColores.nag2ico(2, 16))
+        self.dicValoracion[VERY_GOOD_MOVE] = (dic_nags[3], WindowColores.nag2ico(3, 16))
+        self.dicValoracion[VERY_POOR_MOVE] = (dic_nags[4], WindowColores.nag2ico(4, 16))
+        self.dicValoracion[SPECULATIVE_MOVE] = (dic_nags[5], WindowColores.nag2ico(5, 16))
+        self.dicValoracion[QUESTIONABLE_MOVE] = (dic_nags[6], WindowColores.nag2ico(6, 16))
         self.dicValoracion[NO_RATING] = (_("No rating"), QtGui.QIcon())
 
         self.dicVentaja = collections.OrderedDict()
         self.dicVentaja[V_SIN] = (_("Undefined"), QtGui.QIcon())
-        self.dicVentaja[V_IGUAL] = (dicNAGs[11], Iconos.V_Blancas_Igual_Negras())
-        self.dicVentaja[V_BLANCAS] = (dicNAGs[14], Iconos.V_Blancas())
-        self.dicVentaja[V_BLANCAS_MAS] = (dicNAGs[16], Iconos.V_Blancas_Mas())
-        self.dicVentaja[V_BLANCAS_MAS_MAS] = (dicNAGs[18], Iconos.V_Blancas_Mas_Mas())
-        self.dicVentaja[V_NEGRAS] = (dicNAGs[15], Iconos.V_Negras())
-        self.dicVentaja[V_NEGRAS_MAS] = (dicNAGs[17], Iconos.V_Negras_Mas())
-        self.dicVentaja[V_NEGRAS_MAS_MAS] = (dicNAGs[19], Iconos.V_Negras_Mas_Mas())
+        self.dicVentaja[V_IGUAL] = (dic_nags[11], Iconos.V_Blancas_Igual_Negras())
+        self.dicVentaja[V_BLANCAS] = (dic_nags[14], Iconos.V_Blancas())
+        self.dicVentaja[V_BLANCAS_MAS] = (dic_nags[16], Iconos.V_Blancas_Mas())
+        self.dicVentaja[V_BLANCAS_MAS_MAS] = (dic_nags[18], Iconos.V_Blancas_Mas_Mas())
+        self.dicVentaja[V_NEGRAS] = (dic_nags[15], Iconos.V_Negras())
+        self.dicVentaja[V_NEGRAS_MAS] = (dic_nags[17], Iconos.V_Negras_Mas())
+        self.dicVentaja[V_NEGRAS_MAS_MAS] = (dic_nags[19], Iconos.V_Negras_Mas_Mas())
 
         # Valoracion
         li_options = [(tit[0], k, tit[1]) for k, tit in self.dicValoracion.items()]
-        self.cbValoracion = Controles.CB(self, li_options, 0).capturaCambiado(self.cambiadoValoracion)
+        self.cbValoracion = Controles.CB(self, li_options, 0).capture_changes(self.cambiadoValoracion)
         self.cbValoracion.ponFuente(tipoLetra)
 
         # Ventaja
         li_options = [(tit, k, icon) for k, (tit, icon) in self.dicVentaja.items()]
-        self.cbVentaja = Controles.CB(self, li_options, 0).capturaCambiado(self.cambiadoVentaja)
+        self.cbVentaja = Controles.CB(self, li_options, 0).capture_changes(self.cambiadoVentaja)
         self.cbVentaja.ponFuente(tipoLetra)
 
         # Comentario
         self.emComentario = Controles.EM(self, siHTML=False).capturaCambios(self.cambiadoComentario)
         self.emComentario.ponFuente(tipoLetra)
-        self.emComentario.altoFijo(5 * configuracion.x_pgn_rowheight)
+        self.emComentario.altoFijo(5 * configuration.x_pgn_rowheight)
         lyVal = Colocacion.H().control(self.cbValoracion).control(self.cbVentaja)
         lyEd = Colocacion.V().otro(lyVal).control(self.emComentario)
 
-        # Apertura
-        self.lbApertura = Controles.LB(self).alinCentrado().ponFuente(tipoLetra).ponWrap()
+        # Opening
+        self.lb_opening = Controles.LB(self).align_center().ponFuente(tipoLetra).set_wrap()
 
-        lyt = Colocacion.H().relleno().control(self.tablero).relleno()
+        lyt = Colocacion.H().relleno().control(self.board).relleno()
 
         lya = Colocacion.H().relleno().control(self.lbPGN).relleno()
 
@@ -123,7 +122,7 @@ class BoardLines(QtWidgets.QWidget):
         layout.otro(lybt)
         layout.otro(lya)
         layout.otro(lyEd)
-        layout.control(self.lbApertura)
+        layout.control(self.lb_opening)
         layout.relleno().margen(0)
         self.setLayout(layout)
 
@@ -136,17 +135,17 @@ class BoardLines(QtWidgets.QWidget):
     def ponPartida(self, game):
         game.test_apertura()
         self.game = game
-        rotulo = game.rotuloApertura()
-        if rotulo is not None:
+        label = game.rotuloOpening()
+        if label is not None:
             trans = game.rotuloTransposition()
             if trans is not None:
-                rotulo += "\n%s: %s" % (_("Transposition"), trans)
+                label += "\n%s: %s" % (_("Transposition"), trans)
         else:
-            rotulo = ""
-        self.lbApertura.ponTexto(rotulo)
+            label = ""
+        self.lb_opening.set_text(label)
 
     def process_toolbar(self):
-        getattr(self, self.sender().clave)()
+        getattr(self, self.sender().key)()
 
     def setvalue(self, key, valor):
         if self.fenm2:
@@ -164,8 +163,8 @@ class BoardLines(QtWidgets.QWidget):
         self.setvalue("COMENTARIO", self.emComentario.texto().strip())
 
     def ajustaAncho(self):
-        self.setFixedWidth(self.tablero.ancho + 20)
-        self.lbPGN.anchoFijo(self.tablero.ancho)
+        self.setFixedWidth(self.board.ancho + 20)
+        self.lbPGN.anchoFijo(self.board.ancho)
 
     def camposEdicion(self, siVisible):
         if self.siMoves:
@@ -175,14 +174,14 @@ class BoardLines(QtWidgets.QWidget):
             self.cbVentaja.setVisible(siVisible)
             self.emComentario.setVisible(siVisible)
 
-    def mueve_humano(self, from_sq, to_sq, promotion=""):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         cpActual = self.game.move(self.pos_move).position if self.pos_move >= 0 else self.game.first_position
         if cpActual.siPeonCoronando(from_sq, to_sq):
-            promotion = self.tablero.peonCoronando(cpActual.is_white)
+            promotion = self.board.peonCoronando(cpActual.is_white)
             if promotion is None:
                 return
 
-        siBien, mens, move = Move.dameJugada(self.game, cpActual, from_sq, to_sq, promotion)
+        siBien, mens, move = Move.get_game_move(self.game, cpActual, from_sq, to_sq, promotion)
 
         if siBien:
             game = Game.Game()
@@ -191,20 +190,20 @@ class BoardLines(QtWidgets.QWidget):
             if self.pos_move < len(self.game) - 1:
                 game.li_moves = game.li_moves[: self.pos_move + 1]
             game.add_move(move)
-            self.panelOpening.mueve_humano(game)
+            self.panelOpening.player_has_moved(game)
 
     def resetValues(self):
         self.cbValoracion.ponValor(NO_RATING)
         self.cbVentaja.ponValor(V_SIN)
-        self.emComentario.ponTexto("")
+        self.emComentario.set_text("")
 
     def colocatePartida(self, pos):
         self.fenm2 = None
         num_jugadas = len(self.game)
         if num_jugadas == 0:
             self.pos_move = -1
-            self.lbPGN.ponTexto("")
-            self.tablero.setposition(self.game.first_position)
+            self.lbPGN.set_text("")
+            self.board.set_position(self.game.first_position)
             self.resetValues()
             self.activaPiezas()
             return
@@ -228,7 +227,7 @@ class BoardLines(QtWidgets.QWidget):
                 pgn += '<span style="%s">%d.</span>' % (style_number, numJugada)
                 numJugada += 1
 
-            xp = move.pgn_html(self.siFigurines)
+            xp = move.pgn_html(self.with_figurines)
             if n == pos:
                 xp = '<span style="%s">%s</span>' % (style_select, xp)
             else:
@@ -236,12 +235,12 @@ class BoardLines(QtWidgets.QWidget):
 
             pgn += '<a href="%d" style="text-decoration:none;">%s</a> ' % (n, xp)
 
-        self.lbPGN.ponTexto(pgn)
+        self.lbPGN.set_text(pgn)
 
         self.pos_move = pos
 
         if pos < 0:
-            self.tablero.setposition(self.game.first_position)
+            self.board.set_position(self.game.first_position)
             self.resetValues()
             self.activaPiezas()
             return
@@ -255,35 +254,35 @@ class BoardLines(QtWidgets.QWidget):
         comment = dic.get("COMENTARIO", "")
         self.cbValoracion.ponValor(valoracion)
         self.cbVentaja.ponValor(ventaja)
-        self.emComentario.ponTexto(comment)
+        self.emComentario.set_text(comment)
 
-        self.tablero.setposition(position)
+        self.board.set_position(position)
         if move:
-            self.tablero.ponFlechaSC(move.from_sq, move.to_sq)
+            self.board.put_arrow_sc(move.from_sq, move.to_sq)
             position_before = move.position_before
             fenM2_base = position_before.fenm2()
             # dicP = self.dbop.getfenvalue(fenM2_base)
             # if "ANALISIS" in dicP:
             #     mrm = dicP["ANALISIS"]
             #     rm = mrm.mejorMov()
-            #     self.tablero.creaFlechaMulti(rm.movimiento(), False)
+            #     self.board.creaFlechaMulti(rm.movimiento(), False)
 
         if self.siReloj:
-            self.tablero.disable_all()
+            self.board.disable_all()
         else:
             self.activaPiezas()
 
         self.panelOpening.setJugada(self.pos_move)
 
     def activaPiezas(self):
-        self.tablero.disable_all()
+        self.board.disable_all()
         if not self.siReloj and self.pos_move >= self.num_jg_inicial - 1:
             if self.pos_move >= 0:
                 move = self.game.move(self.pos_move)
                 color = not move.is_white()
             else:
                 color = True
-            self.tablero.activaColor(color)
+            self.board.activate_side(color)
 
     def MoverInicio(self):
         self.colocatePartida(0)
@@ -308,8 +307,8 @@ class BoardLines(QtWidgets.QWidget):
         self.activaPiezas()
 
     def toolbar_rightmouse(self):
-        QTVarios.change_interval(self, self.configuracion)
-        self.intervalo = self.configuracion.x_interval_replay
+        QTVarios.change_interval(self, self.configuration)
+        self.intervalo = self.configuration.x_interval_replay
 
     def lanzaReloj(self):
         if self.siReloj:

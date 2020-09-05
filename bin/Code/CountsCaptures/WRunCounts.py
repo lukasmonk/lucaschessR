@@ -5,7 +5,8 @@ from PySide2 import QtCore, QtGui
 import FasterCode
 
 import Code
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, Tablero, QTUtil2
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
+from Code.Board import Board
 
 
 class WRunCounts(QTVarios.WDialogo):
@@ -13,19 +14,19 @@ class WRunCounts(QTVarios.WDialogo):
 
         QTVarios.WDialogo.__init__(self, owner, _("Count moves"), Iconos.Count(), "runcounts")
 
-        self.configuracion = Code.configuracion
+        self.configuration = Code.configuration
         self.count = count
         self.db_counts = db_counts
 
-        conf_board = self.configuracion.config_board("RUNCOUNTS", 64)
+        conf_board = self.configuration.config_board("RUNCOUNTS", 64)
 
-        self.board = Tablero.TableroEstaticoMensaje(self, conf_board, None)
+        self.board = Board.BoardEstaticoMensaje(self, conf_board, None)
         self.board.crea()
 
         # Rotulo informacion
         self.lb_info_game = Controles.LB(
             self, self.count.game.titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")
-        ).ponTipoLetra(puntos=self.configuracion.x_pgn_fontpoints)
+        ).ponTipoLetra(puntos=self.configuration.x_pgn_fontpoints)
 
         # Movimientos
         self.ed_moves = Controles.ED(self, "").ponTipoLetra(puntos=32)
@@ -37,9 +38,9 @@ class WRunCounts(QTVarios.WDialogo):
 
         self.gb_counts = Controles.GB(self, _("Number of moves"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=75))
 
-        self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).ponWrap()
+        self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).set_wrap()
         self.lb_info = (
-            Controles.LB(self).ponTipoLetra(puntos=14, peso=500).anchoFijo(254).ponColorFondoN("white", "#496075").alinCentrado()
+            Controles.LB(self).ponTipoLetra(puntos=14, peso=500).anchoFijo(254).set_foreground_backgound("white", "#496075").align_center()
         )
 
         # Botones
@@ -50,7 +51,7 @@ class WRunCounts(QTVarios.WDialogo):
             (_("Check"), Iconos.Check(), self.check),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
-        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, tamIcon=32)
+        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, icon_size=32)
         self.show_tb(self.terminar, self.begin)
 
         ly_right = (
@@ -84,11 +85,11 @@ class WRunCounts(QTVarios.WDialogo):
     def set_position(self):
         self.move_base = self.count.game.move(self.count.current_posmove)
         self.move_obj = self.count.game.move(self.count.current_posmove + self.count.current_depth)
-        self.board.setposition(self.move_base.position_before)
+        self.board.set_position(self.move_base.position_before)
         self.ed_moves.setFocus()
 
     def pon_info_posic(self):
-        self.lb_info.ponTexto(
+        self.lb_info.set_text(
             "%d+%d / %d"
             % (self.count.current_posmove + 1, self.count.current_depth, len(self.count.game), )
         )
@@ -102,7 +103,7 @@ class WRunCounts(QTVarios.WDialogo):
         self.reject()
 
     def show_tb(self, *lista):
-        for opc in self.tb.dicTB:
+        for opc in self.tb.dic_toolbar:
             self.tb.setAccionVisible(opc, opc in lista)
         QTUtil.refresh_gui()
 
@@ -111,8 +112,8 @@ class WRunCounts(QTVarios.WDialogo):
 
     def seguir(self):
         self.set_position()
-        self.lb_result.ponTexto("")
-        self.ed_moves.ponTexto("")
+        self.lb_result.set_text("")
+        self.ed_moves.set_text("")
 
         self.show_tb()
 
@@ -120,8 +121,11 @@ class WRunCounts(QTVarios.WDialogo):
         depth = self.count.current_depth
         if depth:
             for x in range(depth):
+                if not self.configuration.x_counts_showall:
+                    if x != depth - 1:
+                        continue
                 move = self.count.game.move(self.count.current_posmove + x)
-                txt = move.pgnBaseSP()
+                txt = move.pgn_translated()
                 self.board.pon_texto(txt, 0.9)
                 QTUtil.refresh_gui()
                 dif = depth - x
@@ -159,8 +163,8 @@ class WRunCounts(QTVarios.WDialogo):
                 self.db_counts.change_count_capture(self.count)
                 self.terminar()
                 return
-            self.lb_result.ponTexto("%s (%d)" % (_("Right, go to the next level of depth"), self.count.current_depth))
-            self.lb_result.ponColorN("green")
+            self.lb_result.set_text("%s (%d)" % (_("Right, go to the next level of depth"), self.count.current_depth))
+            self.lb_result.set_foreground("green")
 
         else:
             if self.count.current_depth >= 1:
@@ -168,14 +172,14 @@ class WRunCounts(QTVarios.WDialogo):
                 if self.count.current_posmove < 0:
                     self.count.current_posmove = 0
                 self.count.current_depth = 0
-                self.lb_result.ponTexto(
+                self.lb_result.set_text(
                     "%s (%d)" % (_("Wrong, you advance to the last position solved"), self.count.current_posmove + 1)
                 )
-                self.lb_result.ponColorN("red")
+                self.lb_result.set_foreground("red")
             else:
-                self.lb_result.ponTexto(_("Wrong, you must repeat this position"))
-                self.lb_result.ponColorN("red")
-            self.board.setposition(position_obj)
+                self.lb_result.set_text(_("Wrong, you must repeat this position"))
+                self.lb_result.set_foreground("red")
+            self.board.set_position(position_obj)
             for x in moves:
                 self.board.creaFlechaTmp(x.xfrom(), x.xto(), False)
 

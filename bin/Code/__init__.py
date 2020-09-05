@@ -36,7 +36,7 @@ else:
 dgt = None
 dgtDispatch = None
 
-configuracion = None
+configuration = None
 procesador = None
 
 todasPiezas = None
@@ -52,7 +52,56 @@ mate_en_dos = 154996
 
 runSound = None
 
-VERSION = "R0.30"
+VERSION = "R0.31"
 DEBUG = False
 DEBUG_ENGINE = False
 
+if DEBUG:
+    import builtins
+
+
+    def prlk(*x):
+        import sys
+
+        lx = len(x)-1
+
+        for n, l in enumerate(x):
+            sys.stdout.write(str(l))
+            if n < lx:
+                sys.stdout.write(" ")
+
+
+    def stack(si_previo=False):
+        import traceback
+
+        if si_previo:
+            prlk("-" * 80 + "\n")
+            prlk(traceback.format_stack())
+            prlk("\n" + "-" * 80 + "\n")
+        for line in traceback.format_stack()[:-1]:
+            prlk(line.strip() + "\n")
+
+
+    builtins.__dict__["stack"] = stack
+    builtins.__dict__["prlk"] = prlk
+
+    prlk("Modo debug\n")
+
+    import time
+
+    def xpr(name, line):
+        t = time.time()
+        if name:
+            li = name.split(" ")
+            name = li[0]
+
+        prlk("%0.02f %s %s" % (t - tdbg[0], name, line))
+        tdbg[0] = t
+        return True
+
+
+    if DEBUG_ENGINE:
+        tdbg = [time.time()]
+        xpr("", "Modo debug engine")
+
+    builtins.__dict__["xpr"] = xpr

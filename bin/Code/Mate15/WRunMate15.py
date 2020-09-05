@@ -3,8 +3,9 @@ import time
 from PySide2 import QtCore
 
 import Code
-from Code import Position
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, Tablero, QTUtil2
+from Code.Base import Position
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios
+from Code.Board import Board
 
 from Code.CountsCaptures import WRunCommon
 
@@ -14,35 +15,36 @@ class WRunMate15(QTVarios.WDialogo):
 
         QTVarios.WDialogo.__init__(self, owner, _("Mate in 1½"), Iconos.Mate15(), "runmate15")
 
-        self.configuracion = Code.configuracion
+        self.configuration = Code.configuration
         self.mate15 = mate15
         self.db_mate15 = db_mate15
 
-        conf_board = self.configuracion.config_board("RUNMATE15", 64)
+        conf_board = self.configuration.config_board("RUNMATE15", 64)
 
-        self.board = Tablero.TableroEstatico(self, conf_board)
+        self.board = Board.BoardEstatico(self, conf_board)
         self.board.crea()
 
         # Rotulo informacion
-        self.lb_info = Controles.LB(self, "[%d] %s" % (self.mate15.pos + 1, self.mate15.info)).ponTipoLetra(puntos=self.configuracion.x_pgn_fontpoints).alinCentrado()
+        self.lb_info = Controles.LB(self, "[%d] %s" % (self.mate15.pos + 1, self.mate15.info))
+        self.lb_info.ponTipoLetra(puntos=self.configuration.x_pgn_fontpoints).align_center().set_wrap()
         self.lb_info.setStyleSheet("QWidget { background-color: #1f497d; color: #FFFFFF;padding: 16px; }")
 
         self.lb_first_move = Controles.LB(self).ponTipoLetra(puntos=12, peso=500)
 
-        self.bt_check = Controles.PB(self, _("Check"), self.check, False).ponIcono(Iconos.Check(), tamIcon=20)
+        self.bt_check = Controles.PB(self, _("Check"), self.check, False).ponIcono(Iconos.Check(), icon_size=20)
 
         self.lb_result = Controles.LB(self).ponTipoLetra(puntos=12, peso=500)
 
         # Movimientos
         self.li_lb_wm = []
         ly = Colocacion.G().margen(4)
-        for fila in range(10):
+        for row in range(10):
             lb = Controles.LB(self).ponTipoLetra(puntos=12, peso=500)
             wm = WRunCommon.WEdMove(self)
             self.li_lb_wm.append((lb, wm))
-            ly.controld(lb, fila, 0)
+            ly.controld(lb, row, 0)
             ly.columnaVacia(1, 20)
-            ly.control(wm, fila, 2)
+            ly.control(wm, row, 2)
             lb.hide()
             wm.hide()
         ly.filaVacia(10, 20)
@@ -58,15 +60,17 @@ class WRunMate15(QTVarios.WDialogo):
             (_("Begin"), Iconos.Empezar(), self.begin),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
-        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, tamIcon=32)
+        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, icon_size=32)
+        # self.tb = QTVarios.LCTB(self, li_acciones)
         self.show_tb(self.terminar, self.begin)
 
-        ly_right = Colocacion.V().control(self.tb).\
-            controlc(self.lb_info).espacio(40).\
+        ly_left = Colocacion.V().control(self.tb).control(self.board)
+
+        ly_right = Colocacion.V().controlc(self.lb_info).espacio(40).\
             controlc(self.lb_first_move).espacio(20).\
             control(self.gb).relleno()
 
-        ly_center = Colocacion.H().control(self.board).otro(ly_right).margen(3)
+        ly_center = Colocacion.H().otro(ly_left).otro(ly_right).margen(3)
 
         self.setLayout(ly_center)
 
@@ -80,15 +84,15 @@ class WRunMate15(QTVarios.WDialogo):
         self.ultimaCelda = None
 
     def set_position(self):
-        self.lb_info.ponTexto("[%d] %s" % (self.mate15.pos + 1, self.mate15.info))
+        self.lb_info.set_text("[%d] %s" % (self.mate15.pos + 1, self.mate15.info))
 
         fen = self.mate15.fen
         cp = Position.Position()
         cp.read_fen(fen)
-        self.board.setposition(cp)
+        self.board.set_position(cp)
 
         self.gb.show()
-        self.lb_first_move.ponTexto("%s: %s" % (_("First move"), cp.html(self.mate15.move)))
+        self.lb_first_move.set_text("%s: %s" % (_("First move"), cp.html(self.mate15.move)))
 
         self.bt_check.show()
 
@@ -102,7 +106,7 @@ class WRunMate15(QTVarios.WDialogo):
 
         for n, (lb, wm) in enumerate(self.li_lb_wm):
             if n < n_moves:
-                lb.ponTexto(cp.html(li_moves[n]))
+                lb.set_text(cp.html(li_moves[n]))
                 lb.show()
                 wm.limpia()
                 wm.show()
@@ -116,7 +120,7 @@ class WRunMate15(QTVarios.WDialogo):
 
     def pulsada_celda(self, celda):
         if self.ultimaCelda:
-            self.ultimaCelda.ponTexto(celda)
+            self.ultimaCelda.set_text(celda)
 
             ucld = self.ultimaCelda
             for num, (lb, wm) in enumerate(self.li_lb_wm):
@@ -142,7 +146,7 @@ class WRunMate15(QTVarios.WDialogo):
         event.accept()
 
     def process_toolbar(self):
-        accion = self.sender().clave
+        accion = self.sender().key
         if accion in ["terminar", "cancelar"]:
             self.save_video()
             self.reject()
@@ -156,7 +160,7 @@ class WRunMate15(QTVarios.WDialogo):
         self.reject()
 
     def show_tb(self, *lista):
-        for opc in self.tb.dicTB:
+        for opc in self.tb.dic_toolbar:
             self.tb.setAccionVisible(opc, opc in lista)
         QTUtil.refresh_gui()
 
@@ -195,7 +199,7 @@ class WRunMate15(QTVarios.WDialogo):
             self.bt_check.show()
         else:
             tiempo = time.time() - self.time_base
-            self.lb_result.ponTexto("%s: %.1f\"" % (_("Time"), tiempo))
+            self.lb_result.set_text("%s: %.1f\"" % (_("Time"), tiempo))
             self.lb_result.show()
             self.mate15.append_try(tiempo)
             self.db_mate15.save(self.mate15)

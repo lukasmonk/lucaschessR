@@ -4,7 +4,7 @@ import FasterCode
 
 import Code
 from Code.Engines import Priorities, EngineResponse, EngineRunDirect, EngineRun
-from Code.Constantes import ADJUST_SELECTED_BY_PLAYER
+from Code.Base.Constantes import ADJUST_SELECTED_BY_PLAYER
 
 
 class ListEngineManagers:
@@ -29,7 +29,7 @@ class EngineManager:
         self.engine = None
         self.confMotor = confMotor
         self.name = confMotor.name
-        self.clave = confMotor.clave
+        self.key = confMotor.key
         self.nMultiPV = 0
 
         self.priority = Priorities.priorities.normal
@@ -42,7 +42,7 @@ class EngineManager:
 
         self.direct = direct
         Code.list_engine_managers.append(self)
-        if Code.configuracion.x_log_engines:
+        if Code.configuration.x_log_engines:
             self.log_open()
 
     def set_direct(self):
@@ -53,13 +53,13 @@ class EngineManager:
         self.motorProfundidad = profundidad
         self.nMultiPV = self.confMotor.multiPV if siMultiPV else 0
 
-        self.siInfinito = self.clave == "tarrasch"
+        self.siInfinito = self.key == "tarrasch"
 
-        if self.clave in ("daydreamer", "cinnamon") and profundidad and profundidad == 1:
+        if self.key in ("daydreamer", "cinnamon") and profundidad and profundidad == 1:
             self.motorProfundidad = 2
 
     def log_open(self):
-        carpeta = os.path.join(Code.configuracion.carpeta, "EngineLogs")
+        carpeta = os.path.join(Code.configuration.carpeta, "EngineLogs")
         if not os.path.isdir(carpeta):
             os.mkdir(carpeta)
         plantlog = "%s_%%05d" % os.path.join(carpeta, self.name)
@@ -137,7 +137,7 @@ class EngineManager:
 
     def juegaSegundos(self, segundos):
         self.testEngine()
-        game = self.procesador.gestor.game
+        game = self.procesador.manager.game
         if self.siInfinito:  # problema tarrasch
             mrm = self.engine.bestmove_infinite(game, segundos * 1000)
         else:
@@ -145,7 +145,7 @@ class EngineManager:
         return mrm.mejorMov() if mrm else None
 
     def juega(self, nAjustado=0):
-        return self.juegaPartida(self.procesador.gestor.game, nAjustado)
+        return self.juegaPartida(self.procesador.manager.game, nAjustado)
 
     def juegaPartida(self, game, nAjustado=0):
         self.testEngine()
@@ -162,7 +162,7 @@ class EngineManager:
         if nAjustado:
             mrm.game = game
             if nAjustado >= 1000:
-                mrm.liPersonalidades = self.procesador.configuracion.liPersonalidades
+                mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
                 mrm.fenBase = game.last_position.fen()
             return mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
         else:
@@ -175,7 +175,7 @@ class EngineManager:
         tiempoBlancas = int(tiempoBlancas * 1000)
         tiempoNegras = int(tiempoNegras * 1000)
         tiempoJugada = int(tiempoJugada * 1000)
-        game = self.procesador.gestor.game
+        game = self.procesador.manager.game
         mrm = self.engine.bestmove_time(game, tiempoBlancas, tiempoNegras, tiempoJugada)
         if mrm is None:
             return None
@@ -183,7 +183,7 @@ class EngineManager:
         if nAjustado:
             mrm.game = game
             if nAjustado >= 1000:
-                mrm.liPersonalidades = self.procesador.configuracion.liPersonalidades
+                mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
                 mrm.fenBase = game.last_position.fen()
             return mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
         else:
@@ -259,7 +259,7 @@ class EngineManager:
                 mrm.miraBrilliancies(brDepth, brPuntos)
             return mrm, n
 
-        # No esta considerado, obliga a hacer el analisis de nuevo from_sq position
+        # No esta considerado, obliga a hacer el analysis de nuevo from_sq position
         if move.is_mate or move.is_draw:
             rm = EngineResponse.EngineResponse(self.name, move.position_before.is_white)
             rm.from_sq = mv[:2]
@@ -315,7 +315,7 @@ class EngineManager:
                 mrm.miraBrilliancies(brDepth, brPuntos)
             return mrm, n
 
-        # No esta considerado, obliga a hacer el analisis de nuevo from_sq position
+        # No esta considerado, obliga a hacer el analysis de nuevo from_sq position
         if game.is_finished():
             rm = EngineResponse.EngineResponse(self.name, move.position_before.is_white)
             rm.from_sq = mv[:2]
@@ -341,7 +341,7 @@ class EngineManager:
 
         return mrm, pos
 
-    def analizaVariante(self, move, vtime, is_white):
+    def analizaVariation(self, move, vtime, is_white):
         self.testEngine()
 
         mrm = self.engine.bestmove_fen(move.position.fen(), vtime, None)
@@ -402,7 +402,7 @@ class EngineManager:
 
     def play_time(self, routine_return, tiempoBlancas, tiempoNegras, tiempoJugada, nAjustado=0):
         self.testEngine()
-        game = self.procesador.gestor.game
+        game = self.procesador.manager.game
 
         def play_return(mrm):
             self.engine.gui_dispatch = None
@@ -412,7 +412,7 @@ class EngineManager:
                 mrm.ordena()
                 mrm.game = game
                 if nAjustado >= 1000:
-                    mrm.liPersonalidades = self.procesador.configuracion.liPersonalidades
+                    mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
                     mrm.fenBase = game.last_position.fen()
                 resp = mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
             else:

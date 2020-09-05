@@ -6,7 +6,7 @@ from Code.QT import QTUtil2
 
 class Adjourns:
     def __init__(self):
-        self.file = Code.configuracion.file_adjourns()
+        self.file = Code.configuration.file_adjourns()
 
     def open(self):
         return UtilSQL.DictSQL(self.file)
@@ -63,14 +63,14 @@ class Adjourns:
             return 0
 
     @staticmethod
-    def si_seguimos(gestor):
-        if QTUtil2.pregunta(gestor.main_window, _("Do you want to exit Lucas Chess?")):
-            gestor.main_window.accept()
+    def si_seguimos(manager):
+        if QTUtil2.pregunta(manager.main_window, _("Do you want to exit Lucas Chess?")):
+            manager.main_window.accept()
             return False
         else:
-            gestor.main_window.activaJuego(False, False)
-            gestor.quitaCapturas()
-            gestor.procesador.inicio()
+            manager.main_window.activaJuego(False, False)
+            manager.quitaCapturas()
+            manager.procesador.inicio()
             return True
 
     def __enter__(self):

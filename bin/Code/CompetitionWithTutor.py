@@ -29,8 +29,8 @@ class Grupos:
     def __init__(self):
         self.liGrupos = []
         li = []
-        for clave, cm in Code.configuracion.dic_engines.items():
-            li.append((cm.elo, clave, cm))
+        for key, cm in Code.configuration.dic_engines.items():
+            li.append((cm.elo, key, cm))
 
         self.li_rivales = sorted(li, key=operator.itemgetter(0))
 
@@ -39,12 +39,12 @@ class Grupos:
         minimo = 999999999
         hay = False
         name = None
-        for elo, clave, cm in self.li_rivales:
+        for elo, key, cm in self.li_rivales:
             if from_sq <= elo <= to_sq:
                 li_rivales_uno.append(cm)
                 if elo < minimo:
                     minimo = elo
-                    name = cm.clave
+                    name = cm.key
                     hay = True
         if hay:
             self.liGrupos.append(Grupo(name.capitalize(), from_sq, to_sq, min_puntos, li_rivales_uno))
@@ -64,8 +64,8 @@ class Grupos:
 
 
 class Categoria:
-    def __init__(self, clave, c_icono, ayudas, sin_ayudas_final, valor_puntos):
-        self.clave = clave
+    def __init__(self, key, c_icono, ayudas, sin_ayudas_final, valor_puntos):
+        self.key = key
         self.c_icono = c_icono
         self.ayudas = ayudas
         self.sinAyudasFinal = sin_ayudas_final
@@ -77,13 +77,13 @@ class Categoria:
         return Iconos.icono(self.c_icono)
 
     def name(self):
-        return TrListas.categoria(self.clave)
+        return TrListas.categoria(self.key)
 
     def done_with_white(self):
         return "B" in self.hecho
 
     def graba(self):
-        return self.clave + "," + str(self.level_done) + "," + self.hecho
+        return self.key + "," + str(self.level_done) + "," + self.hecho
 
     def lee(self, txt):
         li = txt.split(",")
@@ -124,9 +124,9 @@ class Categorias:
     def number(self, num):
         return self.lista[num]
 
-    def segun_clave(self, clave):
+    def segun_clave(self, key):
         for una in self.lista:
-            if una.clave == clave:
+            if una.key == key:
                 return una
         return None
 
@@ -154,9 +154,9 @@ class Categorias:
 
     def lee(self, txt):
         for una in txt.split("|"):
-            clave = una.split(",")[0]
+            key = una.split(",")[0]
             for cat in self.lista:
-                if cat.clave == clave:
+                if cat.key == key:
                     cat.lee(una)
 
     def puntuacion(self):
@@ -178,7 +178,7 @@ class Categorias:
     def max_level_by_category(self, categoria):
         max_level = categoria.level_done + 1
         for num, cat in enumerate(self.lista):
-            if categoria.clave == cat.clave:
+            if categoria.key == cat.key:
                 if max_level > cat.level_done and cat.level_done < 36:
                     max_level = cat.level_done + 1
                     hecho = categoria.hecho
@@ -192,8 +192,8 @@ class Categorias:
 
 class DBManagerCWT:
     def __init__(self):
-        self.configuracion = Code.configuracion
-        self.file_path = self.configuracion.file_competition_with_tutor()
+        self.configuration = Code.configuration
+        self.file_path = self.configuration.file_competition_with_tutor()
 
         self.grupos = self.crea_grupos()
 
@@ -202,7 +202,7 @@ class DBManagerCWT:
             p = 0
             for grupo in self.grupos.liGrupos:
                 for rival in grupo.li_rivales:
-                    txt = db[rival.clave]
+                    txt = db[rival.key]
                     if txt:
                         categorias = Categorias()
                         categorias.lee(txt)
@@ -240,15 +240,15 @@ class DBManagerCWT:
             current_rival_key = db["CURRENT_RIVAL_KEY"]
             if current_rival_key is None:
                 elo = 9999
-                for clave, cm in self.configuracion.dic_engines.items():
+                for key, cm in self.configuration.dic_engines.items():
                     if 0 < cm.elo < elo:
-                        current_rival_key = clave
+                        current_rival_key = key
                         elo = cm.elo
             return current_rival_key
 
     def get_current_rival(self):
         current_rival_key = self.get_current_rival_key()
-        return self.configuracion.buscaRival(current_rival_key)
+        return self.configuration.buscaRival(current_rival_key)
 
     def get_puntos_rival(self, rival_key):
         with UtilSQL.DictSQL(self.file_path) as db:

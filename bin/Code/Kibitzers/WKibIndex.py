@@ -3,9 +3,8 @@ from PySide2 import QtCore, QtGui, QtWidgets
 import FasterCode
 
 import Code
-from Code import Position
-from Code import AnalisisIndexes
-from Code import Game
+from Code.Analysis import AnalysisIndexes
+from Code.Base import Game, Position
 from Code.Engines import EngineRun
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -15,7 +14,7 @@ from Code.QT import Iconos
 from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.QT import Tablero
+from Code.Board import Board
 from Code.QT import Voyager
 
 
@@ -31,7 +30,7 @@ class WKibIndex(QtWidgets.QDialog):
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.siShowTablero = dicVideo.get("SHOW_TABLERO", True)
+        self.siShowBoard = dicVideo.get("SHOW_BOARD", True)
         self.history = []
 
         self.fen = ""
@@ -49,13 +48,13 @@ class WKibIndex(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuracion = cpu.configuracion
+        Code.configuration = cpu.configuration
 
         Code.todasPiezas = Piezas.TodasPiezas()
-        config_board = cpu.configuracion.config_board("kib" + cpu.kibitzer.huella, 24)
-        self.tablero = Tablero.Tablero(self, config_board)
-        self.tablero.crea()
-        self.tablero.set_dispatcher(self.mensajero)
+        config_board = cpu.configuration.config_board("kib" + cpu.kibitzer.huella, 24)
+        self.board = Board.Board(self, config_board)
+        self.board.crea()
+        self.board.set_dispatcher(self.mensajero)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("titulo", "", 100, siDerecha=True)
@@ -69,26 +68,26 @@ class WKibIndex(QtWidgets.QDialog):
             (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
             (_("Takeback"), Iconos.Atras(), self.takeback),
             (_("Analyze only color"), Iconos.P_16c(), self.color),
-            (_("Show/hide board"), Iconos.Tablero(), self.config_board),
+            (_("Show/hide board"), Iconos.Board(), self.config_board),
             (_("Manual position"), Iconos.Voyager(), self.set_position),
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, siTexto=False, tamIcon=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
         self.tb.setAccionVisible(self.play, False)
 
         ly1 = Colocacion.H().control(self.tb).relleno()
         ly2 = Colocacion.V().otro(ly1).control(self.grid)
 
-        layout = Colocacion.H().control(self.tablero).otro(ly2)
+        layout = Colocacion.H().control(self.board).otro(ly2)
         self.setLayout(layout)
 
         self.siPlay = True
         self.is_white = True
         self.siNegras = True
 
-        if not self.siShowTablero:
-            self.tablero.hide()
+        if not self.siShowBoard:
+            self.board.hide()
         self.restore_video(dicVideo)
         self.ponFlags()
 
@@ -121,7 +120,7 @@ class WKibIndex(QtWidgets.QDialog):
                         def tr(tp, mas=""):
                             self.liData.append((tp[0], "%.01f%%" % tp[1], "%s%s" % (mas, tp[2])))
 
-                        tp = AnalisisIndexes.tp_gamestage(cp, mrm)
+                        tp = AnalysisIndexes.tp_gamestage(cp, mrm)
                         self.liData.append((tp[0], "%d" % tp[1], tp[2]))
 
                         pts = mrm.li_rm[0].centipawns_abs()
@@ -135,18 +134,18 @@ class WKibIndex(QtWidgets.QDialog):
                                 mas = b if siW else w
                             mas += "-"
 
-                        tr(AnalisisIndexes.tp_winprobability(cp, mrm), mas)
-                        tr(AnalisisIndexes.tp_complexity(cp, mrm))
-                        tr(AnalisisIndexes.tp_efficientmobility(cp, mrm))
+                        tr(AnalysisIndexes.tp_winprobability(cp, mrm), mas)
+                        tr(AnalysisIndexes.tp_complexity(cp, mrm))
+                        tr(AnalysisIndexes.tp_efficientmobility(cp, mrm))
 
-                        tr(AnalisisIndexes.tp_narrowness(cp, mrm))
-                        tr(AnalisisIndexes.tp_piecesactivity(cp, mrm))
-                        tr(AnalisisIndexes.tp_exchangetendency(cp, mrm))
+                        tr(AnalysisIndexes.tp_narrowness(cp, mrm))
+                        tr(AnalysisIndexes.tp_piecesactivity(cp, mrm))
+                        tr(AnalysisIndexes.tp_exchangetendency(cp, mrm))
 
-                        tp = AnalisisIndexes.tp_positionalpressure(cp, mrm)
+                        tp = AnalysisIndexes.tp_positionalpressure(cp, mrm)
                         self.liData.append((tp[0], "%d" % int(tp[1]), ""))
 
-                        tr(AnalisisIndexes.tp_materialasymmetry(cp, mrm))
+                        tr(AnalysisIndexes.tp_materialasymmetry(cp, mrm))
 
                     self.grid.refresh()
                     self.grid.resizeRowsToContents()
@@ -198,9 +197,9 @@ class WKibIndex(QtWidgets.QDialog):
     def grid_num_datos(self, grid):
         return len(self.liData)
 
-    def grid_dato(self, grid, fila, oColumna):
-        key = oColumna.clave
-        titulo, valor, info = self.liData[fila]
+    def grid_dato(self, grid, row, o_column):
+        key = o_column.key
+        titulo, valor, info = self.liData[row]
         if key == "titulo":
             return titulo
 
@@ -210,8 +209,8 @@ class WKibIndex(QtWidgets.QDialog):
         elif key == "info":
             return info
 
-    def grid_bold(self, grid, fila, oColumna):
-        return oColumna.clave in ("Titulo",)
+    def grid_bold(self, grid, row, o_column):
+        return o_column.key in ("Titulo",)
 
     def lanzaMotor(self):
         self.nom_engine = self.kibitzer.name
@@ -262,7 +261,7 @@ class WKibIndex(QtWidgets.QDialog):
         tam = self.size()
         dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
 
-        dic["SHOW_TABLERO"] = self.siShowTablero
+        dic["SHOW_BOARD"] = self.siShowBoard
 
         dic["SITOP"] = self.siTop
 
@@ -306,8 +305,8 @@ class WKibIndex(QtWidgets.QDialog):
 
         self.siW = posicionInicial.is_white
 
-        self.tablero.setposition(posicionInicial)
-        self.tablero.activaColor(self.siW)
+        self.board.set_position(posicionInicial)
+        self.board.activate_side(self.siW)
 
         self.escribe("stop")
 
@@ -318,8 +317,8 @@ class WKibIndex(QtWidgets.QDialog):
         self.engine.put_line(linea)
 
     def config_board(self):
-        self.siShowTablero = not self.siShowTablero
-        self.tablero.setVisible(self.siShowTablero)
+        self.siShowBoard = not self.siShowBoard
+        self.board.setVisible(self.siShowBoard)
         self.save_video()
 
     def set_position(self):

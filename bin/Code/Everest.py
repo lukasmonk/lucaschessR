@@ -1,6 +1,6 @@
 import FasterCode
 
-from Code import Game
+from Code.Base import Game
 from Code.SQL import Base
 from Code import Util
 
@@ -32,11 +32,11 @@ def pos_lidistribution(lidistribution, pos):
 
 
 class Expedition:
-    def __init__(self, configuracion, recno):
-        ex = Expeditions(configuracion)
+    def __init__(self, configuration, recno):
+        ex = Expeditions(configuration)
         self.reg = ex.goto(recno)
         ex.close()
-        self.configuracion = configuracion
+        self.configuration = configuration
         self.recno = recno
 
     def gen_routes(self):
@@ -73,9 +73,9 @@ class Expedition:
             d["MPOINTS"] = "%d" % (int(times[x][1] / done) if done else 0)
             li_routes.append(d)
 
-        rotulo = (self.reg.NAME, xtrayecto, "%s: %s" % (_("Height"), height))
+        label = (self.reg.NAME, xtrayecto, "%s: %s" % (_("Height"), height))
 
-        return li_routes, xcurrent, svg, rotulo
+        return li_routes, xcurrent, svg, label
 
     def run(self):
         # num game
@@ -156,7 +156,7 @@ class Expedition:
         )
 
     def add_try(self, ok, seconds, points):
-        ex = Expeditions(self.configuracion)
+        ex = Expeditions(self.configuration)
 
         change_game = False
 
@@ -187,10 +187,10 @@ class Expedition:
 
 
 class Expeditions:
-    def __init__(self, configuracion):
-        self.configuracion = configuracion
+    def __init__(self, configuration):
+        self.configuration = configuration
 
-        nom_fichero = configuracion.ficheroExpeditions
+        nom_fichero = configuration.ficheroExpeditions
 
         self.db = Base.DBBase(nom_fichero)
         self.tabla = "Expeditions"

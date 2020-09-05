@@ -1,6 +1,6 @@
 from Code import Util
 
-from Code import Configuracion
+from Code.Config import Configuration
 
 
 class User:
@@ -11,7 +11,7 @@ class User:
 
 class Usuarios:
     def __init__(self):
-        self.file = "%s/users.p64" % Configuracion.active_folder()
+        self.file = "%s/users.p64" % Configuration.active_folder()
         self.list_users = self.read()
 
     def save(self):

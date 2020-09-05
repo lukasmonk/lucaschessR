@@ -13,31 +13,31 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 
 
-def datos(wParent, configuracion, procesador):
+def datos(w_parent, configuration, procesador):
     # Primero determinamos la categoria
-    resp = dameCategoria(wParent, configuracion, procesador)
+    resp = dameCategoria(w_parent, configuration, procesador)
     if resp:
         rival, categorias, categoria = resp
     else:
         return None
 
-    w = wDatos(wParent, rival, categorias, categoria, configuracion)
+    w = wDatos(w_parent, rival, categorias, categoria, configuration)
     if w.exec_():
         return categorias, categoria, w.nivel, w.is_white, w.puntos
     else:
         return None
 
 
-def dameCategoria(wParent, configuracion, procesador):
+def dameCategoria(w_parent, configuration, procesador):
     dbm = CompetitionWithTutor.DBManagerCWT()
     rival_key = dbm.get_current_rival_key()
     li_grupos = dbm.grupos.liGrupos
 
     categorias = dbm.get_categorias_rival(rival_key)
 
-    rival = configuracion.buscaRival(rival_key)
+    rival = configuration.buscaRival(rival_key)
 
-    menu = QTVarios.LCMenu(wParent)
+    menu = QTVarios.LCMenu(w_parent)
 
     menu.opcion(None, "%s: %d %s" % (_("Total score"), dbm.puntuacion(), _("pts")), Iconos.NuevaPartida())
     menu.separador()
@@ -73,9 +73,9 @@ def dameCategoria(wParent, configuracion, procesador):
                 # else:
                 # txt += "  ...  %s:%d"%( _( "White" )[0],nm+1)
 
-        siDesHabilitado = ant == 0
+        siset_disabled = ant == 0
         ant = nm
-        menu.opcion(str(x), txt, cat.icono(), is_disabled=siDesHabilitado)
+        menu.opcion(str(x), txt, cat.icono(), is_disabled=siset_disabled)
 
     # ----------- RIVAL
     menu.separador()
@@ -104,11 +104,11 @@ def dameCategoria(wParent, configuracion, procesador):
         submenu = menuRival.submenu(name, icoG)
 
         for rv in grupo.li_rivales:
-            siActual = rv.clave == rival.clave
+            siActual = rv.key == rival.key
             ico = icoActual if siActual else icoM
             submenu.opcion(
-                "MT_" + rv.clave,
-                "%s: [%d %s]" % (rv.name, dbm.get_puntos_rival(rv.clave), _("pts")),
+                "MT_" + rv.key,
+                "%s: [%d %s]" % (rv.name, dbm.get_puntos_rival(rv.key), _("pts")),
                 ico,
                 siDes or siActual,
             )
@@ -129,7 +129,7 @@ def dameCategoria(wParent, configuracion, procesador):
         txt = _(
             "<br><b>The aim is to obtain the highest possible score</b> :<ul><li>The current point score is displayed in the title bar.</li><li>To obtain points it is necessary to win on different levels in different categories.</li><li>To overcome a level it is necessary to win against the engine with white and with black.</li><li>The categories are ranked in the order of the following table:</li><ul><li><b>Beginner</b> : 5</li><li><b>Amateur</b> : 10</li><li><b>Candidate Master</b> : 20</li><li><b>Master</b> : 40</li><li><b>International Master</b> : 80</li><li><b>Grandmaster</b> : 160</li></ul><li>The score for each game is calculated by multiplying the playing level with the score of the category.</li><li>The engines are divided into groups.</li><li>To be able to play with an opponent of a particular group a minimum point score is required. The required score is shown next to the group label.</li></ul>"
         )
-        About.info(wParent, Code.lucas_chess, titulo, txt, ancho, Iconos.pmAyudaGR())
+        About.info(w_parent, Code.lucas_chess, titulo, txt, ancho, Iconos.pmAyudaGR())
         return None
 
     elif resp.startswith("MT_"):
@@ -143,8 +143,8 @@ def dameCategoria(wParent, configuracion, procesador):
 
 
 class wDatos(QtWidgets.QDialog):
-    def __init__(self, wParent, rival, categorias, categoria, configuracion):
-        super(wDatos, self).__init__(wParent)
+    def __init__(self, w_parent, rival, categorias, categoria, configuration):
+        super(wDatos, self).__init__(w_parent)
 
         self.setWindowTitle(_("New game"))
         self.setWindowIcon(Iconos.Datos())
@@ -164,7 +164,7 @@ class wDatos(QtWidgets.QDialog):
         lb = Controles.LB(self, categoria.name() + " " + _("Level"))
 
         lb.ponFuente(f)
-        self.lbPuntos = Controles.LB(self).alinDerecha()
+        self.lbPuntos = Controles.LB(self).align_right()
         self.ed.valueChanged.connect(self.nivelCambiado)
 
         is_white = not categoria.done_with_white()
@@ -178,14 +178,14 @@ class wDatos(QtWidgets.QDialog):
 
         # Rival
         lbRMotor = (
-            Controles.LB(self, "<b>%s</b> : %s" % (_("Engine"), rival.name)).ponFuente(flb).ponWrap().anchoFijo(400)
+            Controles.LB(self, "<b>%s</b> : %s" % (_("Engine"), rival.name)).ponFuente(flb).set_wrap().anchoFijo(400)
         )
         lbRAutor = (
-            Controles.LB(self, "<b>%s</b> : %s" % (_("Author"), rival.autor)).ponFuente(flb).ponWrap().anchoFijo(400)
+            Controles.LB(self, "<b>%s</b> : %s" % (_("Author"), rival.autor)).ponFuente(flb).set_wrap().anchoFijo(400)
         )
         lbRWeb = (
             Controles.LB(self, '<b>%s</b> : <a href="%s">%s</a>' % (_("Web"), rival.url, rival.url))
-            .ponWrap()
+            .set_wrap()
             .anchoFijo(400)
             .ponFuente(flb)
         )
@@ -194,18 +194,18 @@ class wDatos(QtWidgets.QDialog):
         gbR = Controles.GB(self, _("Opponent"), ly).ponFuente(f)
 
         # Tutor
-        tutor = configuracion.tutor
+        tutor = configuration.tutor
         lbTMotor = (
-            Controles.LB(self, "<b>%s</b> : %s" % (_("Engine"), tutor.name)).ponFuente(flb).ponWrap().anchoFijo(400)
+            Controles.LB(self, "<b>%s</b> : %s" % (_("Engine"), tutor.name)).ponFuente(flb).set_wrap().anchoFijo(400)
         )
         lbTAutor = (
-            Controles.LB(self, "<b>%s</b> : %s" % (_("Author"), tutor.autor)).ponFuente(flb).ponWrap().anchoFijo(400)
+            Controles.LB(self, "<b>%s</b> : %s" % (_("Author"), tutor.autor)).ponFuente(flb).set_wrap().anchoFijo(400)
         )
         siURL = hasattr(tutor, "url")
         if siURL:
             lbTWeb = (
                 Controles.LB(self, '<b>%s</b> : <a href="%s">%s</a>' % ("Web", tutor.url, tutor.url))
-                .ponWrap()
+                .set_wrap()
                 .anchoFijo(400)
                 .ponFuente(flb)
             )
@@ -257,8 +257,8 @@ class wDatos(QtWidgets.QDialog):
         self.puntos = p
 
 
-def edit_training_position(wParent, titulo, to_sq, etiqueta=None, pos=None, mensAdicional=None):
-    w = WNumEntrenamiento(wParent, titulo, to_sq, etiqueta, pos, mensAdicional)
+def edit_training_position(w_parent, titulo, to_sq, etiqueta=None, pos=None, mensAdicional=None):
+    w = WNumEntrenamiento(w_parent, titulo, to_sq, etiqueta, pos, mensAdicional)
     if w.exec_():
         return w.number
     else:
@@ -266,8 +266,8 @@ def edit_training_position(wParent, titulo, to_sq, etiqueta=None, pos=None, mens
 
 
 class WNumEntrenamiento(QtWidgets.QDialog):
-    def __init__(self, wParent, titulo, to_sq, etiqueta=None, pos=None, mensAdicional=None):
-        super(WNumEntrenamiento, self).__init__(wParent)
+    def __init__(self, w_parent, titulo, to_sq, etiqueta=None, pos=None, mensAdicional=None):
+        super(WNumEntrenamiento, self).__init__(w_parent)
 
         self.setWindowTitle(titulo)
         self.setWindowIcon(Iconos.Datos())
@@ -285,7 +285,7 @@ class WNumEntrenamiento(QtWidgets.QDialog):
 
         if mensAdicional:
             lb2 = Controles.LB(self, mensAdicional)
-            lb2.ponWrap().anchoMinimo(250)
+            lb2.set_wrap().anchoMinimo(250)
 
         lyH = Colocacion.H().relleno().control(lb).control(self.ed).control(lb1).relleno().margen(15)
 
@@ -303,7 +303,7 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         self.accept()
 
 
-def numPosicion(wParent, titulo, nFEN, pos, salta, tipo):
+def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo):
     liGen = [FormLayout.separador]
 
     label = "%s (1..%d)" % (_("Select position"), nFEN)
@@ -318,7 +318,7 @@ def numPosicion(wParent, titulo, nFEN, pos, salta, tipo):
 
     liGen.append((_("Jump to the next after solve") + ":", salta))
 
-    resultado = FormLayout.fedit(liGen, title=titulo, parent=wParent, anchoMinimo=200, icon=Iconos.Entrenamiento())
+    resultado = FormLayout.fedit(liGen, title=titulo, parent=w_parent, anchoMinimo=200, icon=Iconos.Entrenamiento())
     if resultado:
         position, tipo, jump = resultado[1]
         return position, tipo, jump

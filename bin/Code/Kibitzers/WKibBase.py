@@ -4,8 +4,7 @@ import struct
 import psutil
 import FasterCode
 
-from Code import Position
-from Code import Game
+from Code.Base import Game, Position
 import Code
 from Code.Engines import EngineRun
 from Code.QT import Voyager
@@ -20,8 +19,8 @@ from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import Tablero
-from Code.Kibitzers import PantallaKibitzers
+from Code.Board import Board
+from Code.Kibitzers import WindowKibitzers
 
 
 class WKibBase(QtWidgets.QDialog):
@@ -40,7 +39,7 @@ class WKibBase(QtWidgets.QDialog):
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.siShowTablero = dicVideo.get("SHOW_TABLERO", True)
+        self.siShowBoard = dicVideo.get("SHOW_BOARD", True)
         self.nArrows = dicVideo.get("NARROWS", 2)
 
         self.fen = ""
@@ -59,18 +58,18 @@ class WKibBase(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuracion = cpu.configuracion
+        Code.configuration = cpu.configuration
 
         Code.todasPiezas = Piezas.TodasPiezas()
-        config_board = cpu.configuracion.config_board("kib" + cpu.kibitzer.huella, 24)
-        self.tablero = Tablero.Tablero(self, config_board)
-        self.tablero.crea()
-        self.tablero.set_dispatcher(self.mensajero)
+        config_board = cpu.configuration.config_board("kib" + cpu.kibitzer.huella, 24)
+        self.board = Board.Board(self, config_board)
+        self.board.crea()
+        self.board.set_dispatcher(self.mensajero)
 
-        self.siFigurines = cpu.configuracion.x_pgn_withfigurines
+        self.with_figurines = cpu.configuration.x_pgn_withfigurines
 
-        Delegados.generaPM(self.tablero.piezas)
-        delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.siFigurines else None
+        Delegados.generaPM(self.board.piezas)
+        delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.with_figurines else None
 
         o_columns = Columnas.ListaColumnas()
         if not self.siCandidates:
@@ -89,27 +88,27 @@ class WKibBase(QtWidgets.QDialog):
             (_("Takeback"), Iconos.Atras(), self.takeback),
             (_("The line selected is saved on clipboard"), Iconos.MoverGrabar(), self.portapapelesJugSelected),
             (_("Analyze only color"), Iconos.P_16c(), self.color),
-            (_("Show/hide board"), Iconos.Tablero(), self.config_board),
+            (_("Show/hide board"), Iconos.Board(), self.config_board),
             (_("Manual position"), Iconos.Voyager(), self.set_position),
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
             (_("Options"), Iconos.Opciones(), self.change_options),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, siTexto=False, tamIcon=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
         self.tb.setAccionVisible(self.play, False)
 
         ly1 = Colocacion.H().control(self.tb).relleno().control(self.lbDepth)
         ly2 = Colocacion.V().otro(ly1).control(self.grid)
 
-        layout = Colocacion.H().control(self.tablero).otro(ly2)
+        layout = Colocacion.H().control(self.board).otro(ly2)
         self.setLayout(layout)
 
         self.siPlay = True
         self.is_white = True
         self.siNegras = True
 
-        if not self.siShowTablero:
-            self.tablero.hide()
+        if not self.siShowBoard:
+            self.board.hide()
         self.restore_video(dicVideo)
         self.ponFlags()
 
@@ -141,7 +140,7 @@ class WKibBase(QtWidgets.QDialog):
                     self.depth = rm.depth
                     if self.siCandidates:
                         self.liData = mrm.li_rm
-                        self.lbDepth.ponTexto("%s: %d" % (_("Depth"), rm.depth))
+                        self.lbDepth.set_text("%s: %d" % (_("Depth"), rm.depth))
                     else:
                         self.liData.insert(0, rm.copia())
                         if len(self.liData) > 256:
@@ -150,7 +149,7 @@ class WKibBase(QtWidgets.QDialog):
                     game = Game.Game(fen=self.fen)
                     game.read_pv(rm.pv)
                     if len(game):
-                        self.tablero.quitaFlechas()
+                        self.board.remove_arrows()
                         tipo = "mt"
                         opacidad = 100
                         salto = (80 - 15) * 2 // (self.nArrows - 1) if self.nArrows > 1 else 1
@@ -159,7 +158,7 @@ class WKibBase(QtWidgets.QDialog):
                         for njg in range(min(len(game), self.nArrows)):
                             tipo = "ms" if tipo == "mt" else "mt"
                             move = game.move(njg)
-                            self.tablero.creaFlechaMov(move.from_sq, move.to_sq, tipo + str(opacidad))
+                            self.board.creaFlechaMov(move.from_sq, move.to_sq, tipo + str(opacidad))
                             if njg % 2 == 1:
                                 opacidad -= cambio
                                 cambio = salto
@@ -172,7 +171,7 @@ class WKibBase(QtWidgets.QDialog):
 
     def change_options(self):
         self.pause()
-        w = PantallaKibitzers.WKibitzerLive(self, self.cpu.configuracion, self.cpu.numkibitzer)
+        w = WindowKibitzers.WKibitzerLive(self, self.cpu.configuration, self.cpu.numkibitzer)
         if w.exec_():
             xprioridad = w.result_xprioridad
             if xprioridad is not None:
@@ -237,16 +236,16 @@ class WKibBase(QtWidgets.QDialog):
     def grid_num_datos(self, grid):
         return len(self.liData)
 
-    def grid_dato(self, grid, fila, oColumna):
-        rm = self.liData[fila]
-        key = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        rm = self.liData[row]
+        key = o_column.key
         if key == "EVALUATION":
             return rm.abrTexto()
 
         elif key == "BESTMOVE":
             p = Game.Game(fen=self.fen)
             p.read_pv(rm.pv)
-            pgn = p.pgnBaseRAW() if self.siFigurines else p.pgn_translated()
+            pgn = p.pgnBaseRAW() if self.with_figurines else p.pgn_translated()
             li = pgn.split(" ")
             resp = ""
             if li:
@@ -255,7 +254,7 @@ class WKibBase(QtWidgets.QDialog):
                         resp = li[1]
                 else:
                     resp = li[0].lstrip("1234567890.")
-            if self.siFigurines:
+            if self.with_figurines:
                 is_white = " w " in self.fen
                 return resp, is_white, None, None, None, None, False, True
             else:
@@ -272,16 +271,16 @@ class WKibBase(QtWidgets.QDialog):
                 li = li[1:]
             return " ".join(li[1:])
 
-    def grid_doble_click(self, grid, fila, oColumna):
-        if 0 <= fila < len(self.liData):
-            rm = self.liData[fila]
+    def grid_doble_click(self, grid, row, o_column):
+        if 0 <= row < len(self.liData):
+            rm = self.liData[row]
             self.history.append(self.fen)
             FasterCode.set_fen(self.fen)
             FasterCode.make_move(rm.movimiento())
             self.pon_fen_hist(FasterCode.get_fen())
 
-    def grid_bold(self, grid, fila, oColumna):
-        return oColumna.clave in ("EVALUATION", "BESTMOVE", "DEPTH")
+    def grid_bold(self, grid, row, o_column):
+        return o_column.key in ("EVALUATION", "BESTMOVE", "DEPTH")
 
     def lanzaMotor(self):
         if self.siCandidates:
@@ -354,7 +353,7 @@ class WKibBase(QtWidgets.QDialog):
         tam = self.size()
         dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
 
-        dic["SHOW_TABLERO"] = self.siShowTablero
+        dic["SHOW_BOARD"] = self.siShowBoard
         dic["NARROWS"] = self.nArrows
 
         dic["SITOP"] = self.siTop
@@ -403,8 +402,8 @@ class WKibBase(QtWidgets.QDialog):
         if self.siThreats:
             self.siW = not self.siW
 
-        self.tablero.setposition(posicionInicial)
-        self.tablero.activaColor(self.siW)
+        self.board.set_position(posicionInicial)
+        self.board.activate_side(self.siW)
 
         self.escribe("stop")
 
@@ -415,8 +414,8 @@ class WKibBase(QtWidgets.QDialog):
         self.engine.put_line(linea)
 
     def config_board(self):
-        self.siShowTablero = not self.siShowTablero
-        self.tablero.setVisible(self.siShowTablero)
+        self.siShowBoard = not self.siShowBoard
+        self.board.setVisible(self.siShowBoard)
         self.save_video()
 
     def set_position(self):
@@ -435,7 +434,7 @@ class WKibBase(QtWidgets.QDialog):
             self.history.append(fen)
         self.liData = []
         if self.siCandidates:
-            self.lbDepth.ponTexto("-")
+            self.lbDepth.set_text("-")
         self.depth = 0
         if fen:
             self.fen = fen

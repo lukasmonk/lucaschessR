@@ -1,15 +1,15 @@
 import Code
 from Code.SQL import UtilSQL
-from Code.Kibitzers import PantallaKibitzers
+from Code.Kibitzers import WindowKibitzers
 from Code import XRun
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class Manager:
     def __init__(self, procesador):
         self.procesador = procesador
         self.main_window = procesador.main_window
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
         self.li_activos = []
 
     def close(self):
@@ -17,7 +17,7 @@ class Manager:
             ipc_kibitzer.terminar()
 
     def edit(self):
-        w = PantallaKibitzers.WKibitzers(self.main_window, self)
+        w = WindowKibitzers.WKibitzers(self.main_window, self)
         w.exec_()
 
     def some_working(self):
@@ -68,15 +68,15 @@ class Orden:
 
 class IPCKibitzer:
     def __init__(self, numkibitzer):
-        configuracion = Code.configuracion
+        configuration = Code.configuration
 
-        fdb = configuracion.ficheroTemporal("db")
+        fdb = configuration.ficheroTemporal("db")
 
         self.ipc = UtilSQL.IPC(fdb, True)
 
         orden = Orden()
-        orden.key = KIBRUN_CONFIGURACION
-        orden.dv["USER"] = configuracion.user
+        orden.key = KIBRUN_CONFIGURATION
+        orden.dv["USER"] = configuration.user
         orden.dv["NUMKIBITZER"] = numkibitzer
 
         self.escribe(orden)

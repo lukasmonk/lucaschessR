@@ -2,7 +2,7 @@ import os
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from Code import Configuracion
+from Code.Config import Configuration
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
@@ -27,36 +27,36 @@ def run_gui(procesador):
     else:
         user = None
 
-    active_folder = Configuracion.active_folder()
+    active_folder = Configuration.active_folder()
     askfor_language = not os.path.isdir(active_folder) or not os.listdir(active_folder)
 
     procesador.start_with_user(user)
-    configuracion = procesador.configuracion
+    configuration = procesador.configuration
     if user:
-        if not configuracion.x_player:
-            configuracion.x_player = user.name
-            configuracion.graba()
-        elif configuracion.x_player != user.name:
+        if not configuration.x_player:
+            configuration.x_player = user.name
+            configuration.graba()
+        elif configuration.x_player != user.name:
             for usu in list_users:
                 if usu.number == user.number:
-                    usu.name = configuracion.x_player
+                    usu.name = configuration.x_player
                     Usuarios.Usuarios().save_list(list_users)
 
     # Comprobamos el lenguaje
-    if askfor_language and not configuracion.translator:
+    if askfor_language and not configuration.translator:
         if user:
-            conf_main = Configuracion.Configuracion("")
+            conf_main = Configuration.Configuration("")
             ori = conf_main.file_external_engines()
             conf_main.lee()
             conf_main.limpia(user.name)
             conf_main.set_folders()
             conf_main.graba()
-            procesador.configuracion = conf_main
+            procesador.configuration = conf_main
 
             Util.file_copy(ori, conf_main.file_external_engines())
 
         else:
-            li = configuracion.list_translations()
+            li = configuration.list_translations()
             menu = QTVarios.LCMenuRondo(None)
             for k, name, porc, author in li:
                 if porc != 100:
@@ -64,9 +64,9 @@ def run_gui(procesador):
                 menu.opcion(k, name)
             resp = menu.lanza()
             if resp:
-                configuracion.translator = resp
-                configuracion.graba()
-                configuracion.releeTRA()
+                configuration.translator = resp
+                configuration.graba()
+                configuration.releeTRA()
 
     # Estilo
     # https://github.com/gmarull/qtmodern/blob/master/qtmodern/styles.py
@@ -101,11 +101,11 @@ def run_gui(procesador):
     #                      QColor(80, 80, 80))
     # darkPalette.setColor(QPalette.Disabled, QPalette.HighlightedText,
     #                      QColor(127, 127, 127))
-    # app.setStyle(QtWidgets.QStyleFactory.create(configuracion.x_style))
+    # app.setStyle(QtWidgets.QStyleFactory.create(configuration.x_style))
 
-    if configuracion.palette:
+    if configuration.palette:
         qpalette = QtGui.QPalette(QtGui.QPalette.Dark)
-        palette = configuracion.palette
+        palette = configuration.palette
 
         for key, tp in (
             (QtGui.QPalette.Window, "Window"),
@@ -130,8 +130,8 @@ def run_gui(procesador):
 
     QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "ChessAlpha2.ttf"))
 
-    if configuracion.x_font_family:
-        font = Controles.TipoLetra(configuracion.x_font_family)
+    if configuration.x_font_family:
+        font = Controles.TipoLetra(configuration.x_font_family)
         app.setFont(font)
 
     Code.gc = QTUtil.GarbageCollector()
@@ -203,7 +203,7 @@ def pide_usuario(liUsuarios):
         if len(liUsuarios) == 1:
             usuario = liUsuarios[0]
         else:
-            menu = Controles.Menu(None)  # No puede ser LCmenu, ya que todavia no existe la configuracion
+            menu = Controles.Menu(None)  # No puede ser LCmenu, ya que todavia no existe la configuration
             menu.separador()
 
             for usuario in liUsuarios:

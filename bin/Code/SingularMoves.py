@@ -39,8 +39,8 @@ class SingularMoves:
         self.registro = None
         self.current_key = None
 
-    def repite(self, fila):
-        self.current_key = self.db_keys[fila]
+    def repite(self, row):
+        self.current_key = self.db_keys[row]
         self.registro = self.db[self.current_key]
         self.li_bloque = [lin["LINE"] for lin in self.registro["BLOCK"]]
 
@@ -111,11 +111,11 @@ class SingularMoves:
     def len_db(self):
         return len(self.db_keys)
 
-    def reg_db(self, fila):
-        return self.db[self.db_keys[fila]]
+    def reg_db(self, row):
+        return self.db[self.db_keys[row]]
 
     def borra_db(self, lista):
-        li = [self.db_keys[fila] for fila in lista]
+        li = [self.db_keys[row] for row in lista]
 
         for key in li:
             del self.db[key]

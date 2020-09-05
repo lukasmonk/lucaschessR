@@ -12,22 +12,22 @@ from Code.Engines import EngineManager, EngineResponse
 ALBUMSHECHOS = "albumshechos"
 
 
-class GestorMotorAlbum:
-    def __init__(self, gestor, cromo):
+class ManagerMotorAlbum:
+    def __init__(self, manager, cromo):
 
         self.cromo = cromo
 
-        self.gestor = gestor
+        self.manager = manager
 
-        self.game = gestor.game
+        self.game = manager.game
 
         self.name = cromo.name
 
         self.xirina = None
         self.xsimilar = None
 
-        conf_engine = self.gestor.configuracion.buscaRival("irina")
-        self.xirina = EngineManager.EngineManager(self.gestor.procesador, conf_engine)
+        conf_engine = self.manager.configuration.buscaRival("irina")
+        self.xirina = EngineManager.EngineManager(self.manager.procesador, conf_engine)
         self.xirina.opciones(None, 1, False)
 
         self.opening = self.cromo.opening
@@ -57,7 +57,7 @@ class GestorMotorAlbum:
             pv = self.book.eligeJugadaTipo(fen, "au")
             if pv:
                 self.opening -= 1
-                rmrival = EngineResponse.EngineResponse("Apertura", "w" in fen)
+                rmrival = EngineResponse.EngineResponse("Opening", "w" in fen)
                 rmrival.from_sq = pv[:2]
                 rmrival.to_sq = pv[2:4]
                 rmrival.promotion = pv[4:]
@@ -105,8 +105,8 @@ class GestorMotorAlbum:
 
     def juega_similar(self, fen):
         if self.xsimilar is None:
-            conf_engine = self.gestor.configuracion.buscaRival(self.cromo.engine)
-            self.xsimilar = EngineManager.EngineManager(self.gestor.procesador, conf_engine)
+            conf_engine = self.manager.configuration.buscaRival(self.cromo.engine)
+            self.xsimilar = EngineManager.EngineManager(self.manager.procesador, conf_engine)
             self.xsimilar.opciones(None, 5, True)
         mrm = self.xsimilar.control(fen, 5)
         mrm.game = self.game
@@ -116,7 +116,7 @@ class GestorMotorAlbum:
 class Cromo:
     def __init__(
         self,
-        clave,
+        key,
         name,
         nivel,
         bien,
@@ -130,7 +130,7 @@ class Cromo:
         engine,
         opening,
     ):
-        self.clave = clave
+        self.key = key
         self.name = name
         self.nivel = nivel
         self.hecho = False
@@ -154,10 +154,10 @@ class Cromo:
         self.opening = opening
 
     def icono(self):
-        return Iconos.icono(self.clave)
+        return Iconos.icono(self.key)
 
     def pixmap(self):
-        return Iconos.pixmap(self.clave)
+        return Iconos.pixmap(self.key)
 
     def pixmap_level(self):
         li = ("Amarillo", "Naranja", "Verde", "Azul", "Magenta", "Rojo")
@@ -171,7 +171,7 @@ class Album:
         self.name = _F(alias)
         self.liCromos = []
         self.hecho = False
-        self.ficheroDB = Code.configuracion.ficheroAlbumes
+        self.ficheroDB = Code.configuration.ficheroAlbumes
 
     def icono(self):
         return Iconos.icono(self.alias)
@@ -200,7 +200,7 @@ class Album:
     def guarda(self):
         dic = collections.OrderedDict()
         for cromo in self.liCromos:
-            dic[cromo.clave] = cromo.hecho
+            dic[cromo.key] = cromo.hecho
         self.put_db(self.claveDB, dic)
 
     def test_finished(self):
@@ -220,7 +220,7 @@ class Album:
 
 class Albumes:
     def __init__(self, pre_clave):
-        self.ficheroDB = Code.configuracion.ficheroAlbumes
+        self.ficheroDB = Code.configuration.ficheroAlbumes
         self.preClave = pre_clave
         self.liGeneralCromos = self.read_csv()
         self.dicAlbumes = self.configura()
@@ -254,7 +254,7 @@ class Albumes:
         if dic:
             dig = {}
             for cromo in self.liGeneralCromos:
-                dig[cromo.clave] = cromo
+                dig[cromo.key] = cromo
             album = Album(key_db, alias)
             li = []
             pos = 0
@@ -300,8 +300,8 @@ class Albumes:
             dic_db = {}
         dic = collections.OrderedDict()
         for uno in self.dicAlbumes:
-            clave = self.preClave + "_" + uno
-            dic[uno] = dic_db.get(clave, False)
+            key = self.preClave + "_" + uno
+            dic[uno] = dic_db.get(key, False)
         return dic
 
 
@@ -337,7 +337,7 @@ class AlbumesAnimales(Albumes):
         return dic
 
     def read_csv(self):
-        # x = """Animal;Nivel ;Bien;Aleatorio;Captura;Esquivo;Similar;Dif puntos;Aterrizaje;Mate;Engine;Apertura
+        # x = """Animal;Nivel ;Bien;Aleatorio;Captura;Esquivo;Similar;Dif puntos;Aterrizaje;Mate;Engine;Opening
         # Ant;0;0;100;0;0;0;1000;450;0;t;0
         # Bee;0;1;95;0;0;0;1000;450;0;k;0
         # Butterfly;0;2;90;0;0;0;1000;450;0;c;0
@@ -462,7 +462,7 @@ class AlbumesVehicles(Albumes):
         return dic
 
     def read_csv(self):
-        # x = """Vehicle;Nivel ;Bien;Aleatorio;Captura;Esquivo;Similar;Dif puntos;Aterrizaje;Mate;Engine;Apertura
+        # x = """Vehicle;Nivel ;Bien;Aleatorio;Captura;Esquivo;Similar;Dif puntos;Aterrizaje;Mate;Engine;Opening
         # Wheel;0;0;100;0;0;0;1000;450;0;t;0
         # Wheelchair;0;1;95;0;0;0;1000;450;0;k;0
         # TouringMotorcycle;0;2;90;0;0;0;1000;450;0;c;0

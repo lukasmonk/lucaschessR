@@ -48,7 +48,7 @@ class TareaToolTip(Tarea):
         self.texto = texto
 
     def unPaso(self):
-        self.cpu.tablero.setToolTip(self.texto)
+        self.cpu.board.setToolTip(self.texto)
         return True
 
     def __str__(self):
@@ -60,7 +60,7 @@ class TareaPonPosicion(Tarea):
         self.position = position
 
     def unPaso(self):
-        self.cpu.tablero.setposition(self.position)
+        self.cpu.board.set_position(self.position)
         return True
 
     def __str__(self):
@@ -73,14 +73,14 @@ class TareaCambiaPieza(Tarea):
         self.pieza = pieza
 
     def unPaso(self):
-        self.cpu.tablero.cambiaPieza(self.a1h8, self.pieza)
+        self.cpu.board.cambiaPieza(self.a1h8, self.pieza)
         return True
 
     def __str__(self):
         return _X(_("Change piece in %1 to %2"), self.a1h8, self.pieza)
 
-    def directo(self, tablero):
-        return tablero.cambiaPieza(self.a1h8, self.pieza)
+    def directo(self, board):
+        return board.cambiaPieza(self.a1h8, self.pieza)
 
 
 class TareaBorraPieza(Tarea):
@@ -90,32 +90,32 @@ class TareaBorraPieza(Tarea):
 
     def unPaso(self):
         if self.tipo:
-            self.cpu.tablero.borraPiezaTipo(self.a1h8, self.tipo)
+            self.cpu.board.borraPiezaTipo(self.a1h8, self.tipo)
         else:
-            self.cpu.tablero.borraPieza(self.a1h8)
+            self.cpu.board.borraPieza(self.a1h8)
         return True
 
     def __str__(self):
         return _X(_("Remove piece on %1"), self.a1h8)
 
-    def directo(self, tablero):
-        tablero.borraPieza(self.a1h8)
+    def directo(self, board):
+        board.borraPieza(self.a1h8)
 
 
 class TareaMuevePieza(Tarea):
-    def __init__(self, desdeA1H8, hastaA1H8, segundos=0.0):
+    def __init__(self, from_a1h8, to_a1h8, segundos=0.0):
         self.pieza = None
-        self.desdeA1H8 = desdeA1H8
-        self.hastaA1H8 = hastaA1H8
+        self.from_a1h8 = from_a1h8
+        self.to_a1h8 = to_a1h8
         self.segundos = segundos
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
 
-        self.tablero = self.cpu.tablero
+        self.board = self.cpu.board
 
-        dx, dy = self.a1h8_xy(self.desdeA1H8)
-        hx, hy = self.a1h8_xy(self.hastaA1H8)
+        dx, dy = self.a1h8_xy(self.from_a1h8)
+        hx, hy = self.a1h8_xy(self.to_a1h8)
 
         linea = QtCore.QLineF(dx, dy, hx, hy)
 
@@ -127,41 +127,41 @@ class TareaMuevePieza(Tarea):
         self.totalPasos = len(self.liPuntos)
 
     def a1h8_xy(self, a1h8):
-        fila = int(a1h8[1])
-        columna = ord(a1h8[0]) - 96
-        x = self.tablero.columna2punto(columna)
-        y = self.tablero.fila2punto(fila)
+        row = int(a1h8[1])
+        column = ord(a1h8[0]) - 96
+        x = self.board.columna2punto(column)
+        y = self.board.fila2punto(row)
         return x, y
 
     def unPaso(self):
         if self.pieza is None:
-            self.pieza = self.tablero.damePiezaEn(self.desdeA1H8)
+            self.pieza = self.board.damePiezaEn(self.from_a1h8)
             if self.pieza is None:
                 return True
         p = self.liPuntos[self.nPaso]
         bp = self.pieza.bloquePieza
-        bp.position.x = p.x()
-        bp.position.y = p.y()
+        bp.physical_pos.x = p.x()
+        bp.physical_pos.y = p.y()
         self.pieza.rehazPosicion()
         self.nPaso += 1
         siUltimo = self.nPaso >= self.totalPasos
         if siUltimo:
-            # Para que este al final en la position correcta
-            self.tablero.colocaPieza(bp, self.hastaA1H8)
+            # Para que este al final en la physical_pos correcta
+            self.board.colocaPieza(bp, self.to_a1h8)
         return siUltimo
 
     def __str__(self):
         return _X(
-            _("Move piece from %1 to %2 on %3 second (s)"), self.desdeA1H8, self.hastaA1H8, "%0.2f" % self.segundos
+            _("Move piece from %1 to %2 on %3 second (s)"), self.from_a1h8, self.to_a1h8, "%0.2f" % self.segundos
         )
 
-    def directo(self, tablero):
-        tablero.muevePieza(self.desdeA1H8, self.hastaA1H8)
+    def directo(self, board):
+        board.muevePieza(self.from_a1h8, self.to_a1h8)
 
 
 class TareaMuevePiezaV(TareaMuevePieza):
-    def __init__(self, desdeA1H8, hastaA1H8, vsegundos):
-        TareaMuevePieza.__init__(self, desdeA1H8, hastaA1H8, 0.0)
+    def __init__(self, from_a1h8, to_a1h8, vsegundos):
+        TareaMuevePieza.__init__(self, from_a1h8, to_a1h8, 0.0)
         self.vsegundos = vsegundos
 
     def enlaza(self, cpu):
@@ -171,13 +171,13 @@ class TareaMuevePiezaV(TareaMuevePieza):
     def __str__(self):
         return _X(
             _("Move piece from %1 to %2 on %3 second (s)"),
-            self.desdeA1H8,
-            self.hastaA1H8,
+            self.from_a1h8,
+            self.to_a1h8,
             "%0.2f (%s)" % (self.vsegundos.valor, self.vsegundos.name),
         )
 
-    def directo(self, tablero):
-        tablero.muevePieza(self.desdeA1H8, self.hastaA1H8)
+    def directo(self, board):
+        board.muevePieza(self.from_a1h8, self.to_a1h8)
 
 
 class TareaMuevePiezaLI(Tarea):
@@ -187,16 +187,16 @@ class TareaMuevePiezaLI(Tarea):
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
-        self.tablero = self.cpu.tablero
+        self.board = self.cpu.board
         self.pieza = None
-        self.desdeA1H8 = self.lista[0][0]
-        self.hastaA1H8 = self.lista[-1][1]
+        self.from_a1h8 = self.lista[0][0]
+        self.to_a1h8 = self.lista[-1][1]
         self.liPuntos = []
         pasos1 = int(self.segundos * self.junks / len(self.lista))
 
-        for desdeA1H8, hastaA1H8 in self.lista:
-            dx, dy = self.a1h8_xy(desdeA1H8)
-            hx, hy = self.a1h8_xy(hastaA1H8)
+        for from_a1h8, to_a1h8 in self.lista:
+            dx, dy = self.a1h8_xy(from_a1h8)
+            hx, hy = self.a1h8_xy(to_a1h8)
 
             linea = QtCore.QLineF(dx, dy, hx, hy)
 
@@ -206,25 +206,25 @@ class TareaMuevePiezaLI(Tarea):
         self.totalPasos = len(self.liPuntos)
 
     def a1h8_xy(self, a1h8):
-        fila = int(a1h8[1])
-        columna = ord(a1h8[0]) - 96
-        x = self.tablero.columna2punto(columna)
-        y = self.tablero.fila2punto(fila)
+        row = int(a1h8[1])
+        column = ord(a1h8[0]) - 96
+        x = self.board.columna2punto(column)
+        y = self.board.fila2punto(row)
         return x, y
 
     def unPaso(self):
         if self.pieza is None:
-            self.pieza = self.tablero.damePiezaEn(self.desdeA1H8)
+            self.pieza = self.board.damePiezaEn(self.from_a1h8)
         p = self.liPuntos[self.nPaso]
         bp = self.pieza.bloquePieza
-        bp.position.x = p.x()
-        bp.position.y = p.y()
+        bp.physical_pos.x = p.x()
+        bp.physical_pos.y = p.y()
         self.pieza.rehazPosicion()
         self.nPaso += 1
         siUltimo = self.nPaso >= self.totalPasos
         if siUltimo:
             # Para que este al final en la position correcta
-            self.tablero.colocaPieza(bp, self.hastaA1H8)
+            self.board.colocaPieza(bp, self.to_a1h8)
         return siUltimo
 
 
@@ -240,18 +240,18 @@ class TareaCreaFlecha(Tarea):
         regFlecha = copy.deepcopy(self.tutorial.dameFlecha(self.idFlecha))
         regFlecha.siMovible = True
         regFlecha.a1h8 = self.from_sq + self.to_sq
-        self.scFlecha = self.cpu.tablero.creaFlecha(regFlecha)
+        self.scFlecha = self.cpu.board.creaFlecha(regFlecha)
         return True
 
     def __str__(self):
         vFlecha = self.tutorial.dameFlecha(self.idFlecha)
         return _("Arrow") + " " + vFlecha.name + " " + self.from_sq + self.to_sq
 
-    def directo(self, tablero):
+    def directo(self, board):
         regFlecha = copy.deepcopy(self.tutorial.dameFlecha(self.idFlecha))
         regFlecha.siMovible = True
         regFlecha.a1h8 = self.from_sq + self.to_sq
-        self.scFlecha = tablero.creaFlecha(regFlecha)
+        self.scFlecha = board.creaFlecha(regFlecha)
         return True
 
 
@@ -266,18 +266,18 @@ class TareaCreaMarco(Tarea):
         regMarco = copy.deepcopy(self.tutorial.dameMarco(self.idMarco))
         regMarco.siMovible = True
         regMarco.a1h8 = self.from_sq + self.to_sq
-        self.scMarco = self.cpu.tablero.creaMarco(regMarco)
+        self.scMarco = self.cpu.board.creaMarco(regMarco)
         return True
 
     def __str__(self):
         vMarco = self.tutorial.dameMarco(self.idMarco)
         return _("Box") + " " + vMarco.name + " " + self.from_sq + self.to_sq
 
-    def directo(self, tablero):
+    def directo(self, board):
         regMarco = copy.deepcopy(self.tutorial.dameMarco(self.idMarco))
         regMarco.siMovible = True
         regMarco.a1h8 = self.from_sq + self.to_sq
-        self.scMarco = tablero.creaMarco(regMarco)
+        self.scMarco = board.creaMarco(regMarco)
         return True
 
 
@@ -292,16 +292,16 @@ class TareaCreaSVG(Tarea):
         regSVG = copy.deepcopy(self.tutorial.dameSVG(self.idSVG))
         regSVG.siMovible = True
         regSVG.a1h8 = self.from_sq + self.to_sq
-        self.scSVG = self.cpu.tablero.creaSVG(regSVG)
+        self.scSVG = self.cpu.board.creaSVG(regSVG)
         return True
 
     def __str__(self):
         vSVG = self.tutorial.dameSVG(self.idSVG)
         return _("Image") + " " + vSVG.name + " " + self.from_sq + self.to_sq
 
-    def directo(self, tablero):
+    def directo(self, board):
         regSVG = copy.deepcopy(self.tutorial.dameSVG(self.idSVG))
         regSVG.siMovible = True
         regSVG.a1h8 = self.from_sq + self.to_sq
-        self.scSVG = tablero.creaSVG(regSVG)
+        self.scSVG = board.creaSVG(regSVG)
         return True

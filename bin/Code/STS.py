@@ -309,7 +309,7 @@ class STS:
 
     def formulaWrite(self):
         dic = {"X": self.X, "K": self.K}
-        Code.configuracion.escVariables("STSFORMULA", dic)
+        Code.configuration.escVariables("STSFORMULA", dic)
 
     def formulaChange(self, x, k):
         self.X = x
@@ -317,13 +317,13 @@ class STS:
         self.formulaWrite()
 
     def formulaRead(self):
-        dic = Code.configuracion.leeVariables("STSFORMULA")
+        dic = Code.configuration.leeVariables("STSFORMULA")
         if dic:
             self.X = dic["X"]
             self.K = dic["K"]
 
     def path(self):
-        folder = Code.configuracion.carpetaSTS
+        folder = Code.configuration.carpetaSTS
         if not os.path.isdir(folder):
             os.mkdir(folder)
         return os.path.join(folder, "%s.sts" % self.name)
@@ -354,7 +354,7 @@ class STS:
 
     def createWork(self, me):
         w = Work(len(self.groups))
-        w.ref = me.clave
+        w.ref = me.key
         w.me = me
         return w
 

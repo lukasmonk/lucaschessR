@@ -1,7 +1,7 @@
 import FasterCode
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from Code import Position
+from Code.Base import Position
 import Code
 from Code.Endings import LibChess
 from Code.QT import Colocacion
@@ -12,7 +12,7 @@ from Code.QT import Iconos
 from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.QT import Tablero
+from Code.Board import Board
 from Code.QT import Delegados
 from Code.QT import Voyager
 
@@ -28,7 +28,7 @@ class WGaviota(QtWidgets.QDialog):
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.siShowTablero = dicVideo.get("SHOW_TABLERO", True)
+        self.siShowBoard = dicVideo.get("SHOW_BOARD", True)
         self.position = Position.Position()
 
         self.fen = ""
@@ -48,21 +48,21 @@ class WGaviota(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuracion = cpu.configuracion
+        Code.configuration = cpu.configuration
 
         Code.todasPiezas = Piezas.TodasPiezas()
-        config_board = cpu.configuracion.config_board("kib" + cpu.kibitzer.huella, 24)
-        self.tablero = Tablero.Tablero(self, config_board)
-        self.tablero.crea()
-        self.tablero.set_dispatcher(self.mensajero)
-        Delegados.generaPM(self.tablero.piezas)
+        config_board = cpu.configuration.config_board("kib" + cpu.kibitzer.huella, 24)
+        self.board = Board.Board(self, config_board)
+        self.board.crea()
+        self.board.set_dispatcher(self.mensajero)
+        Delegados.generaPM(self.board.piezas)
 
-        self.t4 = LibChess.T4(cpu.configuracion)
+        self.t4 = LibChess.T4(cpu.configuration)
 
-        self.siFigurines = cpu.configuracion.x_pgn_withfigurines
+        self.with_figurines = cpu.configuration.x_pgn_withfigurines
 
         o_columns = Columnas.ListaColumnas()
-        delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.siFigurines else None
+        delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.with_figurines else None
         o_columns.nueva("MOVE", _("Move"), 80, centered=True, edicion=delegado)
         o_columns.nueva("DTM", "DTM", 60, centered=True)
         self.grid_moves = Grid.Grid(self, o_columns, dicVideo=dicVideo, siSelecFilas=True)
@@ -73,49 +73,49 @@ class WGaviota(QtWidgets.QDialog):
             (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
             (_("Takeback"), Iconos.Atras(), self.takeback),
             (_("Manual position"), Iconos.Voyager(), self.set_position),
-            (_("Show/hide board"), Iconos.Tablero(), self.config_board),
+            (_("Show/hide board"), Iconos.Board(), self.config_board),
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, siTexto=False, tamIcon=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
         self.tb.setAccionVisible(self.play, False)
 
         ly1 = Colocacion.H().control(self.tb)
         ly2 = Colocacion.V().otro(ly1).control(self.grid_moves)
 
-        layout = Colocacion.H().control(self.tablero).otro(ly2)
+        layout = Colocacion.H().control(self.board).otro(ly2)
         self.setLayout(layout)
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.cpu.compruebaInput)
         self.timer.start(200)
 
-        if not self.siShowTablero:
-            self.tablero.hide()
+        if not self.siShowBoard:
+            self.board.hide()
         self.restore_video(dicVideo)
         self.ponFlags()
 
-    def grid_doble_click(self, grid, fila, oColumna):
-        if 0 <= fila < len(self.li_moves):
+    def grid_doble_click(self, grid, row, o_column):
+        if 0 <= row < len(self.li_moves):
             FasterCode.set_fen(self.fen)
-            san, xdtm, orden, from_sq, to_sq, promotion = self.li_moves[fila]
+            san, xdtm, orden, from_sq, to_sq, promotion = self.li_moves[row]
             FasterCode.make_move(from_sq + to_sq + promotion)
             self.pon_fen_hist(FasterCode.get_fen())
 
-    def grid_boton_derecho(self, grid, fila, columna, modificadores):
+    def grid_boton_derecho(self, grid, row, column, modificadores):
         if len(self.history) > 0:
-            fila, fen = self.history[-1]
+            row, fen = self.history[-1]
             self.history = self.history[:-1]
             self.ponFen(fen)
-            self.grid_moves.goto(fila, 0)
+            self.grid_moves.goto(row, 0)
 
-    def grid_cambiado_registro(self, grid, fila, oColumna):
-        self.ponFlecha(fila)
+    def grid_cambiado_registro(self, grid, row, o_column):
+        self.ponFlecha(row)
 
-    def ponFlecha(self, fila):
-        if -1 < fila < len(self.li_moves):
-            san, xdtm, orden, from_sq, to_sq, promotion = self.li_moves[fila]
-            self.tablero.ponFlechaSC(from_sq, to_sq)
+    def ponFlecha(self, row):
+        if -1 < row < len(self.li_moves):
+            san, xdtm, orden, from_sq, to_sq, promotion = self.li_moves[row]
+            self.board.put_arrow_sc(from_sq, to_sq)
 
     def ponFlags(self):
         flags = self.windowFlags()
@@ -159,12 +159,12 @@ class WGaviota(QtWidgets.QDialog):
     def grid_num_datos(self, grid):
         return len(self.li_moves)
 
-    def grid_dato(self, grid, fila, oColumna):
-        san, xdtm, orden, from_sq, to_sq, promotion = self.li_moves[fila]
+    def grid_dato(self, grid, row, o_column):
+        san, xdtm, orden, from_sq, to_sq, promotion = self.li_moves[row]
 
-        key = oColumna.clave
+        key = o_column.key
         if key == "MOVE":
-            if self.siFigurines:
+            if self.with_figurines:
                 is_white = " w " in self.fen
                 return san, is_white, None, None, None, None, False, True
             else:
@@ -210,7 +210,7 @@ class WGaviota(QtWidgets.QDialog):
         tam = self.size()
         dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
 
-        dic["SHOW_TABLERO"] = self.siShowTablero
+        dic["SHOW_BOARD"] = self.siShowBoard
 
         dic["SITOP"] = self.siTop
 
@@ -247,8 +247,8 @@ class WGaviota(QtWidgets.QDialog):
             self.resize(w, h)
 
     def config_board(self):
-        self.siShowTablero = not self.siShowTablero
-        self.tablero.setVisible(self.siShowTablero)
+        self.siShowBoard = not self.siShowBoard
+        self.board.setVisible(self.siShowBoard)
         self.save_video()
 
     def ponFen(self, fen):
@@ -263,8 +263,8 @@ class WGaviota(QtWidgets.QDialog):
 
         if self.siPlay:
             self.siW = self.position.is_white
-            self.tablero.setposition(self.position)
-            self.tablero.activaColor(self.siW)
+            self.board.set_position(self.position)
+            self.board.activate_side(self.siW)
             self.li_moves = self.t4.listFen(fen)
             self.grid_moves.gotop()
             self.grid_moves.refresh()

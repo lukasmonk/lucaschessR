@@ -3,7 +3,7 @@ import os
 from PySide2 import QtCore, QtWidgets
 
 import Code
-from Code.Constantes import FEN_INITIAL
+from Code.Base.Constantes import FEN_INITIAL
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
@@ -15,11 +15,11 @@ from Code import Util
 
 
 class WFiltrar(QtWidgets.QDialog):
-    def __init__(self, wParent, o_columns, liFiltro, dbSaveNom=None):
+    def __init__(self, w_parent, o_columns, liFiltro, dbSaveNom=None):
         super(WFiltrar, self).__init__()
 
         if dbSaveNom is None:
-            dbSaveNom = Code.configuracion.ficheroFiltrosPGN
+            dbSaveNom = Code.configuration.ficheroFiltrosPGN
 
         self.setWindowTitle(_("Filter"))
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
@@ -29,7 +29,7 @@ class WFiltrar(QtWidgets.QDialog):
         nFiltro = len(liFiltro)
         self.dbSaveNom = dbSaveNom
 
-        li_fields = [(x.cabecera, '"%s"' % x.clave) for x in o_columns.liColumnas if x.clave != "number" and x.clave != "opening"]
+        li_fields = [(x.head, '"%s"' % x.key) for x in o_columns.li_columns if x.key != "number" and x.key != "opening"]
         li_fields.insert(0, ("", None))
         liCondicion = [
             ("", None),
@@ -175,7 +175,7 @@ class WFiltrar(QtWidgets.QDialog):
             c_par0.ponValor(par0)
             c_campo.ponValor(campo)
             c_condicion.ponValor(condicion)
-            c_valor.ponTexto(valor)
+            c_valor.set_text(valor)
             c_par1.ponValor(par1)
 
     def reiniciar(self):
@@ -183,7 +183,7 @@ class WFiltrar(QtWidgets.QDialog):
             self.liC[i][1].ponValor(False)
             self.liC[i][2].setCurrentIndex(0)
             self.liC[i][3].setCurrentIndex(0)
-            self.liC[i][4].ponTexto("")
+            self.liC[i][4].set_text("")
             self.liC[i][5].ponValor(False)
             if i > 0:
                 self.liC[i][0].setCurrentIndex(0)
@@ -275,13 +275,13 @@ class EM_SQL(Controles.EM):
 
 
 class WFiltrarRaw(QTVarios.WDialogo):
-    def __init__(self, wParent, o_columns, where):
-        QtWidgets.QDialog.__init__(self, wParent)
+    def __init__(self, w_parent, o_columns, where):
+        QtWidgets.QDialog.__init__(self, w_parent)
 
-        QTVarios.WDialogo.__init__(self, wParent, _("Filter"), Iconos.Filtrar(), "rawfilter")
+        QTVarios.WDialogo.__init__(self, w_parent, _("Filter"), Iconos.Filtrar(), "rawfilter")
 
         self.where = ""
-        li_fields = [(x.cabecera, x.key) for x in o_columns.liColumnas if x.key != "number"]
+        li_fields = [(x.head, x.key) for x in o_columns.li_columns if x.key != "number"]
 
         f = Controles.TipoLetra(puntos=12)  # 0, peso=75 )
 
@@ -328,84 +328,83 @@ def mensajeEntrenamientos(owner, liCreados, liNoCreados):
     QTUtil2.message_bold(owner, txt)
 
 
-def crearTactic(procesador, wowner, liRegistros, rutinaDatos):
+def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
     # Se pide el name de la carpeta
-    liGen = [(None, None)]
+    li_gen = [(None, None)]
 
-    liGen.append((_("Name") + ":", ""))
+    li_gen.append((_("Name") + ":", name))
 
-    liGen.append((None, None))
+    li_gen.append((None, None))
 
-    liJ = [(_("Default"), 0), (_("White"), 1), (_("Black"), 2)]
-    config = FormLayout.Combobox(_("Point of view"), liJ)
-    liGen.append((config, 0))
+    li_j = [(_("Default"), 0), (_("White"), 1), (_("Black"), 2)]
+    config = FormLayout.Combobox(_("Point of view"), li_j)
+    li_gen.append((config, 0))
 
     eti = _("Create tactics training")
-    resultado = FormLayout.fedit(liGen, title=eti, parent=wowner, anchoMinimo=460, icon=Iconos.Tacticas())
+    resultado = FormLayout.fedit(li_gen, title=eti, parent=wowner, anchoMinimo=460, icon=Iconos.Tacticas())
 
     if not resultado:
         return
-    accion, liGen = resultado
-    menuname = liGen[0].strip()
+    accion, li_gen = resultado
+    menuname = li_gen[0].strip()
     if not menuname:
         return
-    pointview = str(liGen[1])
+    pointview = str(li_gen[1])
 
-    restDir = Util.valid_filename(menuname)
-    nomDir = os.path.join(Code.configuracion.dirPersonalTraining, "Tactics", restDir)
-    nomIni = os.path.join(nomDir, "Config.ini")
-    if os.path.isfile(nomIni):
-        dicIni = Util.ini2dic(nomIni)
+    rest_dir = Util.valid_filename(menuname)
+    nom_dir = os.path.join(Code.configuration.folder_tactics(), rest_dir)
+    nom_ini = os.path.join(nom_dir, "Config.ini")
+    if os.path.isfile(nom_ini):
+        dic_ini = Util.ini2dic(nom_ini)
         n = 1
         while True:
-            if "TACTIC%d" % n in dicIni:
-                if "MENU" in dicIni["TACTIC%d" % n]:
-                    if dicIni["TACTIC%d" % n]["MENU"].upper() == menuname.upper():
+            if "TACTIC%d" % n in dic_ini:
+                if "MENU" in dic_ini["TACTIC%d" % n]:
+                    if dic_ini["TACTIC%d" % n]["MENU"].upper() == menuname.upper():
                         break
                 else:
                     break
                 n += 1
             else:
                 break
-        nomTactic = "TACTIC%d" % n
+        nom_tactic = "TACTIC%d" % n
     else:
-        nomDirTac = os.path.join(Code.configuracion.dirPersonalTraining, "Tactics")
-        Util.create_folder(nomDirTac)
-        Util.create_folder(nomDir)
-        nomTactic = "TACTIC1"
-        dicIni = {}
-    nomFNS = os.path.join(nomDir, "Puzzles.fns")
-    if os.path.isfile(nomFNS):
+        nom_dir_tac = Code.configuration.folder_tactics()
+        Util.create_folder(nom_dir)
+        nom_tactic = "TACTIC1"
+        dic_ini = {}
+    nom_fns = os.path.join(nom_dir, "Puzzles.fns")
+    if os.path.isfile(nom_fns):
         n = 1
-        nomFNS = os.path.join(nomDir, "Puzzles-%d.fns")
-        while os.path.isfile(nomFNS % n):
+        nom_fns = os.path.join(nom_dir, "Puzzles-%d.fns")
+        while os.path.isfile(nom_fns % n):
             n += 1
-        nomFNS = nomFNS % n
+        nom_fns = nom_fns % n
 
     # Se crea el fichero con los puzzles
-    f = open(nomFNS, "wt", encoding="utf-8", errors="ignore")
+    f = open(nom_fns, "wt", encoding="utf-8", errors="ignore")
 
     nregs = len(liRegistros)
-    tmpBP = QTUtil2.BarraProgreso(wowner, menuname, _("Game"), nregs)
-    tmpBP.mostrar()
+    tmp_bp = QTUtil2.BarraProgreso(wowner, menuname, _("Game"), nregs)
+    tmp_bp.mostrar()
 
     fen0 = FEN_INITIAL
 
     for n in range(nregs):
 
-        if tmpBP.is_canceled():
+        if tmp_bp.is_canceled():
             break
 
-        tmpBP.pon(n + 1)
+        tmp_bp.pon(n + 1)
 
         recno = liRegistros[n]
 
-        dicValores = rutinaDatos(recno)
-        plies = dicValores["PLIES"]
+        dic_valores = rutinaDatos(recno)
+        plies = dic_valores["PLIES"]
         if plies == 0:
             continue
 
-        pgn = dicValores["PGN"]
+        pgn = dic_valores["PGN"]
         li = pgn.split("\n")
         if len(li) == 1:
             li = pgn.split("\r")
@@ -415,14 +414,14 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos):
             continue
 
         def xdic(k):
-            x = dicValores.get(k, "")
+            x = dic_valores.get(k, "")
             if x is None:
                 x = ""
             elif "?" in x:
                 x = x.replace(".?", "").replace("?", "")
             return x.strip()
 
-        fen = dicValores.get("FEN")
+        fen = dic_valores.get("FEN")
         if not fen:
             fen = fen0
 
@@ -458,18 +457,24 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos):
         f.write(txt)
 
     f.close()
-    tmpBP.cerrar()
+    tmp_bp.cerrar()
 
     # Se crea el fichero de control
-    dicIni[nomTactic] = d = {}
+    dic_ini[nom_tactic] = d = {}
     d["MENU"] = menuname
-    d["FILESW"] = "%s:100" % os.path.basename(nomFNS)
+    d["FILESW"] = "%s:100" % os.path.basename(nom_fns)
     d["POINTVIEW"] = pointview
 
-    Util.dic2ini(nomIni, dicIni)
+    Util.dic2ini(nom_ini, dic_ini)
 
     QTUtil2.message_bold(
-        wowner, (_("Tactic training %s created.") % menuname + "\n" + _("You can access this training from<br>menu Trainings<br>➔Learn tactics by repetition<br>➔%s") % restDir)
+        wowner, ("%s<br>%s<br>  %s<br>    ➔%s<br>        ➔%s" % (
+                        _("Tactic training %s created.") % menuname,
+                        _("You can access this training from"),
+                        _("Trainings"),
+                        _("Learn tactics by repetition"),
+                        rest_dir)
+                 )
     )
 
     procesador.entrenamientos.rehaz()

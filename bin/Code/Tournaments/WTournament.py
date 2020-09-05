@@ -1,19 +1,18 @@
 import os
 
 from PySide2 import QtWidgets, QtCore
-from Code.Constantes import FEN_INITIAL
+from Code.Base.Constantes import FEN_INITIAL
 
-from Code import Game
+from Code.Base import Game, Position
 from Code.Polyglots import Books
 from Code.Engines import Engines, WEngines
-from Code import Position
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import PantallaSavePGN
+from Code.QT import WindowSavePGN
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -27,16 +26,16 @@ GRID_ALIAS, GRID_VALUES, GRID_GAMES_QUEUED, GRID_GAMES_FINISHED, GRID_RESULTS = 
 
 
 class WTournament(QTVarios.WDialogo):
-    def __init__(self, wParent, nombre_torneo):
+    def __init__(self, w_parent, nombre_torneo):
 
         torneo = self.torneo = Tournament.Tournament(nombre_torneo)
 
         titulo = nombre_torneo
         icono = Iconos.Torneos()
         extparam = "untorneo_v1"
-        QTVarios.WDialogo.__init__(self, wParent, titulo, icono, extparam)
+        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
 
-        self.configuracion = Code.configuracion
+        self.configuration = Code.configuration
 
         # Datos
 
@@ -47,14 +46,14 @@ class WTournament(QTVarios.WDialogo):
         self.li_results = []
 
         # Toolbar
-        tb = Controles.TBrutina(self, tamIcon=24)
+        tb = Controles.TBrutina(self, icon_size=24)
         tb.new(_("Close"), Iconos.MainMenu(), self.terminar)
         tb.new(_("Launch a worker"), Iconos.Lanzamiento(), self.gm_launch)
 
         # Tabs
         self.tab = tab = Controles.Tab()
 
-        # Tab-configuracion --------------------------------------------------
+        # Tab-configuration --------------------------------------------------
         w = QtWidgets.QWidget()
 
         # Adjudicator
@@ -71,9 +70,9 @@ class WTournament(QTVarios.WDialogo):
         bt_draw_range = Controles.PB(self, "", rutina=self.borra_draw_range).ponIcono(Iconos.Reciclar())
 
         # adjudicator
-        self.liMotores = self.configuracion.comboMotoresMultiPV10()
+        self.liMotores = self.configuration.comboMotoresMultiPV10()
         self.cbJmotor, self.lbJmotor = QTUtil2.comboBoxLB(self, self.liMotores, torneo.adjudicator(), _("Engine"))
-        self.edJtiempo = Controles.ED(self).tipoFloat().ponFloat(1.0).anchoFijo(50).ponFloat(torneo.adjudicator_time())
+        self.edJtiempo = Controles.ED(self).tipoFloat(torneo.adjudicator_time()).anchoFijo(50)
         self.lbJtiempo = Controles.LB2P(self, _("Time in seconds"))
         layout = Colocacion.G()
         layout.controld(self.lbJmotor, 3, 0).control(self.cbJmotor, 3, 1)
@@ -83,7 +82,7 @@ class WTournament(QTVarios.WDialogo):
         self.gbJ.setChecked(torneo.adjudicator_active())
 
         lbBook = Controles.LB(self, _("Opening book") + ": ")
-        fvar = self.configuracion.ficheroBooks
+        fvar = self.configuration.ficheroBooks
         self.listaLibros = Books.ListaLibros()
         self.listaLibros.restore_pickle(fvar)
         # Comprobamos que todos esten accesibles
@@ -91,7 +90,7 @@ class WTournament(QTVarios.WDialogo):
         li = [(x.name, x.path) for x in self.listaLibros.lista]
         li.insert(0, ("* " + _("None"), "-"))
         self.cbBooks = Controles.CB(self, li, torneo.book())
-        btNuevoBook = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), tamIcon=16)
+        btNuevoBook = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), icon_size=16)
         lyBook = Colocacion.H().control(self.cbBooks).control(btNuevoBook).relleno()
 
         lbBookDepth = Controles.LB(self, _("Max depth of book (0=Maximum)") + ": ")
@@ -155,7 +154,7 @@ class WTournament(QTVarios.WDialogo):
             (_("Import"), Iconos.MasDoc(), self.enImportar),
             None,
         ]
-        tbEnA = Controles.TBrutina(self, li_acciones, tamIcon=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
+        tbEnA = Controles.TBrutina(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
 
         # Grid engine
         o_columns = Columnas.ListaColumnas()
@@ -198,7 +197,7 @@ class WTournament(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.gm_borrar_queued),
             None,
         ]
-        tbEnG = Controles.TBrutina(self, li_acciones, tamIcon=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
+        tbEnG = Controles.TBrutina(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUM", _("N."), 50, centered=True)
@@ -228,7 +227,7 @@ class WTournament(QTVarios.WDialogo):
             (_("Save") + "(%s)" % _("PGN"), Iconos.GrabarComo(), self.gm_save_pgn),
             None,
         ]
-        tbEnGt = Controles.TBrutina(self, li_acciones, tamIcon=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
+        tbEnGt = Controles.TBrutina(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUM", _("N."), 50, centered=True)
@@ -284,7 +283,7 @@ class WTournament(QTVarios.WDialogo):
         tab.nuevaTab(w, _("Results"))
 
         # Layout
-        # tab.setposition("W")
+        # tab.set_position("W")
         layout = Colocacion.V().control(tb).espacio(-3).control(tab).margen(2)
         self.setLayout(layout)
 
@@ -333,7 +332,7 @@ class WTournament(QTVarios.WDialogo):
             tt = ww + wb + dw + db + lw + lb
             p = (ww + wb) * 2 + (dw + db) * 1
             score = (p * 50 / tt) if tt > 0 else 0
-            self.li_results.append((eng.clave, score, ww, wb, dw, db, lw, lb))
+            self.li_results.append((eng.key, score, ww, wb, dw, db, lw, lb))
         self.li_results.sort(key=lambda x: x[1], reverse=True)
         self.gridResults.refresh()
 
@@ -347,16 +346,16 @@ class WTournament(QTVarios.WDialogo):
 
     def muestraPosicion(self):
         if self.fen:
-            rotulo = self.fen
+            label = self.fen
             self.btPosicionQuitar.show()
             self.btPosicionPegar.show()
             self.chbNorman.ponValor(False)
         else:
-            rotulo = _("Change")
+            label = _("Change")
             self.btPosicionQuitar.hide()
             self.btPosicionPegar.show()
-        rotulo = " " * 5 + rotulo + " " * 5
-        self.btPosicion.ponTexto(rotulo)
+        label = " " * 5 + label + " " * 5
+        self.btPosicion.set_text(label)
 
     def posicionEditar(self):
         cp = Position.Position()
@@ -390,7 +389,7 @@ class WTournament(QTVarios.WDialogo):
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
             self.listaLibros.nuevo(b)
-            fvar = self.configuracion.ficheroBooks
+            fvar = self.configuration.ficheroBooks
             self.listaLibros.save_pickle(fvar)
             li = [(x.name, x.path) for x in self.listaLibros.lista]
             li.insert(0, ("* " + _("Default"), "*"))
@@ -409,106 +408,106 @@ class WTournament(QTVarios.WDialogo):
         elif gid == GRID_RESULTS:
             return self.torneo.num_engines()
 
-    def grid_dato(self, grid, fila, oColumna):
-        columna = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        column = o_column.key
         gid = grid.id
         if gid == GRID_ALIAS:
-            return self.gridDatoEnginesAlias(fila, columna)
+            return self.gridDatoEnginesAlias(row, column)
         elif gid == GRID_VALUES:
-            return self.gridDatoEnginesValores(fila, columna)
+            return self.gridDatoEnginesValores(row, column)
         elif gid == GRID_RESULTS:
-            return self.gridDatoResult(fila, columna)
+            return self.gridDatoResult(row, column)
         elif gid == GRID_GAMES_QUEUED:
-            return self.gridDatoGamesQueued(fila, columna)
+            return self.gridDatoGamesQueued(row, column)
         elif gid == GRID_GAMES_FINISHED:
-            return self.gridDatoGamesFinished(fila, columna)
+            return self.gridDatoGamesFinished(row, column)
 
-    def gridDatoEnginesAlias(self, fila, columna):
-        me = self.torneo.engine(fila)
-        if columna == "ALIAS":
-            return me.clave
-        elif columna == "NUM":
-            return str(fila + 1)
+    def gridDatoEnginesAlias(self, row, column):
+        me = self.torneo.engine(row)
+        if column == "ALIAS":
+            return me.key
+        elif column == "NUM":
+            return str(row + 1)
 
-    def gridDatoEnginesValores(self, fila, columna):
-        li = self.liEnActual[fila]
-        if columna == "CAMPO":
+    def gridDatoEnginesValores(self, row, column):
+        li = self.liEnActual[row]
+        if column == "CAMPO":
             return li[0]
         else:
             return str(li[1])
 
-    def gridDatoResult(self, fila, columna):
-        clave, score, ww, wb, dw, db, lw, lb = self.li_results[fila]
-        if columna == "NUM":
-            return str(fila + 1)
-        elif columna == "ENGINE":
-            return clave
-        elif columna == "SCORE":
+    def gridDatoResult(self, row, column):
+        key, score, ww, wb, dw, db, lw, lb = self.li_results[row]
+        if column == "NUM":
+            return str(row + 1)
+        elif column == "ENGINE":
+            return key
+        elif column == "SCORE":
             return "%.1f" % score if score > 0 else "0"
-        elif columna == "WIN":
+        elif column == "WIN":
             return "%d" % (ww + wb)
-        elif columna == "LOST":
+        elif column == "LOST":
             return "%d" % (lw + lb)
-        elif columna == "DRAW":
+        elif column == "DRAW":
             return "%d" % (dw + db)
-        elif columna == "WIN-WHITE":
+        elif column == "WIN-WHITE":
             return "%d" % ww
-        elif columna == "LOST-WHITE":
+        elif column == "LOST-WHITE":
             return "%d" % lw
-        elif columna == "DRAW-WHITE":
+        elif column == "DRAW-WHITE":
             return "%d" % dw
-        elif columna == "WIN-BLACK":
+        elif column == "WIN-BLACK":
             return "%d" % wb
-        elif columna == "LOST-BLACK":
+        elif column == "LOST-BLACK":
             return "%d" % lb
-        elif columna == "DRAW-BLACK":
+        elif column == "DRAW-BLACK":
             return "%d" % db
-        elif columna == "GAMES":
+        elif column == "GAMES":
             return "%s" % (ww + wb + lw + lb + dw + db)
 
-    def gridDatoGamesQueued(self, fila, columna):
-        gm = self.torneo.game_queued(fila)
-        if columna == "NUM":
-            return str(fila + 1)
-        elif columna == "WHITE":
+    def gridDatoGamesQueued(self, row, column):
+        gm = self.torneo.game_queued(row)
+        if column == "NUM":
+            return str(row + 1)
+        elif column == "WHITE":
             en = self.torneo.buscaHEngine(gm.hwhite)
-            return en.clave if en else "???"
-        elif columna == "BLACK":
+            return en.key if en else "???"
+        elif column == "BLACK":
             en = self.torneo.buscaHEngine(gm.hblack)
-            return en.clave if en else "???"
-        # elif columna == "STATE":
+            return en.key if en else "???"
+        # elif column == "STATE":
         #     return _("Working...") if gm.worker else ""
-        elif columna == "TIME":
+        elif column == "TIME":
             return gm.etiTiempo()
 
-    def gridDatoGamesFinished(self, fila, columna):
-        gm = self.torneo.game_finished(fila)
-        if columna == "NUM":
-            return str(fila + 1)
-        elif columna == "WHITE":
+    def gridDatoGamesFinished(self, row, column):
+        gm = self.torneo.game_finished(row)
+        if column == "NUM":
+            return str(row + 1)
+        elif column == "WHITE":
             en = self.torneo.buscaHEngine(gm.hwhite)
-            return en.clave if en else "???"
-        elif columna == "BLACK":
+            return en.key if en else "???"
+        elif column == "BLACK":
             en = self.torneo.buscaHEngine(gm.hblack)
-            return en.clave if en else "???"
-        elif columna == "RESULT":
+            return en.key if en else "???"
+        elif column == "RESULT":
             return gm.result
-        elif columna == "TIME":
+        elif column == "TIME":
             return gm.etiTiempo()
 
-    def grid_cambiado_registro(self, grid, fila, columna):
+    def grid_cambiado_registro(self, grid, row, column):
         if grid.id == GRID_ALIAS:
-            me = self.torneo.engine(fila)
+            me = self.torneo.engine(row)
             self.actEngine(me)
             self.gridEnginesValores.refresh()
 
     def actEngine(self, me):
         self.liEnActual = []
-        fila = self.gridEnginesAlias.recno()
-        if fila < 0:
+        row = self.gridEnginesAlias.recno()
+        if row < 0:
             return
 
-        # tipo, key, rotulo, valor
+        # tipo, key, label, valor
         self.liEnActual.append((_("Engine"), me.name))
         self.liEnActual.append((_("Author"), me.autor))
         self.liEnActual.append((_("File"), Util.relative_path(me.path_exe)))
@@ -532,7 +531,7 @@ class WTournament(QTVarios.WDialogo):
 
     def gm_launch(self):
         self.grabar()
-        worker_plant = os.path.join(self.configuracion.folder_tournaments_workers(), "worker.%05d")
+        worker_plant = os.path.join(self.configuration.folder_tournaments_workers(), "worker.%05d")
         pos = 1
         while True:
             wfile = worker_plant % pos
@@ -612,10 +611,10 @@ class WTournament(QTVarios.WDialogo):
 
     def enImportar(self):
         menu = QTVarios.LCMenu(self)
-        lista = self.configuracion.comboMotores()
+        lista = self.configuration.comboMotores()
         nico = QTVarios.rondoPuntos()
-        for name, clave in lista:
-            menu.opcion(clave, name, nico.otro())
+        for name, key in lista:
+            menu.opcion(key, name, nico.otro())
 
         resp = menu.lanza()
         if not resp:
@@ -632,7 +631,7 @@ class WTournament(QTVarios.WDialogo):
 
         self.rotulos_tabs()
 
-    def grid_tecla_control(self, grid, k, siShift, siControl, siAlt):
+    def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
         if k == 16777223:
             if grid == self.gridGamesQueued:
                 self.gm_borrar_queued()
@@ -641,7 +640,7 @@ class WTournament(QTVarios.WDialogo):
             elif grid == self.gridGamesFinished:
                 self.gm_borrar_finished()
 
-    def grid_doble_click(self, grid, fila, columna):
+    def grid_doble_click(self, grid, row, column):
         if grid in [self.gridEnginesAlias, self.gridEnginesValores]:
             self.enModificar()
         elif grid == self.gridGamesFinished:
@@ -649,7 +648,7 @@ class WTournament(QTVarios.WDialogo):
 
     def grid_color_fondo(self, grid, nfila, ocol):
         if grid == self.gridResults:
-            key = ocol.clave
+            key = ocol.key
             if "WHITE" in key:
                 return self.qtColor["WHITE"]
             elif "BLACK" in key:
@@ -658,10 +657,10 @@ class WTournament(QTVarios.WDialogo):
                 return self.qtColor["SCORE"]
 
     def enModificar(self):
-        fila = self.gridEnginesAlias.recno()
-        if fila < 0:
+        row = self.gridEnginesAlias.recno()
+        if row < 0:
             return
-        me = self.torneo.engine(fila)
+        me = self.torneo.engine(row)
 
         w = WEngines.WEngine(self, self.torneo.list_engines(), me, siTorneo=True)
         if w.exec_():
@@ -689,9 +688,9 @@ class WTournament(QTVarios.WDialogo):
                 self.rotulos_tabs()
 
     def enCopiar(self):
-        fila = self.gridEnginesAlias.recno()
-        if fila >= 0:
-            me = self.torneo.engine(fila)
+        row = self.gridEnginesAlias.recno()
+        if row >= 0:
+            me = self.torneo.engine(row)
             self.torneo.copy_engine(me)
             self.gridEnginesAlias.refresh()
             self.gridEnginesAlias.gobottom(0)
@@ -703,7 +702,7 @@ class WTournament(QTVarios.WDialogo):
             QTUtil2.message_error(self, _("You must create at least two engines"))
             return
 
-        dicValores = self.configuracion.leeVariables("crear_torneo")
+        dicValores = self.configuration.leeVariables("crear_torneo")
 
         get = dicValores.get
 
@@ -724,7 +723,7 @@ class WTournament(QTVarios.WDialogo):
 
         li_engines = self.torneo.list_engines()
         for pos, en in enumerate(li_engines):
-            liGen.append((en.clave, get(en.huella, True)))
+            liGen.append((en.key, get(en.huella, True)))
 
         liGen.append(FormLayout.separador)
 
@@ -744,7 +743,7 @@ class WTournament(QTVarios.WDialogo):
             if si:
                 liSel.append(en.huella)
 
-        self.configuracion.escVariables("crear_torneo", dicValores)
+        self.configuration.escVariables("crear_torneo", dicValores)
 
         nSel = len(liSel)
         if nSel < 2:
@@ -783,7 +782,7 @@ class WTournament(QTVarios.WDialogo):
         if li:
             pos = li[0]
             game = self.torneo.game_finished(pos)
-            game = Code.procesador.gestorPartida(self, game.game(), True, None)
+            game = Code.procesador.managerPartida(self, game.game(), True, False, None)
             if game:
                 self.torneo.save_game_finished(pos, game)
                 self.gridGamesFinished.refresh()
@@ -791,9 +790,9 @@ class WTournament(QTVarios.WDialogo):
 
     def gm_save_pgn(self):
         if self.torneo.num_games_finished() > 0:
-            w = PantallaSavePGN.WSaveVarios(self, self.configuracion)
+            w = WindowSavePGN.WSaveVarios(self, self.configuration)
             if w.exec_():
-                ws = PantallaSavePGN.FileSavePGN(self, w.dic_result)
+                ws = WindowSavePGN.FileSavePGN(self, w.dic_result)
                 if ws.open():
                     ws.um()
                     if not ws.is_new:

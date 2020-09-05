@@ -4,7 +4,7 @@ El grid es un TableView de QT.
 Realiza llamadas a rutinas de la ventana donde esta ante determinados eventos, o en determinadas situaciones,
 siempre que la rutina se haya definido en la ventana:
 
-    - grid_doble_clickCabecera : ante un doble click en la cabecera, normalmente se usa para la reordenacion de la tabla por la columna pulsada.
+    - grid_doble_clickCabecera : ante un doble click en la head, normalmente se usa para la reordenacion de la tabla por la column pulsada.
     - grid_tecla_pulsada : al pulsarse una tecla, llama a esta rutina, para que pueda usarse por ejemplo en busquedas.
     - grid_tecla_control : al pulsarse una tecla de control, llama a esta rutina, para que pueda usarse por ejemplo en busquedas.
     - grid_doble_click : en el caso de un doble click en un registro, se hace la llamad a esta rutina
@@ -27,21 +27,21 @@ class ControlGrid(QtCore.QAbstractTableModel):
     Modelo de datos asociado al grid, y que realiza todo el trabajo asignado por QT.
     """
 
-    def __init__(self, grid, wParent, oColumnasR):
+    def __init__(self, grid, w_parent, oColumnasR):
         """
         @param tableView:
-        @param oColumnasR: ListaColumnas con la configuracion de todas las columnas visualizables.
+        @param oColumnasR: ListaColumnas con la configuration de todas las columnas visualizables.
         """
-        QtCore.QAbstractTableModel.__init__(self, wParent)
+        QtCore.QAbstractTableModel.__init__(self, w_parent)
         self.grid = grid
-        self.wParent = wParent
+        self.w_parent = w_parent
         self.siOrden = False
         self.hh = grid.horizontalHeader()
-        self.siColorTexto = hasattr(self.wParent, "grid_color_texto")
-        self.siColorFondo = hasattr(self.wParent, "grid_color_fondo")
-        self.siAlineacion = hasattr(self.wParent, "grid_alineacion")
+        self.siColorTexto = hasattr(self.w_parent, "grid_color_texto")
+        self.siColorFondo = hasattr(self.w_parent, "grid_color_fondo")
+        self.siAlineacion = hasattr(self.w_parent, "grid_alineacion")
         self.font = grid.font()
-        self.siBold = hasattr(self.wParent, "grid_bold")
+        self.siBold = hasattr(self.w_parent, "grid_bold")
         if self.siBold:
             self.bfont = QtGui.QFont(self.font)
             self.bfont.setWeight(75)
@@ -52,8 +52,8 @@ class ControlGrid(QtCore.QAbstractTableModel):
         """
         Llamada interna, solicitando el number de registros.
         """
-        self.numDatos = self.wParent.grid_num_datos(self.grid)
-        return self.numDatos
+        self.num_rows = self.w_parent.grid_num_datos(self.grid)
+        return self.num_rows
 
     def refresh(self):
         """
@@ -61,14 +61,14 @@ class ControlGrid(QtCore.QAbstractTableModel):
         """
         # self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
         self.layoutAboutToBeChanged.emit()
-        ant_ndatos = self.numDatos
-        nue_ndatos = self.wParent.grid_num_datos(self.grid)
+        ant_ndatos = self.num_rows
+        nue_ndatos = self.w_parent.grid_num_datos(self.grid)
         if ant_ndatos != nue_ndatos:
             if ant_ndatos < nue_ndatos:
                 self.insertRows(ant_ndatos, nue_ndatos - ant_ndatos)
             else:
                 self.removeRows(nue_ndatos, ant_ndatos - nue_ndatos)
-            self.numDatos = nue_ndatos
+            self.num_rows = nue_ndatos
 
         ant_ncols = self.numCols
         nue_ncols = self.oColumnasR.numColumnas()
@@ -94,43 +94,43 @@ class ControlGrid(QtCore.QAbstractTableModel):
         if not index.isValid():
             return None
 
-        columna = self.oColumnasR.columna(index.column())
+        column = self.oColumnasR.column(index.column())
 
         if role == QtCore.Qt.TextAlignmentRole:
             if self.siAlineacion:
-                resp = self.wParent.grid_alineacion(self.grid, index.row(), columna)
+                resp = self.w_parent.grid_alineacion(self.grid, index.row(), column)
                 if resp:
-                    return columna.QTalineacion(resp)
-            return columna.qtAlineacion
+                    return column.QTalineacion(resp)
+            return column.qtAlineacion
         elif role == QtCore.Qt.BackgroundRole:
             if self.siColorFondo:
-                resp = self.wParent.grid_color_fondo(self.grid, index.row(), columna)
+                resp = self.w_parent.grid_color_fondo(self.grid, index.row(), column)
                 if resp:
                     return resp
-            return columna.qtColorFondo
+            return column.qtColorFondo
         elif role == QtCore.Qt.TextColorRole:
             if self.siColorTexto:
-                resp = self.wParent.grid_color_texto(self.grid, index.row(), columna)
+                resp = self.w_parent.grid_color_texto(self.grid, index.row(), column)
                 if resp:
                     return resp
-            return columna.qtColorTexto
+            return column.qtColorTexto
         elif self.siBold and role == QtCore.Qt.FontRole:
-            if self.wParent.grid_bold(self.grid, index.row(), columna):
+            if self.w_parent.grid_bold(self.grid, index.row(), column):
                 return self.bfont
             return None
 
         if role == QtCore.Qt.DisplayRole:
-            return self.wParent.grid_dato(self.grid, index.row(), columna)
+            return self.w_parent.grid_dato(self.grid, index.row(), column)
 
         return None
 
     def getAlineacion(self, index):
-        columna = self.oColumnasR.columna(index.column())
-        return self.wParent.grid_alineacion(self.grid, index.row(), columna)
+        column = self.oColumnasR.column(index.column())
+        return self.w_parent.grid_alineacion(self.grid, index.row(), column)
 
     def getFondo(self, index):
-        columna = self.oColumnasR.columna(index.column())
-        return self.wParent.grid_color_fondo(self.grid, index.row(), columna)
+        column = self.oColumnasR.column(index.column())
+        return self.w_parent.grid_color_fondo(self.grid, index.row(), column)
 
     def flags(self, index):
         """
@@ -140,11 +140,11 @@ class ControlGrid(QtCore.QAbstractTableModel):
             return QtCore.Qt.ItemIsEnabled
 
         flag = QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable
-        columna = self.oColumnasR.columna(index.column())
-        if columna.siEditable:
+        column = self.oColumnasR.column(index.column())
+        if column.siEditable:
             flag |= QtCore.Qt.ItemIsEditable
 
-        if columna.siChecked:
+        if column.siChecked:
             flag |= QtCore.Qt.ItemIsUserCheckable
         return flag
 
@@ -156,9 +156,9 @@ class ControlGrid(QtCore.QAbstractTableModel):
         if not index.isValid():
             return None
         if role == QtCore.Qt.EditRole or role == QtCore.Qt.CheckStateRole:
-            columna = self.oColumnasR.columna(index.column())
+            column = self.oColumnasR.column(index.column())
             nfila = index.row()
-            self.wParent.grid_setvalue(self.grid, nfila, columna, valor)
+            self.w_parent.grid_setvalue(self.grid, nfila, column, valor)
             index2 = self.createIndex(nfila, 1)
             # self.emit(QtCore.SIGNAL('dataChanged(const QModelIndex &,const QModelIndex &)'), index2, index2)
             self.dataChanged.emit(index2, index2)
@@ -170,8 +170,8 @@ class ControlGrid(QtCore.QAbstractTableModel):
         Llamada interna, para determinar el texto de las cabeceras de las columnas.
         """
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-            columna = self.oColumnasR.columna(col)
-            return columna.cabecera
+            column = self.oColumnasR.column(col)
+            return column.head
         # elif orientation == QtCore.Qt.Vertical and role == QtCore.Qt.DisplayRole:
         #     return str(col+1)
         return None
@@ -179,7 +179,7 @@ class ControlGrid(QtCore.QAbstractTableModel):
 
 class Cabecera(QtWidgets.QHeaderView):
     """
-    Se crea esta clase para poder implementar el doble click en la cabecera.
+    Se crea esta clase para poder implementar el doble click en la head.
     """
 
     def __init__(self, tvParent, siCabeceraMovible):
@@ -212,12 +212,12 @@ class CabeceraHeight(Cabecera):
 
 class Grid(QtWidgets.QTableView):
     """
-    Implementa un TableView, en base a la configuracion de una lista de columnas.
+    Implementa un TableView, en base a la configuration de una lista de columnas.
     """
 
     def __init__(
         self,
-        wParent,
+        w_parent,
         o_columns,
         dicVideo=None,
         altoFila=20,
@@ -232,28 +232,28 @@ class Grid(QtWidgets.QTableView):
         altoCabecera=None,
     ):
         """
-        @param wParent: ventana propietaria
-        @param o_columns: configuracion de las columnas.
+        @param w_parent: ventana propietaria
+        @param o_columns: configuration de las columnas.
         @param altoFila: altura de todas las filas.
         """
 
-        assert wParent is not None
+        assert w_parent is not None
 
         self.starting = True
 
         QtWidgets.QTableView.__init__(self)
 
-        configuracion = Code.configuracion
+        configuration = Code.configuration
 
         p = self.palette()
         p.setBrush(
             QtGui.QPalette.Active,
             QtGui.QPalette.Highlight,
-            QtGui.QBrush(QtGui.QColor(configuracion.pgn_selbackground())),
+            QtGui.QBrush(QtGui.QColor(configuration.pgn_selbackground())),
         )
         self.setPalette(p)
 
-        self.wParent = wParent
+        self.w_parent = w_parent
         self.id = xid
 
         self.o_columns = o_columns
@@ -261,7 +261,7 @@ class Grid(QtWidgets.QTableView):
             self.restore_video(dicVideo)
         self.oColumnasR = self.o_columns.columnasMostrables()  # Necesario tras recuperar video
 
-        self.cg = ControlGrid(self, wParent, self.oColumnasR)
+        self.cg = ControlGrid(self, w_parent, self.oColumnasR)
 
         self.setModel(self.cg)
         self.setShowGrid(siLineas)
@@ -273,8 +273,8 @@ class Grid(QtWidgets.QTableView):
         elif background is not None:
             self.setStyleSheet("QTableView {background: %s;}" % background)
 
-        if configuracion.x_pgn_headerbackground:
-            self.setStyleSheet("QHeaderView::section { background-color:%s }" % configuracion.pgn_headerbackground())
+        if configuration.x_pgn_headerbackground:
+            self.setStyleSheet("QHeaderView::section { background-color:%s }" % configuration.pgn_headerbackground())
 
         self.coloresAlternados()
 
@@ -293,13 +293,13 @@ class Grid(QtWidgets.QTableView):
 
         self.seleccionaFilas(siSelecFilas, siSeleccionMultiple)
 
-        self.ponAnchosColumnas()  # es necesario llamarlo from_sq aqui
+        self.set_widthsColumnas()  # es necesario llamarlo from_sq aqui
 
         self.siEditable = siEditable
         self.starting = False
 
-    def buscaCabecera(self, clave):
-        return self.o_columns.buscaColumna(clave)
+    def buscaCabecera(self, key):
+        return self.o_columns.buscaColumna(key)
 
     def coloresAlternados(self):
         self.setAlternatingRowColors(True)
@@ -315,18 +315,18 @@ class Grid(QtWidgets.QTableView):
 
     def releerColumnas(self):
         """
-        Cuando se cambia la configuracion de las columnas, se vuelven a releer y se indican al control de datos.
+        Cuando se cambia la configuration de las columnas, se vuelven a releer y se indican al control de datos.
         """
         self.oColumnasR = self.o_columns.columnasMostrables()
         self.cg.oColumnasR = self.oColumnasR
         self.cg.refresh()
-        self.ponAnchosColumnas()
+        self.set_widthsColumnas()
 
-    def ponAnchosColumnas(self):
-        for numCol, columna in enumerate(self.oColumnasR.liColumnas):
-            self.setColumnWidth(numCol, columna.ancho)
-            if columna.edicion and columna.siMostrar:
-                self.setItemDelegateForColumn(numCol, columna.edicion)
+    def set_widthsColumnas(self):
+        for numCol, column in enumerate(self.oColumnasR.li_columns):
+            self.setColumnWidth(numCol, column.ancho)
+            if column.edicion and column.must_show:
+                self.setItemDelegateForColumn(numCol, column.edicion)
 
     def keyPressEvent(self, event):
         """
@@ -335,26 +335,26 @@ class Grid(QtWidgets.QTableView):
         """
         k = event.key()
         m = int(event.modifiers())
-        siShift = (m & QtCore.Qt.ShiftModifier) > 0
-        siControl = (m & QtCore.Qt.ControlModifier) > 0
-        siAlt = (m & QtCore.Qt.AltModifier) > 0
-        if hasattr(self.wParent, "grid_tecla_pulsada"):
-            if not (siControl or siAlt) and k < 256:
-                self.wParent.grid_tecla_pulsada(self, event.text())
-        if hasattr(self.wParent, "grid_tecla_control"):
-            self.wParent.grid_tecla_control(self, k, siShift, siControl, siAlt)
+        is_shift = (m & QtCore.Qt.ShiftModifier) > 0
+        is_control = (m & QtCore.Qt.ControlModifier) > 0
+        is_alt = (m & QtCore.Qt.AltModifier) > 0
+        if hasattr(self.w_parent, "grid_tecla_pulsada"):
+            if not (is_control or is_alt) and k < 256:
+                self.w_parent.grid_tecla_pulsada(self, event.text())
+        if hasattr(self.w_parent, "grid_tecla_control"):
+            self.w_parent.grid_tecla_control(self, k, is_shift, is_control, is_alt)
 
     def selectionChanged(self, uno, dos):
         if self.starting:
             return
-        if hasattr(self.wParent, "grid_cambiado_registro"):
-            fil, columna = self.current_position()
-            self.wParent.grid_cambiado_registro(self, fil, columna)
+        if hasattr(self.w_parent, "grid_cambiado_registro"):
+            fil, column = self.current_position()
+            self.w_parent.grid_cambiado_registro(self, fil, column)
         self.refresh()
 
     def wheelEvent(self, event):
-        if hasattr(self.wParent, "grid_wheel_event"):
-            self.wParent.grid_wheel_event(self, event.angleDelta().y() > 0)
+        if hasattr(self.w_parent, "grid_wheel_event"):
+            self.w_parent.grid_wheel_event(self, event.angleDelta().y() > 0)
         else:
             QtWidgets.QTableView.wheelEvent(self, event)
 
@@ -362,13 +362,13 @@ class Grid(QtWidgets.QTableView):
         """
         Se gestiona este evento, ante la posibilidad de que la ventana quiera controlar,
         cada doble click, llamando a la rutina correspondiente si existe (grid_doble_click)
-        con el number de fila y el objeto columna como argumentos
+        con el number de row y el objeto column como argumentos
         """
         if self.siEditable:
             QtWidgets.QTableView.mouseDoubleClickEvent(self, event)
-        if hasattr(self.wParent, "grid_doble_click") and event.button() == 1:
-            fil, columna = self.current_position()
-            self.wParent.grid_doble_click(self, fil, columna)
+        if hasattr(self.w_parent, "grid_doble_click") and event.button() == 1:
+            fil, column = self.current_position()
+            self.w_parent.grid_doble_click(self, fil, column)
 
     def mousePressEvent(self, event):
         """
@@ -381,76 +381,76 @@ class Grid(QtWidgets.QTableView):
         if fil < 0:
             return
         if button == 2:
-            if hasattr(self.wParent, "grid_boton_derecho"):
+            if hasattr(self.w_parent, "grid_boton_derecho"):
 
                 class Vacia:
                     pass
 
                 modif = Vacia()
                 m = int(event.modifiers())
-                modif.siShift = (m & QtCore.Qt.ShiftModifier) > 0
-                modif.siControl = (m & QtCore.Qt.ControlModifier) > 0
-                modif.siAlt = (m & QtCore.Qt.AltModifier) > 0
-                self.wParent.grid_boton_derecho(self, fil, col, modif)
+                modif.is_shift = (m & QtCore.Qt.ShiftModifier) > 0
+                modif.is_control = (m & QtCore.Qt.ControlModifier) > 0
+                modif.is_alt = (m & QtCore.Qt.AltModifier) > 0
+                self.w_parent.grid_boton_derecho(self, fil, col, modif)
         elif button == 1:
             if fil < 0:
                 return
             if col.siChecked:
-                value = self.wParent.grid_dato(self, fil, col)
-                self.wParent.grid_setvalue(self, fil, col, not value)
+                value = self.w_parent.grid_dato(self, fil, col)
+                self.w_parent.grid_setvalue(self, fil, col, not value)
                 self.refresh()
-            elif hasattr(self.wParent, "grid_boton_izquierdo"):
-                self.wParent.grid_boton_izquierdo(self, fil, col)
+            elif hasattr(self.w_parent, "grid_boton_izquierdo"):
+                self.w_parent.grid_boton_izquierdo(self, fil, col)
 
     def dobleClickCabecera(self, numColumna):
         """
         Se gestiona este evento, ante la posibilidad de que la ventana quiera controlar,
-        los doble clicks sobre la cabecera , normalmente para cambiar el orden de la columna,
+        los doble clicks sobre la head , normalmente para cambiar el orden de la column,
         llamando a la rutina correspondiente si existe (grid_doble_clickCabecera) y con el
-        argumento del objeto columna
+        argumento del objeto column
         """
-        if hasattr(self.wParent, "grid_doble_clickCabecera"):
-            self.wParent.grid_doble_clickCabecera(self, self.oColumnasR.columna(numColumna))
+        if hasattr(self.w_parent, "grid_doble_clickCabecera"):
+            self.w_parent.grid_doble_clickCabecera(self, self.oColumnasR.column(numColumna))
 
     def mouseCabecera(self, numColumna):
         """
         Se gestiona este evento, ante la posibilidad de que la ventana quiera controlar,
-        los doble clicks sobre la cabecera , normalmente para cambiar el orden de la columna,
+        los doble clicks sobre la head , normalmente para cambiar el orden de la column,
         llamando a la rutina correspondiente si existe (grid_doble_clickCabecera) y con el
-        argumento del objeto columna
+        argumento del objeto column
         """
-        if hasattr(self.wParent, "grid_pulsada_cabecera"):
-            self.wParent.grid_pulsada_cabecera(self, self.oColumnasR.columna(numColumna))
+        if hasattr(self.w_parent, "grid_pulsada_cabecera"):
+            self.w_parent.grid_pulsada_cabecera(self, self.oColumnasR.column(numColumna))
 
     def save_video(self, dic):
         """
-        Guarda en el diccionario de video la configuracion actual de todas las columnas
+        Guarda en el diccionario de video la configuration actual de todas las columnas
 
-        @param dic: diccionario de video donde se guarda la configuracion de las columnas
+        @param dic: diccionario de video donde se guarda la configuration de las columnas
         """
         liClaves = []
-        for n, columna in enumerate(self.oColumnasR.liColumnas):
-            columna.ancho = self.columnWidth(n)
-            columna.position = self.columnViewportPosition(n)
-            columna.guardarConf(dic, self)
-            liClaves.append(columna.clave)
+        for n, column in enumerate(self.oColumnasR.li_columns):
+            column.ancho = self.columnWidth(n)
+            column.position = self.columnViewportPosition(n)
+            column.guardarConf(dic, self)
+            liClaves.append(column.key)
 
         # Las que no se muestran
-        for columna in self.o_columns.liColumnas:
-            if not (columna.clave in liClaves):
-                columna.guardarConf(dic, self)
+        for column in self.o_columns.li_columns:
+            if not (column.key in liClaves):
+                column.guardarConf(dic, self)
 
     def restore_video(self, dic):
-        for columna in self.o_columns.liColumnas:
-            columna.recuperarConf(dic, self)
+        for column in self.o_columns.li_columns:
+            column.recuperarConf(dic, self)
 
-        self.o_columns.liColumnas.sort(key=lambda x: x.position)
+        self.o_columns.li_columns.sort(key=lambda x: x.position)
 
     def columnas(self):
-        for n, columna in enumerate(self.oColumnasR.liColumnas):
-            columna.ancho = self.columnWidth(n)
-            columna.position = self.columnViewportPosition(n)
-        self.o_columns.liColumnas.sort(key=lambda x: x.position)
+        for n, column in enumerate(self.oColumnasR.li_columns):
+            column.ancho = self.columnWidth(n)
+            column.position = self.columnViewportPosition(n)
+        self.o_columns.li_columns.sort(key=lambda x: x.position)
         return self.o_columns
 
     def anchoColumnas(self):
@@ -458,8 +458,8 @@ class Grid(QtWidgets.QTableView):
         Calcula el ancho que corresponde a todas las columnas mostradas.
         """
         ancho = 0
-        for n, columna in enumerate(self.oColumnasR.liColumnas):
-            ancho += columna.ancho
+        for n, column in enumerate(self.oColumnasR.li_columns):
+            ancho += column.ancho
         return ancho
 
     def fixMinWidth(self):
@@ -469,14 +469,14 @@ class Grid(QtWidgets.QTableView):
 
     def recno(self):
         """
-        Devuelve la fila actual.
+        Devuelve la row actual.
         """
         n = self.currentIndex().row()
-        nX = self.cg.numDatos - 1
+        nX = self.cg.num_rows - 1
         return n if n <= nX else nX
 
     def reccount(self):
-        return self.cg.numDatos
+        return self.cg.num_rows
 
     def recnosSeleccionados(self):
         li = []
@@ -485,11 +485,11 @@ class Grid(QtWidgets.QTableView):
 
         return list(set(li))
 
-    def goto(self, fila, col):
+    def goto(self, row, col):
         """
         Se situa en una position determinada.
         """
-        elem = self.cg.createIndex(fila, col)
+        elem = self.cg.createIndex(row, col)
         self.setCurrentIndex(elem)
         self.scrollTo(elem)
 
@@ -497,15 +497,15 @@ class Grid(QtWidgets.QTableView):
         """
         Se situa al principio del grid.
         """
-        if self.cg.numDatos > 0:
+        if self.cg.num_rows > 0:
             self.goto(0, 0)
 
     def gobottom(self, col=0):
         """
         Se situa en el ultimo registro del frid.
         """
-        if self.cg.numDatos > 0:
-            self.goto(self.cg.numDatos - 1, col)
+        if self.cg.num_rows > 0:
+            self.goto(self.cg.num_rows - 1, col)
 
     def refresh(self):
         """
@@ -517,25 +517,25 @@ class Grid(QtWidgets.QTableView):
         """
         Devuelve la position actual.
 
-        @return: tupla con ( num fila, objeto columna )
+        @return: tupla con ( num row, objeto column )
         """
-        columna = self.oColumnasR.columna(self.currentIndex().column())
-        return self.recno(), columna
+        column = self.oColumnasR.column(self.currentIndex().column())
+        return self.recno(), column
 
     def posActualN(self):
         """
         Devuelve la position actual.
 
-        @return: tupla con ( num fila, num  columna )
+        @return: tupla con ( num row, num  column )
         """
         return self.recno(), self.currentIndex().column()
 
-    def tipoLetra(self, name="", puntos=8, peso=50, siCursiva=False, siSubrayado=False, siTachado=False, txt=None):
+    def tipoLetra(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):
         font = QtGui.QFont()
         if txt is None:
-            cursiva = 1 if siCursiva else 0
-            subrayado = 1 if siSubrayado else 0
-            tachado = 1 if siTachado else 0
+            cursiva = 1 if is_italic else 0
+            subrayado = 1 if is_underlined else 0
+            tachado = 1 if is_striked else 0
             if not name:
                 name = font.defaultFamily()
             txt = "%s,%d,-1,5,%d,%d,%d,%d,0,0" % (name, puntos, peso, cursiva, subrayado, tachado)

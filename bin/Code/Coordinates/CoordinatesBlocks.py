@@ -2,7 +2,7 @@ import datetime
 import random
 
 from Code.SQL import UtilSQL
-from Code.Constantes import WHITE, BLACK
+from Code.Base.Constantes import WHITE, BLACK
 
 
 class GenTry:

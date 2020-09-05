@@ -7,8 +7,8 @@ from Code.Coordinates import WRunCoordinatesBasic
 
 class WCoordinatesBasic(QTVarios.WDialogo):
     def __init__(self, procesador):
-        configuracion = procesador.configuracion
-        path = configuracion.file_coordinates()
+        configuration = procesador.configuration
+        path = configuration.file_coordinates()
         title = _("Coordinates")
         icon = Iconos.West()
         extconfig = "coordinatesbasic"
@@ -21,7 +21,7 @@ class WCoordinatesBasic(QTVarios.WDialogo):
         o_columns.nueva("SIDE", _("Side"), 100, centered=True)
         o_columns.nueva("SCORE", _("Score"), 90, centered=True)
         self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)
-        f = Controles.TipoLetra(puntos=configuracion.x_menu_points)
+        f = Controles.TipoLetra(puntos=configuration.x_menu_points)
         self.glista.ponFuente(f)
 
         li_acciones = (
@@ -43,7 +43,7 @@ class WCoordinatesBasic(QTVarios.WDialogo):
 
         self.glista.gotop()
 
-    def grid_doble_click(self, grid, fila, oColumna):
+    def grid_doble_click(self, grid, row, o_column):
         self.play()
 
     def borrar(self):
@@ -60,9 +60,9 @@ class WCoordinatesBasic(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.db)
 
-    def grid_dato(self, grid, fila, oColumna):
-        coordinate : CoordinatesBasic.CoordinatesBasic = self.db.coordinate(fila)
-        col = oColumna.clave
+    def grid_dato(self, grid, row, o_column):
+        coordinate : CoordinatesBasic.CoordinatesBasic = self.db.coordinate(row)
+        col = o_column.key
         if col == "DATE":
             return Util.dtostr_hm(coordinate.date)
         elif col == "SIDE":

@@ -2,8 +2,8 @@ import FasterCode
 
 from PySide2 import QtWidgets, QtCore
 
-from Code import Game
-from Code import AperturasStd
+from Code.Base import Game
+from Code.Openings import OpeningsStd
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -42,7 +42,7 @@ class ToolbarMoves(QtWidgets.QWidget):
         ply5 = Controles.PB(self, _("%d ply") % 5, self.run_p5, plano=False).anchoFijo(ancho)
 
         self.sbply = Controles.SB(self, 0, 0, 100)
-        self.sbply.capturaCambiado(self.run_p)
+        self.sbply.capture_changes(self.run_p)
         lbply = Controles.LB(self, _("Plies"))
 
         layout = Colocacion.H().relleno(1).control(bt_all)
@@ -100,13 +100,13 @@ class WPlayer(QtWidgets.QWidget):
         self.movesWhite = []
         self.movesBlack = []
         self.lastFilterMoves = {"white": "", "black": ""}
-        self.configuracion = procesador.configuracion
+        self.configuration = procesador.configuration
 
         self.infoMove = None  # <-- setInfoMove
 
         self.rebuilding = False
 
-        self.ap = AperturasStd.ap
+        self.ap = OpeningsStd.ap
 
         self.gridOpeningWhite = self.gridOpeningBlack = self.gridMovesWhite = self.gridMovesBlack = 0
 
@@ -139,7 +139,7 @@ class WPlayer(QtWidgets.QWidget):
         o_columns.nueva("plost", "% " + _("Loss"), ancho, siDerecha=True)
 
         ancho_col = 40
-        si_figurines_pgn = self.configuracion.x_pgn_withfigurines
+        si_figurines_pgn = self.configuration.x_pgn_withfigurines
         for x in range(1, 50):
             num = (x - 1) * 2
             o_columns.nueva(
@@ -284,7 +284,7 @@ class WPlayer(QtWidgets.QWidget):
     def grid_dato(self, grid, nfila, ocol):
         if self.rebuilding:
             return ""
-        key = ocol.clave
+        key = ocol.key
         dt = self.dataGrid(grid)
         if grid == self.gridMovesWhite:
             nfila = self.movesWhite[nfila]
@@ -315,7 +315,7 @@ class WPlayer(QtWidgets.QWidget):
             nfila = self.movesWhite[nfila]
         elif grid == self.gridMovesBlack:
             nfila = self.movesBlack[nfila]
-        key = ocol.clave + "c"
+        key = ocol.key + "c"
         color = dt[nfila].get(key)
         return self.qtColor[color] if color is not None else None
 
@@ -484,7 +484,7 @@ class WPlayer(QtWidgets.QWidget):
         color = None
         info = None
         indicadorInicial = None
-        liNAGs = []
+        li_nags = []
         siLine = False
 
         data = [[], [], [], []]
@@ -589,7 +589,7 @@ class WPlayer(QtWidgets.QWidget):
                         elif x < nli:
                             if lipv[x] != antlipv[x]:
                                 agrisar = False
-                    dic[str(x)] = pgn, iswhite, color, info, indicadorInicial, liNAGs, agrisar, siLine
+                    dic[str(x)] = pgn, iswhite, color, info, indicadorInicial, li_nags, agrisar, siLine
                 antlipv = lipv
                 dic["winc"] = dic["pwinc"] = color3(win, draw, lost)
                 dic["drawc"] = dic["pdrawc"] = color3(draw, win, lost)

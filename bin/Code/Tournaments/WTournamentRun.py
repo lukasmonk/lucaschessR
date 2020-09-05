@@ -4,8 +4,7 @@ from PySide2 import QtWidgets, QtCore
 
 import Code
 from Code import Util
-from Code import Game
-from Code import Move
+from Code.Base import Game, Move
 from Code.Polyglots import Books
 from Code import ControlPGN
 from Code.Engines import EngineManager
@@ -14,13 +13,13 @@ from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Delegados
 from Code.QT import Controles
-from Code.QT import Tablero
+from Code.Board import Board
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
 from Code.Tournaments import Tournament
-from Code.Constantes import *
+from Code.Base.Constantes import *
 
 
 class TournamentRun:
@@ -105,16 +104,16 @@ class WTournamentRun(QtWidgets.QWidget):
         self.setWindowIcon(Iconos.Torneos())
 
         # Toolbar
-        self.tb = Controles.TBrutina(self, tamIcon=24)
+        self.tb = Controles.TBrutina(self, icon_size=24)
 
-        # Tablero
-        conf_tablero = Code.configuracion.config_board("TOURNEYPLAY", 36)
-        self.tablero = Tablero.Tablero(self, conf_tablero)
-        self.tablero.crea()
-        Delegados.generaPM(self.tablero.piezas)
+        # Board
+        conf_board = Code.configuration.config_board("TOURNEYPLAY", 36)
+        self.board = Board.Board(self, conf_board)
+        self.board.crea()
+        Delegados.generaPM(self.board.piezas)
 
         # PGN
-        self.configuracion = Code.configuracion
+        self.configuration = Code.configuration
         self.game = Game.Game()
         self.pgn = ControlPGN.ControlPGN(self)
         ly_pgn = self.crea_bloque_informacion()
@@ -123,7 +122,7 @@ class WTournamentRun(QtWidgets.QWidget):
         self.state = None
         self.current_side = WHITE
 
-        ly_tt = Colocacion.V().control(self.tb).control(self.tablero)
+        ly_tt = Colocacion.V().control(self.tb).control(self.board)
 
         layout = Colocacion.H().otro(ly_tt).otro(ly_pgn).relleno().margen(3)
         self.setLayout(layout)
@@ -157,37 +156,37 @@ class WTournamentRun(QtWidgets.QWidget):
         self.tb.reset(li_acciones)
 
     def crea_bloque_informacion(self):
-        configuracion = Code.configuracion
-        n_ancho_pgn = configuracion.x_pgn_width
+        configuration = Code.configuration
+        n_ancho_pgn = configuration.x_pgn_width
         n_ancho_color = (n_ancho_pgn - 52 - 24) // 2
         n_ancho_labels = max(int((n_ancho_pgn - 3) // 2), 140)
         # # Pgn
         o_columnas = Columnas.ListaColumnas()
-        o_columnas.nueva("NUMERO", _("N."), 52, centered=True)
-        si_figurines_pgn = configuracion.x_pgn_withfigurines
+        o_columnas.nueva("NUMBER", _("N."), 52, centered=True)
+        si_figurines_pgn = configuration.x_pgn_withfigurines
         o_columnas.nueva(
-            "BLANCAS", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
+            "WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
         )
         o_columnas.nueva(
-            "NEGRAS", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
+            "BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
         )
         self.grid_pgn = Grid.Grid(self, o_columnas, siCabeceraMovible=False)
         self.grid_pgn.setMinimumWidth(n_ancho_pgn)
         self.grid_pgn.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.grid_pgn.tipoLetra(puntos=configuracion.x_pgn_fontpoints)
-        self.grid_pgn.ponAltoFila(configuracion.x_pgn_rowheight)
+        self.grid_pgn.tipoLetra(puntos=configuration.x_pgn_fontpoints)
+        self.grid_pgn.ponAltoFila(configuration.x_pgn_rowheight)
 
         # # Blancas y negras
-        f = Controles.TipoLetra(puntos=configuracion.x_sizefont_infolabels + 2, peso=75)
+        f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels + 2, peso=75)
         bl, ng = "", ""
         alto_lb = 48
         self.lb_player = {}
         for side in (WHITE, BLACK):
             self.lb_player[side] = Controles.LB(self, bl).anchoFijo(n_ancho_labels).altoFijo(alto_lb)
-            self.lb_player[side].alinCentrado().ponFuente(f).ponWrap()
+            self.lb_player[side].align_center().ponFuente(f).set_wrap()
             self.lb_player[side].setFrameStyle(QtWidgets.QFrame.Box | QtWidgets.QFrame.Raised)
-        self.lb_player[WHITE].ponColorFondoN("black", "white")
-        self.lb_player[BLACK].ponColorFondoN("white", "black")
+        self.lb_player[WHITE].set_foreground_backgound("black", "white")
+        self.lb_player[BLACK].set_foreground_backgound("white", "black")
 
         # Relojes
         f = Controles.TipoLetra("Arial Black", puntos=26, peso=75)
@@ -197,15 +196,15 @@ class WTournamentRun(QtWidgets.QWidget):
             self.lb_reloj[side] = (
                 Controles.LB(self, "00:00")
                 .ponFuente(f)
-                .alinCentrado()
-                .ponColorFondoN("#076C9F", "#EFEFEF")
+                .align_center()
+                .set_foreground_backgound("#076C9F", "#EFEFEF")
                 .anchoMinimo(n_ancho_labels)
             )
             self.lb_reloj[side].setFrameStyle(QtWidgets.QFrame.Box | QtWidgets.QFrame.Raised)
 
         # Rotulos de informacion
-        f = Controles.TipoLetra(puntos=configuracion.x_sizefont_infolabels)
-        self.lbRotulo3 = Controles.LB(self).ponWrap().ponFuente(f)
+        f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels)
+        self.lbRotulo3 = Controles.LB(self).set_wrap().ponFuente(f)
 
         # Layout
         lyColor = Colocacion.G()
@@ -223,7 +222,7 @@ class WTournamentRun(QtWidgets.QWidget):
         return lyV
 
     def grid_num_datos(self, grid):
-        return self.pgn.numDatos()
+        return self.pgn.num_rows()
 
     def busca_trabajo(self):
         if self.torneo:
@@ -244,7 +243,7 @@ class WTournamentRun(QtWidgets.QWidget):
         Code.list_engine_managers.close_all()
 
         if self.torneo.adjudicator_active():
-            conf_engine = Code.configuracion.buscaRival(self.torneo.adjudicator())
+            conf_engine = Code.configuration.buscaRival(self.torneo.adjudicator())
             self.xadjudicator = EngineManager.EngineManager(self, conf_engine)
             self.xadjudicator.opciones(self.torneo.adjudicator_time() * 1000, 0, False)
             self.xadjudicator.anulaMultiPV()
@@ -261,7 +260,7 @@ class WTournamentRun(QtWidgets.QWidget):
             BLACK: self.torneo.buscaHEngine(self.tournament_game.hblack),
         }
         for side in (WHITE, BLACK):
-            self.lb_player[side].ponTexto(rival[side].name)
+            self.lb_player[side].set_text(rival[side].name)
 
         self.vtime = {}
 
@@ -295,8 +294,8 @@ class WTournamentRun(QtWidgets.QWidget):
 
         self.lbRotulo3.altoFijo(32)
 
-        self.tablero.disable_all()
-        self.tablero.setposition(self.game.last_position)
+        self.board.disable_all()
+        self.board.set_position(self.game.last_position)
         self.grid_pgn.refresh()
 
         for side in (WHITE, BLACK):
@@ -393,7 +392,7 @@ class WTournamentRun(QtWidgets.QWidget):
     def pon_reloj_side(self, side, tm, tm2):
         if tm2 is not None:
             tm += '<br><FONT SIZE="-4">' + tm2
-        self.lb_reloj[side].ponTexto(tm)
+        self.lb_reloj[side].set_text(tm)
 
     def reloj_start(self, is_white):
         self.vtime[is_white].iniciaMarcador()
@@ -418,15 +417,15 @@ class WTournamentRun(QtWidgets.QWidget):
     def add_move(self, move):
         self.game.add_move(move)
 
-        self.tablero.borraMovibles()
-        self.tablero.ponFlechaSC(move.from_sq, move.to_sq)
+        self.board.borraMovibles()
+        self.board.put_arrow_sc(move.from_sq, move.to_sq)
         self.grid_pgn.refresh()
         self.grid_pgn.gobottom(2 if self.game.last_position.is_white else 1)
 
         self.refresh()
 
     def refresh(self):
-        self.tablero.escena.update()
+        self.board.escena.update()
         self.update()
         QTUtil.refresh_gui()
 
@@ -436,7 +435,7 @@ class WTournamentRun(QtWidgets.QWidget):
     def showPV(self, pv, nArrows):
         if not pv:
             return True
-        self.tablero.quitaFlechas()
+        self.board.remove_arrows()
         tipo = "mt"
         opacidad = 100
         pv = pv.strip()
@@ -450,7 +449,7 @@ class WTournamentRun(QtWidgets.QWidget):
 
         for n in range(nbloques):
             pv = lipv[n]
-            self.tablero.creaFlechaMov(pv[:2], pv[2:4], tipo + str(opacidad))
+            self.board.creaFlechaMov(pv[:2], pv[2:4], tipo + str(opacidad))
             if n % 2 == 1:
                 opacidad -= cambio
                 cambio = salto
@@ -463,10 +462,10 @@ class WTournamentRun(QtWidgets.QWidget):
 
         self.current_side = is_white = self.game.is_white()
 
-        self.tablero.ponIndicador(is_white)
+        self.board.set_side_indicator(is_white)
 
         move_found = False
-        analisis = None
+        analysis = None
         bk = self.book[is_white]
         if bk:
             move_found, from_sq, to_sq, promotion = self.eligeJugadaBook(bk, self.bookRR[is_white])
@@ -482,7 +481,7 @@ class WTournamentRun(QtWidgets.QWidget):
             mrm = xrival.juegaTiempoTorneo(self.game, tiempoBlancas, tiempoNegras, segundosJugada)
             if self.state == ST_PAUSE:
                 self.reloj_pause(is_white)
-                self.tablero.borraMovibles()
+                self.board.borraMovibles()
                 return True
             self.reloj_stop(is_white)
             if mrm is None:
@@ -491,27 +490,27 @@ class WTournamentRun(QtWidgets.QWidget):
             from_sq = rm.from_sq
             to_sq = rm.to_sq
             promotion = rm.promotion
-            analisis = mrm, 0
+            analysis = mrm, 0
 
-        siBien, mens, move = Move.dameJugada(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         if not move:
             return False
-        if analisis:
-            move.analysis = analisis
+        if analysis:
+            move.analysis = analysis
             move.del_nags()
         self.add_move(move)
         self.move_the_pieces(move.liMovs)
 
         return True
 
-    def grid_dato(self, grid, fila, oColumna):
+    def grid_dato(self, grid, row, o_column):
         controlPGN = self.pgn
 
-        col = oColumna.clave
-        if col == "NUMERO":
-            return controlPGN.dato(fila, col)
+        col = o_column.key
+        if col == "NUMBER":
+            return controlPGN.dato(row, col)
 
-        move = controlPGN.soloJugada(fila, col)
+        move = controlPGN.only_move(row, col)
         if move is None:
             return ""
 
@@ -539,13 +538,13 @@ class WTournamentRun(QtWidgets.QWidget):
                     pts = -pts
                 info = "(%+0.2f)" % float(pts / 100.0)
 
-            nag, color_nag = mrm.set_nag_color(self.configuracion, rm)
+            nag, color_nag = mrm.set_nag_color(self.configuration, rm)
             stNAGS.add(nag)
 
         if move.in_the_opening:
             indicador_inicial = "R"
 
-        pgn = move.pgnFigurinesSP() if self.configuracion.x_pgn_withfigurines else move.pgn_translated()
+        pgn = move.pgnFigurinesSP() if self.configuration.x_pgn_withfigurines else move.pgn_translated()
 
         return pgn, color, info, indicador_inicial, stNAGS
 
@@ -557,7 +556,7 @@ class WTournamentRun(QtWidgets.QWidget):
             p.read_pv(rm.pv)
             rm.is_white = self.game.last_position.is_white
             txt = "<b>[%s]</b> (%s) %s" % (rm.name, rm.abrTexto(), p.pgn_translated())
-            self.lbRotulo3.ponTexto(txt)
+            self.lbRotulo3.set_text(txt)
             self.showPV(rm.pv, 1)
         return self.pon_reloj()
 
@@ -640,8 +639,8 @@ class WTournamentRun(QtWidgets.QWidget):
     def move_the_pieces(self, liMovs):
         for movim in liMovs:
             if movim[0] == "b":
-                self.tablero.borraPieza(movim[1])
+                self.board.borraPieza(movim[1])
             elif movim[0] == "m":
-                self.tablero.muevePieza(movim[1], movim[2])
+                self.board.muevePieza(movim[1], movim[2])
             elif movim[0] == "c":
-                self.tablero.cambiaPieza(movim[1], movim[2])
+                self.board.cambiaPieza(movim[1], movim[2])

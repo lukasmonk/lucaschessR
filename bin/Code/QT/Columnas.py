@@ -5,13 +5,13 @@ from Code.QT import Delegados
 
 class Columna:
     """
-    Definicion de cada columna del grid.
+    Definicion de cada column del grid.
     """
 
     def __init__(
         self,
-        clave,
-        cabecera,
+        key,
+        head,
         ancho=100,
         centered=False,
         siDerecha=False,
@@ -21,13 +21,13 @@ class Columna:
         estadoOrden=0,
         edicion=None,
         siEditable=None,
-        siMostrar=True,
+        must_show=True,
         siChecked=False,
     ):
         """
 
-        @param clave: referencia de la columna.
-        @param cabecera: texto mostrado en el grid como cabecera.
+        @param key: referencia de la column.
+        @param head: texto mostrado en el grid como head.
         @param ancho: anchura en pixels.
         @param centered: alineacion
         @param siDerecha: alineacion, se ha diferenciado la alineacion, para que al definir
@@ -35,15 +35,15 @@ class Columna:
         @param rgbTexto: color del texto como un entero.
         @param rgbFondo: color de fondo.
         @param siOrden: si se puede ordenar por este campo
-        @param estadoOrden: indica cual es el orden inicial de la columna  -1 Desc, 0 No, 1 Asc
-        @param edicion: objeto delegate usado para la edicion de los campos de esta columna
-        @param siEditable: este parametro se usa cuando aunque la columna tiene un delegate asociado para mostrarla, sin embargo no es editable.
-        @param siMostrar: si se muestra o no.
+        @param estadoOrden: indica cual es el orden inicial de la column  -1 Desc, 0 No, 1 Asc
+        @param edicion: objeto delegate usado para la edicion de los campos de esta column
+        @param siEditable: este parametro se usa cuando aunque la column tiene un delegate asociado para mostrarla, sin embargo no es editable.
+        @param must_show: si se muestra o no.
         @param siChecked: si es un campo de chequeo.
         """
 
-        self.clave = clave
-        self.cabeceraDef = self.cabecera = cabecera
+        self.key = key
+        self.cabeceraDef = self.head = head
         self.anchoDef = self.ancho = ancho
 
         alineacion = "i"
@@ -68,7 +68,7 @@ class Columna:
             if siEditable is not None:
                 self.siEditable = siEditable
 
-        self.siMostrarDef = self.siMostrar = siMostrar
+        self.siMostrarDef = self.must_show = must_show
         self.siChecked = siChecked
 
         if siChecked:
@@ -83,11 +83,11 @@ class Columna:
         self.qtColorFondo = self.QTcolorFondo(self.rgbFondo)
 
     def porDefecto(self):
-        self.cabecera = self.cabeceraDef
+        self.head = self.cabeceraDef
         self.alineacion = self.alineacionDef
         self.rgbTexto = self.rgbTextoDef
         self.rgbFondo = self.rgbFondoDef
-        self.siMostrar = self.siMostrarDef
+        self.must_show = self.siMostrarDef
 
     def copia_defecto(self, col):
         self.cabeceraDef = col.cabeceraDef
@@ -126,43 +126,43 @@ class Columna:
 
     def guardarConf(self, dic, grid):
         """
-        Guarda los valores actuales de configuracion de la columna.
+        Guarda los valores actuales de configuration de la column.
 
-        @param dic: diccionario con los datos del modulo al que pertenece la columna.
+        @param dic: diccionario con los datos del modulo al que pertenece la column.
         """
 
         xid = grid.id if grid else None
 
         def x(c, v):
             if xid is None:
-                k = "%s.%s" % (self.clave, c)
+                k = "%s.%s" % (self.key, c)
             else:
-                k = "%s.%s.%s" % (self.clave, c, xid)
+                k = "%s.%s.%s" % (self.key, c, xid)
 
             dic[k] = v
 
-        x("CABECERA", self.cabecera)  # Traduccion
+        x("CABECERA", self.head)  # Traduccion
         x("ANCHO", str(self.ancho))
         x("ALINEACION", self.alineacion)
         x("RGBTEXTO", str(self.rgbTexto))
         x("RGBFONDO", str(self.rgbFondo))
         x("POSICION", str(self.position))
-        x("SIMOSTRAR", "S" if self.siMostrar else "N")
+        x("SIMOSTRAR", "S" if self.must_show else "N")
 
     def recuperarConf(self, dic, grid, with_cabeceras=False):
         """
-        Recupera los valores de configuracion de la columna.
+        Recupera los valores de configuration de la column.
 
-        @param dic: diccionario con los datos del modulo al que pertenece la columna.
+        @param dic: diccionario con los datos del modulo al que pertenece la column.
         """
         xid = grid.id if grid else None
 
         def x(varTxt, varInt, tipo):
-            clave = "%s.%s" % (self.clave, varTxt)
+            key = "%s.%s" % (self.key, varTxt)
             if xid:
-                clave += ".%s" % xid
-            if clave in dic:
-                v = dic[clave]
+                key += ".%s" % xid
+            if key in dic:
+                v = dic[key]
                 if tipo == "n":
                     v = int(v)
                 elif tipo == "l":
@@ -170,13 +170,13 @@ class Columna:
                 setattr(self, varInt, v)
 
         if with_cabeceras:
-            x("CABECERA", "cabecera", "t")  # Traduccion, se pierde si no
+            x("CABECERA", "head", "t")  # Traduccion, se pierde si no
         x("ANCHO", "ancho", "n")
         x("ALINEACION", "alineacion", "t")
         x("RGBTEXTO", "rgbTexto", "n")
         x("RGBFONDO", "rgbFondo", "n")
         x("POSICION", "position", "n")
-        x("SIMOSTRAR", "siMostrar", "l")
+        x("SIMOSTRAR", "must_show", "l")
 
         self.ponQT()
 
@@ -185,17 +185,17 @@ class Columna:
 
 class ListaColumnas:
     """
-    Recorda la configuracion de columnas como un bloque.
+    Recorda la configuration de columnas como un bloque.
     """
 
     def __init__(self):
-        self.liColumnas = []
+        self.li_columns = []
         self.posCreacion = 0
 
     def nueva(
         self,
-        clave,
-        cabecera="",
+        key,
+        head="",
         ancho=100,
         centered=False,
         siDerecha=False,
@@ -205,14 +205,14 @@ class ListaColumnas:
         estadoOrden=0,
         edicion=None,
         siEditable=None,
-        siMostrar=True,
+        must_show=True,
         siChecked=False,
     ):
         """
         Contiene los mismos parametros que la Columna.
 
-        @param clave: referencia de la columna.
-        @param cabecera: texto mostrado en el grid como cabecera.
+        @param key: referencia de la column.
+        @param head: texto mostrado en el grid como head.
         @param ancho: anchura en pixels.
         @param centered: alineacion
         @param siDerecha: alineacion, se ha diferenciado la alineacion, para que al definir
@@ -220,17 +220,17 @@ class ListaColumnas:
         @param rgbTexto: color del texto como un entero.
         @param rgbFondo: color de fondo.
         @param siOrden: si se puede ordenar por este campo
-        @param estadoOrden: indica cual es el orden inicial de la columna  -1 Desc, 0 No, 1 Asc
-        @param edicion: objeto delegate usado para la edicion de los campos de esta columna
-        @param siEditable: este parametro se usa cuando aunque la columna tiene un delegate asociado para mostrarla, sin embargo no es editable.
-        @param siMostrar: si se muestra o no.
+        @param estadoOrden: indica cual es el orden inicial de la column  -1 Desc, 0 No, 1 Asc
+        @param edicion: objeto delegate usado para la edicion de los campos de esta column
+        @param siEditable: este parametro se usa cuando aunque la column tiene un delegate asociado para mostrarla, sin embargo no es editable.
+        @param must_show: si se muestra o no.
         @param siChecked: si es un campo de chequeo.
 
-        @return: la columna creada.
+        @return: la column creada.
         """
-        columna = Columna(
-            clave,
-            cabecera,
+        column = Columna(
+            key,
+            head,
             ancho,
             centered,
             siDerecha,
@@ -240,55 +240,55 @@ class ListaColumnas:
             estadoOrden,
             edicion,
             siEditable,
-            siMostrar,
+            must_show,
             siChecked,
         )
-        self.liColumnas.append(columna)
+        self.li_columns.append(column)
         self.posCreacion += 1
-        columna.posCreacion = self.posCreacion
-        return columna
+        column.posCreacion = self.posCreacion
+        return column
 
-    def columna(self, numCol):
-        return self.liColumnas[numCol]
+    def column(self, numCol):
+        return self.li_columns[numCol]
 
     def borrarColumna(self, numCol):
-        del self.liColumnas[numCol]
+        del self.li_columns[numCol]
 
     def numColumnas(self):
-        return len(self.liColumnas)
+        return len(self.li_columns)
 
     def resetEstadoOrden(self):
-        for x in self.liColumnas:
+        for x in self.li_columns:
             x.stateOrden = 0
 
     def porDefecto(self):
-        for x in self.liColumnas:
+        for x in self.li_columns:
             x.porDefecto()
 
     def columnasMostrables(self):
         """
         Crea un nuevo objeto con solo las columnas mostrables.
         """
-        for col in self.liColumnas:
+        for col in self.li_columns:
             col.ponQT()
-        cols = [columna for columna in self.liColumnas if columna.siMostrar]
+        cols = [column for column in self.li_columns if column.must_show]
         cols.sort(key=lambda x: x.position)
         oColumnasR = ListaColumnas()
-        oColumnasR.liColumnas = cols
+        oColumnasR.li_columns = cols
         return oColumnasR
 
-    def buscaColumna(self, clave):
-        for col in self.liColumnas:
-            if col.clave == clave:
+    def buscaColumna(self, key):
+        for col in self.li_columns:
+            if col.key == key:
                 return col
         return None
 
     def clone(self):
         oColumnasCopy = ListaColumnas()
-        for col in self.liColumnas:
+        for col in self.li_columns:
             col_nueva = oColumnasCopy.nueva(
-                col.clave,
-                cabecera=col.cabecera,
+                col.key,
+                head=col.head,
                 ancho=col.ancho,
                 centered=col.alineacion == "c",
                 siDerecha=col.alineacion == "d",
@@ -298,7 +298,7 @@ class ListaColumnas:
                 estadoOrden=col.stateOrden,
                 edicion=col.edicion,
                 siEditable=col.siEditable,
-                siMostrar=col.siMostrar,
+                must_show=col.must_show,
                 siChecked=col.siChecked,
             )
             col_nueva.copia_defecto(col)
@@ -306,10 +306,10 @@ class ListaColumnas:
 
     def save_dic(self, grid):
         dic_conf = {}
-        for col in self.liColumnas:
+        for col in self.li_columns:
             col.guardarConf(dic_conf, grid)
         return dic_conf
 
     def restore_dic(self, dic_conf, grid):
-        for col in self.liColumnas:
+        for col in self.li_columns:
             col.recuperarConf(dic_conf, grid)

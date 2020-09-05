@@ -4,7 +4,7 @@
 import os
 import random
 
-from Code import Position
+from Code.Base import Position
 from Code import Util
 import Code
 
@@ -14,7 +14,7 @@ class ListaLibros:
         self.lista = []
         self.path = ""
 
-        # S = Gestor solo
+        # S = Manager solo
         # P = PGN
         # M = EntMaquina
         # T = Tutor
@@ -120,7 +120,7 @@ class ListaLibros:
             if libroL == libro:
                 del self.lista[n]
 
-    def compruebaApertura(self, game):
+    def compruebaOpening(self, game):
         liLibros = [libro for libro in self.lista if libro.pordefecto]
         if (not liLibros) and self.lista:
             liLibros = [self.lista[0]]

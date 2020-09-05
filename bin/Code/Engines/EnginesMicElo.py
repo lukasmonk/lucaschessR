@@ -3,7 +3,7 @@ from Code import Util
 
 
 def read_mic_engines():
-    configuracion = Code.configuracion
+    configuration = Code.configuration
     fichero = Code.path_resource("IntFiles", "mic_tourney.eval")
 
     with open(fichero) as f:
@@ -16,7 +16,7 @@ def read_mic_engines():
             elo = dic["ELO"]
             li_uci = [(d["name"], d["valor"]) for d in dic["LIUCI"]]
 
-            engine = configuracion.dic_engines.get(nom_base_engine)
+            engine = configuration.dic_engines.get(nom_base_engine)
             if engine:
                 eng = engine.clona()
                 eng.name = alias
