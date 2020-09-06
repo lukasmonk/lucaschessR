@@ -39,11 +39,11 @@ class MesaSonido(QtWidgets.QGraphicsView):
     def crea(self):
         # base
         cajon = BoardTypes.Caja()
-        cajon.position.orden = 1
+        cajon.physical_pos.orden = 1
         cajon.colorRelleno = 4294243572
         ancho, alto = 544, 100
-        cajon.position.ancho, cajon.position.alto = ancho, alto
-        cajon.position.x, cajon.position.y = 0, 0
+        cajon.physical_pos.ancho, cajon.physical_pos.alto = ancho, alto
+        cajon.physical_pos.x, cajon.physical_pos.y = 0, 0
         cajon.tipo = QtCore.Qt.NoPen
 
         self.cajonSC = BoardElements.CajaSC(self.escena, cajon)
@@ -51,13 +51,13 @@ class MesaSonido(QtWidgets.QGraphicsView):
         def tiempoSC(x, y, linea, minim, maxim, rutina, color):
             tt = BoardTypes.Texto()
             tt.tipoLetra = BoardTypes.TipoLetra("Courier New", 10)
-            tt.position.ancho = 68
-            tt.position.alto = 12
-            tt.position.orden = 5
+            tt.physical_pos.ancho = 68
+            tt.physical_pos.alto = 12
+            tt.physical_pos.orden = 5
             tt.colorFondo = color
             tt.valor = "00:00:00"
-            tt.position.x = x
-            tt.position.y = y
+            tt.physical_pos.x = x
+            tt.physical_pos.y = y
             tt.linea = linea
             tt.min = x + minim
             tt.max = x + maxim
@@ -72,30 +72,30 @@ class MesaSonido(QtWidgets.QGraphicsView):
         self.txtDuracion = tiempoSC(236, 78, None, 0, 0, None, 4289509046)
 
         tf = BoardTypes.Caja()
-        tf.position.orden = 2
-        tf.position.x = 70
-        tf.position.y = 44
-        tf.position.ancho = 400
-        tf.position.alto = 4
+        tf.physical_pos.orden = 2
+        tf.physical_pos.x = 70
+        tf.physical_pos.y = 44
+        tf.physical_pos.ancho = 400
+        tf.physical_pos.alto = 4
         tf.grosor = 0
         tf.colorRelleno = 4281413888
         self.linMain = BoardElements.CajaSC(self.escena, tf)
 
         tf = BoardTypes.Caja()
-        tf.position.orden = 2
-        tf.position.x = 70
-        tf.position.y = 32
-        tf.position.ancho = 0
-        tf.position.alto = 26
+        tf.physical_pos.orden = 2
+        tf.physical_pos.x = 70
+        tf.physical_pos.y = 32
+        tf.physical_pos.ancho = 0
+        tf.physical_pos.alto = 26
         tf.colorRelleno = 4281413888
         BoardElements.CajaSC(self.escena, tf)
 
         tf = BoardTypes.Caja()
-        tf.position.orden = 2
-        tf.position.x = 470
-        tf.position.y = 32
-        tf.position.ancho = 0
-        tf.position.alto = 26
+        tf.physical_pos.orden = 2
+        tf.physical_pos.x = 470
+        tf.physical_pos.y = 32
+        tf.physical_pos.ancho = 0
+        tf.physical_pos.alto = 26
         tf.colorRelleno = 4281413888
         BoardElements.CajaSC(self.escena, tf)
 
@@ -123,7 +123,7 @@ class MesaSonido(QtWidgets.QGraphicsView):
         self.escena.update()
 
     def ponCentesimasActual(self, centesimas):
-        self.txtActual.set_position(centesimas)
+        self.txtActual.set_physical_pos(centesimas)
         self.escena.update()
 
     def limites(self, siTotal):
