@@ -102,7 +102,7 @@ class WGaviota(QtWidgets.QDialog):
             FasterCode.make_move(from_sq + to_sq + promotion)
             self.pon_fen_hist(FasterCode.get_fen())
 
-    def grid_boton_derecho(self, grid, row, column, modificadores):
+    def grid_right_button(self, grid, row, column, modificadores):
         if len(self.history) > 0:
             row, fen = self.history[-1]
             self.history = self.history[:-1]

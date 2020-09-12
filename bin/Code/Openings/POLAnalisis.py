@@ -245,7 +245,7 @@ class TabBook(QtWidgets.QWidget):
         self.lee_subnivel(row)
         self.grid_moves.refresh()
 
-    def grid_boton_derecho(self, grid, row, column, modificadores):
+    def grid_right_button(self, grid, row, column, modificadores):
         self.borra_subnivel(row)
         self.grid_moves.refresh()
 

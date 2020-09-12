@@ -314,10 +314,10 @@ class WBase(QtWidgets.QWidget):
     def grid_num_datos(self, grid):
         return self.manager.num_rows()
 
-    def grid_boton_izquierdo(self, grid, row, column):
+    def grid_left_button(self, grid, row, column):
         self.manager.pgnMueveBase(row, column.key)
 
-    def grid_boton_derecho(self, grid, row, column, modificadores):
+    def grid_right_button(self, grid, row, column, modificadores):
         self.manager.pgnMueveBase(row, column.key)
         self.manager.gridRightMouse(modificadores.is_shift, modificadores.is_control, modificadores.is_alt)
 

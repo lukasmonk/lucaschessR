@@ -647,7 +647,7 @@ class Manager:
         if column == "NUMBER":
             if row == 0:
                 if self.pgn.variations_mode:
-                    self.setposition_with_variations(self.game.first_position, "-1")
+                    self.set_position(self.game.first_position, "-1")
                     self.main_window.base.pgn.goto(0, 0)
                     self.main_window.base.pgnRefresh()  # No se puede usar pgnRefresh, ya que se usa con gobottom en otros lados y aqui eso no funciona
                     self.put_view()
@@ -1403,7 +1403,7 @@ class Manager:
         menuSave.separador()
 
         menuDB = menuSave.submenu(_("Database"), Iconos.DatabaseMas())
-        QTVarios.menuDB(menuDB, self.configuration, True)
+        QTVarios.menuDB(menuDB, self.configuration, True, indicador_previo="dbf_")
         menuSave.separador()
 
         menuV = menuSave.submenu(_("Board -> Image"), icoCamara)
@@ -1593,7 +1593,7 @@ class Manager:
         if self.game_type == GT_ALONE:
             return getattr(self, "grabarComo")()
 
-        dic = dict(GAME= self.game)
+        dic = dict(GAME=self.game.save(True))
         extension = "lcsb"
         fichero = self.configuration.x_save_lcsb
         while True:
@@ -1602,7 +1602,7 @@ class Manager:
                 _("File to save"),
                 fichero,
                 _("File") + " %s (*.%s)" % (extension, extension),
-                siConfirmarSobreescritura=True,
+                siConfirmarSobreescritura=False,
             )
             if fichero:
                 fichero = str(fichero)

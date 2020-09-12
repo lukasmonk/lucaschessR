@@ -1,6 +1,8 @@
+import PySide2.QtGui
 from PySide2 import QtWidgets, QtCore
 
-from Code.QT import Controles, Colocacion
+from Code.QT import Controles, Colocacion, QTVarios, Iconos
+
 
 
 class LBPGN(Controles.LB):
@@ -20,6 +22,11 @@ class LBPGN(Controles.LB):
     def mouseDoubleClickEvent(self, event):
         self.wparent.double_click(self)
 
+    def mousePressEvent(self, ev:PySide2.QtGui.QMouseEvent):
+        if ev.button() == QtCore.Qt.RightButton:
+            return self.wparent.right_click(self)
+        # Controles.LB.mousePressEvent(self, ev)
+
 
 class ShowPGN(QtWidgets.QScrollArea):
     def __init__(self, parent, puntos, with_figurines):
@@ -33,6 +40,8 @@ class ShowPGN(QtWidgets.QScrollArea):
 
         self.link_externo = None
         self.link_edit = None
+
+        self.selected_link = None
 
         self.num_showed = 0
 
@@ -53,6 +62,8 @@ class ShowPGN(QtWidgets.QScrollArea):
         self.link_externo = link_externo
 
     def run_link(self, info):
+        print(info)
+        self.last_runlink = info
         if self.link_externo:
             self.link_externo(info)
 
@@ -78,6 +89,20 @@ class ShowPGN(QtWidgets.QScrollArea):
                 self.link_edit(num)
                 return
 
+    def right_click(self, lb_sender):
+        num_lb = None
+        for num, lb in enumerate(self.li_variations):
+            if lb == lb_sender:
+                num_lb = num
+                break
+        menu = QTVarios.LCMenu(self)
+        menu.opcion("remove_line", _("Remove line"), Iconos.Delete())
+        if self.selected_link and self.selected_link in lb_sender.text():
+            menu.separador()
+            menu.opcion("remove_move", _("Remove move"), Iconos.Delete())
+
+        menu.lanza()
+
     def change(self, num_pgn, pgn):
         if num_pgn >= self.num_showed:
             return self.add(pgn)
@@ -93,6 +118,8 @@ class ShowPGN(QtWidgets.QScrollArea):
         style_number = "color:teal"
         style_moves = "color:black"
         style_select = "color:darkred"
+
+        self.selected_link = selected_link
 
         def do_variation(variation_game, base_select):
             num_move = variation_game.primeraJugada()

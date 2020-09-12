@@ -261,7 +261,7 @@ class AnalizaPartida:
         cab += '[Result "%s"]\n' % result
 
         with open(fichero, "at", encoding="utf-8", errors="ignore") as q:
-            texto = (cab + "\n" + p.pgnBase() + mas + "\n\n").replace("\n", "\r\n")
+            texto = (cab + "\n" + p.pgnBase() + mas + "\n\n")
             q.write(texto)
 
         return True

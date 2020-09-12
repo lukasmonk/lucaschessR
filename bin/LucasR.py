@@ -10,10 +10,8 @@ import sys
 # TODO Analisis/kibitzers con todos los movimientos
 # TODO Grabar automáticamente todas las partidas con mas de 10 movimientos
 # TODO En análisis usar el mismo sistema que en Databases, para mostrar todo sin que se escondan los botones
-
-
-
-# sys.argv = ['./LucasR.py', '-tournament', 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Irina vs 1400 Honey.mvm', 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Workers\\worker.00001']
+# sys.argv = ['./LucasR.py', '-tournament', 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Irina vs 1400 Honey.mvm',
+# 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Workers\\worker.00001']
 import Code.Translate as Translate
 
 Translate.install()

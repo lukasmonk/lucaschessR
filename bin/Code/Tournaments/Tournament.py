@@ -156,6 +156,11 @@ class GameTournament(object):
             game.restore(self.game_save)
             return game
 
+    def save_game(self, game):
+        self.game_save = game.save(True)
+        if game.resultado():
+            self.result = game.resultado()
+
 
 class Tournament:
     def __init__(self, file):
@@ -315,7 +320,7 @@ class Tournament:
         return self.db_games_finished[pos]
 
     def save_game_finished(self, pos, game):
-        self.db_games_finished[pos] = game
+        self.db_games_finished[pos].save_game(game)
 
     def remove_games_queued(self, lista=None):
         if lista is None:

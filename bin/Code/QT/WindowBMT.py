@@ -409,10 +409,10 @@ class WEntrenarBMT(QTVarios.WDialogo):
     def grid_dato(self, grid, row, o_column):
         return self.controlPGN.dato(row, o_column.key)
 
-    def grid_boton_izquierdo(self, grid, row, column):
+    def grid_left_button(self, grid, row, column):
         self.pgnMueveBase(row, column.key)
 
-    def grid_boton_derecho(self, grid, row, column, modificadores):
+    def grid_right_button(self, grid, row, column, modificadores):
         self.pgnMueveBase(row, column.key)
 
     def grid_doble_click(self, grid, row, column):

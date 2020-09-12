@@ -221,7 +221,10 @@ class RunEngine:
                     self.process.kill()
                     self.process.terminate()
             except:
-                os.kill(self.pid, signal.SIGTERM)
+                if Code.isWindows:
+                    subprocess.call(['taskkill', '/F', '/T', '/PID', str(self.pid)])
+                else:
+                    os.kill(self.pid, signal.SIGTERM)
                 sys.stderr.write("INFO X CLOSE: except - the engine %s won't close properly.\n" % self.exe)
 
             self.pid = None

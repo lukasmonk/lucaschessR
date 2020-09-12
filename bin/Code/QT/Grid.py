@@ -8,7 +8,7 @@ siempre que la rutina se haya definido en la ventana:
     - grid_tecla_pulsada : al pulsarse una tecla, llama a esta rutina, para que pueda usarse por ejemplo en busquedas.
     - grid_tecla_control : al pulsarse una tecla de control, llama a esta rutina, para que pueda usarse por ejemplo en busquedas.
     - grid_doble_click : en el caso de un doble click en un registro, se hace la llamad a esta rutina
-    - grid_boton_derecho : si se ha pulsado el boton derecho del raton.
+    - grid_right_button : si se ha pulsado el boton derecho del raton.
     - grid_setvalue : si hay un campo editable, la llamada se produce cuando se ha cambiado el valor tras la edicion.
 
     - grid_color_texto : si esta definida se la llama al mostrar el texto de un campo, para determinar el color del mismo.
@@ -373,15 +373,15 @@ class Grid(QtWidgets.QTableView):
     def mousePressEvent(self, event):
         """
         Se gestiona este evento, ante la posibilidad de que la ventana quiera controlar,
-        cada pulsacion del boton derecho, llamando a la rutina correspondiente si existe (grid_boton_derecho)
+        cada pulsacion del boton derecho, llamando a la rutina correspondiente si existe (grid_right_button)
         """
         QtWidgets.QTableView.mousePressEvent(self, event)
         button = event.button()
         fil, col = self.current_position()
         if fil < 0:
             return
-        if button == 2:
-            if hasattr(self.w_parent, "grid_boton_derecho"):
+        if button == QtCore.Qt.RightButton:
+            if hasattr(self.w_parent, "grid_right_button"):
 
                 class Vacia:
                     pass
@@ -391,16 +391,16 @@ class Grid(QtWidgets.QTableView):
                 modif.is_shift = (m & QtCore.Qt.ShiftModifier) > 0
                 modif.is_control = (m & QtCore.Qt.ControlModifier) > 0
                 modif.is_alt = (m & QtCore.Qt.AltModifier) > 0
-                self.w_parent.grid_boton_derecho(self, fil, col, modif)
-        elif button == 1:
+                self.w_parent.grid_right_button(self, fil, col, modif)
+        elif button == QtCore.Qt.LeftButton:
             if fil < 0:
                 return
             if col.siChecked:
                 value = self.w_parent.grid_dato(self, fil, col)
                 self.w_parent.grid_setvalue(self, fil, col, not value)
                 self.refresh()
-            elif hasattr(self.w_parent, "grid_boton_izquierdo"):
-                self.w_parent.grid_boton_izquierdo(self, fil, col)
+            elif hasattr(self.w_parent, "grid_left_button"):
+                self.w_parent.grid_left_button(self, fil, col)
 
     def dobleClickCabecera(self, numColumna):
         """

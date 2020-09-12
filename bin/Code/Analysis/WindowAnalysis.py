@@ -129,7 +129,7 @@ class WAnalisisGraph(QTVarios.WDialogo):
         gridAll.gotop()
         gridB.gotop()
         gridW.gotop()
-        self.grid_boton_izquierdo(gridAll, 0, None)
+        self.grid_left_button(gridAll, 0, None)
         th = self.board.height()
         self.tabGrid.setFixedHeight(th)
         self.adjustSize()
@@ -170,13 +170,13 @@ class WAnalisisGraph(QTVarios.WDialogo):
         self.tabActive = ntab
 
     def grid_cambiado_registro(self, grid, row, column):
-        self.grid_boton_izquierdo(grid, row, column)
+        self.grid_left_button(grid, row, column)
 
     def saveIndexes(self):
         self.manager.game.set_first_comment(self.alm.indexesRAW)
         QTUtil2.mensajeTemporal(self, _("Saved"), 1.8)
 
-    def grid_boton_izquierdo(self, grid, row, column):
+    def grid_left_button(self, grid, row, column):
         self.board.remove_arrows()
         move = self.dicLiJG[grid.id][row]
         self.board.set_position(move.position)
@@ -356,11 +356,11 @@ class WMuestra(QtWidgets.QWidget):
     def grid_num_datos(self, grid):
         return len(self.list_rm_name)
 
-    def grid_boton_izquierdo(self, grid, row, column):
+    def grid_left_button(self, grid, row, column):
         self.cambiadoRM(row)
         self.owner.activaMuestra(self.um)
 
-    def grid_boton_derecho(self, grid, row, column, modificadores):
+    def grid_right_button(self, grid, row, column, modificadores):
         self.cambiadoRM(row)
 
     def grid_bold(self, grid, row, column):
@@ -596,7 +596,7 @@ class WAnalisis(QTVarios.WDialogo):
 
         self.activaMuestra(um)
 
-        wm.grid_boton_izquierdo(wm.wrm, um.pos_rm_active, 0)
+        wm.grid_left_button(wm.wrm, um.pos_rm_active, 0)
 
         return wm
 

@@ -318,7 +318,7 @@ class WEndingsGTB(QTVarios.WDialogo):
     def grid_doble_click(self, grid, row, o_column):
         self.play()
 
-    def grid_boton_derecho(self, grid, row, o_column, modif):
+    def grid_right_button(self, grid, row, o_column, modif):
         menu = QTVarios.LCMenu(self)
         menu.opcion("reset", _("Reset data to 0"), Iconos.Delete())
         resp = menu.lanza()

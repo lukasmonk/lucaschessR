@@ -258,7 +258,7 @@ class BotonFichero(QtWidgets.QPushButton):
         if txt:
             txt = os.path.realpath(txt)
             if self.siRelativo:
-                txt = Util.dirRelativo(txt)
+                txt = Util.relative_path(txt)
             tamTxt = self.qm.boundingRect(txt).width()
             tmax = self.width() - 10
             if self.siPrimeraVez:

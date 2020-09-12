@@ -267,7 +267,7 @@ class ManagerSolo(Manager.Manager):
             self.pon_rotulo()
 
     def guardaDir(self, resp):
-        direc = os.path.dirname(resp)
+        direc = Util.dirRelativo(os.path.dirname(resp))
         if direc != self.configuration.folder_save_lcsb():
             self.configuration.folder_save_lcsb(direc)
             self.configuration.graba()

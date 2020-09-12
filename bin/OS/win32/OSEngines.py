@@ -206,7 +206,8 @@ def dict_engines_fixed_elo(folder_engines):
     for nm, desde, hasta in (
         ("rodent", 600, 2600),
         ("amyan", 1000, 2400),
-        ("honey", 1000, 2900),
+        ("honey", 1750, 2900),
+        ("stockfish", 1350, 2850),
         ("rhetoric", 1300, 2600),
         ("cheng", 800, 2500),
         ("greko", 1600, 2400),

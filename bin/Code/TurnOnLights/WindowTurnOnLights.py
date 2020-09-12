@@ -112,7 +112,7 @@ class WTurnOnLights(QTVarios.WDialogo):
             self.save_video()
             self.accept()
 
-    def grid_boton_derecho(self, grid, row, o_column, modificadores):
+    def grid_right_button(self, grid, row, o_column, modificadores):
         col = o_column.key
         num_theme = row
         if col.startswith("BLOCK"):

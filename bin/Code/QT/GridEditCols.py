@@ -206,7 +206,7 @@ class EditCols(QtWidgets.QDialog):
                     column.rgbFondo = -1 if color == blanco else color.rgb()
             column.ponQT()
 
-    def grid_boton_derecho(self, grid, row, col, modif):
+    def grid_right_button(self, grid, row, col, modif):
         key = col.key
         col = self.o_columnas.li_columns[row]
         if key in ["CTEXTO", "CFONDO"]:

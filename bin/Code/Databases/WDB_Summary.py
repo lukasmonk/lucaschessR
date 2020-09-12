@@ -651,7 +651,7 @@ class WSummaryBase(QtWidgets.QWidget):
         self.grid.refresh()
         self.grid.gotop()
 
-    def grid_boton_derecho(self, grid, row, column, modificadores):
+    def grid_right_button(self, grid, row, column, modificadores):
         if self.siFilaTotales(row):
             return
         alm = self.liMoves[row]["rec"]
