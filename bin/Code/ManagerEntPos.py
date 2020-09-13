@@ -122,7 +122,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.is_analyzed_by_tutor = False
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         if self.line_fns.with_game_original():
             self.repiteUltimaJugada()
@@ -406,7 +406,7 @@ class ManagerEntPos(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def pon_resultado(self):
         self.state = ST_ENDGAME

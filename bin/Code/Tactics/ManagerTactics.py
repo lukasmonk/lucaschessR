@@ -67,7 +67,7 @@ class ManagerTacticas(Manager.Manager):
         self.pgnRefresh(True)
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         if self.game_base:
             self.repiteUltimaJugada()
@@ -244,7 +244,7 @@ class ManagerTacticas(Manager.Manager):
         self.board.set_position(move.position)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def cambiar(self):
         if self.tactic.w_next_position >= 0:

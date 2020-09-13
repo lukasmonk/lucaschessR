@@ -325,7 +325,7 @@ class ManagerElo(Manager.Manager):
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.game.add_tag("Event", _("Lucas-Elo"))
 
@@ -555,7 +555,7 @@ class ManagerElo(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         if self.pte_tool_resigndraw:
             self.pon_toolbar()

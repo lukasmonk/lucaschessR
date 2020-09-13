@@ -179,96 +179,20 @@ class Board(QtWidgets.QGraphicsView):
             return
 
         if self.mensajero and self.siActivasPiezas and not is_alt:
-
-            # Entrada directa con el pgn
+            # Entrada directa
             if 128 > key > 32:
                 self.cad_buffer += chr(key)
             if self.cad_buffer:
                 FasterCode.set_fen(self.last_position.fen())
-                li = FasterCode.get_exmoves()
+                li = FasterCode.get_moves()
                 ok_ini = False
                 busca = self.cad_buffer.lower()
-                if busca.startswith("o-o") and not (busca[-1] in "o-"):
-                    busca = "o-o"
-                if busca == "o2":
-                    busca = "o-o"
-                    key = 33
-                elif busca == "o3":
-                    busca = "o-o-o"
-                for m in li:
-                    san = m._san.decode().lower().replace("+", "").replace("=", "")
-                    if san == busca:
-                        if busca == "o-o":
-                            siExt = False
-                            for mt in li:
-                                if mt._san == "O-O-O":
-                                    siExt = True
-                                    break
-                            if siExt and chr(key).lower() == "o":
-                                ok_ini = True  # esperamos al siguiente caracter
-                                break
-                        self.cad_buffer = ""
-                        self.mensajero(m._from, m._to, m._promotion)
+                for p_a1h8 in li:
+                    a1h8 = p_a1h8[1:]
+                    if busca.endswith(a1h8):
+                        self.init_kb_buffer()
+                        self.mensajero(a1h8[:2], a1h8[2:4], a1h8[4:])
                         return
-                    elif san.startswith(busca):
-                        ok_ini = True
-                if not ok_ini:
-                    self.cad_buffer = ""
-
-            nk = len(self.kb_buffer)
-            if nk == 4:
-                k = chr(key).lower()
-                if k in "qrbn":
-                    from_sq = chr(self.kb_buffer[0].key).lower() + chr(self.kb_buffer[1].key)
-                    to_sq = chr(self.kb_buffer[2].key).lower() + chr(self.kb_buffer[3].key)
-                    self.mensajero(from_sq, to_sq, k)
-            elif 48 < key < 57 or 64 < key < 73:  # coordenadas
-                c = chr(key)
-                if nk == 0:
-                    if not c.isdigit():
-                        self.kb_buffer.append(RegKB(key, flags))
-                    return
-                elif nk == 1:
-                    if c.isdigit():
-                        from_sq = chr(self.kb_buffer[0].key).lower() + c
-                        pz = self.dameNomPiezaEn(from_sq)
-                        if pz and (
-                            (self.siActivasPiezasColor and pz.isupper())
-                            or (not self.siActivasPiezasColor and pz.islower())
-                        ):
-                            self.kb_buffer.append(RegKB(key, flags))
-                            self.markPosition(from_sq)
-                        else:
-                            self.markError(from_sq)
-                            self.init_kb_buffer(False)
-                    else:
-                        self.kb_buffer[0] = RegKB(key, flags)
-                    return
-                elif nk == 2:
-                    if c.isdigit():
-                        self.kb_buffer[1] = RegKB(key, flags)
-                    else:
-                        self.kb_buffer.append(RegKB(key, flags))
-                    return
-                elif nk == 3:
-                    if c.isdigit():
-                        from_sq = chr(self.kb_buffer[0].key).lower() + chr(self.kb_buffer[1].key)
-                        to_sq = chr(self.kb_buffer[2].key).lower() + c
-                        # si es promocion esperamos una tecla mas
-                        if (self.siActivasPiezasColor and from_sq[1] == "7" and to_sq[1] == "8") or (
-                            not self.siActivasPiezasColor and from_sq[1] == "2" and to_sq[1] == "1"
-                        ):
-                            pz = self.dameNomPiezaEn(from_sq)
-                            if pz and pz.lower() == "p":
-                                self.markPosition(to_sq)
-                                self.kb_buffer.append(RegKB(key, flags))
-                                return  # esperamos promocion
-                        if not self.mensajero(from_sq, to_sq, ""):
-                            self.markError(from_sq)
-                            self.init_kb_buffer()
-                    else:
-                        self.kb_buffer[2] = RegKB(key, flags)
-                    return
 
     def sizeHint(self):
         return QtCore.QSize(self.ancho + 6, self.ancho + 6)
@@ -1280,7 +1204,7 @@ class Board(QtWidgets.QGraphicsView):
         self.dbVisual.setFichero(alm.nomdbVisual)
         self.dbVisual.showAllways(alm.dbVisual_showAllways)
 
-    def setUltPosicion(self, position):
+    def set_last_position(self, position):
         self.cierraGuion()
         self.last_position = position
         if self.siDirectorIcon or self.dbVisual.showAllways():
@@ -1295,6 +1219,10 @@ class Board(QtWidgets.QGraphicsView):
                 elif self.siDirectorIcon:
                     self.scriptSC_menu.hide()
 
+    def set_raw_last_position(self, position):
+        if position != self.last_position:
+            self.set_last_position(position)
+
     def set_position(self, position, siBorraMoviblesAhora=True, variation_history=None):
         if self.dirvisual:
             self.dirvisual.cambiadaPosicionAntes()
@@ -1304,7 +1232,7 @@ class Board(QtWidgets.QGraphicsView):
         if self.si_borraMovibles and siBorraMoviblesAhora:
             self.borraMovibles()
 
-        self.ponPosicionBase(position, variation_history=variation_history)
+        self.set_base_position(position, variation_history=variation_history)
 
         if self.dirvisual:
             self.dirvisual.cambiadaPosicionDespues()
@@ -1318,7 +1246,7 @@ class Board(QtWidgets.QGraphicsView):
                 self.xremoveItem(x[1])
         self.liPiezas = []
 
-    def ponPosicionBase(self, position, variation_history=None):
+    def set_base_position(self, position, variation_history=None):
         self.blindfoldPosicion(True, position, self.last_position)
 
         self.variation_history = variation_history
@@ -1341,7 +1269,7 @@ class Board(QtWidgets.QGraphicsView):
             self.flechaSC = None
             self.remove_arrows()
         self.init_kb_buffer()
-        self.setUltPosicion(position)
+        self.set_last_position(position)
         if self.variation_history:
             self.activate_side(position.is_white)
         QtCore.QCoreApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)

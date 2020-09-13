@@ -144,7 +144,7 @@ class ManagerRoutes(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
 
 class ManagerRoutesPlay(ManagerRoutes):
@@ -193,7 +193,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.pgnRefresh(True)
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.siguiente_jugada()
 
@@ -418,7 +418,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         self.pgnRefresh(True)
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         if self.is_guided:
             self.set_label1("<b>%s</b>" % label)
@@ -637,7 +637,7 @@ class ManagerRoutesTactics(ManagerRoutes):
         self.pgnRefresh(True)
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.siguiente_jugada()
 

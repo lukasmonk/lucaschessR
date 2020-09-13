@@ -45,7 +45,7 @@ class ManagerPartida(Manager.Manager):
         self.ponCapInfoPorDefecto()
         self.goto_end()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.ponInformacion()
 
@@ -177,7 +177,7 @@ class ManagerPartida(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def current_pgn(self):
         resp = ""

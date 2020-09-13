@@ -62,7 +62,6 @@ class ShowPGN(QtWidgets.QScrollArea):
         self.link_externo = link_externo
 
     def run_link(self, info):
-        print(info)
         self.last_runlink = info
         if self.link_externo:
             self.link_externo(info)

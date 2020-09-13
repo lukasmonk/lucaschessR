@@ -143,7 +143,7 @@ class ManagerFideFics(Manager.Manager):
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def ponPuntos(self):
         self.set_label2("%s : <b>%d</b>" % (_("Points"), self.puntos))
@@ -401,7 +401,7 @@ class ManagerFideFics(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def muestra_resultado(self):
         self.analizaTerminar()

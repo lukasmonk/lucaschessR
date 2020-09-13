@@ -82,7 +82,7 @@ class ManagerCompeticion(Manager.Manager):
 
         self.is_analyzed_by_tutor = False
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def xrotulo2(self):
         self.set_label2(
@@ -375,7 +375,7 @@ class ManagerCompeticion(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, respMotor):
         from_sq = respMotor.from_sq

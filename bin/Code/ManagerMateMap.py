@@ -73,7 +73,7 @@ class ManagerMateMap(Manager.Manager):
 
         self.is_analyzed_by_tutor = False
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.reiniciando = False
         self.is_rival_thinking = False
@@ -171,7 +171,7 @@ class ManagerMateMap(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, from_sq, to_sq, promotion):
         siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)

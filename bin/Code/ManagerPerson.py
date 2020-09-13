@@ -113,4 +113,4 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
             self.main_window.ponDatosReloj(bl, tpBL, ng, tpNG)
             self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()

@@ -255,7 +255,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         self.is_analyzed_by_tutor = False
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def pon_toolbar(self):
         if self.state == ST_PLAYING:
@@ -626,7 +626,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.state = ST_PLAYING
                 self.toolbar_state = None
                 self.pon_toolbar()
-            self.dgt_setposition()
+            self.check_boards_setposition()
             self.siguiente_jugada()
 
     def testBook(self):
@@ -1081,7 +1081,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         self.pgnRefresh(self.game.last_position.is_white)
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.refresh()
 

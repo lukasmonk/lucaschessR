@@ -47,7 +47,7 @@ class ManagerAlbum(Manager.Manager):
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         player = self.configuration.nom_player()
         other = self.cromo.name
@@ -194,7 +194,7 @@ class ManagerAlbum(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, respMotor):
         from_sq = respMotor.from_sq

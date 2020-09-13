@@ -63,7 +63,7 @@ class WVariations(QtWidgets.QWidget):
                 var_move = variation.move(num)
             is_num_variation = not is_num_variation
         board = self.get_board()
-        board.ponPosicionBase(var_move.position, variation_history=selected_link)
+        board.set_base_position(var_move.position, variation_history=selected_link)
         board.put_arrow_sc(var_move.from_sq, var_move.to_sq)
         self.mostrar()
 

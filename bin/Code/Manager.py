@@ -400,6 +400,7 @@ class Manager:
         # Aprovechamos que esta operacion se hace en cada move
         self.atajosRatonReset()
 
+
     def num_rows(self):
         return self.pgn.num_rows()
 
@@ -1126,7 +1127,7 @@ class Manager:
                 QTUtil2.message_error(self.main_window, _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board)
             else:
                 if set_position:
-                    self.dgt_setposition()
+                    DGT.set_position(self.game)
 
     def dgt(self, quien, a1h8):
         if self.board.mensajero and self.board.siActivasPiezas:
@@ -1151,8 +1152,9 @@ class Manager:
     def set_position(self, position, variation_history=None):
         self.board.set_position(position, variation_history=variation_history)
 
-    def dgt_setposition(self):
+    def check_boards_setposition(self):
         DGT.set_position(self.game)
+        self.board.set_raw_last_position(self.game.last_position)
 
     def juegaPorMi(self):
         if (

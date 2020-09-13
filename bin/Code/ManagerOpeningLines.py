@@ -125,7 +125,7 @@ class ManagerOpeningEngines(Manager.Manager):
 
         self.state = ST_PLAYING
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.errores = 0
         self.ini_time = time.time()
@@ -256,7 +256,7 @@ class ManagerOpeningEngines(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def muestraInformacion(self):
         li = []
@@ -613,7 +613,7 @@ class ManagerOpeningLines(Manager.Manager):
 
         self.state = ST_PLAYING
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.errores = 0
         self.ini_time = time.time()
@@ -850,7 +850,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, respMotor):
         from_sq = respMotor.from_sq
@@ -918,7 +918,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
 
         self.state = ST_PLAYING
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.quitaInformacion()
 
@@ -1093,4 +1093,4 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()

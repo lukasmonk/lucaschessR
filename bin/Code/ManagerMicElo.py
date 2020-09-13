@@ -226,7 +226,7 @@ class ManagerMicElo(Manager.Manager):
         self.main_window.ponDatosReloj(bl, tpBL, ng, tpNG)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         if not self.is_human_side_white:
             mensaje = _("Press the continue button to start.")
@@ -411,7 +411,7 @@ class ManagerMicElo(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         if self.pte_tool_resigndraw:
             if len(self.game) > self.maxPlyRendirse:

@@ -99,7 +99,7 @@ class ManagerGM(Manager.Manager):
 
         self.state = ST_PLAYING
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.siguiente_jugada()
 
@@ -421,7 +421,7 @@ class ManagerGM(Manager.Manager):
 
         self.motorGM.play(move.movimiento())
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def put_result(self):
         self.state = ST_ENDGAME

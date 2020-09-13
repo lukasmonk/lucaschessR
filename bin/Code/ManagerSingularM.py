@@ -154,7 +154,7 @@ class ManagerSingularM(Manager.Manager):
 
         self.state = ST_ENDGAME
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.refresh()
 

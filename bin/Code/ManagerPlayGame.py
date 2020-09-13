@@ -60,7 +60,7 @@ class ManagerPlayGame(Manager.Manager):
 
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.state = ST_PLAYING
         self.siguiente_jugada()
@@ -115,7 +115,7 @@ class ManagerPlayGame(Manager.Manager):
         self.state = ST_PLAYING
         self.board.set_position(self.game.first_position)
         self.pgnRefresh(True)
-        self.dgt_setposition()
+        self.check_boards_setposition()
         self.analizaFinal()
 
         self.siguiente_jugada()
@@ -299,7 +299,7 @@ class ManagerPlayGame(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def put_result(self):
         self.analizaTerminar()

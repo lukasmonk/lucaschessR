@@ -75,7 +75,7 @@ class ManagerSolo(Manager.Manager):
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.goto_end()
 
@@ -208,9 +208,8 @@ class ManagerSolo(Manager.Manager):
         if not move:
             return False
 
-        self.move_the_pieces(move.liMovs)
-
         self.add_move(move, True)
+        self.move_the_pieces(move.liMovs)
 
         if self.play_against_engine and not self.game.siEstaTerminada():
             self.play_against_engine = False
@@ -232,7 +231,7 @@ class ManagerSolo(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def muestra_resultado(self):
         self.state = ST_ENDGAME

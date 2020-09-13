@@ -488,7 +488,7 @@ def get_moves():
     for x in range(nmoves):
         get_move(x+nbase, pv)
         r = pv
-        li.append(r.decode("utf-8"))
+        li.append(r.decode())
     return li
 
 

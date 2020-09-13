@@ -105,7 +105,7 @@ class ManagerTurnOnLights(Manager.Manager):
 
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.state = ST_PLAYING
 
@@ -298,7 +298,7 @@ class ManagerTurnOnLights(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, from_sq, to_sq, promotion):
         siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)

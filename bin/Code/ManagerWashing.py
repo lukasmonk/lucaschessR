@@ -75,7 +75,7 @@ class ManagerWashingReplay(Manager.Manager):
 
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.state = ST_PLAYING
 
@@ -213,7 +213,7 @@ class ManagerWashingReplay(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, from_sq, to_sq, promotion):
         siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
@@ -284,7 +284,7 @@ class ManagerWashingTactics(Manager.Manager):
 
         QTUtil.refresh_gui()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.state = ST_PLAYING
 
@@ -405,7 +405,7 @@ class ManagerWashingTactics(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
     def mueve_rival(self, from_sq, to_sq, promotion):
         siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
@@ -491,7 +491,7 @@ class ManagerWashingCreate(Manager.Manager):
                 self.goto_end()
                 self.main_window.base.pgnRefresh()
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.siguiente_jugada()
 
@@ -698,7 +698,7 @@ class ManagerWashingCreate(Manager.Manager):
 
         self.pgnRefresh(self.game.last_position.is_white)
 
-        self.dgt_setposition()
+        self.check_boards_setposition()
 
         self.refresh()
 
