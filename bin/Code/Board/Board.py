@@ -130,6 +130,15 @@ class Board(QtWidgets.QGraphicsView):
                 QTUtil.ponPortapapeles(self.last_position.fen())
                 QTUtil2.message_bold(self, _("FEN is in clipboard"))
 
+            if siCtrl and (key in (Qt.Key_Plus, Qt.Key_Minus)):
+                ap = self.config_board.anchoPieza()
+                ap += 2 *(1 if key == Qt.Key_Plus else -1)
+                if ap >= 10:
+                    self.config_board.anchoPieza(ap)
+                    self.config_board.guardaEnDisco()
+                    self.cambiadoAncho()
+                    return
+
             # ALT-F -> Rota board
             if key == Qt.Key_F:
                 self.intentaRotarBoard(None)
@@ -626,17 +635,6 @@ class Board(QtWidgets.QGraphicsView):
                     self.rutinaDropsPGN(li[0].path().strip("/"))
         event.setDropAction(QtCore.Qt.IgnoreAction)
         event.ignore()
-        # if mimeData.hasFormat('image/x-lc-dato'):
-        #     dato = mimeData.data('image/x-lc-dato')
-        #     p = event.pos()
-        #     x = p.x()
-        #     y = p.y()
-        #     cx = self.punto2columna(x)
-        #     cy = self.punto2fila(y)
-        #     if cx in range(1, 9) and cy in range(1, 9):
-        #         a1h8 = self.num2alg(cy, cx)
-        #         self.dispatchDrop(a1h8, str(dato))
-        #     event.setDropAction(QtCore.Qt.IgnoreAction)
 
     def showKeys(self):
         liKeys = [
@@ -663,7 +661,6 @@ class Board(QtWidgets.QGraphicsView):
             if hasattr(self.main_window.manager, "rightMouse"):
                 liKeys.append((None, None))
                 liKeys.append(("P", _("Show/Hide PGN information")))
-                liKeys.append((_("ALT") + "-C", _("Show/Hide captures")))
                 liKeys.append((_("ALT") + "-N", _("Activate/Deactivate non distract mode")))
 
             if hasattr(self.main_window.manager, "listHelpTeclado"):
@@ -1143,7 +1140,7 @@ class Board(QtWidgets.QGraphicsView):
                 ap = self.config_board.anchoPieza()
                 if ap > 500:
                     ap = 64
-                ap += 4 * (+1 if salto else -1)
+                ap += 2 * (+1 if salto else -1)
                 if ap >= 10:
                     self.config_board.anchoPieza(ap)
                     self.config_board.guardaEnDisco()

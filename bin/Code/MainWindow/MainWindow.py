@@ -239,14 +239,12 @@ class MainWindow(QTVarios.WDialogo):
                 self.board.maximizaTam(self.activadoF11)
         else:
             n = 0
-            while self.height() > self.board.ancho + 80:
+            while self.height() > self.board.ancho + self.base.tb.height() + 18:
                 self.adjustSize()
                 self.refresh()
                 n += 1
                 if n > 3:
                     break
-        if hasattr(self, "capturas"):
-            self.capturas.resetPZ(self.board)
         self.refresh()
 
     def ajustaTamH(self):

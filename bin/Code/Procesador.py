@@ -208,6 +208,8 @@ class Procesador:
         self.main_window.ponTitulo()
         self.pararMotores()
 
+        self.main_window.current_height = self.main_window.height()
+
     def inicio(self):
         Code.runSound.close()
         if self.manager:

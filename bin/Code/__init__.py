@@ -48,11 +48,11 @@ xtutor = None
 
 list_engine_managers = None
 
-mate_en_dos = 154996
+mate_en_dos = 175522
 
 runSound = None
 
-VERSION = "R0.32a"
+VERSION = "R0.32b"
 DEBUG = False
 DEBUG_ENGINE = False
 
