@@ -671,6 +671,18 @@ class Opening:
     def __len__(self):
         return len(self.li_xpv)
 
+    def get_all_games(self):
+        li_games = []
+        for xpv in self.li_xpv:
+            if xpv in self.cache:
+                game = self.cache[xpv]
+            else:
+                game = Game.Game()
+                pv = FasterCode.xpv_pv(xpv)
+                game.read_pv(pv)
+            li_games.append(game)
+        return li_games
+
     def removeLines(self, li, label):
         self.saveHistory(_("Removing"), label)
         li.sort(reverse=True)
@@ -954,19 +966,16 @@ class Opening:
         bp.ponRotulo(_X(_("Reading %1"), "..."))
         bp.mostrar()
 
-        cp = game.last_position
-
         set_fen = FasterCode.set_fen
         make_move = FasterCode.make_move
         get_fen = FasterCode.get_fen
-
-        st_history_fen_m2 = set()
+        control = Util.Record()
+        control.liPartidas = []
+        control.num_partidas = 0
+        control.with_history = True
+        control.label = "%s,%s,%s" % (_("Polyglot book"), bookW.name, bookB.name)
 
         def hazFEN(fen, lipv_ant, control):
-            fen_m2 = FasterCode.fen_fenm2(fen)
-            if fen_m2 in st_history_fen_m2:
-                return
-            st_history_fen_m2.add(fen_m2)
             if bp.is_canceled():
                 return
             siWhite1 = " w " in fen
@@ -992,13 +1001,11 @@ class Opening:
                     control.liPartidas = []
                     control.with_history = False
 
-        control = Util.Record()
-        control.liPartidas = []
-        control.num_partidas = 0
-        control.with_history = True
-        control.label = "%s,%s,%s" % (_("Polyglot book"), bookW.name, bookB.name)
+        li_games = self.get_all_games() if game is None else [game, ]
 
-        hazFEN(cp.fen(), game.lipv(), control)
+        for game in li_games:
+            cp = game.last_position
+            hazFEN(cp.fen(), game.lipv(), control)
 
         bp.ponRotulo(_("Writing..."))
 

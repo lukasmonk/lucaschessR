@@ -573,7 +573,7 @@ class WLines(QTVarios.WDialogo):
             haz_menu(sub1, game)
             menu.separador()
             sub1 = menu.submenu(_("From all end positions"), Iconos.MoverFinal())
-            haz_menu(sub1, None, all=False)
+            sub1.opcion(("polyglot", None), _("Polyglot book"), Iconos.Libros())
             menu.separador()
         else:
             haz_menu(menu, self.partidabase)
@@ -582,22 +582,19 @@ class WLines(QTVarios.WDialogo):
         if resp is None:
             return
         tipo, game = resp
-        if game is None:
-            pass
-        else:
-            if tipo == "pgn":
-                self.importarPGN(game)
-            elif tipo == "polyglot":
-                self.importarPolyglot(game)
-            elif tipo == "summary":
-                self.importarSummary(game)
-            elif tipo == "voyager2":
-                self.voyager2(game)
-            elif tipo == "opening":
-                self.importarOpening(game)
-            elif tipo == "ol":
-                fichero, game = game
-                self.importarOtra(fichero, game)
+        if tipo == "pgn":
+            self.importarPGN(game)
+        elif tipo == "polyglot":
+            self.importarPolyglot(game)
+        elif tipo == "summary":
+            self.importarSummary(game)
+        elif tipo == "voyager2":
+            self.voyager2(game)
+        elif tipo == "opening":
+            self.importarOpening(game)
+        elif tipo == "ol":
+            fichero, game = game
+            self.importarOtra(fichero, game)
         self.show_lines()
 
     def importarOtra(self, fichero, game):
@@ -837,7 +834,7 @@ class WLines(QTVarios.WDialogo):
         return len(self.dbop) * 2
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
-        if k == QtCore.Qt.Key_Right:
+        if k == QtCore.Qt.Key_Left:
             row, col = self.glines.current_position()
             pos = col.posCreacion
             if pos > 1:
@@ -846,7 +843,7 @@ class WLines(QTVarios.WDialogo):
                 else:
                     self.glines.goto(row - 1, pos - 1)
                 return
-        elif k == QtCore.Qt.Key_Left:
+        elif k == QtCore.Qt.Key_Right:
             row, col = self.glines.current_position()
             pos = col.posCreacion
             if pos >= 1:
@@ -855,12 +852,23 @@ class WLines(QTVarios.WDialogo):
                 else:
                     self.glines.goto(row - 1, pos)
                 return
-        if k in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):
+        elif k in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):
             row, col = self.glines.current_position()
             if col.key == "LINE":
                 self.borrar()
             else:
                 self.borrar_move()
+        elif k == QtCore.Qt.Key_Up:
+            row, col = self.glines.current_position()
+            if row > 0:
+                self.glines.goto(row-1, col.posCreacion-1)
+
+        elif k == QtCore.Qt.Key_Down:
+            row, col = self.glines.current_position()
+            if row < self.grid_num_datos(None)-1:
+                self.glines.goto(row+1, col.posCreacion-1)
+
+
 
     def grid_doble_click(self, grid, row, o_column):
         game = self.partidaActual()
