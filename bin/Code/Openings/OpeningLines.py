@@ -7,6 +7,7 @@ import collections
 
 import FasterCode
 
+import Code
 from Code import Util
 from Code.SQL import UtilSQL
 from Code.Base import Game, Position
@@ -191,6 +192,17 @@ class Opening:
         self.db_cache_engines = None
         self.basePV = self.getconfig("BASEPV", "")
         self.title = self.getconfig("TITLE", os.path.basename(nom_fichero).split(".")[0])
+
+        # Check visual
+        if not UtilSQL.check_table_in_db(nom_fichero, "Flechas"):
+            file_resources = Code.configuration.ficheroRecursos
+            for tabla in ("Config", "Flechas", "Marcos", "SVGs", "Markers"):
+                dbr = UtilSQL.DictSQL(nom_fichero, tabla=tabla)
+                dbv = UtilSQL.DictSQL(file_resources, tabla=tabla)
+                dbr.copy_from(dbv)
+                dbr.close()
+                dbv.close()
+
 
         self.board = None
 
@@ -808,47 +820,32 @@ class Opening:
         sql_insert = "INSERT INTO LINES( XPV ) VALUES( ? )"
         sql_update = "UPDATE LINES SET XPV=? WHERE XPV=?"
 
-        for n, (nbytes, p) in enumerate(Game.read_games(ficheroPGN)):
+        for n, (nbytes, game) in enumerate(Game.read_games(ficheroPGN)):
             dlTmp.pon(nbytes)
 
-            def haz_partida(game, mx):
-                njg = len(game)
-                if njg > mx:
-                    game.li_moves = game.li_moves[:mx]
-                pv = game.pv()
-                if base and not pv.startswith(base):
-                    return
+            li_pv = game.all_pv("", variations)
+            for pv in li_pv:
+                li = pv.split(" ")[:maxDepth]
+                pv = " ".join(li)
+
+                if base and not pv.startswith(base) or base == pv:
+                    continue
                 xpv = FasterCode.pv_xpv(pv)
                 updated = False
                 for npos, xpv_ant in enumerate(self.li_xpv):
                     if xpv_ant.startswith(xpv):
-                        return
-                    if xpv.startswith(xpv_ant):
+                        updated = True
+                        break
+                    if xpv.startswith(xpv_ant) and xpv > xpv_ant:
                         cursor.execute(sql_update, (xpv, xpv_ant))
                         self.li_xpv[npos] = xpv
                         updated = True
                         break
                 if not updated:
-                    cursor.execute(sql_insert, (xpv,))
-                    self.li_xpv.append(xpv)
+                    if len(xpv) > 0:
+                        cursor.execute(sql_insert, (xpv,))
+                        self.li_xpv.append(xpv)
 
-                if variations != "N":  # None
-                    for njug, move in enumerate(game.li_moves):
-                        ok = True
-                        if variations != "A":
-                            if variations == "W":
-                                if njug % 2 == 1:
-                                    ok = False
-                            elif variations == "B":
-                                if njug % 2 == 0:
-                                    ok = False
-                        if ok:
-                            for pvar in move.variations.list_games():
-                                if len(pvar):
-                                    if mx - njug > 0:
-                                        haz_partida(pvar, mx - njug)
-
-            haz_partida(p, maxDepth)
             if n % 50:
                 self._conexion.commit()
 
@@ -856,62 +853,6 @@ class Opening:
         self.li_xpv.sort()
         self._conexion.commit()
         dlTmp.cerrar()
-
-    def importarPGO(self, partidabase, ficheroPGO, maxDepth):
-        self.saveHistory(_("Personal Opening Guide"), os.path.basename(ficheroPGO))
-
-        base = partidabase.pv() if partidabase else self.getconfig("BASEPV")
-        base_xpv = FasterCode.pv_xpv(base)
-
-        conexionPGO = sqlite3.connect(ficheroPGO)
-        liRawPGO = conexionPGO.execute("SELECT XPV from GUIDE")
-        stPGO = set()
-        for raw in liRawPGO:
-            xpv = raw[0]
-            if maxDepth:
-                lipv = FasterCode.xpv_pv(xpv).split(" ")
-                if len(lipv) > maxDepth:
-                    lipv = lipv[:maxDepth]
-                    xpv = FasterCode.pv_xpv(" ".join(lipv))
-            if not xpv.startswith(base_xpv):
-                continue
-            ok = True
-            lirem = []
-            for xpv0 in stPGO:
-                if xpv.startswith(xpv0):
-                    lirem.append(xpv0)
-                elif xpv0.startswith(xpv):
-                    ok = False
-                    break
-            for xpv0 in lirem:
-                stPGO.remove(xpv0)
-            if ok:
-                stPGO.add(xpv)
-        conexionPGO.close()
-
-        cursor = self._conexion.cursor()
-
-        sql_insert = "INSERT INTO LINES( XPV ) VALUES( ? )"
-        sql_update = "UPDATE LINES SET XPV=? WHERE XPV=?"
-
-        for xpv in stPGO:
-            add = True
-            for npos, xpv_ant in enumerate(self.li_xpv):
-                if xpv_ant.startswith(xpv):
-                    add = False
-                    break
-                if xpv.startswith(xpv_ant):
-                    cursor.execute(sql_update, (xpv, xpv_ant))
-                    self.li_xpv[npos] = xpv
-                    add = False
-                    break
-            if add:
-                cursor.execute(sql_insert, (xpv,))
-                self.li_xpv.append(xpv)
-
-        cursor.close()
-        self.li_xpv.sort()
-        self._conexion.commit()
 
     def guardaPartidas(self, label, liPartidas, minMoves=0, with_history=True):
         if with_history:

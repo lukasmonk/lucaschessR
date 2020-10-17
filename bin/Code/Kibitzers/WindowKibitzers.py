@@ -105,10 +105,6 @@ class WKibitzers(QTVarios.WDialogo):
             control = "cb"
             lista = Priorities.priorities.combo()
             valor = kibitzer.prioridad
-        elif key == "position_before":
-            kibitzer.position_before = not kibitzer.position_before
-            self.kibitzers.save()
-            self.goto(nk)
         elif key == "visible":
             kibitzer.visible = not kibitzer.visible
             self.kibitzers.save()
@@ -373,7 +369,6 @@ class WKibitzers(QTVarios.WDialogo):
             self.liKibActual.append((_("Type"), me.ctipo(), "tipo"))
             self.liKibActual.append((_("Priority"), me.cpriority(), "prioridad"))
 
-        self.liKibActual.append((_("Analysis of the base position"), str(me.position_before), "position_before"))
         self.liKibActual.append((_("Visible in menu"), str(me.visible), "visible"))
 
         if not (tipo in (Kibitzers.KIB_POLYGLOT, Kibitzers.KIB_GAVIOTA, Kibitzers.KIB_INDEXES)):
@@ -438,7 +433,6 @@ class WKibitzerLive(QTVarios.WDialogo):
     def leeOpciones(self):
         li = []
         li.append([_("Priority"), self.kibitzer.cpriority(), "prioridad"])
-        li.append([_("Analysis of the base position"), str(self.kibitzer.position_before), "position_before"])
         for num, opcion in enumerate(self.kibitzer.li_uci_options()):
             default = opcion.label_default()
             label_default = " (%s)" % default if default else ""
@@ -460,8 +454,6 @@ class WKibitzerLive(QTVarios.WDialogo):
                     prioridad = self.kibitzer.prioridad
                     priorities = Priorities.priorities
                     xprioridad = priorities.value(prioridad)
-                elif key == "position_before":
-                    xposicionBase = self.kibitzer.position_before
                 else:
                     numopcion = int(key)
                     opcion = self.kibitzer.li_options[numopcion]
@@ -481,10 +473,6 @@ class WKibitzerLive(QTVarios.WDialogo):
             control = "cb"
             lista = Priorities.priorities.combo()
             valor = self.kibitzer.prioridad
-        elif key == "position_before":
-            self.kibitzer.position_before = not self.kibitzer.position_before
-            self.li_options[recno][1] = self.kibitzer.position_before
-            self.gridValores.refresh()
         else:
             opcion = self.kibitzer.li_options[int(key)]
             tipo = opcion.tipo

@@ -671,7 +671,7 @@ class ManagerOpeningLines(Manager.Manager):
                     mens3 += "\n %s" % dic_nags[valoracion]
             self.set_label3(mens3 if mens3 else None)
 
-    def partidaTerminada(self, siCompleta):
+    def partidaTerminada(self, si_completa):
         self.state = ST_ENDGAME
         tm = time.time() - self.ini_time
         li = [_("Line finished.")]
@@ -680,14 +680,14 @@ class ManagerOpeningLines(Manager.Manager):
         if self.errores > 0:
             li.append("%s: %d" % (_("Errors"), self.errores))
 
-        if siCompleta:
+        if si_completa:
             mensaje = "\n".join(li)
             self.mensajeEnPGN(mensaje)
         dictry = {"DATE": Util.today(), "TIME": tm, "AYUDA": self.siAyuda, "ERRORS": self.errores}
         self.game_info["TRIES"].append(dictry)
 
         sinError = self.errores == 0 and not self.siAyuda
-        if siCompleta:
+        if si_completa:
             if sinError:
                 self.game_info["NOERROR"] += 1
                 noError = self.game_info["NOERROR"]
@@ -814,7 +814,7 @@ class ManagerOpeningLines(Manager.Manager):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False
-        pvSel = from_sq + to_sq + promotion
+        pvSel = from_sq + to_sq + (promotion if promotion else "")
         pvObj = self.li_pv[len(self.game)]
 
         if pvSel != pvObj:

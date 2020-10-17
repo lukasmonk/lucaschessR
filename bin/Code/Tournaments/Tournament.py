@@ -354,7 +354,7 @@ class Tournament:
         lista.sort(reverse=True)
         for pos in lista:
             game = self.game_finished(pos)
-            if game:
+            if game is not None:
                 eng_white = self.db_engines.get(game.hwhite)
                 eng_black = self.db_engines.get(game.hblack)
                 eng_white.remove_result(game)

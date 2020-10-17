@@ -130,6 +130,15 @@ class DictSQL(object):
     def __exit__(self, xtype, value, traceback):
         self.close()
 
+    def copy_from(self, dbdict):
+        mode = self.normal_save_mode
+        self.set_faster_mode()
+        for key in dbdict.keys():
+            self[key] = dbdict[key]
+        self.conexion.commit()
+        self.pending_commit = False
+        self.normal_save_mode = mode
+
 
 class DictObjSQL(DictSQL):
     def __init__(self, nom_db, class_storage, tabla="Data", max_cache=2048):
@@ -596,3 +605,11 @@ class DictBigDB(object):
         k, v = self.rows_iter[self.pos_iter]
         self.pos_iter += 1
         return k, pickle.loads(v)
+
+
+def check_table_in_db(path_db: str, table: str):
+    conexion = sqlite3.connect(path_db)
+    cursor = conexion.cursor()
+    cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name=?", (table, ))
+    resp = cursor.fetchone()[0] == 1
+    conexion.close()

@@ -181,6 +181,7 @@ class WBase(QtWidgets.QWidget):
         self.pgn.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.pgn.tipoLetra(puntos=configuration.x_pgn_fontpoints)
         self.pgn.ponAltoFila(configuration.x_pgn_rowheight)
+        self.pgn.set_right_button_without_rows(True)
 
         # # Blancas y negras
         f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels + 2, peso=75)
@@ -318,8 +319,8 @@ class WBase(QtWidgets.QWidget):
         self.manager.pgnMueveBase(row, column.key)
 
     def grid_right_button(self, grid, row, column, modificadores):
-        self.manager.pgnMueveBase(row, column.key)
         self.manager.gridRightMouse(modificadores.is_shift, modificadores.is_control, modificadores.is_alt)
+        self.manager.pgnMueveBase(row, column.key)
 
     def boardRightMouse(self, is_shift, is_control, is_alt):
         if hasattr(self.manager, "boardRightMouse"):

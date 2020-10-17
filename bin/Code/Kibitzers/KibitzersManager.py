@@ -30,15 +30,15 @@ class Manager:
         for ipc_kibitzer in self.li_activos:
             ipc_kibitzer.stop()
 
-    def put_fen(self, fen, fenbase, only_last=False):
+    def put_game(self, game, only_last=False):
         if self.li_activos:
             if only_last:
-                self.li_activos[-1].put_fen(fen, fenbase)
+                self.li_activos[-1].put_game(game)
             else:
                 li_closed = []
                 for n, ipc_kibitzer in enumerate(self.li_activos):
                     if ipc_kibitzer.working():
-                        ipc_kibitzer.put_fen(fen, fenbase)
+                        ipc_kibitzer.put_game(game)
                     else:
                         li_closed.append(n)
                 if li_closed:
@@ -91,10 +91,10 @@ class IPCKibitzer:
             return False
         return self.popen.poll() is None
 
-    def put_fen(self, fen, fenBase):
+    def put_game(self, game):
         orden = Orden()
-        orden.key = KIBRUN_FEN
-        orden.dv["FEN"] = "%s|%s" % (fen, fenBase)
+        orden.key = KIBRUN_GAME
+        orden.dv["GAME"] = game.save()
         self.escribe(orden)
 
     def stop(self):

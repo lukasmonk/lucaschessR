@@ -4,7 +4,7 @@ from PySide2 import QtWidgets, QtCore
 
 from Code.Base import Game
 from Code import Variations
-from Code.QT import Colocacion, Controles, Iconos, QTVarios, ShowPGN
+from Code.QT import Colocacion, Controles, Iconos, QTVarios, ShowPGN, QTUtil2, FormLayout
 from Code import TrListas
 import Code
 
@@ -24,7 +24,7 @@ class WVariations(QtWidgets.QWidget):
             None,
             ("%s+%s" % (_("Append"), _("Engine")), Iconos.MasR(), self.tb_mas_variation_r),
             None,
-            (_("Edit"), Iconos.ComentarioEditar(), self.tb_edit_variation),
+            (_("Edit in other board"), Iconos.EditVariation(), self.tb_edit_variation),
             None,
             (_("Remove"), Iconos.Borrar(), self.tb_remove_variation),
             None,
@@ -69,6 +69,57 @@ class WVariations(QtWidgets.QWidget):
 
     def link_variation_edit(self, num_variation):
         self.edit(num_variation)
+
+    def det_variation_move(self, li_variation_move):
+        var_move = self.move
+        variation = None
+        is_num_variation = True
+        for num in li_variation_move[1:]:
+            num = int(num)
+            if is_num_variation:
+                variation = var_move.variations.get(num)
+            else:
+                var_move = variation.move(num)
+            is_num_variation = not is_num_variation
+        return variation, var_move
+
+    def remove_line(self):
+        if QTUtil2.pregunta(self, _("Are you sure you want to delete this line?")):
+            li_variation_move = self.selected_link.split("|")
+            num_line = int(li_variation_move[-2])
+
+            li_variation_move = li_variation_move[:-2]
+            selected_link = "|".join(li_variation_move)
+            variation, var_move = self.det_variation_move(li_variation_move)
+
+            var_move.variations.remove(num_line)
+            self.link_variation_pressed(selected_link)
+
+    def remove_move(self):
+        li_variation_move = self.selected_link.split("|")
+        li_variation_move[-1] = str(int(li_variation_move[-1])-1)
+        variation, var_move = self.det_variation_move(li_variation_move)
+        variation.shrink(int(li_variation_move[-1]))
+        selected_link = "|".join(li_variation_move)
+        self.link_variation_pressed(selected_link)
+
+    def comment_edit(self):
+        li_variation_move = self.selected_link.split("|")
+        variation, var_move = self.det_variation_move(li_variation_move)
+        previo = var_move.comment
+        form = FormLayout.FormLayout(self, _("Comments"), Iconos.ComentarioEditar(), anchoMinimo=640)
+        form.separador()
+
+        config = FormLayout.Editbox(_("Comment"), alto=5)
+        form.base(config, previo)
+
+        resultado = form.run()
+
+        if resultado:
+            accion, resp = resultado
+            comment = resp[0].strip()
+            var_move.comment = comment
+            self.link_variation_pressed(self.selected_link)
 
     def set_move(self, move):
         self.move = move
@@ -250,7 +301,7 @@ class InformacionPGN(QtWidgets.QWidget):
 
         else:
             self.gb_comments.set_text("%s - %s" % (_("Game"), _("Comments")))
-            if game:
+            if game is not None:
                 self.comment.set_text(game.first_comment)
                 if opening:
                     self.lb_opening.set_text(opening)

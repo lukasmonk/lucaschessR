@@ -6,16 +6,16 @@
 # ==============================================================================
 import sys
 
-# TODO Variations, que sea editable directamente el movimiento
-# TODO Analisis/kibitzers con todos los movimientos
+# TODO kibitzers con todos los movimientos
+# TODO Kibitzer, misma orientación que el original
 # TODO Grabar automáticamente todas las partidas con mas de 10 movimientos
 # TODO En análisis usar el mismo sistema que en Databases, para mostrar todo sin que se escondan los botones
-# sys.argv = ['./LucasR.py', '-tournament', 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Irina vs 1400 Honey.mvm',
-# 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Workers\\worker.00001']
+# TODO Añadir en databases, ir a la siguiente
 import Code.Translate as Translate
 
 Translate.install()
 
+# sys.argv = ['./LucasR.py', '-kibitzer', r'c:\lucaschess\pyLCR\UserData\435782458.db']
 n_args = len(sys.argv)
 if n_args == 1:
     import Code.Base.Init

@@ -101,7 +101,7 @@ class ManagerSolo(Manager.Manager):
 
     def dropPGN(self, pgn):
         game = self.procesador.select_1_pgn(self.main_window)
-        if game:
+        if game is not None:
             self.leerpgn(game)
 
     def run_action(self, key):
@@ -553,7 +553,7 @@ class ManagerSolo(Manager.Manager):
     def leerpgn(self, game=None):
         if game is None:
             game = self.procesador.select_1_pgn()
-        if game:
+        if game is not None:
             dic = self.creaDic()
             dic["GAME"] = game.save()
             dic["WHITEBOTTOM"] = self.board.is_white_bottom

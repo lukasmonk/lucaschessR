@@ -30,7 +30,7 @@ class WKibIndex(QtWidgets.QDialog):
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.siShowBoard = dicVideo.get("SHOW_BOARD", True)
+        self.show_board = dicVideo.get("SHOW_BOARD", True)
         self.history = []
 
         self.fen = ""
@@ -67,8 +67,8 @@ class WKibIndex(QtWidgets.QDialog):
             (_("Continue"), Iconos.Kibitzer_Continuar(), self.play),
             (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
             (_("Takeback"), Iconos.Atras(), self.takeback),
-            (_("Analyze only color"), Iconos.P_16c(), self.color),
-            (_("Show/hide board"), Iconos.Board(), self.config_board),
+            (_("Analyze only color"), Iconos.Kibitzer_Side(), self.color),
+            (_("Show/hide board"), Iconos.Kibitzer_Board(), self.config_board),
             (_("Manual position"), Iconos.Voyager(), self.set_position),
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
@@ -84,9 +84,9 @@ class WKibIndex(QtWidgets.QDialog):
 
         self.siPlay = True
         self.is_white = True
-        self.siNegras = True
+        self.is_black = True
 
-        if not self.siShowBoard:
+        if not self.show_board:
             self.board.hide()
         self.restore_video(dicVideo)
         self.ponFlags()
@@ -188,7 +188,7 @@ class WKibIndex(QtWidgets.QDialog):
         self.siPlay = True
         self.tb.setPosVisible(1, False)
         self.tb.setPosVisible(2, True)
-        self.ponFen(self.fen)
+        self.put_game(self.fen)
 
     def stop(self):
         self.siPlay = False
@@ -222,9 +222,9 @@ class WKibIndex(QtWidgets.QDialog):
     def closeEvent(self, event):
         self.finalizar()
 
-    def siAnalizar(self):
+    def if_to_analyze(self):
         siW = " w " in self.fen
-        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.siNegras)):
+        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
             return False
         return True
 
@@ -235,14 +235,14 @@ class WKibIndex(QtWidgets.QDialog):
         menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), Iconos.PuntoVerde())
         resp = menu.lanza()
         if resp:
-            self.siNegras = True
+            self.is_black = True
             self.is_white = True
             if resp == "blancas":
-                self.siNegras = False
+                self.is_black = False
             elif resp == "negras":
                 self.is_white = False
-            if self.siAnalizar():
-                self.ponFen(self.fen)
+            if self.if_to_analyze():
+                self.put_game(self.fen)
 
     def finalizar(self):
         self.save_video()
@@ -261,7 +261,7 @@ class WKibIndex(QtWidgets.QDialog):
         tam = self.size()
         dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
 
-        dic["SHOW_BOARD"] = self.siShowBoard
+        dic["SHOW_BOARD"] = self.show_board
 
         dic["SITOP"] = self.siTop
 
@@ -299,26 +299,22 @@ class WKibIndex(QtWidgets.QDialog):
                 h = 20
             self.resize(w, h)
 
-    def orden_fen(self, fen):
-        posicionInicial = Position.Position()
-        posicionInicial.read_fen(fen)
-
-        self.siW = posicionInicial.is_white
-
-        self.board.set_position(posicionInicial)
+    def orden_game(self, game):
+        position = game.last_position
+        self.siW = position.is_white
+        self.board.set_position(position)
         self.board.activate_side(self.siW)
 
         self.escribe("stop")
 
-        game = Game.Game(fen=fen)
         self.engine.ac_inicio(game)
 
     def escribe(self, linea):
         self.engine.put_line(linea)
 
     def config_board(self):
-        self.siShowBoard = not self.siShowBoard
-        self.board.setVisible(self.siShowBoard)
+        self.show_board = not self.show_board
+        self.board.setVisible(self.show_board)
         self.save_video()
 
     def set_position(self):
@@ -326,26 +322,7 @@ class WKibIndex(QtWidgets.QDialog):
         cp.read_fen(self.fen)
         resp = Voyager.voyager_position(self, cp)
         if resp is not None:
-            self.ponFen(resp.fen())
-
-    def ponFen(self, fen):
-        self.history = []
-        self.pon_fen_hist(fen)
-
-    def pon_fen_hist(self, fen):
-        if not self.history or self.history[-1] != fen:
-            self.history.append(fen)
-        self.liData = []
-        self.depth = 0
-        if fen:
-            self.fen = fen
-            if self.siAnalizar():
-                self.orden_fen(fen)
-            else:
-                self.stop()
-        else:
-            self.stop()
-        self.grid.refresh()
+            self.put_game(resp.fen())
 
     def mensajero(self, from_sq, to_sq, promocion=""):
         FasterCode.set_fen(self.fen)
@@ -354,8 +331,8 @@ class WKibIndex(QtWidgets.QDialog):
             self.pon_fen_hist(self.fen)
 
     def takeback(self):
-        if len(self.history) > 1:
-            fen = self.history.pop()
-            if fen == self.fen and self.history:
-                fen = self.history.pop()
-            self.pon_fen_hist(fen)
+        nmoves = len(self.game)
+        if nmoves:
+            self.game.shrink(nmoves-2)
+            self.orden_game(self.game)
+

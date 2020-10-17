@@ -1079,12 +1079,12 @@ class Procesador:
             window, xtutor, is_competitive=is_competitive, kibitzers_manager=self.kibitzers_manager
         )
 
-    def managerPartida(self, window, game, siCompleta, si_solo_consultar, boardFather):
+    def managerPartida(self, window, game, si_completa, si_solo_consultar, boardFather):
         clonProcesador = ProcesadorVariations(
             window, self.xtutor, is_competitive=False, kibitzers_manager=self.kibitzers_manager
         )
         clonProcesador.manager = ManagerPartida.ManagerPartida(clonProcesador)
-        clonProcesador.manager.inicio(game, siCompleta, si_solo_consultar)
+        clonProcesador.manager.inicio(game, si_completa, si_solo_consultar)
 
         board = clonProcesador.main_window.board
         if boardFather:

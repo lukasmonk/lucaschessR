@@ -105,7 +105,7 @@ class WBDatabase(QTVarios.WDialogo):
     def tw_aceptar(self):
         self.game, recno = self.wgames.current_game()
         self.dbGames.close()
-        if self.game:
+        if self.game is not None:
             self.accept()
         else:
             self.reject()

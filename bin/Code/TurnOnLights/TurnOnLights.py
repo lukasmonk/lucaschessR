@@ -260,17 +260,17 @@ class TurnOnLights:
         write_tol(self)
 
     def prev_next(self):
-        prev, next = False, False
+        prev, post = False, False
         if self.work_level > 0:
             prev = True
         level = self.levels[self.work_level]
         terminado = False
         if self.work_level < (len(self.levels) - 1):
             if level.done(self.calculation_mode):
-                next = True
+                post = True
         else:
             terminado = level.done(self.calculation_mode)
-        return prev, next, terminado
+        return prev, post, terminado
 
     @property
     def num_blocks(self):

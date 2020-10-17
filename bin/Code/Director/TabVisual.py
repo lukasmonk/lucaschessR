@@ -800,6 +800,7 @@ class DBManagerVisual:
     def dbConfig(self):
         if self._dbConfig is None:
             self._dbConfig = UtilSQL.DictSQL(self._fichero, tabla="Config")
+            li = self.dbConfig["SELECTBANDA"]
         return self._dbConfig
 
     @property

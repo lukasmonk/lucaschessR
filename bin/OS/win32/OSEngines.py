@@ -180,21 +180,15 @@ def read_engines(folder_engines):
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 218)
 
-    cm = mas("honey", "Michael Byrne", f"12 {t32_64}bit", "https://github.com/MichaelB7/Stockfish/tree/honey",
-             f"Honey-12_x{t32_64}.exe", 3400, folder="stockfish")
-    cm.ordenUCI("Hash", "64")
-    cm.ordenUCI("UCI_ShowWDL", "false")
-    cm.ponMultiPV(20, 256)
 
     if is64:
         mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3240)
 
     cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"12 {t32_64}bits", "http://stockfishchess.org/",
-             f"Stockfish-12_x{t32_64}.exe", 3400)
+             f"Stockfish-12R1_x{t32_64}.exe", 3400)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Threads", "1")
     cm.ordenUCI("Hash", "64")
-    cm.ordenUCI("EvalFile", "eval.bin")
     cm.ponMultiPV(20, 500)
 
     return dic_engines
@@ -206,7 +200,6 @@ def dict_engines_fixed_elo(folder_engines):
     for nm, desde, hasta in (
         ("rodent", 600, 2600),
         ("amyan", 1000, 2400),
-        ("honey", 1750, 2900),
         ("stockfish", 1350, 2850),
         ("rhetoric", 1300, 2600),
         ("cheng", 800, 2500),

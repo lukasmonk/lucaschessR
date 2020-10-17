@@ -60,6 +60,9 @@ class FormLayout:
     def separador(self):
         self.li_gen.append(separador)
 
+    def base(self, config, valor):
+        self.li_gen.append((config, valor))
+
     def eddefault(self, label: str, init_value):
         self.li_gen.append((label + ":", init_value))
 

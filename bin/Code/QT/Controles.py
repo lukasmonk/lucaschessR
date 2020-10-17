@@ -927,6 +927,9 @@ class Tab(QtWidgets.QTabWidget):
     def dispatchChange(self, dispatch):
         self.currentChanged.connect(dispatch)
 
+    def quita_x(self, pos):
+        self.tabBar().tabButton(pos, QtWidgets.QTabBar.RightSide).hide()
+
         # def formaTriangular( self ):
         # self.setTabShape(self.Triangular)
 

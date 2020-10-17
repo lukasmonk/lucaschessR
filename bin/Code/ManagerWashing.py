@@ -485,7 +485,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.pgnRefresh(True)
 
         game = dbwashing.restoreGame(engine)
-        if game:
+        if not (game is None):
             if not game.is_finished():
                 self.game = game
                 self.goto_end()

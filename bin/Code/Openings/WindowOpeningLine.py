@@ -9,6 +9,7 @@ from PySide2 import QtCore, QtWidgets
 
 from Code import Util
 from Code.Base import Game
+from Code.Base.Constantes import *
 from Code.Analysis import Analysis
 from Code.Polyglots import Books
 from Code.Engines import EnginesBunch
@@ -24,6 +25,7 @@ from Code.QT import Delegados
 from Code.QT import Voyager
 from Code.QT import FormLayout
 from Code.QT import WindowSavePGN
+
 
 
 class WLines(QTVarios.WDialogo):
@@ -736,7 +738,7 @@ class WLines(QTVarios.WDialogo):
         liGen.append((FormLayout.Spinbox(_("Depth"), 3, 999, 50), previo.get("IPGN_DEPTH", 30)))
         liGen.append((None, None))
 
-        liVariations = ((_("All"), "A"), (_("None"), "N"), (_("White"), "W"), (_("Black"), "B"))
+        liVariations = ((_("All"), ALL), (_("None"), NONE), (_("White"), ONLY_WHITE), (_("Black"), ONLY_BLACK))
         config = FormLayout.Combobox(_("Include variations"), liVariations)
         liGen.append((config, previo.get("IPGN_VARIATIONSMODE", "A")))
         liGen.append((None, None))
@@ -872,7 +874,7 @@ class WLines(QTVarios.WDialogo):
 
     def grid_doble_click(self, grid, row, o_column):
         game = self.partidaActual()
-        if game:
+        if game is not None:
             self.procesador.cambiaXAnalyzer()
             xanalyzer = self.procesador.xanalyzer
             move = game.move(-1)

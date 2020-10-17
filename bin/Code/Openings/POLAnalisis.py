@@ -474,6 +474,10 @@ class TabsAnalisis(QtWidgets.QWidget):
 
         self.tabtree = TabTree(self, configuration)
         self.tabengine = TabEngine(self, procesador, configuration)
+        # self.tabengine.tabButton(0, QtWidgets.QTabBar.RightSide).deleteLater()
+        # self.tabengine.tabBar().setTabButton(0, QtWidgets.QTabBar.RightSide, 0)
+
+
         self.li_tabs = [("engine", self.tabengine), ("tree", self.tabtree)]
         self.tabActive = 0
 
@@ -500,12 +504,15 @@ class TabsAnalisis(QtWidgets.QWidget):
         self.tabs.setTabsClosable(True)
         self.tabs.tabCloseRequested.connect(self.tabCloseRequested)
 
+        self.tabs.quita_x(0)
+        self.tabs.quita_x(1)
+
         layout = Colocacion.V()
         layout.control(self.tabs).margen(0)
         self.setLayout(layout)
 
     def changedNextMove(self):
-        if self.game:
+        if self.game is not None:
             self.setPosicion(self.game, self.njg)
 
     def tabChanged(self, ntab):

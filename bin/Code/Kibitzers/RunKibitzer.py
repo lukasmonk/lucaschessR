@@ -6,12 +6,13 @@ from PySide2 import QtWidgets
 from Code.Config import Configuration
 
 from Code import Util
+from Code.Base import Game
 from Code.Openings import OpeningsStd
 from Code.Engines import Priorities
 from Code.SQL import UtilSQL
 import Code
 from Code.Kibitzers import Kibitzers
-from Code.Kibitzers import WKibBase
+from Code.Kibitzers import WKibEngine
 from Code.Kibitzers import WKibLinea
 from Code.Kibitzers import WKibBooks
 from Code.Kibitzers import WKibIndex
@@ -35,7 +36,6 @@ class CPU:
         self.ipc = UtilSQL.IPC(fdb, False)
 
         self.configuration = None
-        self.configMotor = None
         self.titulo = None
 
         self.ventana = None
@@ -88,18 +88,12 @@ class CPU:
             self.dic_video = self.configuration.restore_video(self.key_video)
 
             self.tipo = self.kibitzer.tipo
-            self.position_before = self.kibitzer.position_before
             self.lanzaVentana()
 
-        elif key == KIBRUN_FEN:
-            self.fen, self.fenBase = orden.dv["FEN"].split("|")
-            fen = self.fenBase if self.position_before else self.fen
-            if self.tipo == KIB_THREATS:
-                li = fen.split(" ")
-                li[1] = "w" if li[1] == "b" else "b"
-                li[3] = "-"  # Hay que tener cuidado con la captura al paso, stockfish crash.
-                fen = " ".join(li)
-            self.ventana.ponFen(fen)
+        elif key == KIBRUN_GAME:
+            game = Game.Game()
+            game.restore(orden.dv["GAME"])
+            self.ventana.orden_game(game)
 
         elif key == KIBRUN_STOP:
             self.ventana.stop()
@@ -121,13 +115,10 @@ class CPU:
         self.configuration.releeTRA()
 
         if self.tipo == KIB_BESTMOVE:
-            self.ventana = WKibBase.WKibBase(self)
+            self.ventana = WKibEngine.WKibEngine(self)
 
         elif self.tipo == KIB_CANDIDATES:
-            self.ventana = WKibBase.WKibBase(self)
-
-        elif self.tipo == KIB_THREATS:
-            self.ventana = WKibBase.WKibBase(self)
+            self.ventana = WKibEngine.WKibEngine(self)
 
         elif self.tipo == KIB_BESTMOVE_ONELINE:
             self.ventana = WKibLinea.WKibLinea(self)

@@ -250,7 +250,7 @@ class Configuration:
 
         self.x_rival_inicial = "rocinante" if Code.isLinux else "irina"
 
-        self.tutor_inicial = "honey"
+        self.tutor_inicial = "stockfish"
         self.x_tutor_clave = self.tutor_inicial
         self.x_tutor_multipv = 10  # 0: maximo
         self.x_tutor_difpoints = 0

@@ -12,13 +12,12 @@ from Code.Base.Constantes import *
 class Tipos:
     def __init__(self):
         self.li_tipos = (
-            (KIB_CANDIDATES, _("Candidates"), Iconos.pmPuntoRojo()),
-            (KIB_BESTMOVE, _("Best move"), Iconos.pmPuntoVerde()),
+            (KIB_CANDIDATES, _("Candidates"), Iconos.pmKibitzer().scaledToWidth(16)),
+            (KIB_BESTMOVE, _("Best move"), Iconos.pmKibitzer().scaledToWidth(16)),
             (KIB_INDEXES, _("Indexes") + " - RodentII", Iconos.pmPuntoNegro()),
-            (KIB_BESTMOVE_ONELINE, _("Best move in one line"), Iconos.pmPuntoMagenta()),
+            (KIB_BESTMOVE_ONELINE, _("Best move in one line"), Iconos.pmKibitzer().scaledToWidth(16)),
             (KIB_STOCKFISH, _("Stockfish evaluation"), Iconos.pmPuntoAmarillo()),
-            (KIB_THREATS, _("Threats"), Iconos.pmPuntoAzul()),
-            (KIB_POLYGLOT, _("Polyglot book"), Iconos.pmPuntoEstrella()),
+            (KIB_POLYGLOT, _("Polyglot book"), Iconos.pmBook().scaledToWidth(16)),
             (KIB_GAVIOTA, _("Gaviota Tablebases"), Iconos.pmFinales().scaledToWidth(16)),
         )
 
@@ -49,7 +48,6 @@ class Kibitzer(Engines.Engine):
         self.tipo = None
         self.huella = None
         self.prioridad = Priorities.priorities.normal
-        self.position_before = False
         self.visible = True
         self.name = None
 
@@ -66,7 +64,6 @@ class Kibitzer(Engines.Engine):
         otro.tipo = self.tipo
         otro.prioridad = self.prioridad
         otro.name = self.name
-        otro.position_before = self.position_before
         otro.visible = True
         otro.pon_huella(liEngines)
         lista = [en.name for en in liEngines]

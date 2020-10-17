@@ -52,14 +52,6 @@ def Tutor():
     return QtGui.QIcon(pmTutor())
 
 
-def pmBoard():
-    return PM(6430,7617)
-
-
-def Board():
-    return QtGui.QIcon(pmBoard())
-
-
 def pmPartidaOriginal():
     return PM(9646,11623)
 
@@ -820,40 +812,8 @@ def DivisionF():
     return QtGui.QIcon(pmDivisionF())
 
 
-def pmKibitzer():
-    return PM(216938,217477)
-
-
-def Kibitzer():
-    return QtGui.QIcon(pmKibitzer())
-
-
-def pmKibitzer_Pausa():
-    return PM(217477,218341)
-
-
-def Kibitzer_Pausa():
-    return QtGui.QIcon(pmKibitzer_Pausa())
-
-
-def pmKibitzer_Continuar():
-    return PM(218341,219172)
-
-
-def Kibitzer_Continuar():
-    return QtGui.QIcon(pmKibitzer_Continuar())
-
-
-def pmKibitzer_Terminar():
-    return PM(219172,220096)
-
-
-def Kibitzer_Terminar():
-    return QtGui.QIcon(pmKibitzer_Terminar())
-
-
 def pmDelete():
-    return PM(219172,220096)
+    return PM(216938,217862)
 
 
 def Delete():
@@ -861,7 +821,7 @@ def Delete():
 
 
 def pmModificarP():
-    return PM(220096,221162)
+    return PM(217862,218928)
 
 
 def ModificarP():
@@ -869,7 +829,7 @@ def ModificarP():
 
 
 def pmGrupo_Si():
-    return PM(221162,221624)
+    return PM(218928,219390)
 
 
 def Grupo_Si():
@@ -877,7 +837,7 @@ def Grupo_Si():
 
 
 def pmGrupo_No():
-    return PM(221624,221947)
+    return PM(219390,219713)
 
 
 def Grupo_No():
@@ -885,7 +845,7 @@ def Grupo_No():
 
 
 def pmMotor_Si():
-    return PM(221947,222409)
+    return PM(219713,220175)
 
 
 def Motor_Si():
@@ -893,7 +853,7 @@ def Motor_Si():
 
 
 def pmMotor_No():
-    return PM(219172,220096)
+    return PM(216938,217862)
 
 
 def Motor_No():
@@ -901,7 +861,7 @@ def Motor_No():
 
 
 def pmMotor_Actual():
-    return PM(222409,223426)
+    return PM(220175,221192)
 
 
 def Motor_Actual():
@@ -909,7 +869,7 @@ def Motor_Actual():
 
 
 def pmMotor():
-    return PM(223426,224053)
+    return PM(221192,221819)
 
 
 def Motor():
@@ -917,7 +877,7 @@ def Motor():
 
 
 def pmMoverInicio():
-    return PM(224053,224351)
+    return PM(221819,222117)
 
 
 def MoverInicio():
@@ -925,7 +885,7 @@ def MoverInicio():
 
 
 def pmMoverFinal():
-    return PM(224351,224652)
+    return PM(222117,222418)
 
 
 def MoverFinal():
@@ -933,7 +893,7 @@ def MoverFinal():
 
 
 def pmMoverAdelante():
-    return PM(224652,225007)
+    return PM(222418,222773)
 
 
 def MoverAdelante():
@@ -941,7 +901,7 @@ def MoverAdelante():
 
 
 def pmMoverAtras():
-    return PM(225007,225372)
+    return PM(222773,223138)
 
 
 def MoverAtras():
@@ -949,7 +909,7 @@ def MoverAtras():
 
 
 def pmMoverLibre():
-    return PM(225372,225790)
+    return PM(223138,223556)
 
 
 def MoverLibre():
@@ -957,7 +917,7 @@ def MoverLibre():
 
 
 def pmMoverTiempo():
-    return PM(225790,226369)
+    return PM(223556,224135)
 
 
 def MoverTiempo():
@@ -965,7 +925,7 @@ def MoverTiempo():
 
 
 def pmMoverMas():
-    return PM(226369,227408)
+    return PM(224135,225174)
 
 
 def MoverMas():
@@ -973,7 +933,7 @@ def MoverMas():
 
 
 def pmMoverGrabar():
-    return PM(227408,228264)
+    return PM(225174,226030)
 
 
 def MoverGrabar():
@@ -981,7 +941,7 @@ def MoverGrabar():
 
 
 def pmMoverGrabarTodos():
-    return PM(228264,229308)
+    return PM(226030,227074)
 
 
 def MoverGrabarTodos():
@@ -989,7 +949,7 @@ def MoverGrabarTodos():
 
 
 def pmMoverJugar():
-    return PM(218341,219172)
+    return PM(227074,227905)
 
 
 def MoverJugar():
@@ -997,7 +957,7 @@ def MoverJugar():
 
 
 def pmPelicula():
-    return PM(229308,231442)
+    return PM(227905,230039)
 
 
 def Pelicula():
@@ -1005,7 +965,7 @@ def Pelicula():
 
 
 def pmPelicula_Pausa():
-    return PM(231442,233201)
+    return PM(230039,231798)
 
 
 def Pelicula_Pausa():
@@ -1013,7 +973,7 @@ def Pelicula_Pausa():
 
 
 def pmPelicula_Seguir():
-    return PM(233201,235290)
+    return PM(231798,233887)
 
 
 def Pelicula_Seguir():
@@ -1021,7 +981,7 @@ def Pelicula_Seguir():
 
 
 def pmPelicula_Rapido():
-    return PM(235290,237349)
+    return PM(233887,235946)
 
 
 def Pelicula_Rapido():
@@ -1029,7 +989,7 @@ def Pelicula_Rapido():
 
 
 def pmPelicula_Lento():
-    return PM(237349,239224)
+    return PM(235946,237821)
 
 
 def Pelicula_Lento():
@@ -1045,7 +1005,7 @@ def Pelicula_Repetir():
 
 
 def pmPelicula_PGN():
-    return PM(239224,240132)
+    return PM(237821,238729)
 
 
 def Pelicula_PGN():
@@ -1053,7 +1013,7 @@ def Pelicula_PGN():
 
 
 def pmMemoria():
-    return PM(240132,242073)
+    return PM(238729,240670)
 
 
 def Memoria():
@@ -1061,7 +1021,7 @@ def Memoria():
 
 
 def pmEntrenar():
-    return PM(242073,243612)
+    return PM(240670,242209)
 
 
 def Entrenar():
@@ -1069,7 +1029,7 @@ def Entrenar():
 
 
 def pmEnviar():
-    return PM(242073,243612)
+    return PM(240670,242209)
 
 
 def Enviar():
@@ -1077,7 +1037,7 @@ def Enviar():
 
 
 def pmBoxRooms():
-    return PM(243612,248415)
+    return PM(242209,247012)
 
 
 def BoxRooms():
@@ -1085,7 +1045,7 @@ def BoxRooms():
 
 
 def pmBoxRoom():
-    return PM(248415,248877)
+    return PM(247012,247474)
 
 
 def BoxRoom():
@@ -1093,7 +1053,7 @@ def BoxRoom():
 
 
 def pmNewBoxRoom():
-    return PM(248877,250385)
+    return PM(247474,248982)
 
 
 def NewBoxRoom():
@@ -1101,7 +1061,7 @@ def NewBoxRoom():
 
 
 def pmNuevoMas():
-    return PM(248877,250385)
+    return PM(247474,248982)
 
 
 def NuevoMas():
@@ -1109,7 +1069,7 @@ def NuevoMas():
 
 
 def pmTemas():
-    return PM(250385,252608)
+    return PM(248982,251205)
 
 
 def Temas():
@@ -1117,7 +1077,7 @@ def Temas():
 
 
 def pmTutorialesCrear():
-    return PM(252608,258877)
+    return PM(251205,257474)
 
 
 def TutorialesCrear():
@@ -1125,7 +1085,7 @@ def TutorialesCrear():
 
 
 def pmMover():
-    return PM(258877,259459)
+    return PM(257474,258056)
 
 
 def Mover():
@@ -1133,7 +1093,7 @@ def Mover():
 
 
 def pmSeleccionar():
-    return PM(259459,265163)
+    return PM(258056,263760)
 
 
 def Seleccionar():
@@ -1141,7 +1101,7 @@ def Seleccionar():
 
 
 def pmVista():
-    return PM(265163,267087)
+    return PM(263760,265684)
 
 
 def Vista():
@@ -1149,7 +1109,7 @@ def Vista():
 
 
 def pmInformacionPGNUno():
-    return PM(267087,268465)
+    return PM(265684,267062)
 
 
 def InformacionPGNUno():
@@ -1157,7 +1117,7 @@ def InformacionPGNUno():
 
 
 def pmDailyTest():
-    return PM(268465,270805)
+    return PM(267062,269402)
 
 
 def DailyTest():
@@ -1165,7 +1125,7 @@ def DailyTest():
 
 
 def pmJuegaPorMi():
-    return PM(270805,272525)
+    return PM(269402,271122)
 
 
 def JuegaPorMi():
@@ -1173,7 +1133,7 @@ def JuegaPorMi():
 
 
 def pmArbol():
-    return PM(272525,273159)
+    return PM(271122,271756)
 
 
 def Arbol():
@@ -1189,7 +1149,7 @@ def GrabarFichero():
 
 
 def pmClipboard():
-    return PM(273159,273937)
+    return PM(271756,272534)
 
 
 def Clipboard():
@@ -1197,7 +1157,7 @@ def Clipboard():
 
 
 def pmFics():
-    return PM(273937,274354)
+    return PM(272534,272951)
 
 
 def Fics():
@@ -1221,7 +1181,7 @@ def FichPGN():
 
 
 def pmFlechas():
-    return PM(274354,277706)
+    return PM(272951,276303)
 
 
 def Flechas():
@@ -1229,7 +1189,7 @@ def Flechas():
 
 
 def pmMarcos():
-    return PM(277706,279153)
+    return PM(276303,277750)
 
 
 def Marcos():
@@ -1237,7 +1197,7 @@ def Marcos():
 
 
 def pmSVGs():
-    return PM(279153,282722)
+    return PM(277750,281319)
 
 
 def SVGs():
@@ -1245,7 +1205,7 @@ def SVGs():
 
 
 def pmAmarillo():
-    return PM(282722,283974)
+    return PM(281319,282571)
 
 
 def Amarillo():
@@ -1253,7 +1213,7 @@ def Amarillo():
 
 
 def pmNaranja():
-    return PM(283974,285206)
+    return PM(282571,283803)
 
 
 def Naranja():
@@ -1261,7 +1221,7 @@ def Naranja():
 
 
 def pmVerde():
-    return PM(285206,286482)
+    return PM(283803,285079)
 
 
 def Verde():
@@ -1269,7 +1229,7 @@ def Verde():
 
 
 def pmAzul():
-    return PM(286482,287570)
+    return PM(285079,286167)
 
 
 def Azul():
@@ -1277,7 +1237,7 @@ def Azul():
 
 
 def pmMagenta():
-    return PM(287570,288858)
+    return PM(286167,287455)
 
 
 def Magenta():
@@ -1285,7 +1245,7 @@ def Magenta():
 
 
 def pmRojo():
-    return PM(288858,290077)
+    return PM(287455,288674)
 
 
 def Rojo():
@@ -1293,7 +1253,7 @@ def Rojo():
 
 
 def pmGris():
-    return PM(290077,291035)
+    return PM(288674,289632)
 
 
 def Gris():
@@ -1301,7 +1261,7 @@ def Gris():
 
 
 def pmAmarillo32():
-    return PM(291035,293015)
+    return PM(289632,291612)
 
 
 def Amarillo32():
@@ -1309,7 +1269,7 @@ def Amarillo32():
 
 
 def pmNaranja32():
-    return PM(293015,295139)
+    return PM(291612,293736)
 
 
 def Naranja32():
@@ -1317,7 +1277,7 @@ def Naranja32():
 
 
 def pmVerde32():
-    return PM(295139,297260)
+    return PM(293736,295857)
 
 
 def Verde32():
@@ -1325,7 +1285,7 @@ def Verde32():
 
 
 def pmAzul32():
-    return PM(297260,299639)
+    return PM(295857,298236)
 
 
 def Azul32():
@@ -1333,7 +1293,7 @@ def Azul32():
 
 
 def pmMagenta32():
-    return PM(299639,302090)
+    return PM(298236,300687)
 
 
 def Magenta32():
@@ -1341,7 +1301,7 @@ def Magenta32():
 
 
 def pmRojo32():
-    return PM(302090,303905)
+    return PM(300687,302502)
 
 
 def Rojo32():
@@ -1349,7 +1309,7 @@ def Rojo32():
 
 
 def pmGris32():
-    return PM(303905,305819)
+    return PM(302502,304416)
 
 
 def Gris32():
@@ -1357,7 +1317,7 @@ def Gris32():
 
 
 def pmPuntoBlanco():
-    return PM(305819,306168)
+    return PM(304416,304765)
 
 
 def PuntoBlanco():
@@ -1365,7 +1325,7 @@ def PuntoBlanco():
 
 
 def pmPuntoAmarillo():
-    return PM(221162,221624)
+    return PM(218928,219390)
 
 
 def PuntoAmarillo():
@@ -1373,7 +1333,7 @@ def PuntoAmarillo():
 
 
 def pmPuntoNaranja():
-    return PM(306168,306630)
+    return PM(304765,305227)
 
 
 def PuntoNaranja():
@@ -1381,7 +1341,7 @@ def PuntoNaranja():
 
 
 def pmPuntoVerde():
-    return PM(221947,222409)
+    return PM(219713,220175)
 
 
 def PuntoVerde():
@@ -1389,7 +1349,7 @@ def PuntoVerde():
 
 
 def pmPuntoAzul():
-    return PM(248415,248877)
+    return PM(247012,247474)
 
 
 def PuntoAzul():
@@ -1397,7 +1357,7 @@ def PuntoAzul():
 
 
 def pmPuntoMagenta():
-    return PM(306630,307129)
+    return PM(305227,305726)
 
 
 def PuntoMagenta():
@@ -1405,7 +1365,7 @@ def PuntoMagenta():
 
 
 def pmPuntoRojo():
-    return PM(307129,307628)
+    return PM(305726,306225)
 
 
 def PuntoRojo():
@@ -1413,7 +1373,7 @@ def PuntoRojo():
 
 
 def pmPuntoNegro():
-    return PM(221624,221947)
+    return PM(219390,219713)
 
 
 def PuntoNegro():
@@ -1421,7 +1381,7 @@ def PuntoNegro():
 
 
 def pmPuntoEstrella():
-    return PM(307628,308055)
+    return PM(306225,306652)
 
 
 def PuntoEstrella():
@@ -1429,7 +1389,7 @@ def PuntoEstrella():
 
 
 def pmComentario():
-    return PM(308055,308692)
+    return PM(306652,307289)
 
 
 def Comentario():
@@ -1437,7 +1397,7 @@ def Comentario():
 
 
 def pmComentarioMas():
-    return PM(308692,309631)
+    return PM(307289,308228)
 
 
 def ComentarioMas():
@@ -1445,7 +1405,7 @@ def ComentarioMas():
 
 
 def pmComentarioEditar():
-    return PM(227408,228264)
+    return PM(225174,226030)
 
 
 def ComentarioEditar():
@@ -1453,7 +1413,7 @@ def ComentarioEditar():
 
 
 def pmOpeningComentario():
-    return PM(309631,310627)
+    return PM(308228,309224)
 
 
 def OpeningComentario():
@@ -1461,7 +1421,7 @@ def OpeningComentario():
 
 
 def pmMas():
-    return PM(310627,311136)
+    return PM(309224,309733)
 
 
 def Mas():
@@ -1469,7 +1429,7 @@ def Mas():
 
 
 def pmMasR():
-    return PM(311136,311624)
+    return PM(309733,310221)
 
 
 def MasR():
@@ -1477,7 +1437,7 @@ def MasR():
 
 
 def pmMasDoc():
-    return PM(311624,312425)
+    return PM(310221,311022)
 
 
 def MasDoc():
@@ -1493,7 +1453,7 @@ def Potencia():
 
 
 def pmBMT():
-    return PM(312425,313303)
+    return PM(311022,311900)
 
 
 def BMT():
@@ -1501,7 +1461,7 @@ def BMT():
 
 
 def pmOjo():
-    return PM(313303,314425)
+    return PM(311900,313022)
 
 
 def Ojo():
@@ -1509,7 +1469,7 @@ def Ojo():
 
 
 def pmOcultar():
-    return PM(313303,314425)
+    return PM(311900,313022)
 
 
 def Ocultar():
@@ -1517,7 +1477,7 @@ def Ocultar():
 
 
 def pmMostrar():
-    return PM(314425,315481)
+    return PM(313022,314078)
 
 
 def Mostrar():
@@ -1525,7 +1485,7 @@ def Mostrar():
 
 
 def pmBlog():
-    return PM(315481,316003)
+    return PM(314078,314600)
 
 
 def Blog():
@@ -1533,7 +1493,7 @@ def Blog():
 
 
 def pmVariations():
-    return PM(316003,316910)
+    return PM(314600,315507)
 
 
 def Variations():
@@ -1541,7 +1501,7 @@ def Variations():
 
 
 def pmVariationsG():
-    return PM(316910,319337)
+    return PM(315507,317934)
 
 
 def VariationsG():
@@ -1549,7 +1509,7 @@ def VariationsG():
 
 
 def pmCambiar():
-    return PM(319337,321051)
+    return PM(317934,319648)
 
 
 def Cambiar():
@@ -1557,7 +1517,7 @@ def Cambiar():
 
 
 def pmAnterior():
-    return PM(321051,323105)
+    return PM(319648,321702)
 
 
 def Anterior():
@@ -1565,7 +1525,7 @@ def Anterior():
 
 
 def pmSiguiente():
-    return PM(323105,325175)
+    return PM(321702,323772)
 
 
 def Siguiente():
@@ -1573,7 +1533,7 @@ def Siguiente():
 
 
 def pmSiguienteF():
-    return PM(325175,327350)
+    return PM(323772,325947)
 
 
 def SiguienteF():
@@ -1581,7 +1541,7 @@ def SiguienteF():
 
 
 def pmAnteriorF():
-    return PM(327350,329544)
+    return PM(325947,328141)
 
 
 def AnteriorF():
@@ -1589,7 +1549,7 @@ def AnteriorF():
 
 
 def pmX():
-    return PM(329544,330826)
+    return PM(328141,329423)
 
 
 def X():
@@ -1597,7 +1557,7 @@ def X():
 
 
 def pmTools():
-    return PM(330826,333427)
+    return PM(329423,332024)
 
 
 def Tools():
@@ -1605,7 +1565,7 @@ def Tools():
 
 
 def pmTacticas():
-    return PM(333427,336000)
+    return PM(332024,334597)
 
 
 def Tacticas():
@@ -1613,7 +1573,7 @@ def Tacticas():
 
 
 def pmCancelarPeque():
-    return PM(336000,336562)
+    return PM(334597,335159)
 
 
 def CancelarPeque():
@@ -1621,23 +1581,15 @@ def CancelarPeque():
 
 
 def pmAceptarPeque():
-    return PM(222409,223426)
+    return PM(220175,221192)
 
 
 def AceptarPeque():
     return QtGui.QIcon(pmAceptarPeque())
 
 
-def pmP_16c():
-    return PM(336562,337086)
-
-
-def P_16c():
-    return QtGui.QIcon(pmP_16c())
-
-
 def pmLibre():
-    return PM(337086,339478)
+    return PM(335159,337551)
 
 
 def Libre():
@@ -1645,7 +1597,7 @@ def Libre():
 
 
 def pmEnBlanco():
-    return PM(339478,340204)
+    return PM(337551,338277)
 
 
 def EnBlanco():
@@ -1653,7 +1605,7 @@ def EnBlanco():
 
 
 def pmDirector():
-    return PM(340204,343178)
+    return PM(338277,341251)
 
 
 def Director():
@@ -1661,7 +1613,7 @@ def Director():
 
 
 def pmTorneos():
-    return PM(343178,344916)
+    return PM(341251,342989)
 
 
 def Torneos():
@@ -1669,7 +1621,7 @@ def Torneos():
 
 
 def pmOpenings():
-    return PM(344916,345841)
+    return PM(342989,343914)
 
 
 def Openings():
@@ -1677,7 +1629,7 @@ def Openings():
 
 
 def pmV_Blancas():
-    return PM(345841,346121)
+    return PM(343914,344194)
 
 
 def V_Blancas():
@@ -1685,7 +1637,7 @@ def V_Blancas():
 
 
 def pmV_Blancas_Mas():
-    return PM(346121,346401)
+    return PM(344194,344474)
 
 
 def V_Blancas_Mas():
@@ -1693,7 +1645,7 @@ def V_Blancas_Mas():
 
 
 def pmV_Blancas_Mas_Mas():
-    return PM(346401,346673)
+    return PM(344474,344746)
 
 
 def V_Blancas_Mas_Mas():
@@ -1701,7 +1653,7 @@ def V_Blancas_Mas_Mas():
 
 
 def pmV_Negras():
-    return PM(346673,346948)
+    return PM(344746,345021)
 
 
 def V_Negras():
@@ -1709,7 +1661,7 @@ def V_Negras():
 
 
 def pmV_Negras_Mas():
-    return PM(346948,347223)
+    return PM(345021,345296)
 
 
 def V_Negras_Mas():
@@ -1717,7 +1669,7 @@ def V_Negras_Mas():
 
 
 def pmV_Negras_Mas_Mas():
-    return PM(347223,347492)
+    return PM(345296,345565)
 
 
 def V_Negras_Mas_Mas():
@@ -1725,7 +1677,7 @@ def V_Negras_Mas_Mas():
 
 
 def pmV_Blancas_Igual_Negras():
-    return PM(347492,347794)
+    return PM(345565,345867)
 
 
 def V_Blancas_Igual_Negras():
@@ -1741,7 +1693,7 @@ def Mezclar():
 
 
 def pmVoyager():
-    return PM(347794,349756)
+    return PM(345867,347829)
 
 
 def Voyager():
@@ -1749,7 +1701,7 @@ def Voyager():
 
 
 def pmReindexar():
-    return PM(349756,351573)
+    return PM(347829,349646)
 
 
 def Reindexar():
@@ -1757,7 +1709,7 @@ def Reindexar():
 
 
 def pmRename():
-    return PM(351573,352557)
+    return PM(349646,350630)
 
 
 def Rename():
@@ -1765,7 +1717,7 @@ def Rename():
 
 
 def pmAdd():
-    return PM(352557,353510)
+    return PM(350630,351583)
 
 
 def Add():
@@ -1773,7 +1725,7 @@ def Add():
 
 
 def pmMas22():
-    return PM(353510,354174)
+    return PM(351583,352247)
 
 
 def Mas22():
@@ -1781,7 +1733,7 @@ def Mas22():
 
 
 def pmMenos22():
-    return PM(354174,354618)
+    return PM(352247,352691)
 
 
 def Menos22():
@@ -1789,7 +1741,7 @@ def Menos22():
 
 
 def pmTransposition():
-    return PM(354618,355137)
+    return PM(352691,353210)
 
 
 def Transposition():
@@ -1797,7 +1749,7 @@ def Transposition():
 
 
 def pmRat():
-    return PM(355137,360841)
+    return PM(353210,358914)
 
 
 def Rat():
@@ -1805,7 +1757,7 @@ def Rat():
 
 
 def pmAlligator():
-    return PM(360841,365833)
+    return PM(358914,363906)
 
 
 def Alligator():
@@ -1813,7 +1765,7 @@ def Alligator():
 
 
 def pmAnt():
-    return PM(365833,372531)
+    return PM(363906,370604)
 
 
 def Ant():
@@ -1821,7 +1773,7 @@ def Ant():
 
 
 def pmBat():
-    return PM(372531,375485)
+    return PM(370604,373558)
 
 
 def Bat():
@@ -1829,7 +1781,7 @@ def Bat():
 
 
 def pmBear():
-    return PM(375485,382764)
+    return PM(373558,380837)
 
 
 def Bear():
@@ -1837,7 +1789,7 @@ def Bear():
 
 
 def pmBee():
-    return PM(382764,387766)
+    return PM(380837,385839)
 
 
 def Bee():
@@ -1845,7 +1797,7 @@ def Bee():
 
 
 def pmBird():
-    return PM(387766,393825)
+    return PM(385839,391898)
 
 
 def Bird():
@@ -1853,7 +1805,7 @@ def Bird():
 
 
 def pmBull():
-    return PM(393825,400794)
+    return PM(391898,398867)
 
 
 def Bull():
@@ -1861,7 +1813,7 @@ def Bull():
 
 
 def pmBulldog():
-    return PM(400794,407685)
+    return PM(398867,405758)
 
 
 def Bulldog():
@@ -1869,7 +1821,7 @@ def Bulldog():
 
 
 def pmButterfly():
-    return PM(407685,415059)
+    return PM(405758,413132)
 
 
 def Butterfly():
@@ -1877,7 +1829,7 @@ def Butterfly():
 
 
 def pmCat():
-    return PM(415059,421331)
+    return PM(413132,419404)
 
 
 def Cat():
@@ -1885,7 +1837,7 @@ def Cat():
 
 
 def pmChicken():
-    return PM(421331,427142)
+    return PM(419404,425215)
 
 
 def Chicken():
@@ -1893,7 +1845,7 @@ def Chicken():
 
 
 def pmCow():
-    return PM(427142,433885)
+    return PM(425215,431958)
 
 
 def Cow():
@@ -1901,7 +1853,7 @@ def Cow():
 
 
 def pmCrab():
-    return PM(433885,439474)
+    return PM(431958,437547)
 
 
 def Crab():
@@ -1909,7 +1861,7 @@ def Crab():
 
 
 def pmCrocodile():
-    return PM(439474,445615)
+    return PM(437547,443688)
 
 
 def Crocodile():
@@ -1917,7 +1869,7 @@ def Crocodile():
 
 
 def pmDeer():
-    return PM(445615,451922)
+    return PM(443688,449995)
 
 
 def Deer():
@@ -1925,7 +1877,7 @@ def Deer():
 
 
 def pmDog():
-    return PM(451922,458525)
+    return PM(449995,456598)
 
 
 def Dog():
@@ -1933,7 +1885,7 @@ def Dog():
 
 
 def pmDonkey():
-    return PM(458525,464172)
+    return PM(456598,462245)
 
 
 def Donkey():
@@ -1941,7 +1893,7 @@ def Donkey():
 
 
 def pmDuck():
-    return PM(464172,470715)
+    return PM(462245,468788)
 
 
 def Duck():
@@ -1949,7 +1901,7 @@ def Duck():
 
 
 def pmEagle():
-    return PM(470715,475533)
+    return PM(468788,473606)
 
 
 def Eagle():
@@ -1957,7 +1909,7 @@ def Eagle():
 
 
 def pmElephant():
-    return PM(475533,482014)
+    return PM(473606,480087)
 
 
 def Elephant():
@@ -1965,7 +1917,7 @@ def Elephant():
 
 
 def pmFish():
-    return PM(482014,488855)
+    return PM(480087,486928)
 
 
 def Fish():
@@ -1973,7 +1925,7 @@ def Fish():
 
 
 def pmFox():
-    return PM(488855,495638)
+    return PM(486928,493711)
 
 
 def Fox():
@@ -1981,7 +1933,7 @@ def Fox():
 
 
 def pmFrog():
-    return PM(495638,502054)
+    return PM(493711,500127)
 
 
 def Frog():
@@ -1989,7 +1941,7 @@ def Frog():
 
 
 def pmGiraffe():
-    return PM(502054,509232)
+    return PM(500127,507305)
 
 
 def Giraffe():
@@ -1997,7 +1949,7 @@ def Giraffe():
 
 
 def pmGorilla():
-    return PM(509232,515771)
+    return PM(507305,513844)
 
 
 def Gorilla():
@@ -2005,7 +1957,7 @@ def Gorilla():
 
 
 def pmHippo():
-    return PM(515771,522892)
+    return PM(513844,520965)
 
 
 def Hippo():
@@ -2013,7 +1965,7 @@ def Hippo():
 
 
 def pmHorse():
-    return PM(522892,529439)
+    return PM(520965,527512)
 
 
 def Horse():
@@ -2021,7 +1973,7 @@ def Horse():
 
 
 def pmInsect():
-    return PM(529439,535374)
+    return PM(527512,533447)
 
 
 def Insect():
@@ -2029,7 +1981,7 @@ def Insect():
 
 
 def pmLion():
-    return PM(535374,544284)
+    return PM(533447,542357)
 
 
 def Lion():
@@ -2037,7 +1989,7 @@ def Lion():
 
 
 def pmMonkey():
-    return PM(544284,551963)
+    return PM(542357,550036)
 
 
 def Monkey():
@@ -2045,7 +1997,7 @@ def Monkey():
 
 
 def pmMoose():
-    return PM(551963,558587)
+    return PM(550036,556660)
 
 
 def Moose():
@@ -2053,7 +2005,7 @@ def Moose():
 
 
 def pmMouse():
-    return PM(355137,360841)
+    return PM(353210,358914)
 
 
 def Mouse():
@@ -2061,7 +2013,7 @@ def Mouse():
 
 
 def pmOwl():
-    return PM(558587,565293)
+    return PM(556660,563366)
 
 
 def Owl():
@@ -2069,7 +2021,7 @@ def Owl():
 
 
 def pmPanda():
-    return PM(565293,569327)
+    return PM(563366,567400)
 
 
 def Panda():
@@ -2077,7 +2029,7 @@ def Panda():
 
 
 def pmPenguin():
-    return PM(569327,574876)
+    return PM(567400,572949)
 
 
 def Penguin():
@@ -2085,7 +2037,7 @@ def Penguin():
 
 
 def pmPig():
-    return PM(574876,582916)
+    return PM(572949,580989)
 
 
 def Pig():
@@ -2093,7 +2045,7 @@ def Pig():
 
 
 def pmRabbit():
-    return PM(582916,590217)
+    return PM(580989,588290)
 
 
 def Rabbit():
@@ -2101,7 +2053,7 @@ def Rabbit():
 
 
 def pmRhino():
-    return PM(590217,596604)
+    return PM(588290,594677)
 
 
 def Rhino():
@@ -2109,7 +2061,7 @@ def Rhino():
 
 
 def pmRooster():
-    return PM(596604,601867)
+    return PM(594677,599940)
 
 
 def Rooster():
@@ -2117,7 +2069,7 @@ def Rooster():
 
 
 def pmShark():
-    return PM(601867,607637)
+    return PM(599940,605710)
 
 
 def Shark():
@@ -2125,7 +2077,7 @@ def Shark():
 
 
 def pmSheep():
-    return PM(607637,611468)
+    return PM(605710,609541)
 
 
 def Sheep():
@@ -2133,7 +2085,7 @@ def Sheep():
 
 
 def pmSnake():
-    return PM(611468,617493)
+    return PM(609541,615566)
 
 
 def Snake():
@@ -2141,7 +2093,7 @@ def Snake():
 
 
 def pmTiger():
-    return PM(617493,625530)
+    return PM(615566,623603)
 
 
 def Tiger():
@@ -2149,7 +2101,7 @@ def Tiger():
 
 
 def pmTurkey():
-    return PM(625530,632944)
+    return PM(623603,631017)
 
 
 def Turkey():
@@ -2157,7 +2109,7 @@ def Turkey():
 
 
 def pmTurtle():
-    return PM(632944,639665)
+    return PM(631017,637738)
 
 
 def Turtle():
@@ -2165,7 +2117,7 @@ def Turtle():
 
 
 def pmWolf():
-    return PM(639665,642760)
+    return PM(637738,640833)
 
 
 def Wolf():
@@ -2173,7 +2125,7 @@ def Wolf():
 
 
 def pmSteven():
-    return PM(642760,649912)
+    return PM(640833,647985)
 
 
 def Steven():
@@ -2181,7 +2133,7 @@ def Steven():
 
 
 def pmWheel():
-    return PM(649912,657977)
+    return PM(647985,656050)
 
 
 def Wheel():
@@ -2189,7 +2141,7 @@ def Wheel():
 
 
 def pmWheelchair():
-    return PM(657977,666781)
+    return PM(656050,664854)
 
 
 def Wheelchair():
@@ -2197,7 +2149,7 @@ def Wheelchair():
 
 
 def pmTouringMotorcycle():
-    return PM(666781,673093)
+    return PM(664854,671166)
 
 
 def TouringMotorcycle():
@@ -2205,7 +2157,7 @@ def TouringMotorcycle():
 
 
 def pmContainer():
-    return PM(673093,678428)
+    return PM(671166,676501)
 
 
 def Container():
@@ -2213,7 +2165,7 @@ def Container():
 
 
 def pmBoatEquipment():
-    return PM(678428,683951)
+    return PM(676501,682024)
 
 
 def BoatEquipment():
@@ -2221,7 +2173,7 @@ def BoatEquipment():
 
 
 def pmCar():
-    return PM(683951,688597)
+    return PM(682024,686670)
 
 
 def Car():
@@ -2229,7 +2181,7 @@ def Car():
 
 
 def pmLorry():
-    return PM(688597,694633)
+    return PM(686670,692706)
 
 
 def Lorry():
@@ -2237,7 +2189,7 @@ def Lorry():
 
 
 def pmCarTrailer():
-    return PM(694633,698730)
+    return PM(692706,696803)
 
 
 def CarTrailer():
@@ -2245,7 +2197,7 @@ def CarTrailer():
 
 
 def pmTowTruck():
-    return PM(698730,703488)
+    return PM(696803,701561)
 
 
 def TowTruck():
@@ -2253,7 +2205,7 @@ def TowTruck():
 
 
 def pmQuadBike():
-    return PM(703488,709457)
+    return PM(701561,707530)
 
 
 def QuadBike():
@@ -2261,7 +2213,7 @@ def QuadBike():
 
 
 def pmRecoveryTruck():
-    return PM(709457,714454)
+    return PM(707530,712527)
 
 
 def RecoveryTruck():
@@ -2269,7 +2221,7 @@ def RecoveryTruck():
 
 
 def pmContainerLoader():
-    return PM(714454,719596)
+    return PM(712527,717669)
 
 
 def ContainerLoader():
@@ -2277,7 +2229,7 @@ def ContainerLoader():
 
 
 def pmPoliceCar():
-    return PM(719596,724428)
+    return PM(717669,722501)
 
 
 def PoliceCar():
@@ -2285,7 +2237,7 @@ def PoliceCar():
 
 
 def pmExecutiveCar():
-    return PM(724428,729106)
+    return PM(722501,727179)
 
 
 def ExecutiveCar():
@@ -2293,7 +2245,7 @@ def ExecutiveCar():
 
 
 def pmTruck():
-    return PM(729106,734569)
+    return PM(727179,732642)
 
 
 def Truck():
@@ -2301,7 +2253,7 @@ def Truck():
 
 
 def pmExcavator():
-    return PM(734569,739460)
+    return PM(732642,737533)
 
 
 def Excavator():
@@ -2309,7 +2261,7 @@ def Excavator():
 
 
 def pmCabriolet():
-    return PM(739460,744298)
+    return PM(737533,742371)
 
 
 def Cabriolet():
@@ -2317,7 +2269,7 @@ def Cabriolet():
 
 
 def pmMixerTruck():
-    return PM(744298,750608)
+    return PM(742371,748681)
 
 
 def MixerTruck():
@@ -2325,7 +2277,7 @@ def MixerTruck():
 
 
 def pmForkliftTruckLoaded():
-    return PM(750608,756756)
+    return PM(748681,754829)
 
 
 def ForkliftTruckLoaded():
@@ -2333,7 +2285,7 @@ def ForkliftTruckLoaded():
 
 
 def pmAmbulance():
-    return PM(756756,762806)
+    return PM(754829,760879)
 
 
 def Ambulance():
@@ -2341,7 +2293,7 @@ def Ambulance():
 
 
 def pmDieselLocomotiveBoxcar():
-    return PM(762806,766812)
+    return PM(760879,764885)
 
 
 def DieselLocomotiveBoxcar():
@@ -2349,7 +2301,7 @@ def DieselLocomotiveBoxcar():
 
 
 def pmTractorUnit():
-    return PM(766812,772279)
+    return PM(764885,770352)
 
 
 def TractorUnit():
@@ -2357,7 +2309,7 @@ def TractorUnit():
 
 
 def pmFireTruck():
-    return PM(772279,778618)
+    return PM(770352,776691)
 
 
 def FireTruck():
@@ -2365,7 +2317,7 @@ def FireTruck():
 
 
 def pmCargoShip():
-    return PM(778618,782959)
+    return PM(776691,781032)
 
 
 def CargoShip():
@@ -2373,7 +2325,7 @@ def CargoShip():
 
 
 def pmSubwayTrain():
-    return PM(782959,787849)
+    return PM(781032,785922)
 
 
 def SubwayTrain():
@@ -2381,7 +2333,7 @@ def SubwayTrain():
 
 
 def pmTruckMountedCrane():
-    return PM(787849,793590)
+    return PM(785922,791663)
 
 
 def TruckMountedCrane():
@@ -2389,7 +2341,7 @@ def TruckMountedCrane():
 
 
 def pmAirAmbulance():
-    return PM(793590,798703)
+    return PM(791663,796776)
 
 
 def AirAmbulance():
@@ -2397,7 +2349,7 @@ def AirAmbulance():
 
 
 def pmAirplane():
-    return PM(798703,803591)
+    return PM(796776,801664)
 
 
 def Airplane():
@@ -2405,7 +2357,7 @@ def Airplane():
 
 
 def pmCaracol():
-    return PM(803591,805407)
+    return PM(801664,803480)
 
 
 def Caracol():
@@ -2413,7 +2365,7 @@ def Caracol():
 
 
 def pmUno():
-    return PM(805407,807869)
+    return PM(803480,805942)
 
 
 def Uno():
@@ -2421,7 +2373,7 @@ def Uno():
 
 
 def pmMotoresExternos():
-    return PM(807869,809771)
+    return PM(805942,807844)
 
 
 def MotoresExternos():
@@ -2429,7 +2381,7 @@ def MotoresExternos():
 
 
 def pmDatabase():
-    return PM(809771,811087)
+    return PM(807844,809160)
 
 
 def Database():
@@ -2437,7 +2389,7 @@ def Database():
 
 
 def pmDatabaseMas():
-    return PM(811087,812546)
+    return PM(809160,810619)
 
 
 def DatabaseMas():
@@ -2445,7 +2397,7 @@ def DatabaseMas():
 
 
 def pmDatabaseImport():
-    return PM(812546,813182)
+    return PM(810619,811255)
 
 
 def DatabaseImport():
@@ -2453,7 +2405,7 @@ def DatabaseImport():
 
 
 def pmDatabaseExport():
-    return PM(813182,813827)
+    return PM(811255,811900)
 
 
 def DatabaseExport():
@@ -2461,7 +2413,7 @@ def DatabaseExport():
 
 
 def pmDatabaseDelete():
-    return PM(813827,814950)
+    return PM(811900,813023)
 
 
 def DatabaseDelete():
@@ -2469,7 +2421,7 @@ def DatabaseDelete():
 
 
 def pmDatabaseMaintenance():
-    return PM(814950,816446)
+    return PM(813023,814519)
 
 
 def DatabaseMaintenance():
@@ -2477,7 +2429,7 @@ def DatabaseMaintenance():
 
 
 def pmAtacante():
-    return PM(816446,817051)
+    return PM(814519,815124)
 
 
 def Atacante():
@@ -2485,7 +2437,7 @@ def Atacante():
 
 
 def pmAtacada():
-    return PM(817051,817617)
+    return PM(815124,815690)
 
 
 def Atacada():
@@ -2493,7 +2445,7 @@ def Atacada():
 
 
 def pmGoToNext():
-    return PM(817617,818029)
+    return PM(815690,816102)
 
 
 def GoToNext():
@@ -2501,7 +2453,7 @@ def GoToNext():
 
 
 def pmBlancas():
-    return PM(818029,818380)
+    return PM(816102,816453)
 
 
 def Blancas():
@@ -2509,7 +2461,7 @@ def Blancas():
 
 
 def pmNegras():
-    return PM(818380,818626)
+    return PM(816453,816699)
 
 
 def Negras():
@@ -2525,7 +2477,7 @@ def FolderChange():
 
 
 def pmMarkers():
-    return PM(818626,820321)
+    return PM(816699,818394)
 
 
 def Markers():
@@ -2533,7 +2485,7 @@ def Markers():
 
 
 def pmTop():
-    return PM(820321,820905)
+    return PM(818394,818978)
 
 
 def Top():
@@ -2541,7 +2493,7 @@ def Top():
 
 
 def pmBottom():
-    return PM(820905,821494)
+    return PM(818978,819567)
 
 
 def Bottom():
@@ -2549,7 +2501,7 @@ def Bottom():
 
 
 def pmSTS():
-    return PM(821494,823685)
+    return PM(819567,821758)
 
 
 def STS():
@@ -2557,7 +2509,7 @@ def STS():
 
 
 def pmRun():
-    return PM(823685,825409)
+    return PM(821758,823482)
 
 
 def Run():
@@ -2565,7 +2517,7 @@ def Run():
 
 
 def pmRun2():
-    return PM(825409,826929)
+    return PM(823482,825002)
 
 
 def Run2():
@@ -2573,7 +2525,7 @@ def Run2():
 
 
 def pmWorldMap():
-    return PM(826929,829670)
+    return PM(825002,827743)
 
 
 def WorldMap():
@@ -2581,7 +2533,7 @@ def WorldMap():
 
 
 def pmAfrica():
-    return PM(829670,832156)
+    return PM(827743,830229)
 
 
 def Africa():
@@ -2589,7 +2541,7 @@ def Africa():
 
 
 def pmMaps():
-    return PM(832156,833100)
+    return PM(830229,831173)
 
 
 def Maps():
@@ -2597,7 +2549,7 @@ def Maps():
 
 
 def pmSol():
-    return PM(833100,834026)
+    return PM(831173,832099)
 
 
 def Sol():
@@ -2605,7 +2557,7 @@ def Sol():
 
 
 def pmSolNubes():
-    return PM(834026,834889)
+    return PM(832099,832962)
 
 
 def SolNubes():
@@ -2613,7 +2565,7 @@ def SolNubes():
 
 
 def pmSolNubesLluvia():
-    return PM(834889,835849)
+    return PM(832962,833922)
 
 
 def SolNubesLluvia():
@@ -2621,7 +2573,7 @@ def SolNubesLluvia():
 
 
 def pmLluvia():
-    return PM(835849,836688)
+    return PM(833922,834761)
 
 
 def Lluvia():
@@ -2629,7 +2581,7 @@ def Lluvia():
 
 
 def pmInvierno():
-    return PM(836688,838264)
+    return PM(834761,836337)
 
 
 def Invierno():
@@ -2645,7 +2597,7 @@ def FixedElo():
 
 
 def pmSoundTool():
-    return PM(838264,840723)
+    return PM(836337,838796)
 
 
 def SoundTool():
@@ -2653,7 +2605,7 @@ def SoundTool():
 
 
 def pmVoyager1():
-    return PM(840723,843173)
+    return PM(838796,841246)
 
 
 def Voyager1():
@@ -2661,7 +2613,7 @@ def Voyager1():
 
 
 def pmTrain():
-    return PM(843173,844543)
+    return PM(841246,842616)
 
 
 def Train():
@@ -2669,7 +2621,7 @@ def Train():
 
 
 def pmPlay():
-    return PM(233201,235290)
+    return PM(231798,233887)
 
 
 def Play():
@@ -2685,7 +2637,7 @@ def Measure():
 
 
 def pmPlayGame():
-    return PM(844543,848901)
+    return PM(842616,846974)
 
 
 def PlayGame():
@@ -2693,7 +2645,7 @@ def PlayGame():
 
 
 def pmScanner():
-    return PM(848901,849242)
+    return PM(846974,847315)
 
 
 def Scanner():
@@ -2701,7 +2653,7 @@ def Scanner():
 
 
 def pmMenos():
-    return PM(849242,849767)
+    return PM(847315,847840)
 
 
 def Menos():
@@ -2709,7 +2661,7 @@ def Menos():
 
 
 def pmSchool():
-    return PM(849767,851129)
+    return PM(847840,849202)
 
 
 def School():
@@ -2717,7 +2669,7 @@ def School():
 
 
 def pmLaw():
-    return PM(851129,851745)
+    return PM(849202,849818)
 
 
 def Law():
@@ -2725,7 +2677,7 @@ def Law():
 
 
 def pmLearnGame():
-    return PM(851745,852178)
+    return PM(849818,850251)
 
 
 def LearnGame():
@@ -2733,7 +2685,7 @@ def LearnGame():
 
 
 def pmLonghaul():
-    return PM(852178,853104)
+    return PM(850251,851177)
 
 
 def Longhaul():
@@ -2741,7 +2693,7 @@ def Longhaul():
 
 
 def pmTrekking():
-    return PM(853104,853798)
+    return PM(851177,851871)
 
 
 def Trekking():
@@ -2749,7 +2701,7 @@ def Trekking():
 
 
 def pmPassword():
-    return PM(853798,854251)
+    return PM(851871,852324)
 
 
 def Password():
@@ -2757,7 +2709,7 @@ def Password():
 
 
 def pmSQL_RAW():
-    return PM(844543,848901)
+    return PM(842616,846974)
 
 
 def SQL_RAW():
@@ -2765,7 +2717,7 @@ def SQL_RAW():
 
 
 def pmSun():
-    return PM(312425,313303)
+    return PM(311022,311900)
 
 
 def Sun():
@@ -2773,7 +2725,7 @@ def Sun():
 
 
 def pmLight32():
-    return PM(854251,855951)
+    return PM(852324,854024)
 
 
 def Light32():
@@ -2781,7 +2733,7 @@ def Light32():
 
 
 def pmTOL():
-    return PM(855951,856660)
+    return PM(854024,854733)
 
 
 def TOL():
@@ -2789,7 +2741,7 @@ def TOL():
 
 
 def pmUned():
-    return PM(856660,857080)
+    return PM(854733,855153)
 
 
 def Uned():
@@ -2797,7 +2749,7 @@ def Uned():
 
 
 def pmUwe():
-    return PM(857080,858049)
+    return PM(855153,856122)
 
 
 def Uwe():
@@ -2805,7 +2757,7 @@ def Uwe():
 
 
 def pmThinking():
-    return PM(858049,858838)
+    return PM(856122,856911)
 
 
 def Thinking():
@@ -2813,7 +2765,7 @@ def Thinking():
 
 
 def pmWashingMachine():
-    return PM(858838,859501)
+    return PM(856911,857574)
 
 
 def WashingMachine():
@@ -2821,7 +2773,7 @@ def WashingMachine():
 
 
 def pmTerminal():
-    return PM(859501,863045)
+    return PM(857574,861118)
 
 
 def Terminal():
@@ -2829,7 +2781,7 @@ def Terminal():
 
 
 def pmManualSave():
-    return PM(863045,863628)
+    return PM(861118,861701)
 
 
 def ManualSave():
@@ -2837,7 +2789,7 @@ def ManualSave():
 
 
 def pmSettings():
-    return PM(863628,864066)
+    return PM(861701,862139)
 
 
 def Settings():
@@ -2845,7 +2797,7 @@ def Settings():
 
 
 def pmStrength():
-    return PM(864066,864737)
+    return PM(862139,862810)
 
 
 def Strength():
@@ -2853,7 +2805,7 @@ def Strength():
 
 
 def pmSingular():
-    return PM(864737,865592)
+    return PM(862810,863665)
 
 
 def Singular():
@@ -2861,7 +2813,7 @@ def Singular():
 
 
 def pmScript():
-    return PM(865592,866161)
+    return PM(863665,864234)
 
 
 def Script():
@@ -2869,7 +2821,7 @@ def Script():
 
 
 def pmTexto():
-    return PM(866161,869006)
+    return PM(864234,867079)
 
 
 def Texto():
@@ -2877,7 +2829,7 @@ def Texto():
 
 
 def pmLampara():
-    return PM(869006,869715)
+    return PM(867079,867788)
 
 
 def Lampara():
@@ -2885,7 +2837,7 @@ def Lampara():
 
 
 def pmFile():
-    return PM(869715,872015)
+    return PM(867788,870088)
 
 
 def File():
@@ -2893,7 +2845,7 @@ def File():
 
 
 def pmCalculo():
-    return PM(872015,872941)
+    return PM(870088,871014)
 
 
 def Calculo():
@@ -2901,7 +2853,7 @@ def Calculo():
 
 
 def pmOpeningLines():
-    return PM(872941,873619)
+    return PM(871014,871692)
 
 
 def OpeningLines():
@@ -2909,7 +2861,7 @@ def OpeningLines():
 
 
 def pmStudy():
-    return PM(873619,874532)
+    return PM(871692,872605)
 
 
 def Study():
@@ -2917,7 +2869,7 @@ def Study():
 
 
 def pmLichess():
-    return PM(874532,875422)
+    return PM(872605,873495)
 
 
 def Lichess():
@@ -2925,7 +2877,7 @@ def Lichess():
 
 
 def pmMiniatura():
-    return PM(875422,876349)
+    return PM(873495,874422)
 
 
 def Miniatura():
@@ -2933,7 +2885,7 @@ def Miniatura():
 
 
 def pmLocomotora():
-    return PM(876349,877130)
+    return PM(874422,875203)
 
 
 def Locomotora():
@@ -2941,7 +2893,7 @@ def Locomotora():
 
 
 def pmTrainSequential():
-    return PM(877130,878271)
+    return PM(875203,876344)
 
 
 def TrainSequential():
@@ -2949,7 +2901,7 @@ def TrainSequential():
 
 
 def pmTrainStatic():
-    return PM(878271,879231)
+    return PM(876344,877304)
 
 
 def TrainStatic():
@@ -2957,7 +2909,7 @@ def TrainStatic():
 
 
 def pmTrainPositions():
-    return PM(879231,880212)
+    return PM(877304,878285)
 
 
 def TrainPositions():
@@ -2965,7 +2917,7 @@ def TrainPositions():
 
 
 def pmTrainEngines():
-    return PM(880212,881646)
+    return PM(878285,879719)
 
 
 def TrainEngines():
@@ -2981,7 +2933,7 @@ def Error():
 
 
 def pmAtajos():
-    return PM(881646,882825)
+    return PM(879719,880898)
 
 
 def Atajos():
@@ -2989,7 +2941,7 @@ def Atajos():
 
 
 def pmTOLline():
-    return PM(882825,883929)
+    return PM(880898,882002)
 
 
 def TOLline():
@@ -2997,7 +2949,7 @@ def TOLline():
 
 
 def pmTOLchange():
-    return PM(883929,886151)
+    return PM(882002,884224)
 
 
 def TOLchange():
@@ -3005,7 +2957,7 @@ def TOLchange():
 
 
 def pmPack():
-    return PM(886151,887324)
+    return PM(884224,885397)
 
 
 def Pack():
@@ -3021,7 +2973,7 @@ def Home():
 
 
 def pmImport8():
-    return PM(887324,888082)
+    return PM(885397,886155)
 
 
 def Import8():
@@ -3029,7 +2981,7 @@ def Import8():
 
 
 def pmExport8():
-    return PM(888082,888707)
+    return PM(886155,886780)
 
 
 def Export8():
@@ -3037,7 +2989,7 @@ def Export8():
 
 
 def pmTablas8():
-    return PM(888707,889499)
+    return PM(886780,887572)
 
 
 def Tablas8():
@@ -3045,7 +2997,7 @@ def Tablas8():
 
 
 def pmBlancas8():
-    return PM(889499,890529)
+    return PM(887572,888602)
 
 
 def Blancas8():
@@ -3053,7 +3005,7 @@ def Blancas8():
 
 
 def pmNegras8():
-    return PM(890529,891368)
+    return PM(888602,889441)
 
 
 def Negras8():
@@ -3061,7 +3013,7 @@ def Negras8():
 
 
 def pmBook():
-    return PM(891368,891942)
+    return PM(889441,890015)
 
 
 def Book():
@@ -3069,7 +3021,7 @@ def Book():
 
 
 def pmWrite():
-    return PM(891942,893147)
+    return PM(890015,891220)
 
 
 def Write():
@@ -3077,7 +3029,7 @@ def Write():
 
 
 def pmAlt():
-    return PM(893147,893589)
+    return PM(891220,891662)
 
 
 def Alt():
@@ -3085,7 +3037,7 @@ def Alt():
 
 
 def pmShift():
-    return PM(893589,893929)
+    return PM(891662,892002)
 
 
 def Shift():
@@ -3093,7 +3045,7 @@ def Shift():
 
 
 def pmRightMouse():
-    return PM(893929,894729)
+    return PM(892002,892802)
 
 
 def RightMouse():
@@ -3101,7 +3053,7 @@ def RightMouse():
 
 
 def pmControl():
-    return PM(894729,895254)
+    return PM(892802,893327)
 
 
 def Control():
@@ -3109,7 +3061,7 @@ def Control():
 
 
 def pmFinales():
-    return PM(895254,896341)
+    return PM(893327,894414)
 
 
 def Finales():
@@ -3117,7 +3069,7 @@ def Finales():
 
 
 def pmEditColumns():
-    return PM(896341,897073)
+    return PM(894414,895146)
 
 
 def EditColumns():
@@ -3125,7 +3077,7 @@ def EditColumns():
 
 
 def pmResizeAll():
-    return PM(897073,897583)
+    return PM(895146,895656)
 
 
 def ResizeAll():
@@ -3133,7 +3085,7 @@ def ResizeAll():
 
 
 def pmChecked():
-    return PM(897583,898089)
+    return PM(895656,896162)
 
 
 def Checked():
@@ -3141,7 +3093,7 @@ def Checked():
 
 
 def pmUnchecked():
-    return PM(898089,898337)
+    return PM(896162,896410)
 
 
 def Unchecked():
@@ -3149,7 +3101,7 @@ def Unchecked():
 
 
 def pmBuscarC():
-    return PM(898337,898781)
+    return PM(896410,896854)
 
 
 def BuscarC():
@@ -3157,7 +3109,7 @@ def BuscarC():
 
 
 def pmPeonBlanco():
-    return PM(898781,900962)
+    return PM(896854,899035)
 
 
 def PeonBlanco():
@@ -3165,7 +3117,7 @@ def PeonBlanco():
 
 
 def pmPeonNegro():
-    return PM(900962,902486)
+    return PM(899035,900559)
 
 
 def PeonNegro():
@@ -3173,7 +3125,7 @@ def PeonNegro():
 
 
 def pmReciclar():
-    return PM(902486,903210)
+    return PM(900559,901283)
 
 
 def Reciclar():
@@ -3181,7 +3133,7 @@ def Reciclar():
 
 
 def pmLanzamiento():
-    return PM(903210,903923)
+    return PM(901283,901996)
 
 
 def Lanzamiento():
@@ -3189,7 +3141,7 @@ def Lanzamiento():
 
 
 def pmEndGame():
-    return PM(903923,904337)
+    return PM(901996,902410)
 
 
 def EndGame():
@@ -3197,7 +3149,7 @@ def EndGame():
 
 
 def pmPause():
-    return PM(904337,905206)
+    return PM(902410,903279)
 
 
 def Pause():
@@ -3205,7 +3157,7 @@ def Pause():
 
 
 def pmContinue():
-    return PM(905206,906410)
+    return PM(903279,904483)
 
 
 def Continue():
@@ -3213,7 +3165,7 @@ def Continue():
 
 
 def pmClose():
-    return PM(906410,907109)
+    return PM(904483,905182)
 
 
 def Close():
@@ -3221,7 +3173,7 @@ def Close():
 
 
 def pmStop():
-    return PM(907109,908142)
+    return PM(905182,906215)
 
 
 def Stop():
@@ -3229,7 +3181,7 @@ def Stop():
 
 
 def pmFactoryPolyglot():
-    return PM(908142,908962)
+    return PM(906215,907035)
 
 
 def FactoryPolyglot():
@@ -3237,7 +3189,7 @@ def FactoryPolyglot():
 
 
 def pmTags():
-    return PM(908962,909785)
+    return PM(907035,907858)
 
 
 def Tags():
@@ -3245,7 +3197,7 @@ def Tags():
 
 
 def pmAppearance():
-    return PM(909785,910512)
+    return PM(907858,908585)
 
 
 def Appearance():
@@ -3253,7 +3205,7 @@ def Appearance():
 
 
 def pmFill():
-    return PM(910512,911550)
+    return PM(908585,909623)
 
 
 def Fill():
@@ -3261,7 +3213,7 @@ def Fill():
 
 
 def pmSupport():
-    return PM(911550,912282)
+    return PM(909623,910355)
 
 
 def Support():
@@ -3269,7 +3221,7 @@ def Support():
 
 
 def pmOrder():
-    return PM(912282,913080)
+    return PM(910355,911153)
 
 
 def Order():
@@ -3277,7 +3229,7 @@ def Order():
 
 
 def pmPlay1():
-    return PM(913080,914375)
+    return PM(911153,912448)
 
 
 def Play1():
@@ -3285,7 +3237,7 @@ def Play1():
 
 
 def pmRemove1():
-    return PM(914375,915502)
+    return PM(912448,913575)
 
 
 def Remove1():
@@ -3293,7 +3245,7 @@ def Remove1():
 
 
 def pmNew1():
-    return PM(915502,915824)
+    return PM(913575,913897)
 
 
 def New1():
@@ -3301,7 +3253,7 @@ def New1():
 
 
 def pmMensError():
-    return PM(915824,917888)
+    return PM(913897,915961)
 
 
 def MensError():
@@ -3309,7 +3261,7 @@ def MensError():
 
 
 def pmMensInfo():
-    return PM(917888,920443)
+    return PM(915961,918516)
 
 
 def MensInfo():
@@ -3317,7 +3269,7 @@ def MensInfo():
 
 
 def pmJump():
-    return PM(920443,921118)
+    return PM(918516,919191)
 
 
 def Jump():
@@ -3325,7 +3277,7 @@ def Jump():
 
 
 def pmCaptures():
-    return PM(921118,922299)
+    return PM(919191,920372)
 
 
 def Captures():
@@ -3333,7 +3285,7 @@ def Captures():
 
 
 def pmRepeat():
-    return PM(922299,922958)
+    return PM(920372,921031)
 
 
 def Repeat():
@@ -3341,7 +3293,7 @@ def Repeat():
 
 
 def pmCount():
-    return PM(922958,923634)
+    return PM(921031,921707)
 
 
 def Count():
@@ -3349,7 +3301,7 @@ def Count():
 
 
 def pmMate15():
-    return PM(923634,924705)
+    return PM(921707,922778)
 
 
 def Mate15():
@@ -3357,7 +3309,7 @@ def Mate15():
 
 
 def pmCoordinates():
-    return PM(924705,925858)
+    return PM(922778,923931)
 
 
 def Coordinates():
@@ -3365,7 +3317,7 @@ def Coordinates():
 
 
 def pmKnight():
-    return PM(925858,927101)
+    return PM(923931,925174)
 
 
 def Knight():
@@ -3373,7 +3325,7 @@ def Knight():
 
 
 def pmCorrecto():
-    return PM(927101,928127)
+    return PM(925174,926200)
 
 
 def Correcto():
@@ -3381,7 +3333,7 @@ def Correcto():
 
 
 def pmBlocks():
-    return PM(928127,928464)
+    return PM(926200,926537)
 
 
 def Blocks():
@@ -3389,7 +3341,7 @@ def Blocks():
 
 
 def pmWest():
-    return PM(928464,929570)
+    return PM(926537,927643)
 
 
 def West():
@@ -3397,7 +3349,7 @@ def West():
 
 
 def pmOpening():
-    return PM(929570,929828)
+    return PM(927643,927901)
 
 
 def Opening():
@@ -3405,7 +3357,7 @@ def Opening():
 
 
 def pmVariation():
-    return PM(225372,225790)
+    return PM(223138,223556)
 
 
 def Variation():
@@ -3413,7 +3365,7 @@ def Variation():
 
 
 def pmComment():
-    return PM(929828,930191)
+    return PM(927901,928264)
 
 
 def Comment():
@@ -3421,7 +3373,7 @@ def Comment():
 
 
 def pmVariationComment():
-    return PM(930191,930535)
+    return PM(928264,928608)
 
 
 def VariationComment():
@@ -3429,7 +3381,7 @@ def VariationComment():
 
 
 def pmOpeningVariation():
-    return PM(930535,930999)
+    return PM(928608,929072)
 
 
 def OpeningVariation():
@@ -3437,7 +3389,7 @@ def OpeningVariation():
 
 
 def pmOpeningComment():
-    return PM(930999,931332)
+    return PM(929072,929405)
 
 
 def OpeningComment():
@@ -3445,10 +3397,130 @@ def OpeningComment():
 
 
 def pmOpeningVariationComment():
-    return PM(930535,930999)
+    return PM(928608,929072)
 
 
 def OpeningVariationComment():
     return QtGui.QIcon(pmOpeningVariationComment())
+
+
+def pmDeleteRow():
+    return PM(929405,929836)
+
+
+def DeleteRow():
+    return QtGui.QIcon(pmDeleteRow())
+
+
+def pmDeleteColumn():
+    return PM(929836,930279)
+
+
+def DeleteColumn():
+    return QtGui.QIcon(pmDeleteColumn())
+
+
+def pmEditVariation():
+    return PM(930279,930634)
+
+
+def EditVariation():
+    return QtGui.QIcon(pmEditVariation())
+
+
+def pmKibitzer():
+    return PM(930634,931233)
+
+
+def Kibitzer():
+    return QtGui.QIcon(pmKibitzer())
+
+
+def pmKibitzer_Pause():
+    return PM(931233,931405)
+
+
+def Kibitzer_Pause():
+    return QtGui.QIcon(pmKibitzer_Pause())
+
+
+def pmKibitzer_Options():
+    return PM(931405,932307)
+
+
+def Kibitzer_Options():
+    return QtGui.QIcon(pmKibitzer_Options())
+
+
+def pmKibitzer_Voyager():
+    return PM(932307,933150)
+
+
+def Kibitzer_Voyager():
+    return QtGui.QIcon(pmKibitzer_Voyager())
+
+
+def pmKibitzer_Close():
+    return PM(933150,933707)
+
+
+def Kibitzer_Close():
+    return QtGui.QIcon(pmKibitzer_Close())
+
+
+def pmKibitzer_Down():
+    return PM(933707,934096)
+
+
+def Kibitzer_Down():
+    return QtGui.QIcon(pmKibitzer_Down())
+
+
+def pmKibitzer_Up():
+    return PM(934096,934491)
+
+
+def Kibitzer_Up():
+    return QtGui.QIcon(pmKibitzer_Up())
+
+
+def pmKibitzer_Back():
+    return PM(934491,934924)
+
+
+def Kibitzer_Back():
+    return QtGui.QIcon(pmKibitzer_Back())
+
+
+def pmKibitzer_Clipboard():
+    return PM(934924,935310)
+
+
+def Kibitzer_Clipboard():
+    return QtGui.QIcon(pmKibitzer_Clipboard())
+
+
+def pmKibitzer_Play():
+    return PM(935310,935831)
+
+
+def Kibitzer_Play():
+    return QtGui.QIcon(pmKibitzer_Play())
+
+
+def pmKibitzer_Side():
+    return PM(935831,936584)
+
+
+def Kibitzer_Side():
+    return QtGui.QIcon(pmKibitzer_Side())
+
+
+def pmKibitzer_Board():
+    return PM(936584,937022)
+
+
+def Kibitzer_Board():
+    return QtGui.QIcon(pmKibitzer_Board())
 
 

@@ -1,7 +1,9 @@
 import PySide2.QtGui
 from PySide2 import QtWidgets, QtCore
 
-from Code.QT import Controles, Colocacion, QTVarios, Iconos
+from Code.Base import Move
+from Code.QT import Controles, Colocacion, QTVarios, Iconos, QTUtil2
+
 
 
 
@@ -44,6 +46,8 @@ class ShowPGN(QtWidgets.QScrollArea):
         self.selected_link = None
 
         self.num_showed = 0
+
+        self.wowner = parent
 
         ly = Colocacion.V()
         self.li_variations = []
@@ -95,12 +99,26 @@ class ShowPGN(QtWidgets.QScrollArea):
                 num_lb = num
                 break
         menu = QTVarios.LCMenu(self)
-        menu.opcion("remove_line", _("Remove line"), Iconos.Delete())
-        if self.selected_link and self.selected_link in lb_sender.text():
+        menu.opcion("remove_line", _("Remove line"), Iconos.DeleteRow())
+        if self.selected_link and self.selected_link in lb_sender.text():  # move selected in variation
+            if not self.selected_link.endswith("|0"): # si no es el primero
+                menu.separador()
+                menu.opcion("remove_move", _("Remove move"), Iconos.DeleteColumn())
             menu.separador()
-            menu.opcion("remove_move", _("Remove move"), Iconos.Delete())
+            menu.opcion("comment", _("Edit comment"), Iconos.ComentarioEditar())
 
-        menu.lanza()
+        resp = menu.lanza()
+        if resp is None:
+            return
+
+        elif resp == "remove_line":
+            self.wowner.remove_line()
+
+        elif resp == "remove_move":
+            self.wowner.remove_move()
+
+        elif resp == "comment":
+            self.wowner.comment_edit()
 
     def change(self, num_pgn, pgn):
         if num_pgn >= self.num_showed:
@@ -118,6 +136,7 @@ class ShowPGN(QtWidgets.QScrollArea):
         style_moves = "color:black"
         style_select = "color:darkred"
 
+        self.move: Move.Move = work_move
         self.selected_link = selected_link
 
         def do_variation(variation_game, base_select):

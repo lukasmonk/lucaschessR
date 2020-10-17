@@ -19,19 +19,20 @@ class WStEval(QtWidgets.QDialog):
 
         self.cpu = cpu
 
+        self.kibitzer = cpu.kibitzer
+
         dicVideo = self.cpu.dic_video
         if not dicVideo:
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.siShowBoard = dicVideo.get("SHOW_BOARD", True)
+        self.show_board = dicVideo.get("SHOW_BOARD", True)
         self.position = Position.Position()
 
-        self.fen = ""
-        self.almFEN = {}
+        self.game = None
         self.siPlay = True
         self.is_white = True
-        self.siNegras = True
+        self.is_black = True
 
         self.setWindowTitle(cpu.titulo)
         self.setWindowIcon(Iconos.Book())
@@ -58,20 +59,18 @@ class WStEval(QtWidgets.QDialog):
         self.em.ponFuente(f)
 
         li_acciones = (
-            (_("Quit"), Iconos.Kibitzer_Terminar(), self.terminar),
-            (_("Continue"), Iconos.Kibitzer_Continuar(), self.play),
-            (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
-            (_("Board"), Iconos.Board(), self.config_board),
+            (_("Quit"), Iconos.Kibitzer_Close(), self.terminar),
+            (_("Continue"), Iconos.Kibitzer_Play(), self.play),
+            (_("Pause"), Iconos.Kibitzer_Pause(), self.pause),
+            (_("Show/hide board"), Iconos.Kibitzer_Board(), self.config_board),
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=24)
         self.tb.setAccionVisible(self.play, False)
 
-        ly1 = Colocacion.H().control(self.tb)
-        ly2 = Colocacion.V().otro(ly1).control(self.em)
-
-        layout = Colocacion.H().control(self.board).otro(ly2)
+        ly1 = Colocacion.H().control(self.board).control(self.em).margen(3)
+        layout = Colocacion.V().control(self.tb).espacio(-10).otro(ly1).margen(3)
         self.setLayout(layout)
 
         self.engine = self.lanzaMotor()
@@ -80,7 +79,7 @@ class WStEval(QtWidgets.QDialog):
         self.timer.timeout.connect(self.cpu.compruebaInput)
         self.timer.start(200)
 
-        if not self.siShowBoard:
+        if not self.show_board:
             self.board.hide()
         self.restore_video(dicVideo)
         self.ponFlags()
@@ -116,7 +115,7 @@ class WStEval(QtWidgets.QDialog):
         self.siPlay = True
         self.tb.setPosVisible(1, False)
         self.tb.setPosVisible(2, True)
-        self.ponFen(self.fen)
+        self.reset()
 
     def stop(self):
         self.siPlay = False
@@ -125,9 +124,9 @@ class WStEval(QtWidgets.QDialog):
     def closeEvent(self, event):
         self.finalizar()
 
-    def siAnalizar(self):
-        siW = " w " in self.fen
-        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.siNegras)):
+    def if_to_analyze(self):
+        siW = self.game.last_position.is_white
+        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
             return False
         return True
 
@@ -138,14 +137,14 @@ class WStEval(QtWidgets.QDialog):
         menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), Iconos.PuntoVerde())
         resp = menu.lanza()
         if resp:
-            self.siNegras = True
+            self.is_black = True
             self.is_white = True
             if resp == "blancas":
-                self.siNegras = False
+                self.is_black = False
             elif resp == "negras":
                 self.is_white = False
-            if self.siAnalizar():
-                self.ponFen(self.fen)
+            if self.if_to_analyze():
+                self.reset()
 
     def finalizar(self):
         self.save_video()
@@ -163,7 +162,7 @@ class WStEval(QtWidgets.QDialog):
         tam = self.size()
         dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
 
-        dic["SHOW_BOARD"] = self.siShowBoard
+        dic["SHOW_BOARD"] = self.show_board
 
         dic["SITOP"] = self.siTop
 
@@ -200,47 +199,27 @@ class WStEval(QtWidgets.QDialog):
             self.resize(w, h)
 
     def config_board(self):
-        self.pause()
-        menu = QTVarios.LCMenu(self)
-        if self.siShowBoard:
-            menu.opcion("hide", _("Hide"), Iconos.PuntoNaranja())
-        else:
-            menu.opcion("show", _("Show"), Iconos.PuntoNaranja())
-        resp = menu.lanza()
-        if resp:
-            if resp == "hide":
-                self.siShowBoard = False
-                self.board.hide()
-            elif resp == "show":
-                self.siShowBoard = True
-                self.board.show()
-            self.save_video()
-        self.play()
+        self.show_board = not self.show_board
+        self.board.setVisible(self.show_board)
+        self.save_video()
 
     def lanzaMotor(self):
-        confMotor = self.cpu.configMotor
-        self.nom_engine = confMotor.name
-        exe = confMotor.ejecutable()
-        args = confMotor.argumentos()
-        liUCI = confMotor.liUCI
-        return EngineRun.RunEngine(self.nom_engine, exe, liUCI, 0, priority=self.cpu.prioridad, args=args)
+        self.numMultiPV = self.kibitzer.multiPV
 
-    def ponFen(self, fen):
+        self.nom_engine = self.kibitzer.name
+        exe = self.kibitzer.path_exe
+        args = self.kibitzer.args
+        li_uci = self.kibitzer.liUCI
+        return EngineRun.RunEngine(self.nom_engine, exe, li_uci, self.numMultiPV, priority=self.cpu.prioridad, args=args)
+
+    def orden_game(self, game):
         txt = ""
-        if fen:
-            position = Position.Position()
-            position.read_fen(fen)
+        self.game = game
+        if game:
+            position = game.last_position
             self.board.set_position(position)
-            if self.fen and fen != self.fen:
-                txt = self.em.texto()
-                if self.fen and txt:
-                    self.almFEN[self.fen] = txt
-
-            self.fen = fen
-            if fen in self.almFEN:
-                txt = self.almFEN[fen]
-            elif self.siAnalizar():
-                self.engine.set_fen_position(fen)
+            if self.if_to_analyze():
+                self.engine.set_fen_position(position.fen())
                 self.engine.put_line("eval")
                 li, ok = self.engine.wait_list(":", 2000)
                 while li and li[-1] == "\n":
@@ -249,3 +228,7 @@ class WStEval(QtWidgets.QDialog):
                     txt = "".join(li)
 
         self.em.set_text(txt)
+
+    def reset(self):
+        self.orden_game(self.game)
+

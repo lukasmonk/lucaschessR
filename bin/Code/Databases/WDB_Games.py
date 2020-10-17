@@ -375,7 +375,7 @@ class WGames(QtWidgets.QWidget):
 
     def edit(self, recno, game):
         game = self.procesador.managerPartida(self, game, not self.dbGames.allows_positions, False, self.infoMove.board)
-        if game:
+        if game is not None:
             resp = self.dbGames.guardaPartidaRecno(recno, game)
             if resp.ok:
                 if not resp.changed:
@@ -405,7 +405,7 @@ class WGames(QtWidgets.QWidget):
 
     def tw_edit(self):
         game, recno = self.current_game()
-        if game:
+        if game is not None:
             self.edit(recno, game)
         elif recno is not None:
             QTUtil2.message_bold(self, _("This game is wrong and can not be edited"))

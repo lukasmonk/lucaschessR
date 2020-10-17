@@ -55,7 +55,7 @@ class Manager:
 
         self.main_window.set_manager_active(self)
 
-        self.game = None
+        self.game: Game.Game = None
         self.new_game()
 
         self.listaOpeningsStd = OpeningsStd.ap
@@ -437,7 +437,7 @@ class Manager:
 
             if self.kibitzers_manager.some_working():
                 if self.si_mira_kibitzers():
-                    self.mira_kibitzers(move, column.key)
+                    self.mira_kibitzers(True)
                 else:
                     self.kibitzers_manager.stop()
 
@@ -446,14 +446,13 @@ class Manager:
         # self.game_type in (GT_POSITIONS, GT_AGAINST_PGN, GT_AGAINST_ENGINE, GT_TACTICS, GT_AGAINST_GM, GT_ALONE, GT_BOOK, GT_OPENINGS) or
         # (self.game_type in (GT_ELO, GT_MICELO) and ))
 
-    def mira_kibitzers(self, move, columnaClave, only_last=False):
-        if move:
-            fenBase = move.position_before.fen()
-            fen = fenBase if columnaClave == "NUMBER" else move.position.fen()
-        else:
-            fen = self.game.last_position.fen()
-            fenBase = fen
-        self.kibitzers_manager.put_fen(fen, fenBase, only_last)
+    def mira_kibitzers(self, all_kibitzers):
+        row, column = self.main_window.pgnPosActual()
+        pos_move, move = self.pgn.move(row, column.key)
+        if column.key == "NUMBER":
+            pos_move -= 1
+        game_run = self.game.copy_raw(pos_move)
+        self.kibitzers_manager.put_game(game_run, not all_kibitzers)
 
     def ponPiezasAbajo(self, is_white):
         self.board.ponerPiezasAbajo(is_white)
@@ -646,7 +645,7 @@ class Manager:
 
     def pgnMueveBase(self, row, column):
         if column == "NUMBER":
-            if row == 0:
+            if row <= 0:
                 if self.pgn.variations_mode:
                     self.set_position(self.game.first_position, "-1")
                     self.main_window.base.pgn.goto(0, 0)
@@ -1076,9 +1075,7 @@ class Manager:
         else:
             nkibitzer = int(orden)
             self.kibitzers_manager.run_new(nkibitzer)
-            row, column = self.main_window.pgnPosActual()
-            pos_move, move = self.pgn.move(row, column.key)
-            self.mira_kibitzers(move, column.key, True)
+            self.mira_kibitzers(False)
 
     def paraHumano(self):
         self.human_is_playing = False

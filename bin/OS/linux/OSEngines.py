@@ -77,10 +77,6 @@ def read_engines(folder_engines):
     cm = mas("rodentII", "Pawel Koziol", "0.9.64", "http://www.pkoziol.cal24.pl/rodent/rodent.htm", "rodentII", 2912)
     cm.ordenUCI("Hash", "64")
 
-    cm = mas("honey", "Michael Byrne", f"XI-r3 64bit", "https://github.com/MichaelB7/Stockfish/tree/honey", f"Honey-XI-r3", 3300)
-    cm.ordenUCI("Hash", "64")
-    cm.ponMultiPV(20, 256)
-
     cm = mas("zappa", "Anthony Cozzie", "1.1", "http://www.acoz.net/zappa/", "zappa.exe", 2614)
 
     return dic_engines
@@ -92,7 +88,6 @@ def dict_engines_fixed_elo(folder_engines):
     for nm, desde, hasta in (
         ("rodent", 600, 2600),
         ("amyan", 1000, 2400),
-        ("honey", 1000, 2900),
         ("rhetoric", 1300, 2600),
         ("cheng", 800, 2500),
         ("greko", 1600, 2400),

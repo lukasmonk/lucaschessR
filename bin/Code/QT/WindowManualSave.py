@@ -452,7 +452,7 @@ class WManualSave(QTVarios.WDialogo):
         return pc
 
     def reset_partida(self):
-        if self.game:
+        if self.game is not None:
             self.game = None
             self.board.set_position(self.position)
 

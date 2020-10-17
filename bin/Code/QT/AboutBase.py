@@ -486,13 +486,8 @@ class ThanksTo:
         txt += "</tr>"
         for name, autor, url in self.list_engines(orden):
             txt += "<tr>"
-            if "honey" in name.lower():
-                style = 'style="color:darkred;font-weight:bold">'
-                txt += '<td %s%s (%s)</td>' % (style, name, _("default"))
-                txt += '<td %s%s</font></td>' % (style, autor)
-            else:
-                txt += "<td>%s</td>" % name
-                txt += "<td>%s</td>" % autor
+            txt += "<td>%s</td>" % name
+            txt += "<td>%s</td>" % autor
             txt += '<td><a href="%s">%s</a></td>' % (url, url)
             txt += "</tr>"
         txt += self.table_end()

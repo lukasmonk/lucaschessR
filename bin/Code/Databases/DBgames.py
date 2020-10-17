@@ -688,7 +688,7 @@ class DBgames:
                                 data = memoryview(BODY_SAVE + body)
                             reg.append(data)
                         elif campo == "PLYCOUNT":
-                            reg.append(pv.count(" ") + 1)
+                            reg.append((pv.count(" ") + 1) if pv else 0)
                         else:
                             reg.append(dCab.get(campo))
                             if campo == "RESULT":

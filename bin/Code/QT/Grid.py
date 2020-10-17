@@ -298,6 +298,11 @@ class Grid(QtWidgets.QTableView):
         self.siEditable = siEditable
         self.starting = False
 
+        self.right_button_without_rows = False
+
+    def set_right_button_without_rows(self, ok):
+        self.right_button_without_rows = ok
+
     def buscaCabecera(self, key):
         return self.o_columns.buscaColumna(key)
 
@@ -378,10 +383,10 @@ class Grid(QtWidgets.QTableView):
         QtWidgets.QTableView.mousePressEvent(self, event)
         button = event.button()
         fil, col = self.current_position()
-        if fil < 0:
-            return
         if button == QtCore.Qt.RightButton:
             if hasattr(self.w_parent, "grid_right_button"):
+                if fil < 0 and not self.right_button_without_rows:
+                    return
 
                 class Vacia:
                     pass

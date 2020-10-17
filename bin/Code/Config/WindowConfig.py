@@ -131,9 +131,9 @@ def opciones(parent, configuration):
     x = " - %s Graham O'Neill (https://goneill.co.nz)" % _("developed by")
     li_db = [(_("None"), ""),
              (_("DGT"), "DGT"),
-             # (_("Novag UCB") + x, "Novag UCB"),
-             # (_("Millennium") + x, "Millennium"),
-             # (_("Certabo") + x, "Certabo"),
+             (_("Novag UCB") + x, "Novag UCB"),
+             (_("Millennium") + x, "Millennium"),
+             (_("Certabo") + x, "Certabo"),
              ]
     form.combobox(_("Digital board"), li_db, configuration.x_digital_board)
 

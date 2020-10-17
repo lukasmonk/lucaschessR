@@ -496,6 +496,20 @@ class Game:
             resp = "|%s|%s" % (self.first_position.fen(), resp)
         return resp
 
+    def all_pv(self, pv_previo, with_variations):
+        li_pvc = []
+        if pv_previo:
+            pv_previo += " "
+        for move in self.li_moves:
+            if with_variations != NONE and move.variations:
+                is_w = move.is_white()
+                if (with_variations == ALL) or (is_w and with_variations == ONLY_WHITE) or (not is_w and with_variations == ONLY_BLACK):
+                    for variation in move.variations.li_variations:
+                        li_pvc.extend(variation.all_pv(pv_previo.strip(), with_variations))
+            pv_previo += move.movimiento() + " "
+            li_pvc.append(pv_previo.strip())
+        return li_pvc
+
     def lipv(self):
         return [move.movimiento() for move in self.li_moves]
 
@@ -810,6 +824,17 @@ class Game:
             mensaje += "\n\n%s: %s" % (_("Result"), DIC_LABELS_TERMINATION[self.termination])
 
         return mensaje, beep, beep in (BEEP_WIN_PLAYER_TIME, BEEP_WIN_PLAYER)
+
+    def shrink(self, until_move: int):
+        self.li_moves = self.li_moves[:until_move+1]
+
+    def copy_raw(self, hasta):
+        g = Game(self.first_position)
+        if hasta not in (None, -1):
+            pv = self.pv_hasta(hasta)
+            if pv:
+                g.read_pv(pv)
+        return g
 
 
 def pv_san(fen, pv):

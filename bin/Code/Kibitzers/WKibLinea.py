@@ -39,10 +39,10 @@ class WKibLinea(QtWidgets.QDialog):
 
         self.siTop = dicVideo.get("SITOP", True)
 
-        self.fen = ""
+        self.game = None
 
         self.setWindowTitle(cpu.titulo)
-        self.setWindowIcon(Iconos.Motor())
+        self.setWindowIcon(Iconos.Kibitzer())
 
         self.flags = {
             True: QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowStaysOnTopHint,
@@ -66,15 +66,15 @@ class WKibLinea(QtWidgets.QDialog):
         )
 
         li_acciones = (
-            (_("Quit"), Iconos.Kibitzer_Terminar(), self.terminar),
-            (_("Continue"), Iconos.Kibitzer_Continuar(), self.play),
-            (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
-            (_("Analyze only color"), Iconos.P_16c(), self.color),
-            (_("Change window position"), Iconos.TamTablero(), self.mover),
+            (_("Quit"), Iconos.Kibitzer_Close(), self.terminar),
+            (_("Continue"), Iconos.Kibitzer_Play(), self.play),
+            (_("Pause"), Iconos.Kibitzer_Pause(), self.pause),
+            (_("Analyze only color"), Iconos.Kibitzer_Side(), self.color),
+            (_("Change window position"), Iconos.ResizeBoard(), self.mover),
             (_("Options"), Iconos.Opciones(), self.changeOptions),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
-        self.tb.setFixedSize(120, 24)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=24)
+        self.tb.setFixedSize(180, 32)
         self.tb.setPosVisible(1, False)
         self.em = EDP(self)
         self.em.ponTipoLetra(peso=75, puntos=10)
@@ -88,7 +88,7 @@ class WKibLinea(QtWidgets.QDialog):
 
         self.siPlay = True
         self.is_white = True
-        self.siNegras = True
+        self.is_black = True
 
         self.siMover = False
 
@@ -113,7 +113,7 @@ class WKibLinea(QtWidgets.QDialog):
                 rm = mrm.rmBest()
                 if rm and rm.depth > self.depth:
                     self.depth = rm.depth
-                    game = Game.Game(fen=self.fen)
+                    game = Game.Game(ini_posicion=self.game.last_position)
                     game.read_pv(rm.pv)
                     if len(game):
                         self.em.ponHtml(game.pgnBaseRAW())
@@ -133,9 +133,6 @@ class WKibLinea(QtWidgets.QDialog):
                     hp, ht, pid, dt = struct.unpack("PPII", pid.asstring(16))
                 p = psutil.Process(pid)
                 p.nice(xprioridad)
-            if w.result_posicionBase is not None:
-                self.cpu.position_before = w.result_posicionBase
-                self.fen = self.cpu.fenBase if self.cpu.position_before else self.cpu.fen
             if w.result_opciones:
                 for opcion, valor in w.result_opciones:
                     if valor is None:
@@ -181,7 +178,7 @@ class WKibLinea(QtWidgets.QDialog):
         self.siPlay = True
         self.tb.setPosVisible(1, False)
         self.tb.setPosVisible(2, True)
-        self.ponFen(self.fen)
+        self.reset()
 
     def stop(self):
         self.siPlay = False
@@ -198,9 +195,9 @@ class WKibLinea(QtWidgets.QDialog):
     def closeEvent(self, event):
         self.finalizar()
 
-    def siAnalizar(self):
-        siW = " w " in self.fen
-        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.siNegras)):
+    def if_to_analyze(self):
+        siW = self.game.last_position.is_white
+        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
             return False
         return True
 
@@ -211,14 +208,14 @@ class WKibLinea(QtWidgets.QDialog):
         menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), Iconos.PuntoVerde())
         resp = menu.lanza()
         if resp:
-            self.siNegras = True
+            self.is_black = True
             self.is_white = True
             if resp == "blancas":
-                self.siNegras = False
+                self.is_black = False
             elif resp == "negras":
                 self.is_white = False
-            if self.siAnalizar():
-                self.ponFen(self.fen)
+            if self.if_to_analyze():
+                self.orden_game(self.game)
 
     def finalizar(self):
         self.save_video()
@@ -271,31 +268,20 @@ class WKibLinea(QtWidgets.QDialog):
                 h = 20
             self.resize(w, h)
 
-    def orden_fen(self, fen):
-        posicionInicial = Position.Position()
-        posicionInicial.read_fen(fen)
+    def orden_game(self, game: Game.Game):
+        posicion = game.last_position
 
-        self.siW = posicionInicial.is_white
+        self.siW = posicion.is_white
 
         self.escribe("stop")
 
-        game = Game.Game(fen=fen)
+        self.game = game
+        self.depth = 0
+
         self.engine.ac_inicio(game)
 
     def escribe(self, linea):
         self.engine.put_line(linea)
-
-    def ponFen(self, fen):
-        self.liData = []
-        self.depth = 0
-        if fen:
-            self.fen = fen
-            if self.siAnalizar():
-                self.orden_fen(fen)
-            else:
-                self.stop()
-        else:
-            self.stop()
 
     def mover(self):
         w = self.width()
@@ -304,3 +290,6 @@ class WKibLinea(QtWidgets.QDialog):
         self.show()
         QTUtil.refresh_gui()
         self.resize(w, self.height())
+
+    def reset(self):
+        self.orden_game(self.game)

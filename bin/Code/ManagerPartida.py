@@ -18,7 +18,7 @@ class ManagerPartida(Manager.Manager):
 
         self.game = game
         self.reinicio = self.game.save()
-        self.siCompleta = si_completa
+        self.si_completa = si_completa
 
         self.human_is_playing = True
         self.is_human_side_white = True
@@ -43,7 +43,7 @@ class ManagerPartida(Manager.Manager):
         self.ponPiezasAbajo(game.iswhite())
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        self.goto_end()
+        self.ponteAlPrincipio()
 
         self.check_boards_setposition()
 
@@ -54,27 +54,26 @@ class ManagerPartida(Manager.Manager):
         self.siguiente_jugada()
 
     def ponInformacion(self):
-        if self.siCompleta:
-            white = black = result = None
-            for key, valor in self.game.li_tags:
-                key = key.upper()
-                if key == "WHITE":
-                    white = valor
-                elif key == "BLACK":
-                    black = valor
-                elif key == "RESULT":
-                    result = valor
-            self.set_label1(
-                "%s : <b>%s</b><br>%s : <b>%s</b>" % (_("White"), white, _("Black"), black) if white and black else ""
-            )
-            self.set_label2("%s : <b>%s</b>" % (_("Result"), result) if result else "")
+        white = black = result = None
+        for key, valor in self.game.li_tags:
+            key = key.upper()
+            if key == "WHITE":
+                white = valor
+            elif key == "BLACK":
+                black = valor
+            elif key == "RESULT":
+                result = valor
+        self.set_label1(
+            "%s : <b>%s</b><br>%s : <b>%s</b>" % (_("White"), white, _("Black"), black) if white and black else ""
+        )
+        self.set_label2("%s : <b>%s</b>" % (_("Result"), result) if result else "")
 
     def reiniciar(self):
         if self.changed and not QTUtil2.pregunta(self.main_window, _("You will loose all changes, are you sure?")):
             return
         p = Game.Game()
         p.restore(self.reinicio)
-        self.inicio(p, self.siCompleta)
+        self.inicio(p, self.si_completa)
 
     def run_action(self, key):
         if key == TB_REINIT:
@@ -265,7 +264,7 @@ class ManagerPartida(Manager.Manager):
             ("pastepgn", _("Paste PGN"), Iconos.Pegar16()),
             sep,
         ]
-        if not self.siCompleta:
+        if not self.si_completa:
             liMasOpciones.extend(
                 [
                     ("position", _("Edit start position"), Iconos.Datos()),
@@ -290,7 +289,7 @@ class ManagerPartida(Manager.Manager):
             new_position = Voyager.voyager_position(self.main_window, ini_position)
             if new_position and new_position != ini_position:
                 self.game.set_position(new_position)
-                self.inicio(self.game, self.siCompleta)
+                self.inicio(self.game, self.si_completa)
 
         elif resp == "pasteposicion":
             texto = QTUtil.traePortapapeles()
@@ -306,8 +305,8 @@ class ManagerPartida(Manager.Manager):
 
         elif resp == "leerpgn":
             game = self.procesador.select_1_pgn(self.main_window)
-            if game:
-                if self.siCompleta and not game.siFenInicial():
+            if game is not None:
+                if self.si_completa and not game.siFenInicial():
                     return
                 p = Game.Game()
                 p.leeOtra(game)
@@ -324,7 +323,7 @@ class ManagerPartida(Manager.Manager):
                         self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
                     )
                     return
-                if self.siCompleta and not game.siFenInicial():
+                if self.si_completa and not game.siFenInicial():
                     return
                 self.reinicio = game.save()
                 self.reiniciar()
