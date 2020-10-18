@@ -72,7 +72,13 @@ class ManagerWashingReplay(Manager.Manager):
         self.pgnRefresh(True)
 
         self.game.pending_opening = True
+        self.game.add_tag("Event", _("The Washing Machine"))
 
+        player = self.configuration.nom_player()
+        other = self.engine.name
+        w, b = (player, other) if self.is_human_side_white else (other, player)
+        self.game.add_tag("White", w)
+        self.game.add_tag("Black", b)
         QTUtil.refresh_gui()
 
         self.check_boards_setposition()
@@ -490,6 +496,12 @@ class ManagerWashingCreate(Manager.Manager):
                 self.game = game
                 self.goto_end()
                 self.main_window.base.pgnRefresh()
+        else:
+            player = self.configuration.nom_player()
+            other = self.xrival.name
+            w, b = (player, other) if self.is_human_side_white else (other, player)
+            self.game.add_tag("White", w)
+            self.game.add_tag("Black", b)
 
         self.check_boards_setposition()
 
@@ -518,7 +530,8 @@ class ManagerWashingCreate(Manager.Manager):
 
         is_white = self.game.is_white()
 
-        if self.checkFinal(is_white):
+        if self.game.is_finished():
+            self.muestra_resultado()
             return
 
         self.set_side_indicator(is_white)
@@ -702,29 +715,6 @@ class ManagerWashingCreate(Manager.Manager):
 
         self.refresh()
 
-    def checkFinal(self, is_white):
-        if len(self.game) == 0:
-            return False
-
-        jgUltima = self.game.last_jg()
-        if jgUltima:
-            if jgUltima.is_mate:
-                self.put_result(RS_WIN_OPPONENT if self.is_human_side_white == is_white else RS_WIN_PLAYER)
-                return True
-            if jgUltima.is_draw_stalemate:
-                self.put_result(RS_DRAW)
-                return True
-            if jgUltima.is_draw_repetition:
-                self.put_result(RS_DRAW_REPETITION)
-                return True
-            if jgUltima.is_draw_50:
-                self.put_result(RS_DRAW_50)
-                return True
-            if jgUltima.is_draw_material:
-                self.put_result(RS_DRAW_MATERIAL)
-                return True
-        return False
-
     def finalizar(self):
         self.analizaTerminar()
         self.main_window.activaJuego(False, False)
@@ -783,53 +773,26 @@ class ManagerWashingCreate(Manager.Manager):
 
         self.inicio(self.dbwashing, self.washing, self.engine)
 
-    def put_result(self, quien):
+    def muestra_resultado(self):
         self.state = ST_ENDGAME
-        self.resultado = quien
         self.disable_all()
         self.human_is_playing = False
 
-        self.beepResultadoCAMBIAR(quien)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
 
-        nombreContrario = self.xrival.name
+        self.beepResultado(beep)
+        self.guardarGanados(player_win)
+        QTUtil.refresh_gui()
 
-        mensaje = _("Game ended")
-        if quien == RS_WIN_PLAYER:
-            mensaje = _X(_("Congratulations you have won against %1."), nombreContrario)
+        QTUtil2.message(self.main_window, mensaje)
 
-        elif quien == RS_WIN_OPPONENT:
-            mensaje = _X(_("Unfortunately you have lost against %1"), nombreContrario)
-
-        elif quien == RS_DRAW:
-            mensaje = _X(_("Draw against %1."), nombreContrario)
-
-        elif quien == RS_DRAW_REPETITION:
-            mensaje = _X(
-                _("Draw due to three times repetition (n. %1) against %2."),
-                self.game.rotuloTablasRepeticion,
-                nombreContrario,
-            )
-            self.resultado = RS_DRAW
-
-        elif quien == RS_DRAW_50:
-            mensaje = _X(_("Draw according to the 50 move rule against %1."), nombreContrario)
-            self.resultado = RS_DRAW
-
-        elif quien == RS_DRAW_MATERIAL:
-            mensaje = _X(_("Draw, not enough material to mate %1"), nombreContrario)
-            self.resultado = RS_DRAW
-
-        self.guardarGanados(quien == RS_WIN_PLAYER)
-        self.mensajeEnPGN(mensaje)
-        self.state = ST_ENDGAME
-        self.disable_all()
         li_options = [TB_CLOSE, TB_CONFIG, TB_UTILITIES]
-        if quien != RS_WIN_PLAYER:
+        if player_win:
             li_options.insert(1, TB_REINIT)
         self.main_window.pon_toolbar(li_options)
         self.quitaAyudas()
 
-        if quien == RS_WIN_PLAYER:
+        if player_win:
             self.saveGame(True)
         else:
             self.cancelGame()
