@@ -271,7 +271,7 @@ class ManagerPartida(Manager.Manager):
                     sep,
                     ("pasteposicion", _("Paste FEN position"), Iconos.Pegar16()),
                     sep,
-                    ("voyager", _("Voyager 2"), Iconos.Voyager1()),
+                    ("voyager", _("Voyager 2"), Iconos.Voyager()),
                 ]
             )
 

@@ -468,7 +468,7 @@ class ManagerSolo(Manager.Manager):
             sep,
             ("engine", mt, Iconos.Motores()),
             sep,
-            ("voyager", _("Voyager 2"), Iconos.Voyager1()),
+            ("voyager", _("Voyager 2"), Iconos.Voyager()),
         ]
         resp = self.configurar(liMasOpciones, siCambioTutor=True, siSonidos=True)
 

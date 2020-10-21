@@ -17,8 +17,8 @@ def opciones(parent, configuration):
 
     form.edit(_("Player's name"), configuration.x_player)
     form.separador()
-    form.combobox(_("Window style"), configuration.estilos(), configuration.x_style)
-    form.separador()
+    # form.combobox(_("Window style"), configuration.estilos(), configuration.x_style)
+    # form.separador()
 
     li_traducciones = configuration.list_translations()
     tr_actual = configuration.translator()
@@ -237,7 +237,7 @@ def opciones(parent, configuration):
 
         (
             configuration.x_player,
-            configuration.x_style,
+            # configuration.x_style,
             translator,
             configuration.x_menu_play,
             configuration.x_check_for_update,

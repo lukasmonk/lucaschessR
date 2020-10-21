@@ -107,55 +107,116 @@ class Entrenamientos:
         td.reduce()  # Elimina carpetas vacias
         td.menu(bmenu, xopcion)
 
-    def creaMenu(self):
-        dicMenu = {}
-        menu = QTVarios.LCMenu(self.parent)
+    def create_menu_basic(self, menu, xopcion):
+        menu.separador()
+        menu_basic = menu.submenu(_("Basics"), Iconos.Training_Basic())
 
-        talpha = Controles.TipoLetra("Chess Alpha 2", self.configuration.x_menu_points + 4)
+        # menu1 = menu.submenu(_("Resources for zebras"), Iconos.Cebra())
+        menu2 = menu_basic.submenu(_("Check your memory on a chessboard"), Iconos.Memoria())
 
-        def xopcion(menu, key, texto, icono, is_disabled=False):
-            if "KP" in texto:
-                k2 = texto.index("K", 2)
-                texto = texto[:k2] + texto[k2:].lower()
-                menu.opcion(key, texto, icono, is_disabled, tipoLetra=talpha)
-            else:
-                menu.opcion(key, texto, icono, is_disabled)
-            dicMenu[key] = (self.menu_run, texto, icono, is_disabled)
+        mem = Memory.Memoria(self.procesador)
+        categorias = CompetitionWithTutor.Categorias()
 
-        # Posiciones de entrenamiento --------------------------------------------------------------------------
-        self.menuFNS(menu, _("Training positions"), xopcion)
+        for x in range(6):
+            cat = categorias.number(x)
+            txt = cat.name()
+
+            nm = mem.nivel(x)
+            if nm >= 0:
+                txt += " %s %d" % (_("Level"), nm + 1)
+
+            xopcion(menu2, -100 - x, txt, cat.icono(), is_disabled=not mem.is_active(x))
+
+        menu_basic.separador()
+
+        menu2 = menu_basic.submenu(_("Find all moves"), Iconos.FindAllMoves())
+        xopcion(menu2, "find_all_moves_rival", _("Opponent"), Iconos.PuntoNaranja())
+        xopcion(menu2, "find_all_moves_player", _("Player"), Iconos.PuntoAzul())
+
+        menu_basic.separador()
+        self.horsesDef = hd = {
+            1: ("N", "Alpha", _("Basic test")),
+            2: ("p", "Fantasy", _("Four pawns test")),
+            3: ("Q", "Pirat", _("Jonathan Levitt test")),
+            4: ("n", "Spatial", _("Basic test") + ": a1"),
+            5: ("N", "Cburnett", _("Basic test") + ": e4"),
+        }
+        menu2 = menu_basic.submenu(_("Becoming a knight tamer"), Iconos.Knight())
+        vicon = Code.todasPiezas.icono
+        icl, icn, tit = hd[1]
+        menu3 = menu2.submenu(tit, vicon(icl, icn))
+        xopcion(menu3, "horses_1", tit, vicon(icl, icn))
+        menu3.separador()
+        icl, icn, tit = hd[4]
+        xopcion(menu3, "horses_4", tit, vicon(icl, icn))
+        menu3.separador()
+        icl, icn, tit = hd[5]
+        xopcion(menu3, "horses_5", tit, vicon(icl, icn))
+        menu2.separador()
+        icl, icn, tit = hd[2]
+        xopcion(menu2, "horses_2", tit, vicon(icl, icn))
+        menu2.separador()
+        icl, icn, tit = hd[3]
+        xopcion(menu2, "horses_3", tit, vicon(icl, icn))
+
+        menu_basic.separador()
+        menu2 = menu_basic.submenu(_("Moves between two positions"), Iconos.Puente())
+        rp = QTVarios.rondoPuntos()
+        for x in range(1, 11):
+            xopcion(menu2, "puente_%d" % x, "%s %d" % (_("Level"), x), rp.otro())
+
+        menu_basic.separador()
+        xopcion(menu_basic, "visualiza", _("The board at a glance"), Iconos.Gafas())
+
+        menu_basic.separador()
+        menu2 = menu_basic.submenu(_("Coordinates"), Iconos.Coordinates())
+        xopcion(menu2, "coordinates_basic", _("Basic"), Iconos.West())
+        menu2.separador()
+        xopcion(menu2, "coordinates_blocks", _("By blocks"), Iconos.Blocks())
+
+        menu_basic.separador()
+        xopcion(menu_basic, "anotar", _("Writing down moves of a game"), Iconos.Write())
+
+    def create_menu_games(self, menu, xopcion):
         menu.separador()
 
-        # GM ---------------------------------------------------------------------------------------------------
-        xopcion(menu, "gm", _("Play like a GrandMaster"), Iconos.GranMaestro())
+        menu_games = menu.submenu(_("Games"), Iconos.Training_Games())
+
+        #   GM ---------------------------------------------------------------------------------------------------
+        xopcion(menu_games, "gm", _("Play like a GrandMaster"), Iconos.GranMaestro())
         menu.separador()
 
-        # Mate --------------------------------------------------------------------------------------------------
-        menu1 = menu.submenu(_("Training mates"), Iconos.Mate())
-        for mate in range(1, 8):
-            xopcion(menu1, "mate%d" % mate, _X(_("Mate in %1"), str(mate)), Iconos.PuntoAzul())
-            menu1.separador()
-        menu.separador()
+        menu_games.separador()
+        xopcion(menu_games, "captures", _("Captures and threats in a game"), Iconos.Captures())
 
-        # BMT -------------------------------------------------------------------------------------------
-        xopcion(menu, "bmt", _("Find best move"), Iconos.BMT())
-        menu.separador()
+        menu_games.separador()
+        xopcion(menu_games, "counts", _("Count moves"), Iconos.Count())
 
         # Resistencia ------------------------------------------------------------------------------------------
-        menu1 = menu.submenu(_("Resistance Test"), Iconos.Resistencia())
+        menu_games.separador()
+        menu1 = menu_games.submenu(_("Resistance Test"), Iconos.Resistencia())
         nico = Util.Rondo(Iconos.Verde(), Iconos.Azul(), Iconos.Amarillo(), Iconos.Naranja())
         xopcion(menu1, "resistance", _("Normal"), nico.otro())
         xopcion(menu1, "resistancec", _("Blindfold chess"), nico.otro())
         xopcion(menu1, "resistancep1", _("Hide only our pieces"), nico.otro())
         xopcion(menu1, "resistancep2", _("Hide only opponent pieces"), nico.otro())
-        menu.separador()
 
-        # DailyTest ------------------------------------------------------------------------------------------------
-        xopcion(menu, "dailytest", _("Your daily test"), Iconos.DailyTest())
+        menu_games.separador()
+        menu2 = menu_games.submenu(_("Learn a game"), Iconos.School())
+        xopcion(menu2, "learnPGN", _("Memorizing their moves"), Iconos.LearnGame())
+        menu2.separador()
+        xopcion(menu2, "playGame", _("Playing against"), Iconos.Law())
+
+    def create_menu_tactics(self, menu, xopcion):
         menu.separador()
+        menu_tactics = menu.submenu(_("Tactics"), Iconos.Training_Tactics())
+
+        #   Posiciones de entrenamiento --------------------------------------------------------------------------
+        self.menuFNS(menu_tactics, _("Training positions"), xopcion)
+        menu_tactics.separador()
 
         # Tacticas ---------------------------------------------------------------------------------------------
-        menu1 = menu.submenu(_("Learn tactics by repetition"), Iconos.Tacticas())
+        menu_t = menu_tactics.submenu(_("Learn tactics by repetition"), Iconos.Tacticas())
         nico = Util.Rondo(Iconos.Amarillo(), Iconos.Naranja(), Iconos.Verde(), Iconos.Azul(), Iconos.Magenta())
         dicTraining = TrListas.dicTraining()
 
@@ -176,43 +237,66 @@ class Entrenamientos:
                                 trTraining(name),
                                 nico.otro(),
                             )
-                            menu1.separador()
+                            menu_t.separador()
                             lista.append((carpeta, name))
                         else:
                             submenu1 = submenu.submenu(entry.name, nico.otro())
                             menu_tacticas(submenu1, tipo, carpeta, lista)
             return lista
 
-        menu_tacticas(menu1, TACTICS_BASIC, Code.path_resource("Tactics"), [])
+        menu_tacticas(menu_t, TACTICS_BASIC, Code.path_resource("Tactics"), [])
         lista = []
         carpetaTacticasP = self.configuration.folder_tactics()
         if os.path.isdir(carpetaTacticasP):
-            submenu1 = menu1.submenu(_("Personal tactics"), nico.otro())
+            submenu1 = menu_t.submenu(_("Personal tactics"), nico.otro())
             lista = menu_tacticas(submenu1, TACTICS_PERSONAL, carpetaTacticasP, lista)
             if lista:
                 ico = Iconos.Delete()
-                menub = menu1.submenu(_("Remove"), ico)
+                menub = menu_t.submenu(_("Remove"), ico)
                 for carpeta, name in lista:
                     xopcion(menub, "remtactica|%s|%s" % (carpeta, name), trTraining(name), ico)
+        menu_tactics.separador()
 
+        xopcion(menu_tactics, "bmt", _("Find best move"), Iconos.BMT())
+        menu_tactics.separador()
+
+        xopcion(menu_tactics, "dailytest", _("Your daily test"), Iconos.DailyTest())
+        menu_tactics.separador()
+
+        xopcion(menu_tactics, "potencia", _("Determine your calculating power"), Iconos.Potencia())
+
+    def create_menu_endings(self, menu, xopcion):
         menu.separador()
+        menu_endings = menu.submenu(_("Endings"), Iconos.Training_Endings())
 
-        # Longs ----------------------------------------------------------------------------------------
-        menu1 = menu.submenu(_("Long-term trainings"), Iconos.Longhaul())
+        menu1 = menu_endings.submenu(_("Training mates"), Iconos.Mate())
+        for mate in range(1, 8):
+            xopcion(menu1, "mate%d" % mate, _X(_("Mate in %1"), str(mate)), Iconos.PuntoAzul())
+            menu1.separador()
+        menu_endings.separador()
+
+        xopcion(menu_endings, "15mate", _("Mate in 1½"), Iconos.Mate15())
+        menu_endings.separador()
+
+        xopcion(menu_endings, "endings_gtb", _("Endings with Gaviota Tablebases"), Iconos.Finales())
+
+    def create_menu_long(self, menu, xopcion):
+        menu.separador()
+        menu_long = menu.submenu(_("Long-term trainings"), Iconos.Longhaul())
         # Maps
-        menu2 = menu1.submenu(_("Training on a map"), Iconos.Maps())
+        menu2 = menu_long.submenu(_("Training on a map"), Iconos.Maps())
         xopcion(menu2, "map_Africa", _("Africa map"), Iconos.Africa())
         menu2.separador()
         xopcion(menu2, "map_WorldMap", _("World map"), Iconos.WorldMap())
         # Rail
-        menu1.separador()
-        xopcion(menu1, "transsiberian", _("Transsiberian Railway"), Iconos.Train())
+        menu_long.separador()
+        xopcion(menu_long, "transsiberian", _("Transsiberian Railway"), Iconos.Train())
         # Everest
-        menu1.separador()
-        xopcion(menu1, "everest", _("Expeditions to the Everest"), Iconos.Trekking())
+        menu_long.separador()
+        xopcion(menu_long, "everest", _("Expeditions to the Everest"), Iconos.Trekking())
         # TOL
-        menu1.separador()
-        menu2 = menu1.submenu(_("Turn on the lights"), Iconos.TOL())
+        menu_long.separador()
+        menu2 = menu_long.submenu(_("Turn on the lights"), Iconos.TOL())
         menu.separador()
         menu3 = menu2.submenu(_("Memory mode"), Iconos.TOL())
         xopcion(menu3, "tol_uned_easy", "%s (%s)" % (_("UNED chess school"), _("Initial")), Iconos.Uned())
@@ -234,98 +318,35 @@ class Entrenamientos:
         # Washing
         menu2.separador()
         xopcion(menu2, "tol_oneline", _("In one line"), Iconos.TOLline())
-        menu1.separador()
-        xopcion(menu1, "washing_machine", _("The Washing Machine"), Iconos.WashingMachine())
+        menu_long.separador()
+        xopcion(menu_long, "washing_machine", _("The Washing Machine"), Iconos.WashingMachine())
+
+    def creaMenu(self):
+        dicMenu = {}
+        menu = QTVarios.LCMenu(self.parent)
+
+        talpha = Controles.TipoLetra("Chess Alpha 2", self.configuration.x_menu_points + 4)
+
+        def xopcion(menu, key, texto, icono, is_disabled=False):
+            if "KP" in texto:
+                k2 = texto.index("K", 2)
+                texto = texto[:k2] + texto[k2:].lower()
+                menu.opcion(key, texto, icono, is_disabled, tipoLetra=talpha)
+            else:
+                menu.opcion(key, texto, icono, is_disabled)
+            dicMenu[key] = (self.menu_run, texto, icono, is_disabled)
+
+        self.create_menu_games(menu, xopcion)
+        self.create_menu_tactics(menu, xopcion)
+        self.create_menu_endings(menu, xopcion)
+        self.create_menu_basic(menu, xopcion)
+        self.create_menu_long(menu, xopcion)
+
+
+
+        # Longs ----------------------------------------------------------------------------------------
 
         # Cebras ---------------------------------------------------------------------------------------------------
-        menu.separador()
-        # menu1 = menu.submenu(_("Resources for zebras"), Iconos.Cebra())
-        menu2 = menu.submenu(_("Check your memory on a chessboard"), Iconos.Memoria())
-
-        mem = Memory.Memoria(self.procesador)
-        categorias = CompetitionWithTutor.Categorias()
-
-        for x in range(6):
-            cat = categorias.number(x)
-            txt = cat.name()
-
-            nm = mem.nivel(x)
-            if nm >= 0:
-                txt += " %s %d" % (_("Level"), nm + 1)
-
-            xopcion(menu2, -100 - x, txt, cat.icono(), is_disabled=not mem.is_active(x))
-
-        menu.separador()
-
-        menu2 = menu.submenu(_("Find all moves"), Iconos.FindAllMoves())
-        xopcion(menu2, "find_all_moves_rival", _("Opponent"), Iconos.PuntoNaranja())
-        xopcion(menu2, "find_all_moves_player", _("Player"), Iconos.PuntoAzul())
-
-        menu.separador()
-        self.horsesDef = hd = {
-            1: ("N", "Alpha", _("Basic test")),
-            2: ("p", "Fantasy", _("Four pawns test")),
-            3: ("Q", "Pirat", _("Jonathan Levitt test")),
-            4: ("n", "Spatial", _("Basic test") + ": a1"),
-            5: ("N", "Cburnett", _("Basic test") + ": e4"),
-        }
-        menu2 = menu.submenu(_("Becoming a knight tamer"), Iconos.Knight())
-        vicon = Code.todasPiezas.icono
-        icl, icn, tit = hd[1]
-        menu3 = menu2.submenu(tit, vicon(icl, icn))
-        xopcion(menu3, "horses_1", tit, vicon(icl, icn))
-        menu3.separador()
-        icl, icn, tit = hd[4]
-        xopcion(menu3, "horses_4", tit, vicon(icl, icn))
-        menu3.separador()
-        icl, icn, tit = hd[5]
-        xopcion(menu3, "horses_5", tit, vicon(icl, icn))
-        menu2.separador()
-        icl, icn, tit = hd[2]
-        xopcion(menu2, "horses_2", tit, vicon(icl, icn))
-        menu2.separador()
-        icl, icn, tit = hd[3]
-        xopcion(menu2, "horses_3", tit, vicon(icl, icn))
-
-        menu.separador()
-        menu2 = menu.submenu(_("Moves between two positions"), Iconos.Puente())
-        rp = QTVarios.rondoPuntos()
-        for x in range(1, 11):
-            xopcion(menu2, "puente_%d" % x, "%s %d" % (_("Level"), x), rp.otro())
-
-        menu.separador()
-        xopcion(menu, "potencia", _("Determine your calculating power"), Iconos.Potencia())
-
-        menu.separador()
-        menu2 = menu.submenu(_("Learn a game"), Iconos.School())
-        xopcion(menu2, "learnPGN", _("Memorizing their moves"), Iconos.LearnGame())
-        menu2.separador()
-        xopcion(menu2, "playGame", _("Playing against"), Iconos.Law())
-
-        menu.separador()
-        xopcion(menu, "visualiza", _("The board at a glance"), Iconos.Gafas())
-
-        menu.separador()
-        menu2 = menu.submenu(_("Coordinates"), Iconos.Coordinates())
-        xopcion(menu2, "coordinates_basic", _("Basic"), Iconos.West())
-        menu2.separador()
-        xopcion(menu2, "coordinates_blocks", _("By blocks"), Iconos.Blocks())
-
-        menu.separador()
-        xopcion(menu, "anotar", _("Writing down moves of a game"), Iconos.Write())
-
-        menu.separador()
-        xopcion(menu, "captures", _("Captures and threats in a game"), Iconos.Captures())
-
-        menu.separador()
-        xopcion(menu, "counts", _("Count moves"), Iconos.Count())
-
-        menu.separador()
-        xopcion(menu, "15mate", _("Mate in 1½"), Iconos.Mate15())
-
-        menu.separador()
-        xopcion(menu, "endings_gtb", _("Endings with Gaviota Tablebases"), Iconos.Finales())
-
         return menu, dicMenu
 
     def comprueba(self):

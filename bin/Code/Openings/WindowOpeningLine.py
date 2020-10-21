@@ -562,7 +562,7 @@ class WLines(QTVarios.WDialogo):
             frommenu.opcion(("summary", part), _("Database summary"), Iconos.Database())
             if all:
                 frommenu.separador()
-                frommenu.opcion(("voyager2", part), _("Voyager 2"), Iconos.Voyager1())
+                frommenu.opcion(("voyager2", part), _("Voyager 2"), Iconos.Voyager())
                 frommenu.separador()
                 frommenu.opcion(("opening", part), _("Opening"), Iconos.Opening())
 
