@@ -528,6 +528,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def run_adjourn(self, dic):
         self.restore_state(dic)
+        self.check_boards_setposition()
         self.siguiente_jugada()
 
     def xpause(self):

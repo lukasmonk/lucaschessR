@@ -153,6 +153,7 @@ class ManagerCompeticion(Manager.Manager):
         self.game.restore(dic["GAME_SAVE"])
         self.goto_end()
 
+
         self.siguiente_jugada()
 
     def final_x(self):
