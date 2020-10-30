@@ -142,9 +142,8 @@ class ManagerEverest(Manager.Manager):
         return change_game
 
     def analizaInicio(self):
-        if not self.is_finished():
-            self.xanalyzer.ac_inicio(self.game)
-            self.siAnalizando = True
+        self.xanalyzer.ac_inicio(self.game)
+        self.siAnalizando = True
 
     def analizaMinimo(self, minTime):
         self.mrm = copy.deepcopy(self.xanalyzer.ac_minimo(minTime, False))
@@ -239,7 +238,7 @@ class ManagerEverest(Manager.Manager):
         self.vtime += time.time() - self.iniTiempo
 
         jgObj = self.partidaObj.move(self.posJugadaObj)
-        fen = self.fenUltimo()
+        fen = jgObj.position_before.fen()
 
         siAnalizaJuez = True
         if self.book:
@@ -275,7 +274,7 @@ class ManagerEverest(Manager.Manager):
             else:
                 if self.continueTt:
                     um = QTUtil2.analizando(self.main_window)
-                    mrm = self.analizaMinimo(5000) if self.continueTt else self.mrm
+                    mrm = self.analizaMinimo(3000) if self.continueTt else self.mrm
                     um.final()
                 else:
                     self.analizaNoContinuoFinal()

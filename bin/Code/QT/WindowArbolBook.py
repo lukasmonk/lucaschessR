@@ -354,7 +354,7 @@ class WindowArbolBook(QTVarios.WDialogo):
 
         # Se lee la lista de libros1
         self.listaLibros = Books.ListaLibros()
-        self.fvar = manager.configuration.ficheroBooks
+        self.fvar = manager.configuration.file_books
         self.listaLibros.restore_pickle(self.fvar)
 
         # Comprobamos que todos esten accesibles
@@ -363,7 +363,7 @@ class WindowArbolBook(QTVarios.WDialogo):
 
         # fens
         fenActivo = manager.fenActivoConInicio()  # Posicion en el board
-        fenUltimo = manager.fenUltimo()
+        fenUltimo = manager.last_fen()
         self.siEnviar = siEnVivo and (fenActivo == fenUltimo)
 
         self.listaMoves = ListaMoves(None, self.book, fenActivo)

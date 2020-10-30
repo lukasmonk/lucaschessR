@@ -50,14 +50,15 @@ class TournamentRun:
     def tournament(self):
         return Tournament.Tournament(self.file_tournament)
 
-    def get_game_queued(self, file_work):
+    def get_game_queued(self, file_work, times=0):
         with self.tournament() as torneo:
             self.run_name = torneo.name()
             self.run_drawRange = torneo.drawRange()
             self.run_drawMinPly = torneo.drawMinPly()
             self.run_resign = torneo.resign()
             self.run_bookDepth = torneo.bookDepth()
-            return torneo.get_game_queued(file_work)
+            game_tournament = torneo.get_game_queued(file_work)
+            return game_tournament
 
     def fenNorman(self):
         with self.tournament() as torneo:
@@ -260,7 +261,7 @@ class WTournamentRun(QtWidgets.QWidget):
             BLACK: self.torneo.buscaHEngine(self.tournament_game.hblack),
         }
         for side in (WHITE, BLACK):
-            self.lb_player[side].set_text(rival[side].name)
+            self.lb_player[side].set_text(rival[side].key)
 
         self.vtime = {}
 
@@ -408,7 +409,7 @@ class WTournamentRun(QtWidgets.QWidget):
     def eligeJugadaBook(self, book, tipo):
         bdepth = self.torneo.bookDepth()
         if bdepth == 0 or len(self.game) < bdepth:
-            fen = self.fenUltimo()
+            fen = self.game.last_fen()
             pv = book.eligeJugadaTipo(fen, tipo)
             if pv:
                 return True, pv[:2], pv[2:4], pv[4:]
@@ -589,9 +590,13 @@ class WTournamentRun(QtWidgets.QWidget):
         self.next_control = 20
 
         last_jg = self.game.last_jg()
+        if not last_jg.analysis:
+            return False
         mrm, pos = last_jg.analysis
         rmUlt = mrm.li_rm[pos]
         jgAnt = self.game.move(-2)
+        if not jgAnt.analysis:
+            return False
         mrm, pos = jgAnt.analysis
         rmAnt = mrm.li_rm[pos]
 

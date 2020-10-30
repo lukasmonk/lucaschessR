@@ -281,13 +281,13 @@ class WEngine(QtWidgets.QDialog):
 
         if siTorneo:
             lbDepth = Controles.LB(self, _("Maximum depth") + ": ")
-            self.sbDepth = Controles.SB(self, engine.max_depth, 0, 50)
+            self.sbDepth = Controles.SB(self, engine.depth, 0, 50)
 
             lbTime = Controles.LB(self, _("Maximum seconds to think") + ": ")
-            self.sbTime = Controles.SB(self, engine.max_time, 0, 9999)
+            self.sbTime = Controles.SB(self, engine.time, 0, 9999)
 
             lbBook = Controles.LB(self, _("Opening book") + ": ")
-            fvar = Code.configuration.ficheroBooks
+            fvar = Code.configuration.file_books
             self.listaLibros = Books.ListaLibros()
             self.listaLibros.restore_pickle(fvar)
             # # Comprobamos que todos esten accesibles
@@ -346,7 +346,7 @@ class WEngine(QtWidgets.QDialog):
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
             self.listaLibros.nuevo(b)
-            fvar = Code.configuration.ficheroBooks
+            fvar = Code.configuration.file_books
             self.listaLibros.save_pickle(fvar)
             li = [(x.name, x.path) for x in self.listaLibros.lista]
             li.insert(0, ("* " + _("Engine book"), "-"))

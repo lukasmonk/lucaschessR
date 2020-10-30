@@ -289,7 +289,7 @@ class ManagerFideFics(Manager.Manager):
 
         siAnalizaJuez = jgUsu.movimiento() != jgObj.movimiento()
         if self.book:
-            fen = self.fenUltimo()
+            fen = self.last_fen()
             siBookUsu = self.book.check_human(fen, from_sq, to_sq)
             siBookObj = self.book.check_human(fen, jgObj.from_sq, jgObj.to_sq)
             if siBookUsu:

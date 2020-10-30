@@ -299,11 +299,16 @@ class Tournament:
         return self.db_games_queued[pos]
 
     def get_game_queued(self, file_worker):
+        self.db_games_queued.refresh()
         num_queued = self.num_games_queued()
         if num_queued > 0:
-            for pos in range(num_queued):
+            li = list(range(num_queued))
+            random.shuffle(li)
+            for pos in li:
                 game = self.game_queued(pos)
                 if game.worker is None:
+                    if game.minutos is None:
+                        continue
                     game.worker = file_worker
                     self.db_games_queued[pos] = game
                     return game

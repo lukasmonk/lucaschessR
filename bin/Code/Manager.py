@@ -800,7 +800,7 @@ class Manager:
 
     def fenActivo(self):
         pos, move = self.jugadaActiva()
-        return move.position.fen() if move else self.fenUltimo()
+        return move.position.fen() if move else self.last_fen()
 
     def fenActivoConInicio(self):
         pos, move = self.jugadaActiva()
@@ -808,10 +808,10 @@ class Manager:
             row, column = self.main_window.pgnPosActual()
             if column.key == "NUMBER":
                 return self.game.first_position.fen()
-        return move.position.fen() if move else self.fenUltimo()
+        return move.position.fen() if move else self.last_fen()
 
-    def fenUltimo(self):
-        return self.game.fenUltimo()
+    def last_fen(self):
+        return self.game.last_fen()
 
     def fenPrevio(self):
         row, column = self.main_window.pgnPosActual()
@@ -1887,12 +1887,12 @@ class Manager:
             if n >= nArrows:
                 return
 
-    def player_has_moved_base(self, from_sq, to_sq, promotion=None):
+    def player_has_moved_base(self, from_sq, to_sq, promotion=""):
         if self.board.variation_history is not None:
-            return self.mueve_variation(from_sq, to_sq, promotion=None)
+            return self.mueve_variation(from_sq, to_sq, promotion="")
         return self.messenger(from_sq, to_sq, promotion)
 
-    def mueve_variation(self, from_sq, to_sq, promotion=None):
+    def mueve_variation(self, from_sq, to_sq, promotion=""):
         link_variation_pressed = self.main_window.informacionPGN.variantes.link_variation_pressed
         li_variation_move = [int(cnum) for cnum in self.board.variation_history.split("|")]
         num_var_move = li_variation_move[0]

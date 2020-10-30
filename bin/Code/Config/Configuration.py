@@ -182,7 +182,7 @@ class Configuration:
         self.x_save_pgn_folder = ""
         self.x_save_lcsb = ""
         self.x_translator = ""
-        self.x_style = "Fusion"
+        self.x_style = "WindowsVista"
         self.x_tutor_view = POS_TUTOR_HORIZONTAL
 
         self.x_show_effects = False
@@ -447,7 +447,7 @@ class Configuration:
         self.fichEstadFicsElo = "%s/estadFics.pkli" % self.carpeta_results
         self.fichEstadFideElo = "%s/estadFide.pkli" % self.carpeta_results
         self.fichEstadLichessElo = "%s/estadLichess.pkli" % self.carpeta_results
-        self.ficheroBooks = "%s/books.lkv" % self.carpeta_config
+        self.file_books = "%s/books.lkv" % self.carpeta_config
         self.ficheroTrainBooks = "%s/booksTrain.lkv" % self.carpeta_results
         self.ficheroMemoria = "%s/memo.pk" % self.carpeta_results
         self.ficheroEntMaquina = "%s/entmaquina.pke" % self.carpeta_results
@@ -624,6 +624,8 @@ class Configuration:
         self.tutor = self.buscaTutor(self.x_tutor_clave)
         if self.tutor.key != self.x_tutor_clave:
             self.x_tutor_clave = self.tutor.key
+
+        self.x_style = "WindowsVista"
 
     def get_last_database(self):
         dic = self.leeVariables("DATABASE")

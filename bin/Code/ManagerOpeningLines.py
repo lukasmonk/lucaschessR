@@ -66,7 +66,7 @@ class ManagerOpeningEngines(Manager.Manager):
         nombook = liBooks[self.level]
         if nombook:
             listaLibros = Books.ListaLibros()
-            listaLibros.restore_pickle(self.configuration.ficheroBooks)
+            listaLibros.restore_pickle(self.configuration.file_books)
             self.book = listaLibros.buscaLibro(nombook)
             if self.book:
                 self.book.polyglot()

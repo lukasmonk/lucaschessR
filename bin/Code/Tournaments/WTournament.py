@@ -82,7 +82,7 @@ class WTournament(QTVarios.WDialogo):
         self.gbJ.setChecked(torneo.adjudicator_active())
 
         lbBook = Controles.LB(self, _("Opening book") + ": ")
-        fvar = self.configuration.ficheroBooks
+        fvar = self.configuration.file_books
         self.listaLibros = Books.ListaLibros()
         self.listaLibros.restore_pickle(fvar)
         # Comprobamos que todos esten accesibles
@@ -389,7 +389,7 @@ class WTournament(QTVarios.WDialogo):
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
             self.listaLibros.nuevo(b)
-            fvar = self.configuration.ficheroBooks
+            fvar = self.configuration.file_books
             self.listaLibros.save_pickle(fvar)
             li = [(x.name, x.path) for x in self.listaLibros.lista]
             li.insert(0, ("* " + _("Default"), "*"))
@@ -609,6 +609,22 @@ class WTournament(QTVarios.WDialogo):
 
         self.rotulos_tabs()
 
+    def enImportarTodos(self):
+        lista = self.configuration.comboMotores()
+        for name, key in lista:
+            for depth in range(1, 5):
+                me = Tournament.EngineTournament()
+                me.pon_huella(self.torneo)
+                me.read_exist_engine(key)
+                me.key = key + " - depth %d" % depth
+                me.depth = depth
+                me.elo = 1500
+                self.torneo.save_engine(me)
+        self.gridEnginesAlias.refresh()
+        self.gridEnginesAlias.gobottom(0)
+        self.gridResults.refresh()
+        self.rotulos_tabs()
+
     def enImportar(self):
         menu = QTVarios.LCMenu(self)
         lista = self.configuration.comboMotores()
@@ -698,7 +714,9 @@ class WTournament(QTVarios.WDialogo):
             self.rotulos_tabs()
 
     def gm_crear_queued(self):
-        if self.torneo.num_engines() < 2:
+        li_engines = self.torneo.list_engines()
+        n_engines = len(li_engines)
+        if n_engines < 2:
             QTUtil2.message_error(self, _("You must create at least two engines"))
             return
 
@@ -706,40 +724,44 @@ class WTournament(QTVarios.WDialogo):
 
         get = dicValores.get
 
-        liGen = [FormLayout.separador]
+        form = FormLayout.FormLayout(self, _("Games"), Iconos.Torneos())
 
-        config = FormLayout.Spinbox(_("Rounds"), 1, 999, 50)
-        liGen.append((config, get("ROUNDS", 1)))
+        form.separador()
+        form.spinbox(_("Rounds"), 1, 999, 50, get("ROUNDS", 1))
 
-        liGen.append(FormLayout.separador)
+        form.separador()
+        form.float(_("Total minutes"), get("MINUTES", 10.00))
 
-        config = FormLayout.Editbox(_("Total minutes"), 40, tipo=float, decimales=2)
-        liGen.append((config, get("MINUTES", 10.00)))
+        form.separador()
+        form.float(_("Seconds added per move"), get("SECONDS", 0.0))
 
-        config = FormLayout.Editbox(_("Seconds added per move"), 40, tipo=float, decimales=2)
-        liGen.append((config, get("SECONDS", 0.0)))
+        form.add_tab(_("Options"))
 
-        liGen.append((None, _("Engines")))
+        li_groups = Util.div_list(li_engines, 30)
+        for ngroup, group in enumerate(li_groups):
+            for en in group:
+                form.checkbox(en.key, get(en.huella, True))
+            form.add_tab(_("Engines"))
 
-        li_engines = self.torneo.list_engines()
-        for pos, en in enumerate(li_engines):
-            liGen.append((en.key, get(en.huella, True)))
-
-        liGen.append(FormLayout.separador)
-
-        resultado = FormLayout.fedit(liGen, title=_("Games"), parent=self, icon=Iconos.Torneos())
-        if resultado is None:
+        resp = form.run()
+        if resp is None:
             return
 
-        accion, liResp = resultado
-        dicValores["ROUNDS"] = rounds = liResp[0]
-        dicValores["MINUTES"] = minutos = liResp[1]
-        dicValores["SECONDS"] = segundos = liResp[2]
+        accion, li_resp = resp
 
+        options = li_resp[0]
+
+        dicValores["ROUNDS"] = rounds = options[0]
+        dicValores["MINUTES"] = minutos = options[1]
+        dicValores["SECONDS"] = segundos = options[2]
+
+        li_resp_engines = []
+        for group in li_resp[1:]:
+            li_resp_engines.extend(group)
         liSel = []
         for num in range(self.torneo.num_engines()):
             en = li_engines[num]
-            dicValores[en.huella] = si = liResp[3 + num]
+            dicValores[en.huella] = si = li_resp_engines[num]
             if si:
                 liSel.append(en.huella)
 
@@ -751,7 +773,7 @@ class WTournament(QTVarios.WDialogo):
             return
 
         for r in range(rounds):
-            for x in range(0, nSel - 1):
+            for x in range(nSel - 1):
                 for y in range(x + 1, nSel):
                     self.torneo.nuevoGame(liSel[x], liSel[y], minutos, segundos)
                     self.torneo.nuevoGame(liSel[y], liSel[x], minutos, segundos)

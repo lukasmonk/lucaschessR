@@ -972,7 +972,7 @@ class Director:
         self.w.test_siGrabar()
         self.w.terminar()
 
-    def muevePieza(self, from_sq, to_sq, promotion=None):
+    def muevePieza(self, from_sq, to_sq, promotion=""):
         self.w.creaTarea("P", None, from_sq + to_sq, -1)
         self.board.muevePieza(from_sq, to_sq)
         return True

@@ -190,7 +190,7 @@ class WKibitzers(QTVarios.WDialogo):
 
         submenu = menu.submenu(_("Book polyglot"), Iconos.Book())
         listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.ficheroBooks)
+        listaLibros.restore_pickle(self.configuration.file_books)
         listaLibros.comprueba()
         rondo = QTVarios.rondoPuntos()
         for book in listaLibros.lista:
@@ -237,7 +237,7 @@ class WKibitzers(QTVarios.WDialogo):
             name = os.path.basename(fbin)[:-4]
             book = Books.Libro("P", name, fbin, True)
             listaLibros.nuevo(book)
-            listaLibros.save_pickle(self.configuration.ficheroBooks)
+            listaLibros.save_pickle(self.configuration.file_books)
             num = self.kibitzers.nuevo_polyglot(book)
             self.goto(num)
 

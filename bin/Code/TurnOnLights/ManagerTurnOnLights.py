@@ -268,7 +268,7 @@ class ManagerTurnOnLights(Manager.Manager):
 
         self.main_window.pon_toolbar(li_options)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         if self.ini_time is None:
             self.ini_time = self.base_time
         end_time = time.time()

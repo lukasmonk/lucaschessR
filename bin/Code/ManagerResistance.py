@@ -162,7 +162,7 @@ class ManagerResistance(Manager.Manager):
             puntosRivalPrevio = self.puntosRival
 
             if self.in_the_opening:
-                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.fenUltimo())
+                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
                 if siBien:
                     self.rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
                     self.rm_rival.from_sq = from_sq
@@ -261,13 +261,13 @@ class ManagerResistance(Manager.Manager):
 
         return True
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False
 
         if self.in_the_opening:
-            self.opening.check_human(self.fenUltimo(), from_sq, to_sq)
+            self.opening.check_human(self.last_fen(), from_sq, to_sq)
 
         self.move_the_pieces(move.liMovs)
 

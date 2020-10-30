@@ -315,15 +315,12 @@ class WUnSTSMap(QTVarios.WDialogo):
         self.board.set_side_indicator(siW)
         self.board.activate_side(siW)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.board.disable_all()
 
         # Peon coronando
         if not promotion and self.position.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(self.position.is_white)
-            if promotion is None:
-                self.ponJuego()
-                return False
 
         siBien, mens, move = Move.get_game_move(None, self.position, from_sq, to_sq, promotion)
         if siBien:

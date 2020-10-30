@@ -734,11 +734,9 @@ class WPGN(QtWidgets.QWidget):
         self.pgn.gobottom()
         self.board.activate_side(self.game.last_position.is_white)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         if not promotion and self.game.last_position.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(self.game.last_position.is_white)
-            if promotion is None:
-                return False
 
         siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
 

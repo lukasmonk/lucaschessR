@@ -602,7 +602,7 @@ class TabsAnalisis(QtWidgets.QWidget):
 
     def seleccionaLibro(self):
         listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.ficheroBooks)
+        listaLibros.restore_pickle(self.configuration.file_books)
         listaLibros.comprueba()
         menu = QTVarios.LCMenu(self)
         rondo = QTVarios.rondoPuntos()
@@ -622,7 +622,7 @@ class TabsAnalisis(QtWidgets.QWidget):
                     name = os.path.basename(fbin)[:-4]
                     book = Books.Libro("P", name, fbin, True)
                     listaLibros.nuevo(book)
-                    listaLibros.save_pickle(self.configuration.ficheroBooks)
+                    listaLibros.save_pickle(self.configuration.file_books)
         else:
             book = None
         return book

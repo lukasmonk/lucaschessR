@@ -97,9 +97,6 @@ rhetoric|1|1147|5719
 rhetoric|2|1371|6866
 rhetoric|3|1514|7049
 rhetoric|4|1937|7585
-rodent|2|1119|6490
-rodent|3|1492|7185
-rodent|4|1720|7519
 rybka|1|1877|8203
 rybka|2|2083|8675
 rybka|3|2237|9063
@@ -214,7 +211,7 @@ class ManagerElo(Manager.Manager):
             result = -1
         return Util.fideELO(eloJugador, eloRival, result)
 
-    def lista_motores(self, elo):
+    def list_engines(self, elo):
         self.valores()
         li = []
         numX = len(self.liMotores)
@@ -454,7 +451,7 @@ class ManagerElo(Manager.Manager):
 
                 dT, hT = 5, 5
 
-                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.fenUltimo())
+                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
 
                 if siBien:
                     rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
@@ -529,13 +526,13 @@ class ManagerElo(Manager.Manager):
         self.mensaje(mensaje)
         self.ponFinJuego()
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False
 
         if self.in_the_opening:
-            self.in_the_opening = self.opening.check_human(self.fenUltimo(), from_sq, to_sq)
+            self.in_the_opening = self.opening.check_human(self.last_fen(), from_sq, to_sq)
 
         self.move_the_pieces(move.liMovs)
 

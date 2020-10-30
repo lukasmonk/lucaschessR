@@ -907,6 +907,7 @@ class Opening:
         bp.ponRotulo(_X(_("Reading %1"), "..."))
         bp.mostrar()
 
+        # dic_fen = {}
         set_fen = FasterCode.set_fen
         make_move = FasterCode.make_move
         get_fen = FasterCode.get_fen
@@ -919,6 +920,17 @@ class Opening:
         def hazFEN(fen, lipv_ant, control):
             if bp.is_canceled():
                 return
+            if len(lipv_ant) > depth:
+                return
+            d1 = len(lipv_ant)
+            if d1 > depth:
+                return
+            # fenm2 = FasterCode.fen_fenm2(fen)
+            # if fenm2 in dic_fen:
+            #     if (d1 - dic_fen[fenm2]) > 3:
+            #         return
+            # else:
+            #     dic_fen[fenm2] = d1
             siWhite1 = " w " in fen
             book = bookW if siWhite1 else bookB
             li_pv = book.miraListaPV(fen, siWhite1 == siWhite, onlyone=onlyone)
@@ -937,7 +949,7 @@ class Opening:
                 control.num_partidas += 1
                 bp.ponTotal(control.num_partidas)
                 bp.pon(control.num_partidas)
-                if control.num_partidas and control.num_partidas % 1000 == 0:
+                if control.num_partidas and control.num_partidas % 3751 == 0:
                     self.guardaPartidas(control.label, control.liPartidas, minMoves, with_history=control.with_history)
                     control.liPartidas = []
                     control.with_history = False

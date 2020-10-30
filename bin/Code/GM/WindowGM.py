@@ -104,7 +104,7 @@ class WGM(QTVarios.WDialogo):
         self.edJugInicial, lbInicial = QTUtil2.spinBoxLB(self, 1, 1, 99, etiqueta=_("Initial move"), maxTam=40)
 
         # Libros
-        fvar = self.configuration.ficheroBooks
+        fvar = self.configuration.file_books
         self.listaLibros = Books.ListaLibros()
         self.listaLibros.restore_pickle(fvar)
         # # Comprobamos que todos esten accesibles

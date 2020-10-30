@@ -216,7 +216,7 @@ class ManagerGM(Manager.Manager):
 
             if siBuscar:
                 if self.onBypassBook:
-                    li_moves = self.bypassBook.miraListaJugadas(self.fenUltimo())
+                    li_moves = self.bypassBook.miraListaJugadas(self.last_fen())
                     liN = []
                     for from_sq, to_sq, promotion, pgn, peso in li_moves:
                         move = from_sq + to_sq + promotion
@@ -274,7 +274,7 @@ class ManagerGM(Manager.Manager):
             self.siAnalizando = False
             self.xtutor.terminar()
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgUsu = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not jgUsu:
             return False
@@ -292,7 +292,7 @@ class ManagerGM(Manager.Manager):
             siAnalizaJuez = self.siJuez
             if siAnalizaJuez:
                 if self.book:
-                    fen = self.fenUltimo()
+                    fen = self.last_fen()
                     siH = self.book.check_human(fen, from_sq, to_sq)
                     is_gm = self.book.check_human(fen, desdeGM, hastaGM)
                     if is_gm and siH:

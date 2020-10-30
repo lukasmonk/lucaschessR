@@ -52,7 +52,7 @@ class ManagerMicElo(Manager.Manager):
             result = -1
         return Util.fideELO(elo_jugador, elo_rival, result)
 
-    def lista_motores(self, elo):
+    def list_engines(self, elo):
         self.li_t = (
             (0, 50, 3),
             (20, 53, 5),
@@ -101,7 +101,7 @@ class ManagerMicElo(Manager.Manager):
         return li
 
     def engineAplazado(self, alias, basElo):
-        li = self.lista_motores(basElo)
+        li = self.list_engines(basElo)
         for mt in li:
             if mt.alias == alias:
                 return mt
@@ -351,7 +351,7 @@ class ManagerMicElo(Manager.Manager):
                 if self.game.last_position.num_moves >= self.maxMoveBook:
                     self.book = None
                 else:
-                    fen = self.fenUltimo()
+                    fen = self.last_fen()
                     pv = self.book.eligeJugadaTipo(fen, "ap")
                     if pv:
                         rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
@@ -385,7 +385,7 @@ class ManagerMicElo(Manager.Manager):
             self.human_is_playing = True
             self.activate_side(is_white)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False

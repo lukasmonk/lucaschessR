@@ -66,8 +66,7 @@ from Code.Databases import WindowDatabase, WDB_Games, DBgames
 from Code.QT import WindowManualSave
 from Code.Kibitzers import KibitzersManager
 from Code.Tournaments import WTournaments
-from Code.Polyglots import WFactory
-from Code.Polyglots import WPolyglot
+from Code.Polyglots import WFactory, WPolyglot, Books
 from Code.Endings import WEndingsGTB
 
 
@@ -681,6 +680,9 @@ class Procesador:
         elif resp == "polyglot":
             self.polyglot_factory()
 
+        elif resp == "polyglot_install":
+            self.polyglot_install()
+
         elif resp == "pgn_paste":
             self.pgn_paste()
 
@@ -924,6 +926,33 @@ class Procesador:
             w = WPolyglot.WPolyglot(self.main_window, self.configuration, resp)
             w.exec_()
             self.polyglot_factory()
+
+    def polyglot_install(self):
+        listaLibros = Books.ListaLibros()
+        listaLibros.restore_pickle(self.configuration.file_books)
+        listaLibros.comprueba()
+        menu = QTVarios.LCMenu(self.main_window)
+        rondo = QTVarios.rondoPuntos()
+        for book in listaLibros.lista:
+            if not Util.same_path(book.path, Code.tbook):
+                menu.opcion(("x", book), book.name, rondo.otro())
+                menu.separador()
+        menu.opcion(("n", None), _("Install new book"), Iconos.Nuevo())
+        resp = menu.lanza()
+        if resp:
+            orden, book = resp
+            if orden == "x":
+                if QTUtil2.pregunta(self.main_window, _("Do you want to delete %s?") % book.name):
+                    listaLibros.borra(book)
+                    listaLibros.save_pickle(self.configuration.file_books)
+            elif orden == "n":
+                fbin = QTUtil2.leeFichero(self.main_window, listaLibros.path, "bin", titulo=_("Polyglot book"))
+                if fbin:
+                    listaLibros.path = os.path.dirname(fbin)
+                    name = os.path.basename(fbin)[:-4]
+                    book = Books.Libro("P", name, fbin, True)
+                    listaLibros.nuevo(book)
+                    listaLibros.save_pickle(self.configuration.file_books)
 
     def juegaExterno(self, fich_tmp):
         dic_sended = Util.restore_pickle(fich_tmp)

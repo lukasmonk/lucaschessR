@@ -235,7 +235,7 @@ class ManagerCompeticion(Manager.Manager):
 
             if self.in_the_opening:
 
-                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.fenUltimo())
+                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
 
                 if siBien:
                     self.rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
@@ -313,7 +313,7 @@ class ManagerCompeticion(Manager.Manager):
         self.set_activate_tutor(self.is_tutor_enabled)
         self.analizaFinal()
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False
@@ -322,7 +322,7 @@ class ManagerCompeticion(Manager.Manager):
 
         siMirarTutor = self.is_tutor_enabled
         if self.in_the_opening:
-            if self.opening.check_human(self.fenUltimo(), from_sq, to_sq):
+            if self.opening.check_human(self.last_fen(), from_sq, to_sq):
                 siMirarTutor = False
 
         if siMirarTutor:
@@ -332,7 +332,7 @@ class ManagerCompeticion(Manager.Manager):
             if self.mrmTutor is None:
                 self.sigueHumano()
                 return False
-            if not self.tutor_book.si_esta(self.fenUltimo(), movimiento):
+            if not self.tutor_book.si_esta(self.last_fen(), movimiento):
                 if self.mrmTutor.mejorMovQue(movimiento):
                     self.refresh()
                     if not move.is_mate:

@@ -178,8 +178,6 @@ class BoardLines(QtWidgets.QWidget):
         cpActual = self.game.move(self.pos_move).position if self.pos_move >= 0 else self.game.first_position
         if cpActual.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(cpActual.is_white)
-            if promotion is None:
-                return
 
         siBien, mens, move = Move.get_game_move(self.game, cpActual, from_sq, to_sq, promotion)
 

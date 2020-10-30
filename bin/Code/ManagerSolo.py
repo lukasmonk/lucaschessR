@@ -202,7 +202,7 @@ class ManagerSolo(Manager.Manager):
 
         self.activate_side(is_white)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.human_is_playing = True
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:

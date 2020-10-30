@@ -81,7 +81,6 @@ lime 1143 1206 1493 1721
 pawny 1096 1121 1333 1508
 rhetoric 1131 1360 1604 1820
 roce 1122 1150 1206 1497
-rodent 1103 1140 1375 1712
 umko 1120 1384 1816 1930
 rybka 1881 2060 2141 2284
 simplex 1118 1166 1411 1814
@@ -273,7 +272,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.move_the_pieces(move.liMovs, True)
         self.siguiente_jugada()
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not jgSel:
             return False
@@ -501,7 +500,7 @@ class ManagerRoutesEndings(ManagerRoutes):
     def show_mens(self, mens):
         QTUtil2.mensajeTemporal(self.main_window, mens, 4, physical_pos="tb", background="#C3D6E8")
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not jgSel:
             return False
@@ -698,7 +697,7 @@ class ManagerRoutesTactics(ManagerRoutes):
             self.human_is_playing = True
             self.activate_side(is_white)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not jgSel:
             return False

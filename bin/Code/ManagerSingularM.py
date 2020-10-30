@@ -109,7 +109,7 @@ class ManagerSingularM(Manager.Manager):
     def resign(self):
         self.add_move(None)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not jgSel:
             return False

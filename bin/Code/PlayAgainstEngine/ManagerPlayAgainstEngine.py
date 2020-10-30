@@ -632,7 +632,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def testBook(self):
         if self.bookR:
-            resp = self.bookR.miraListaJugadas(self.fenUltimo())
+            resp = self.bookR.miraListaJugadas(self.last_fen())
             if not resp:
                 self.bookR = None
                 self.ponRotuloBasico()
@@ -766,7 +766,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.maxMoveBook:
             if self.maxMoveBook <= num_moves:
                 return False, None, None, None
-        fen = self.fenUltimo()
+        fen = self.last_fen()
 
         if bookRR == "su":
             listaJugadas = book.miraListaJugadas(fen)
@@ -822,7 +822,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if not self.is_tutor_enabled:
             self.activate_side(self.is_human_side_white)
 
-        fen_ultimo = self.fenUltimo()
+        fen_ultimo = self.last_fen()
 
         if fen_ultimo in self.cache:
             move = self.cache[fen_ultimo]
@@ -905,7 +905,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         )
         self.rm_rival = rm_rival
         if siBien:
-            fen_ultimo = self.fenUltimo()
+            fen_ultimo = self.last_fen()
             move.set_time_ms(int(time_s * 1000))
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
@@ -930,7 +930,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         return True
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         if not self.human_is_playing:
             return self.check_premove(from_sq, to_sq)
         move = self.checkmueve_humano(from_sq, to_sq, promotion, not self.is_tutor_enabled)
@@ -943,7 +943,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         is_selected = False
 
-        fen_base = self.fenUltimo()
+        fen_base = self.last_fen()
 
         if self.bookR and self.bookMandatory:
             listaJugadas = self.bookR.miraListaJugadas(fen_base)

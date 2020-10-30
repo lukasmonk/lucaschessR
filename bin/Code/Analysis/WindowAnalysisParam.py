@@ -185,7 +185,7 @@ def paramAnalisis(parent, configuration, siModoAmpliado, siTodosMotores=False):
         config = FormLayout.Editbox('<div align="right">' + _("Moves") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx="[0-9,\-,\,]*")
         liGen.append((config, ""))
 
-        fvar = configuration.ficheroBooks
+        fvar = configuration.file_books
         listaLibros = Books.ListaLibros()
         listaLibros.restore_pickle(fvar)
         # Comprobamos que todos esten accesibles
@@ -360,7 +360,7 @@ def paramAnalisisMasivo(parent, configuration, siVariosSeleccionados, siDatabase
 
     liGen.append(('<div align="right">' + _("Only player moves") + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"), ""))
 
-    fvar = configuration.ficheroBooks
+    fvar = configuration.file_books
     listaLibros = Books.ListaLibros()
     listaLibros.restore_pickle(fvar)
     # Comprobamos que todos esten accesibles

@@ -323,7 +323,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         _label(lyG, _("Opening"), hbox)
 
         # Libros
-        fvar = self.configuration.ficheroBooks
+        fvar = self.configuration.file_books
         self.listaLibros = Books.ListaLibros()
         self.listaLibros.restore_pickle(fvar)
         self.listaLibros.comprueba()
@@ -928,7 +928,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
             self.listaLibros.nuevo(b)
-            fvar = self.configuration.ficheroBooks
+            fvar = self.configuration.file_books
             self.listaLibros.save_pickle(fvar)
             li = [(x.name, x) for x in self.listaLibros.lista]
             self.cbBooks.rehacer(li, b)

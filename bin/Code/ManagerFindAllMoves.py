@@ -242,7 +242,7 @@ class ManagerFindAllMoves(Manager.Manager):
         self.procesador.inicio()
         return False
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         # promotion = None por compatibilidad
         if from_sq == to_sq:
             return

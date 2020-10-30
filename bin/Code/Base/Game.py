@@ -330,7 +330,7 @@ class Game:
         else:
             return self.first_position
 
-    def fenUltimo(self):
+    def last_fen(self):
         return self.last_position.fen()
 
     def fensActual(self):

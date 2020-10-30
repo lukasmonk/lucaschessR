@@ -126,9 +126,11 @@ class WJuicio(QTVarios.WDialogo):
             pv1 = rm.pv.split(" ")[0]
             from_sq = pv1[:2]
             to_sq = pv1[2:4]
-            promotion = pv1[4] if len(pv1) == 5 else None
+            promotion = pv1[4] if len(pv1) == 5 else ""
 
             pgn = self.position.pgn_translated(from_sq, to_sq, promotion)
+            if pgn is None:
+                continue
             a = Util.Record()
             a.rm = rm
             a.texto = "%s (%s)" % (pgn, rm.abrTextoBase())

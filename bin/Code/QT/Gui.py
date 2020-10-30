@@ -101,7 +101,7 @@ def run_gui(procesador):
     #                      QColor(80, 80, 80))
     # darkPalette.setColor(QPalette.Disabled, QPalette.HighlightedText,
     #                      QColor(127, 127, 127))
-    # app.setStyle(QtWidgets.QStyleFactory.create(configuration.x_style))
+    app.setStyle(QtWidgets.QStyleFactory.create(configuration.x_style))
 
     if configuration.palette:
         qpalette = QtGui.QPalette(QtGui.QPalette.Dark)

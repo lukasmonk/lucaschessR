@@ -541,7 +541,7 @@ class ManagerMate(Manager.Manager):
 
         self.siguienteMate()
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.human_is_playing = True  # necesario para el check
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:

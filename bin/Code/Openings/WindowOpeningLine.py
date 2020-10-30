@@ -426,7 +426,7 @@ class WLines(QTVarios.WDialogo):
 
         liLevels = [separador]
         listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.ficheroBooks)
+        listaLibros.restore_pickle(self.configuration.file_books)
         listaLibros.comprueba()
         libooks = [(bookx.name, bookx) for bookx in listaLibros.lista]
         libooks.insert(0, ("--", None))
@@ -671,7 +671,7 @@ class WLines(QTVarios.WDialogo):
 
     def importarPolyglot(self, game):
         listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.ficheroBooks)
+        listaLibros.restore_pickle(self.configuration.file_books)
         listaLibros.comprueba()
 
         dicData = self.dbop.getconfig("IMPORT_POLYGLOT")

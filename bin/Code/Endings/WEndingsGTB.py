@@ -422,7 +422,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.timer = time.time()
         self.sigueHumano()
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         if self.timer:
             self.ms += int((time.time() - self.timer) * 1000)
         self.moves += 1
@@ -433,9 +433,6 @@ class WEndingsGTB(QTVarios.WDialogo):
         # Peon coronando
         if not promotion and self.game.last_position.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(self.game.last_position.is_white)
-            if promotion is None:
-                self.sigueHumano()
-                return False
         if promotion:
             movimiento += promotion
 

@@ -519,8 +519,6 @@ class WLearnPuente(QTVarios.WDialogo):
         # Peon coronando
         if not promotion and move.position_before.siPeonCoronando(from_sq, to_sq):
             promotion = self.boardIni.peonCoronando(move.position_before.is_white)
-            if promotion is None:
-                promotion = "q"
 
         if from_sq == move.from_sq and to_sq == move.to_sq and promotion.lower() == move.promotion.lower():
             self.boardIni.put_arrow_sc(from_sq, to_sq)

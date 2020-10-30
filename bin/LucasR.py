@@ -6,7 +6,6 @@
 # ==============================================================================
 import sys
 
-# TODO kibitzers con todos los movimientos
 # TODO Kibitzer, misma orientación que el original
 # TODO Grabar automáticamente todas las partidas con mas de 10 movimientos
 # TODO En análisis usar el mismo sistema que en Databases, para mostrar todo sin que se escondan los botones
@@ -15,7 +14,7 @@ import Code.Translate as Translate
 
 Translate.install()
 
-# sys.argv = ['./LucasR.py', '-kibitzer', r'c:\lucaschess\pyLCR\UserData\435782458.db']
+# sys.argv = ['./LucasR.py', '-tournament', 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\Todos.mvm', 'C:\\lucaschess\\pyLCR\\UserData\\Tournaments\\worker.00001']
 n_args = len(sys.argv)
 if n_args == 1:
     import Code.Base.Init

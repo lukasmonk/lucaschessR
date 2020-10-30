@@ -807,7 +807,7 @@ class AnalisisVariations:
         self.w.board.set_dispatcher(self.player_has_moved)
         self.w.board.activate_side(not self.move.position.is_white)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
 
         # Peon coronando
         if not promotion and self.position_before.siPeonCoronando(from_sq, to_sq):

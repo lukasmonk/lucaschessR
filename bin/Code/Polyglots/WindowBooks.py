@@ -30,7 +30,7 @@ class WBooksCrear(QtWidgets.QDialog):
         f = Controles.TipoLetra(puntos=9, peso=75)
 
         self.configuration = Code.configuration
-        fvar = self.configuration.ficheroBooks
+        fvar = self.configuration.file_books
         self.listaLibros = Books.ListaLibros()
         self.listaLibros.restore_pickle(fvar)
 
@@ -140,7 +140,7 @@ class WBooksCrear(QtWidgets.QDialog):
         name = os.path.basename(self.fichero)[:-4]
         b = Books.Libro("P", name, self.fichero, False)
         self.listaLibros.nuevo(b)
-        fvar = self.configuration.ficheroBooks
+        fvar = self.configuration.file_books
         self.listaLibros.save_pickle(fvar)
 
         self.accept()

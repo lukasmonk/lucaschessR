@@ -209,6 +209,9 @@ class ListSQL:
         cursor = self._conexion.execute("SELECT ROWID FROM %s" % self.tabla)
         return [rowid for rowid, in cursor.fetchall()]
 
+    def refresh(self):
+        self.li_row_ids = self.read_rowids()
+
     def add_cache(self, key, obj):
         if self.max_cache:
             if len(self.cache) > self.max_cache:

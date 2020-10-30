@@ -21,7 +21,7 @@ def html_nag(nag):
 
 
 class Move:
-    def __init__(self, game, position_before=None, position=None, from_sq=None, to_sq=None, promotion=None):
+    def __init__(self, game, position_before=None, position=None, from_sq=None, to_sq=None, promotion=""):
         self.game = game
         self.analysis = None
         self.position_before = position_before

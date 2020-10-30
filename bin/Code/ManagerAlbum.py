@@ -162,7 +162,7 @@ class ManagerAlbum(Manager.Manager):
             self.pensando(True)
             self.disable_all()
 
-            fen = self.fenUltimo()
+            fen = self.last_fen()
             rm_rival = self.xrival.juega(fen)
 
             self.pensando(False)
@@ -173,7 +173,7 @@ class ManagerAlbum(Manager.Manager):
             self.human_is_playing = True
             self.activate_side(is_white)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False

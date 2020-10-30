@@ -1927,7 +1927,7 @@ class Board(QtWidgets.QGraphicsView):
         return BoardMarkers.MarkerSC(self.escena, bloqueMarkerN, siEditando=siEditando)
 
     def creaFlecha(self, bloqueFlecha, rutina=None):
-        bloqueFlechaN = copy.deepcopy(bloqueFlecha)
+        bloqueFlechaN = copy.copy(bloqueFlecha)
         bloqueFlechaN.width_square = self.width_square
 
         return BoardArrows.FlechaSC(self.escena, bloqueFlechaN, rutina)

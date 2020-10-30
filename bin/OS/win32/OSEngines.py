@@ -93,9 +93,6 @@ def read_engines(folder_engines):
     cm = mas("fruit", "Fabien Letouzey", "2.3.1", "http://www.fruitchess.com/", "Fruit-2-3-1.exe", 2786)
     cm.ponMultiPV(20, 256)
 
-    cm = mas("rodent", "Pawel Koziol", "1.6", "http://www.pkoziol.cal24.pl/rodent/rodent.htm", "rodent32.exe", 2790)
-    cm.ordenUCI("Hash", "32")
-
     mas("discocheck", "Lucas Braesch", "5.2.1", "https://github.com/lucasart", "DiscoCheck.exe", 2890)
 
     cm = mas("gaviota", "Miguel A. Ballicora", "1.0", "https://sites.google.com/site/gaviotachessengine", "gaviota-1.0-win32.exe", 2950)
@@ -148,7 +145,7 @@ def read_engines(folder_engines):
 
     mas("monarch", "Steve Maughan", "1.7", "http://www.monarchchess.com/", "Monarch(v1.7).exe", 2100)
 
-    mas("andscacs", "Daniel José Queraltó", "0.9532n", "http://www.amateurschach.de/main/_download.htm", "andscacs_32_no_popcnt.exe", 3240)
+    mas("andscacs", "Daniel José Queraltó", "0.9532n", "http://www.amateurschach.de/main/_download.htm", "andscacs_32_no_popcnt.exe", 3264)
 
     mas("arminius", "Volker Annus", "2017-01-01", "http://www.nnuss.de/Hermann/Arminius2017-01-01.zip", "Arminius2017-01-01-32Bit.exe", 2662)
 
@@ -175,14 +172,14 @@ def read_engines(folder_engines):
     is64 = platform.machine().endswith("64")
     t32_64 = "64" if is64 else "32"
 
-    cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"11.01 {t32_64}bit", "http://komodochess.com/", f"komodo-11.01-{t32_64}bit.exe", 3240)
+    cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"11.01 {t32_64}bit", "http://komodochess.com/", f"komodo-11.01-{t32_64}bit.exe", 3300)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 218)
 
 
     if is64:
-        mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3240)
+        mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
 
     cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"12 {t32_64}bits", "http://stockfishchess.org/",
              f"Stockfish-12R1_x{t32_64}.exe", 3400)
@@ -198,7 +195,6 @@ def dict_engines_fixed_elo(folder_engines):
     d = read_engines(folder_engines)
     dic = {}
     for nm, desde, hasta in (
-        ("rodent", 600, 2600),
         ("amyan", 1000, 2400),
         ("stockfish", 1350, 2850),
         ("rhetoric", 1300, 2600),

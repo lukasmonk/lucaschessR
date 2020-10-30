@@ -282,7 +282,7 @@ class Position:
                 li.append(c)
         return "".join(li)
 
-    def pv2dgt(self, from_sq, to_sq, promotion=None):
+    def pv2dgt(self, from_sq, to_sq, promotion=""):
         p_ori = self.squares.get(from_sq)
 
         # Enroque
@@ -312,10 +312,13 @@ class Position:
 
         return p_ori + from_sq + p_ori + to_sq
 
-    def pgn_translated(self, from_sq, to_sq, promotion=None):
+    def pgn_translated(self, from_sq, to_sq, promotion=""):
         d_conv = TrListas.dConv()
         li = []
-        for c in self.pgn(from_sq, to_sq, promotion):
+        cpgn =  self.pgn(from_sq, to_sq, promotion)
+        if not cpgn:
+            return ""
+        for c in cpgn:
             if c in d_conv:
                 c = d_conv[c]
             li.append(c)

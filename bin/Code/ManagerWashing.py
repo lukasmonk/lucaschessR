@@ -145,7 +145,7 @@ class ManagerWashingReplay(Manager.Manager):
             mens = "%s<br>%s: %d" % (_("Done with errors."), _("Errors"), self.errores)
         self.mensajeEnPGN(mens)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False
@@ -178,7 +178,7 @@ class ManagerWashingReplay(Manager.Manager):
 
             else:
                 # Debe ser una move de libro para aceptarla
-                fen = self.fenUltimo()
+                fen = self.last_fen()
                 siBookUsu = self.book.check_human(fen, from_sq, to_sq)
                 bmove = _("book move")
                 lic.append("%s: %s (%s)" % (_("Played previously"), jgObj.pgn_translated(), bmove))
@@ -382,7 +382,7 @@ class ManagerWashingTactics(Manager.Manager):
                 self.main_window, "%s: %d, %s: %d" % (_("Errors"), self.errores, _("Hints"), self.ayudas)
             )
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             self.errores += 1
@@ -554,7 +554,7 @@ class ManagerWashingCreate(Manager.Manager):
         siEncontrada = False
 
         if self.opening:
-            siEncontrada, from_sq, to_sq, promotion = self.opening.run_engine(self.fenUltimo())
+            siEncontrada, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
             if not siEncontrada:
                 self.opening = None
 
@@ -645,7 +645,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.analizaInicio()
         Manager.Manager.sigueHumano(self)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.checkmueve_humano(from_sq, to_sq, promotion)
         if not move:
             return False
@@ -658,7 +658,7 @@ class ManagerWashingCreate(Manager.Manager):
         is_selected = False
 
         if self.opening:
-            fenBase = self.fenUltimo()
+            fenBase = self.last_fen()
             if self.opening.check_human(fenBase, from_sq, to_sq):
                 is_selected = True
             else:

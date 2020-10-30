@@ -156,7 +156,7 @@ class ManagerChallenge101:
 
         return not (resp == "close" or self.pendientes == 0)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.savePosition()  # Solo cuando ha hecho un intento
         self.puntos_ultimo = 0
         if from_sq + to_sq == self.result:  # No hay coronaciones

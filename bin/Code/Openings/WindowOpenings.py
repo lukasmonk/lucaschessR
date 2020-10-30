@@ -90,7 +90,7 @@ class WOpenings(QTVarios.WDialogo):
         dic = {"_SIZE_": "916,444", "SP_splitter": [356, 548]}
         self.restore_video(dicDef=dic)
 
-    def player_has_moved(self, from_sq, to_sq, promotion=None):
+    def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.board.disable_all()
 
         movimiento = from_sq + to_sq
@@ -100,9 +100,6 @@ class WOpenings(QTVarios.WDialogo):
         # Peon coronando
         if not promotion and position.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(position.is_white)
-            if promotion is None:
-                self.sigueHumano()
-                return False
         if promotion:
             movimiento += promotion
 

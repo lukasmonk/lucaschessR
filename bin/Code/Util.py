@@ -802,3 +802,12 @@ def unique_list(lista):
             st.add(x)
     return li
 
+
+def div_list(list, max_group):
+    nlist = len(list)
+    xfrom = 0
+    li_groups = []
+    while xfrom < nlist:
+        li_groups.append(list[xfrom:xfrom+max_group])
+        xfrom += max_group
+    return li_groups

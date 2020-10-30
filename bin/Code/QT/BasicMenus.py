@@ -67,22 +67,6 @@ def menu_tools_savemenu(procesador, dic_data=None):
         submenu_database.opcion("dbase_M", _("Direct maintenance"), Iconos.Configurar())
     savemenu.separador()
 
-    menu1 = savemenu.submenu(_("Openings"), Iconos.Openings())
-    menu1.opcion("openings", _("Opening lines"), Iconos.OpeningLines())
-    menu1.separador()
-    menu1.opcion("aperturaspers", _("Custom openings"), Iconos.Opening())
-    savemenu.separador()
-
-    menu1 = savemenu.submenu(_("Engines"), Iconos.Motores())
-    menu1.opcion("torneos", _("Tournaments between engines"), Iconos.Torneos())
-    menu1.separador()
-    menu1.opcion("sts", _("STS: Strategic Test Suite"), Iconos.STS())
-    menu1.separador()
-    menu1.opcion("motores", _("External engines"), Iconos.Motores())
-    menu1.separador()
-    menu1.opcion("kibitzers", _("Kibitzers"), Iconos.Kibitzer())
-    savemenu.separador()
-
     menu1 = savemenu.submenu(_("PGN"), Iconos.PGN())
     menu1.opcion("pgn", _("Read PGN"), Iconos.Fichero())
     menu1.separador()
@@ -94,7 +78,25 @@ def menu_tools_savemenu(procesador, dic_data=None):
     menu1.separador()
     savemenu.separador()
 
-    savemenu.opcion("polyglot", _("Polyglot book factory"), Iconos.FactoryPolyglot())
+    menu1 = savemenu.submenu(_("Openings"), Iconos.Openings())
+    menu1.opcion("openings", _("Opening lines"), Iconos.OpeningLines())
+    menu1.separador()
+    menu1.opcion("aperturaspers", _("Custom openings"), Iconos.Opening())
+    menu1.separador()
+    menu1.opcion("polyglot", _("Polyglot book factory"), Iconos.FactoryPolyglot())
+    menu1.separador()
+    menu1.opcion("polyglot_install", _("Install/remove polyglot books"), Iconos.Libros())
+    savemenu.separador()
+
+    menu1 = savemenu.submenu(_("Engines"), Iconos.Motores())
+    menu1.opcion("torneos", _("Tournaments between engines"), Iconos.Torneos())
+    menu1.separador()
+    menu1.opcion("sts", _("STS: Strategic Test Suite"), Iconos.STS())
+    menu1.separador()
+    menu1.opcion("motores", _("External engines"), Iconos.Motores())
+    menu1.separador()
+    menu1.opcion("kibitzers", _("Kibitzers"), Iconos.Kibitzer())
+    savemenu.separador()
 
     return savemenu
 
