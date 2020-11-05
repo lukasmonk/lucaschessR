@@ -13,11 +13,7 @@ from Code.Base.Constantes import *
 from Code import Albums
 from Code import CPU
 from Code.Config import Configuration, WindowConfig
-
-# Added by GON
 from Code import DGT
-# ------------
-
 from Code.Base import Position
 from Code import Trainings
 from Code import ManagerAlbum
@@ -29,7 +25,6 @@ from Code import ManagerFideFics
 from Code import ManagerMateMap
 from Code import ManagerMicElo
 from Code import ManagerCompeticion
-from Code import ManagerOpeningLines
 from Code import ManagerPerson
 from Code import ManagerRoutes
 from Code import ManagerSingularM
@@ -46,7 +41,7 @@ from Code.QT import About
 from Code.MainWindow import MainWindow
 from Code.QT import WindowAlbumes
 from Code.QT import WindowAnotar
-from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd
+from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd, ManagerOpeningLines
 from Code.QT import WindowBMT
 from Code.QT import WindowColores
 from Code.QT import WindowEverest
@@ -66,7 +61,7 @@ from Code.Databases import WindowDatabase, WDB_Games, DBgames
 from Code.QT import WindowManualSave
 from Code.Kibitzers import KibitzersManager
 from Code.Tournaments import WTournaments
-from Code.Polyglots import WFactory, WPolyglot, Books
+from Code.Polyglots import WFactory, WPolyglot, Books, WindowBooksTrain, ManagerTrainBooks
 from Code.Endings import WEndingsGTB
 
 
@@ -245,34 +240,34 @@ class Procesador:
     def juegaAplazada(self, aplazamiento):
         self.cpu = CPU.CPU(self.main_window)
 
-        tipoJuego = aplazamiento["TIPOJUEGO"]
+        type_play = aplazamiento["TIPOJUEGO"]
         is_white = aplazamiento["ISWHITE"]
 
-        if tipoJuego == GT_COMPETITION_WITH_TUTOR:
+        if type_play == GT_COMPETITION_WITH_TUTOR:
             categoria = self.configuration.rival.categorias.segun_clave(aplazamiento["CATEGORIA"])
             nivel = aplazamiento["LEVEL"]
             puntos = aplazamiento["PUNTOS"]
             self.manager = ManagerCompeticion.ManagerCompeticion(self)
             self.manager.inicio(categoria, nivel, is_white, puntos, aplazamiento)
-        elif tipoJuego == GT_AGAINST_ENGINE:
+        elif type_play == GT_AGAINST_ENGINE:
             if aplazamiento["MODO"] == "Basic":
                 self.entrenaMaquina(aplazamiento)
             else:
                 self.playPersonAplazada(aplazamiento)
-        elif tipoJuego == GT_ELO:
+        elif type_play == GT_ELO:
             self.manager = ManagerElo.ManagerElo(self)
             self.manager.inicio(aplazamiento)
-        elif tipoJuego == GT_MICELO:
+        elif type_play == GT_MICELO:
             self.manager = ManagerMicElo.ManagerMicElo(self)
             self.manager.inicio(None, 0, 0, aplazamiento)
-        elif tipoJuego == GT_ALBUM:
+        elif type_play == GT_ALBUM:
             self.manager = ManagerAlbum.ManagerAlbum(self)
             self.manager.inicio(None, None, aplazamiento)
-        elif tipoJuego == GT_AGAINST_PGN:
+        elif type_play == GT_AGAINST_PGN:
             self.read_pgn(sys.argv[1])
-        elif tipoJuego in (GT_FICS, GT_FIDE, GT_LICHESS):
+        elif type_play in (GT_FICS, GT_FIDE, GT_LICHESS):
             self.manager = ManagerFideFics.ManagerFideFics(self)
-            self.manager.selecciona(tipoJuego)
+            self.manager.selecciona(type_play)
             self.manager.inicio(aplazamiento["IDGAME"], aplazamiento=aplazamiento)
 
     def XTutor(self):
@@ -665,6 +660,14 @@ class Procesador:
             self.manager = ManagerMateMap.ManagerMateMap(self)
             self.manager.inicio(resp)
 
+    def train_book(self):
+        w = WindowBooksTrain.WBooksTrain(self)
+        if w.exec_() and w.book_player:
+            self.type_play = GT_BOOK
+            self.estado = ST_PLAYING
+            self.gestor = ManagerTrainBooks.ManagerTrainBooks(self)
+            self.gestor.inicio(w.book_player, w.player_highest, w.book_rival, w.rival_resp, w.is_white)
+
     def menu_tools(self):
         resp = BasicMenus.menu_tools(self)
         if resp:
@@ -928,12 +931,12 @@ class Procesador:
             self.polyglot_factory()
 
     def polyglot_install(self):
-        listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.file_books)
-        listaLibros.comprueba()
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(self.configuration.file_books)
+        list_books.check()
         menu = QTVarios.LCMenu(self.main_window)
         rondo = QTVarios.rondoPuntos()
-        for book in listaLibros.lista:
+        for book in list_books.lista:
             if not Util.same_path(book.path, Code.tbook):
                 menu.opcion(("x", book), book.name, rondo.otro())
                 menu.separador()
@@ -943,16 +946,16 @@ class Procesador:
             orden, book = resp
             if orden == "x":
                 if QTUtil2.pregunta(self.main_window, _("Do you want to delete %s?") % book.name):
-                    listaLibros.borra(book)
-                    listaLibros.save_pickle(self.configuration.file_books)
+                    list_books.borra(book)
+                    list_books.save_pickle(self.configuration.file_books)
             elif orden == "n":
-                fbin = QTUtil2.leeFichero(self.main_window, listaLibros.path, "bin", titulo=_("Polyglot book"))
+                fbin = QTUtil2.leeFichero(self.main_window, list_books.path, "bin", titulo=_("Polyglot book"))
                 if fbin:
-                    listaLibros.path = os.path.dirname(fbin)
+                    list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
                     book = Books.Libro("P", name, fbin, True)
-                    listaLibros.nuevo(book)
-                    listaLibros.save_pickle(self.configuration.file_books)
+                    list_books.nuevo(book)
+                    list_books.save_pickle(self.configuration.file_books)
 
     def juegaExterno(self, fich_tmp):
         dic_sended = Util.restore_pickle(fich_tmp)

@@ -159,7 +159,7 @@ class ManagerChallenge101:
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.savePosition()  # Solo cuando ha hecho un intento
         self.puntos_ultimo = 0
-        if from_sq + to_sq == self.result:  # No hay coronaciones
+        if from_sq + to_sq == self.result:  # No hay promotiones
             tm = time.time() - self.iniTime
             self.board.disable_all()
             self.cp.mover(from_sq, to_sq, promotion)
@@ -247,7 +247,7 @@ class ManagerChallenge101:
 #     return procesador.cpu.set_position(procesador.posicionInicial)
 #
 #
-# def partidaDia(procesador, hx):
+# def gameDia(procesador, hx):
 #     dia = Util.today().day
 #     lid = Util.ListSQL("../resources/IntFiles/31.pkl")
 #     dic = lid[dia - 1]

@@ -6,9 +6,9 @@ from Code.Base.Constantes import WHITE, BLACK
 
 
 class GenTry:
-    def __init__(self, desde, hasta):
-        letra_ini, letra_end = ord(desde[0]), ord(hasta[0])
-        num_ini, num_end = ord(desde[1]), ord(hasta[1])
+    def __init__(self, xfrom, xto):
+        letra_ini, letra_end = ord(xfrom[0]), ord(xto[0])
+        num_ini, num_end = ord(xfrom[1]), ord(xto[1])
 
         li = []
         for letra in range(letra_ini, letra_end+1):
@@ -64,17 +64,17 @@ class CoordinatesBlocks:
             ("a1", "h8")
         )
         li_resp = []
-        for desde, hasta in li:
+        for xfrom, xto in li:
             for side in (WHITE, BLACK):
-                li_resp.append((side, desde, hasta))
+                li_resp.append((side, xfrom, xto))
         return li_resp
 
     def next(self):
         return self.gen_try.next()
 
     def new_try(self):
-        side, desde, hasta = self.li_blocks[self.current_block]
-        self.gen_try = GenTry(desde, hasta)
+        side, xfrom, xto = self.li_blocks[self.current_block]
+        self.gen_try = GenTry(xfrom, xto)
         return side == WHITE
 
     def new_done(self, num_success):

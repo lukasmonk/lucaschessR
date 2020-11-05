@@ -65,9 +65,9 @@ class ManagerOpeningEngines(Manager.Manager):
         self.time = liTimes[self.level]
         nombook = liBooks[self.level]
         if nombook:
-            listaLibros = Books.ListaLibros()
-            listaLibros.restore_pickle(self.configuration.file_books)
-            self.book = listaLibros.buscaLibro(nombook)
+            list_books = Books.ListBooks()
+            list_books.restore_pickle(self.configuration.file_books)
+            self.book = list_books.buscaLibro(nombook)
             if self.book:
                 self.book.polyglot()
                 self.book.mode = liBooks_sel[self.level]
@@ -95,6 +95,9 @@ class ManagerOpeningEngines(Manager.Manager):
         self.xrival = self.procesador.creaManagerMotor(rival, self.time, None)
         self.xrival.is_white = self.is_engine_side_white
 
+
+        self.xanalyzer.cambiaOpciones(max(self.xtutor.motorTiempoJugada, self.time + 5.0), 0)
+
         juez = self.configuration.buscaRival(self.trainingEngines["ENGINE_CONTROL"])
         self.xjuez = self.procesador.creaManagerMotor(juez, int(self.trainingEngines["ENGINE_TIME"] * 1000), None)
         self.xjuez.anulaMultiPV()
@@ -108,7 +111,7 @@ class ManagerOpeningEngines(Manager.Manager):
 
         self.siAyuda = False
         self.board.dbVisual_setShowAllways(False)
-        self.ayudas = 9999  # Para que analice sin problemas
+        self.hints = 9999  # Para que analice sin problemas
 
         self.game = Game.Game()
 
@@ -152,14 +155,14 @@ class ManagerOpeningEngines(Manager.Manager):
         if not self.runcontrol():
             if siRival:
                 self.disable_all()
-                if self.mueve_rival():
+                if self.play_rival():
                     self.siguiente_jugada()
 
             else:
                 self.activate_side(is_white)
                 self.human_is_playing = True
 
-    def mueve_rival(self):
+    def play_rival(self):
         si_obligatorio = len(self.game) <= self.plies_mandatory
         si_pensar = True
         fenm2 = self.game.last_position.fenm2()
@@ -185,9 +188,9 @@ class ManagerOpeningEngines(Manager.Manager):
             move = None
             if self.book:
                 move = self.book.eligeJugadaTipo(self.game.last_position.fen(), self.book.mode)
-            if move is None:
+            if not move:
                 move = self.dbop.get_cache_engines(self.keyengine, self.time, fenm2)
-            if move is None:
+            if not move:
                 rm_rival = self.xrival.juegaPartida(self.game)
                 move = rm_rival.movimiento()
                 self.dbop.set_cache_engines(self.keyengine, self.time, fenm2, move)
@@ -197,8 +200,8 @@ class ManagerOpeningEngines(Manager.Manager):
                     move = list(moves)[0]
                     from_sq, to_sq, promotion = move[:2], move[2:4], move[4:]
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
 
@@ -210,7 +213,7 @@ class ManagerOpeningEngines(Manager.Manager):
             return False
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -595,7 +598,7 @@ class ManagerOpeningLines(Manager.Manager):
 
         self.game = Game.Game()
 
-        self.ayudas = 9999  # Para que analice sin problemas
+        self.hints = 9999  # Para que analice sin problemas
 
         self.is_human_side_white = self.training["COLOR"] == "WHITE"
         self.is_engine_side_white = not self.is_human_side_white
@@ -671,7 +674,7 @@ class ManagerOpeningLines(Manager.Manager):
                     mens3 += "\n %s" % dic_nags[valoracion]
             self.set_label3(mens3 if mens3 else None)
 
-    def partidaTerminada(self, si_completa):
+    def gameTerminada(self, si_completa):
         self.state = ST_ENDGAME
         tm = time.time() - self.ini_time
         li = [_("Line finished.")]
@@ -767,7 +770,7 @@ class ManagerOpeningLines(Manager.Manager):
 
     def reiniciar(self):
         if len(self.game) > 0 and self.state != ST_ENDGAME:
-            self.partidaTerminada(False)
+            self.gameTerminada(False)
         self.reinicio(self.dbop, self.modo, self.num_linea)
 
     def siguiente_jugada(self):
@@ -789,7 +792,7 @@ class ManagerOpeningLines(Manager.Manager):
 
         num_moves = len(self.game)
         if num_moves >= self.numPV:
-            self.partidaTerminada(True)
+            self.gameTerminada(True)
             return
         pv = self.li_pv[num_moves]
 
@@ -801,7 +804,7 @@ class ManagerOpeningLines(Manager.Manager):
             self.rm_rival.to_sq = pv[2:4]
             self.rm_rival.promotion = pv[4:]
 
-            self.mueve_rival(self.rm_rival)
+            self.play_rival(self.rm_rival)
             self.siguiente_jugada()
 
         else:
@@ -811,7 +814,7 @@ class ManagerOpeningLines(Manager.Manager):
                 self.muestraAyuda()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
         pvSel = from_sq + to_sq + (promotion if promotion else "")
@@ -852,14 +855,14 @@ class ManagerOpeningLines(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, respMotor):
-        from_sq = respMotor.from_sq
-        to_sq = respMotor.to_sq
+    def play_rival(self, engine_response):
+        from_sq = engine_response.from_sq
+        to_sq = engine_response.to_sq
 
-        promotion = respMotor.promotion
+        promotion = engine_response.promotion
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
 
@@ -900,7 +903,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
 
         self.game = Game.Game(ini_posicion=cp)
 
-        self.ayudas = 9999  # Para que analice sin problemas
+        self.hints = 9999  # Para que analice sin problemas
 
         self.is_human_side_white = self.training["COLOR"] == "WHITE"
         self.is_engine_side_white = not self.is_human_side_white
@@ -1064,7 +1067,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
             self.muestraAyuda()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
         pvSel = from_sq + to_sq + promotion

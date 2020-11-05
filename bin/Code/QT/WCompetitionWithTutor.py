@@ -168,13 +168,13 @@ class wDatos(QtWidgets.QDialog):
         self.ed.valueChanged.connect(self.nivelCambiado)
 
         is_white = not categoria.done_with_white()
-        self.rbBlancas = QtWidgets.QRadioButton(_("White"))
-        self.rbBlancas.setChecked(is_white)
-        self.rbNegras = QtWidgets.QRadioButton(_("Black"))
-        self.rbNegras.setChecked(not is_white)
+        self.rb_white = QtWidgets.QRadioButton(_("White"))
+        self.rb_white.setChecked(is_white)
+        self.rb_black = QtWidgets.QRadioButton(_("Black"))
+        self.rb_black.setChecked(not is_white)
 
-        self.rbBlancas.clicked.connect(self.ponMaxPuntos)
-        self.rbNegras.clicked.connect(self.ponMaxPuntos)
+        self.rb_white.clicked.connect(self.ponMaxPuntos)
+        self.rb_black.clicked.connect(self.ponMaxPuntos)
 
         # Rival
         lbRMotor = (
@@ -216,7 +216,7 @@ class wDatos(QtWidgets.QDialog):
         ly.margen(10)
         gbT = Controles.GB(self, _("Tutor"), ly).ponFuente(f)
 
-        hbox = Colocacion.H().relleno().control(self.rbBlancas).espacio(10).control(self.rbNegras).relleno()
+        hbox = Colocacion.H().relleno().control(self.rb_white).espacio(10).control(self.rb_black).relleno()
         gbColor = Controles.GB(self, _("Play with"), hbox).ponFuente(f)
 
         lyNivel = Colocacion.H().control(lb).control(self.ed).espacio(10).control(self.lbPuntos).relleno()
@@ -241,7 +241,7 @@ class wDatos(QtWidgets.QDialog):
 
     def aceptar(self):
         self.nivel = self.ed.value()
-        self.is_white = self.rbBlancas.isChecked()
+        self.is_white = self.rb_white.isChecked()
         self.accept()
 
     def nivelCambiado(self, nuevo):
@@ -250,7 +250,7 @@ class wDatos(QtWidgets.QDialog):
     def ponMaxPuntos(self):
         p = 0
         if self.ed.value() >= self.max_level:
-            color = "B" if self.rbBlancas.isChecked() else "N"
+            color = "B" if self.rb_white.isChecked() else "N"
             if not (color in self.maxNivelHecho):
                 p = self.max_puntos
         self.lbPuntos.setText("%d %s" % (p, _("points")))

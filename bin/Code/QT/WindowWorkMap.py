@@ -322,8 +322,8 @@ class WUnSTSMap(QTVarios.WDialogo):
         if not promotion and self.position.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(self.position.is_white)
 
-        siBien, mens, move = Move.get_game_move(None, self.position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(None, self.position, from_sq, to_sq, promotion)
+        if ok:
             self.board.set_position(move.position)
             self.board.put_arrow_sc(from_sq, to_sq)
             self.hechaJugada(move)

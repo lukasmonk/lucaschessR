@@ -18,9 +18,9 @@ from Code.Base.Constantes import *
 
 
 class ManagerFideFics(Manager.Manager):
-    def selecciona(self, tipoJuego):
-        self.game_type = tipoJuego
-        if tipoJuego == GT_FICS:
+    def selecciona(self, type_play):
+        self.game_type = type_play
+        if type_play == GT_FICS:
             self._db = Code.path_resource("IntFiles", "FicsElo.db")
             self._activo = self.configuration.ficsActivo
             self._ponActivo = self.configuration.ponFicsActivo
@@ -30,7 +30,7 @@ class ManagerFideFics(Manager.Manager):
             self._newTitulo = _("New Fics-Elo")
             self._TIPO = "FICS"
 
-        elif tipoJuego == GT_FIDE:
+        elif type_play == GT_FIDE:
             self._db = Code.path_resource("IntFiles", "FideElo.db")
             self._activo = self.configuration.fideActivo
             self._ponActivo = self.configuration.ponFideActivo
@@ -40,7 +40,7 @@ class ManagerFideFics(Manager.Manager):
             self._newTitulo = _("New Fide-Elo")
             self._TIPO = "FIDE"
 
-        elif tipoJuego == GT_LICHESS:
+        elif type_play == GT_LICHESS:
             self._db = Code.path_resource("IntFiles", "LichessElo.db")
             self._activo = self.configuration.lichessActivo
             self._ponActivo = self.configuration.ponLichessActivo
@@ -77,10 +77,10 @@ class ManagerFideFics(Manager.Manager):
         self.is_engine_side_white = not is_white
 
         pv = FasterCode.xpv_pv(dbf.MOVS)
-        self.partidaObj = Game.Game()
-        self.partidaObj.read_pv(pv)
+        self.gameObj = Game.Game()
+        self.gameObj.read_pv(pv)
         self.posJugadaObj = 0
-        self.numJugadasObj = self.partidaObj.num_moves()
+        self.numJugadasObj = self.gameObj.num_moves()
 
         li = dbf.CABS.split("\n")
         for x in li:
@@ -120,7 +120,7 @@ class ManagerFideFics(Manager.Manager):
         self.is_tutor_enabled = False
         self.main_window.set_activate_tutor(self.is_tutor_enabled)
 
-        self.ayudas = 0
+        self.hints = 0
         self.ayudas_iniciales = 0
 
         self.xtutor.maximizaMultiPV()
@@ -275,11 +275,11 @@ class ManagerFideFics(Manager.Manager):
             self.pensando(False)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgUsu = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgUsu = self.check_human_move(from_sq, to_sq, promotion)
         if not jgUsu:
             return False
 
-        jgObj = self.partidaObj.move(self.posJugadaObj)
+        jgObj = self.gameObj.move(self.posJugadaObj)
 
         analysis = None
         comment = None
@@ -378,7 +378,7 @@ class ManagerFideFics(Manager.Manager):
 
     def add_move(self, siNuestra, comment=None, analysis=None):
 
-        move = self.partidaObj.move(self.posJugadaObj)
+        move = self.gameObj.move(self.posJugadaObj)
         self.posJugadaObj += 1
         if analysis:
             move.analysis = analysis

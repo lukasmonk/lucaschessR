@@ -209,7 +209,7 @@ def menucompete(procesador):
 class WAtajos(QTVarios.WDialogo):
     def __init__(self, procesador, dic_data):
         entrenamientos = procesador.entrenamientos
-        entrenamientos.comprueba()
+        entrenamientos.check()
         self.entrenamientos = entrenamientos
         self.procesador = procesador
         self.li_favoritos = self.procesador.configuration.get_favoritos()
@@ -331,7 +331,7 @@ class WAtajos(QTVarios.WDialogo):
 
 
 def atajos(procesador):
-    procesador.entrenamientos.comprueba()
+    procesador.entrenamientos.check()
     dic_data = procesador.entrenamientos.dicMenu
     menuplay_savemenu(procesador, dic_data)
     menucompete_savemenu(procesador, dic_data)
@@ -362,7 +362,7 @@ def atajos(procesador):
 
 
 def atajosALT(procesador, num):
-    procesador.entrenamientos.comprueba()
+    procesador.entrenamientos.check()
     dic_data = procesador.entrenamientos.dicMenu
     menuplay_savemenu(procesador, dic_data)
     menucompete_savemenu(procesador, dic_data)

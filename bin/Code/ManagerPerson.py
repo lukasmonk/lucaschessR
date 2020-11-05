@@ -65,7 +65,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
 
         self.main_window.set_activate_tutor(False)
 
-        self.ayudas = 0
+        self.hints = 0
         self.ayudas_iniciales = 0
 
         self.xrival.is_white = self.is_engine_side_white

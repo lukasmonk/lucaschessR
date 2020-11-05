@@ -39,7 +39,7 @@ class AnalizaPartida:
         # Asignacion de variables para blunders:
         # kblunders: puntos de perdida para considerar un blunder
         # tacticblunders: folder donde guardar tactic
-        # pgnblunders: fichero pgn donde guardar la partidas
+        # pgnblunders: fichero pgn donde guardar la games
         # oriblunders: si se guarda la game original
         # bmtblunders: name del entrenamiento BMT a crear
         self.kblunders = alm.kblunders
@@ -62,7 +62,7 @@ class AnalizaPartida:
         # dpbrilliancies: depth de control para saber si es brilliancie
         # ptbrilliancies: puntos de ganancia
         # fnsbrilliancies: fichero fns donde guardar posiciones fen
-        # pgnbrilliancies: fichero pgn donde guardar la partidas
+        # pgnbrilliancies: fichero pgn donde guardar la games
         # oribrilliancies: si se guarda la game original
         # bmtbrilliancies: name del entrenamiento BMT a crear
         self.dpbrilliancies = alm.dpbrilliancies
@@ -77,7 +77,7 @@ class AnalizaPartida:
         # white: si se analizan las white
         # black: si se analizan las black
         # li_players: si solo se miran los movimiento de determinados jugadores
-        # book: si se usa un libro de aperturas para no analizar los iniciales
+        # book: si se usa un book de aperturas para no analizar los iniciales
         # li_selected: si se indica un alista de movimientos concreta que analizar
         # from_last_move: se determina si se empieza de atras adelante o al reves
         # delete_previous: si la game tiene un analysis previo, se determina si se hace o no
@@ -280,8 +280,8 @@ class AnalizaPartida:
         previa = 999999999
         nprevia = -1
         tniv = 0
-        partida_bmt = Game.Game()
-        cp = partida_bmt.first_position
+        game_bmt = Game.Game()
+        cp = game_bmt.first_position
         cp.read_fen(fen)
 
         if len(mrm.li_rm) > 16:
@@ -302,9 +302,9 @@ class AnalizaPartida:
             rm.nivelBMT = nprevia
             rm.siElegida = False
             rm.siPrimero = n == pos_act
-            partida_bmt.set_position(cp)
-            partida_bmt.read_pv(rm.pv)
-            rm.txtPartida = partida_bmt.save()
+            game_bmt.set_position(cp)
+            game_bmt.read_pv(rm.pv)
+            rm.txtPartida = game_bmt.save()
 
         bmt_uno = BMT.BMTUno(fen, mrm_bmt, tniv, cl_game)
 
@@ -388,9 +388,9 @@ class AnalizaPartida:
                     self.xmanager.remove_gui_dispatch()
                     return
 
-                # # Si esta en el libro
+                # # Si esta en el book
                 move = game.move(njg)
-                if xlibro_aperturas.miraListaJugadas(move.position_before.fen()):
+                if xlibro_aperturas.get_list_moves(move.position_before.fen()):
                     li_borrar.append(pos)
                     continue
                 else:

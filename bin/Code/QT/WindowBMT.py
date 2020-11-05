@@ -1028,7 +1028,7 @@ class WBMT(QTVarios.WDialogo):
         dic = {"MOTOR": engine, "TIME": vtime}
         Util.save_pickle(fichero, dic)
 
-        # Analizamos todos, creamos las partidas, y lo salvamos
+        # Analizamos todos, creamos las games, y lo salvamos
         confMotor = self.configuration.buscaRival(engine)
         confMotor.multiPV = 16
         xmanager = self.procesador.creaManagerMotor(confMotor, vtime, None, True)
@@ -1608,7 +1608,7 @@ class WBMT(QTVarios.WDialogo):
             else:
                 return
 
-        # Analizamos todos, creamos las partidas, y lo salvamos
+        # Analizamos todos, creamos las games, y lo salvamos
         confMotor = self.configuration.buscaRival(engine)
         confMotor.multiPV = 16
         xmanager = self.procesador.creaManagerMotor(confMotor, vtime, None, True)

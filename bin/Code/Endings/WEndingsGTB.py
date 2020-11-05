@@ -410,7 +410,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             return
         move = random.choice(lista)
         from_sq, to_sq, promotion = move[:2], move[2:4], move[4:]
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.game.add_move(move)
         for movim in move.liMovs:
             if movim[0] == "b":
@@ -470,8 +470,8 @@ class WEndingsGTB(QTVarios.WDialogo):
             if (self.pos_game + 1) < len(self.game):
                 move = self.game.move(self.pos_game + 1)
                 ok = True
-                for desde, hasta in lif:
-                    if desde == move.from_sq and hasta[:2] == move.to_sq:
+                for xfrom, xto in lif:
+                    if xfrom == move.from_sq and xto[:2] == move.to_sq:
                         ok = False
                         break
                 if ok:

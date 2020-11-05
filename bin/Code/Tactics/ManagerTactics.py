@@ -196,7 +196,7 @@ class ManagerTacticas(Manager.Manager):
         return True
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 

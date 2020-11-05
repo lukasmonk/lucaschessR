@@ -46,7 +46,7 @@ class TabEngine(QtWidgets.QWidget):
             engine = default
         self.cb_engine = Controles.CB(self, liMotores, engine).capture_changes(self.reset_motor)
 
-        multipv = self.dbop.getconfig("ENGINE_MULTIPV", 10)
+        multipv = self.dbop.getconfig("ENGINE_MULTIPV", 5)
         lb_multipv = Controles.LB(self, _("Multi PV") + ": ")
         self.sb_multipv = Controles.SB(self, multipv, 1, 500).tamMaximo(50)
 
@@ -601,12 +601,12 @@ class TabsAnalisis(QtWidgets.QWidget):
                     tab.start()
 
     def seleccionaLibro(self):
-        listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.file_books)
-        listaLibros.comprueba()
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(self.configuration.file_books)
+        list_books.check()
         menu = QTVarios.LCMenu(self)
         rondo = QTVarios.rondoPuntos()
-        for book in listaLibros.lista:
+        for book in list_books.lista:
             menu.opcion(("x", book), book.name, rondo.otro())
             menu.separador()
         menu.opcion(("n", None), _("Install new book"), Iconos.Nuevo())
@@ -616,13 +616,13 @@ class TabsAnalisis(QtWidgets.QWidget):
             if orden == "x":
                 pass
             elif orden == "n":
-                fbin = QTUtil2.leeFichero(self, listaLibros.path, "bin", titulo=_("Polyglot book"))
+                fbin = QTUtil2.leeFichero(self, list_books.path, "bin", titulo=_("Polyglot book"))
                 if fbin:
-                    listaLibros.path = os.path.dirname(fbin)
+                    list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
                     book = Books.Libro("P", name, fbin, True)
-                    listaLibros.nuevo(book)
-                    listaLibros.save_pickle(self.configuration.file_books)
+                    list_books.nuevo(book)
+                    list_books.save_pickle(self.configuration.file_books)
         else:
             book = None
         return book

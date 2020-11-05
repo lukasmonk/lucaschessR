@@ -408,8 +408,8 @@ class WDailyTest(QTVarios.WDialogo):
         if promotion:
             movimiento += promotion
 
-        siBien, mens, self.move = Move.get_game_move(self.game, self.position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, self.move = Move.get_game_move(self.game, self.position, from_sq, to_sq, promotion)
+        if ok:
             self.board.set_position(self.move.position)
             self.board.put_arrow_sc(from_sq, to_sq)
             self.calculaTiempoPuntos()

@@ -7,9 +7,11 @@
 import sys
 
 # TODO Kibitzer, misma orientación que el original
-# TODO Grabar automáticamente todas las partidas con mas de 10 movimientos
+# TODO Kibitzer, index no va fino
+# TODO Grabar automáticamente todas las games con mas de 10 movimientos
 # TODO En análisis usar el mismo sistema que en Databases, para mostrar todo sin que se escondan los botones
 # TODO Añadir en databases, ir a la siguiente
+# TODO Facilitar el acceso a la UsrData
 import Code.Translate as Translate
 
 Translate.install()

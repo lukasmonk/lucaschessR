@@ -204,7 +204,7 @@ class ManagerSolo(Manager.Manager):
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         self.human_is_playing = True
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 

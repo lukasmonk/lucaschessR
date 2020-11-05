@@ -103,8 +103,8 @@ class WOpenings(QTVarios.WDialogo):
         if promotion:
             movimiento += promotion
 
-        siBien, mens, move = Move.get_game_move(self.game, position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, position, from_sq, to_sq, promotion)
+        if ok:
             self.nuevaJugada(move)
         else:
             self.actualizaPosicion()

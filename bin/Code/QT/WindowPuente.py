@@ -615,8 +615,8 @@ class WPuente(QTVarios.WDialogo):
                 self.incorrecto()
                 return
 
-            siBien, mensaje = cp.mover(from_sq, to_sq, promotion)
-            if not siBien:
+            ok, mensaje = cp.mover(from_sq, to_sq, promotion)
+            if not ok:
                 self.incorrecto()
                 return
         if cp.fen() == self.fenFin:

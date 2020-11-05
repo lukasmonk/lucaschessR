@@ -288,11 +288,11 @@ class WEngine(QtWidgets.QDialog):
 
             lbBook = Controles.LB(self, _("Opening book") + ": ")
             fvar = Code.configuration.file_books
-            self.listaLibros = Books.ListaLibros()
-            self.listaLibros.restore_pickle(fvar)
+            self.list_books = Books.ListBooks()
+            self.list_books.restore_pickle(fvar)
             # # Comprobamos que todos esten accesibles
-            self.listaLibros.comprueba()
-            li = [(x.name, x.path) for x in self.listaLibros.lista]
+            self.list_books.check()
+            li = [(x.name, x.path) for x in self.list_books.lista]
             li.insert(0, ("* " + _("None"), "-"))
             li.insert(0, ("* " + _("Default"), "*"))
             self.cbBooks = Controles.CB(self, li, engine.book)
@@ -340,15 +340,15 @@ class WEngine(QtWidgets.QDialog):
         self.edAlias.setFocus()
 
     def nuevoBook(self):
-        fbin = QTUtil2.leeFichero(self, self.listaLibros.path, "bin", titulo=_("Polyglot book"))
+        fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
-            self.listaLibros.path = os.path.dirname(fbin)
+            self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
-            self.listaLibros.nuevo(b)
+            self.list_books.nuevo(b)
             fvar = Code.configuration.file_books
-            self.listaLibros.save_pickle(fvar)
-            li = [(x.name, x.path) for x in self.listaLibros.lista]
+            self.list_books.save_pickle(fvar)
+            li = [(x.name, x.path) for x in self.list_books.lista]
             li.insert(0, ("* " + _("Engine book"), "-"))
             li.insert(0, ("* " + _("Default"), "*"))
             self.cbBooks.rehacer(li, b.path)

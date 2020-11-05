@@ -26,7 +26,7 @@ class ManagerGM(Manager.Manager):
     def base_inicio(self, record):
         self.game_type = GT_AGAINST_GM
 
-        self.ayudas = 9999  # Para que analice sin problemas
+        self.hints = 9999  # Para que analice sin problemas
 
         self.puntos = 0
 
@@ -42,9 +42,9 @@ class ManagerGM(Manager.Manager):
         self.depth = record.depth
         self.multiPV = record.multiPV
         self.mostrar = record.mostrar
-        self.jugContrario = record.jugContrario
+        self.rival_name = record.rival_name
         self.jugInicial = record.jugInicial
-        self.partidaElegida = record.partidaElegida
+        self.gameElegida = record.gameElegida
         self.bypassBook = record.bypassBook
         self.opening = record.opening
         self.onBypassBook = True if self.bypassBook else False
@@ -70,8 +70,8 @@ class ManagerGM(Manager.Manager):
         carpeta = default if self.modo == "estandar" else self.configuration.personal_training_folder
         self.motorGM = GM.GM(carpeta, self.gm)
         self.motorGM.filter_side(self.is_white)
-        if self.partidaElegida is not None:
-            self.motorGM.set_game_selected(self.partidaElegida)
+        if self.gameElegida is not None:
+            self.motorGM.set_game_selected(self.gameElegida)
 
         self.is_human_side_white = self.is_white
         self.is_engine_side_white = not self.is_white
@@ -216,7 +216,7 @@ class ManagerGM(Manager.Manager):
 
             if siBuscar:
                 if self.onBypassBook:
-                    li_moves = self.bypassBook.miraListaJugadas(self.last_fen())
+                    li_moves = self.bypassBook.get_list_moves(self.last_fen())
                     liN = []
                     for from_sq, to_sq, promotion, pgn, peso in li_moves:
                         move = from_sq + to_sq + promotion
@@ -243,13 +243,13 @@ class ManagerGM(Manager.Manager):
                         move = liAlternativas[0]
 
             if not siBuscar:
-                self.mueve_rival(move)
+                self.play_rival(move)
                 self.siguiente_jugada()
                 return
 
         if siRival:
             if nliAlternativas > 1:
-                if self.jugContrario:
+                if self.rival_name:
                     li_moves = self.motorGM.get_moves_txt(self.game.last_position, False)
                     from_sq, to_sq, promotion = WindowGM.eligeJugada(self, li_moves, False)
                     move = from_sq + to_sq + promotion
@@ -259,7 +259,7 @@ class ManagerGM(Manager.Manager):
             else:
                 move = liAlternativas[0]
 
-            self.mueve_rival(move)
+            self.play_rival(move)
             self.siguiente_jugada()
 
         else:
@@ -275,7 +275,7 @@ class ManagerGM(Manager.Manager):
             self.xtutor.terminar()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgUsu = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgUsu = self.check_human_move(from_sq, to_sq, promotion)
         if not jgUsu:
             return False
 
@@ -288,7 +288,7 @@ class ManagerGM(Manager.Manager):
             self.board.set_position(position)
             self.board.activate_side(self.is_human_side_white)
             li_moves = self.motorGM.get_moves_txt(position, True)
-            desdeGM, hastaGM, coronacionGM = WindowGM.eligeJugada(self, li_moves, True)
+            desdeGM, hastaGM, promotionGM = WindowGM.eligeJugada(self, li_moves, True)
             siAnalizaJuez = self.siJuez
             if siAnalizaJuez:
                 if self.book:
@@ -305,9 +305,9 @@ class ManagerGM(Manager.Manager):
             )  # None es ver siempre False no ver nunca True ver si diferentes
             if len(movimiento) == 5:
                 promotion = movimiento[4].lower()
-            desdeGM, hastaGM, coronacionGM = from_sq, to_sq, promotion
+            desdeGM, hastaGM, promotionGM = from_sq, to_sq, promotion
 
-        siBien, mens, jgGM = Move.get_game_move(self.game, position, desdeGM, hastaGM, coronacionGM)
+        ok, mens, jgGM = Move.get_game_move(self.game, position, desdeGM, hastaGM, promotionGM)
         movGM = jgGM.pgn_translated()
         movUsu = jgUsu.pgn_translated()
 
@@ -327,7 +327,7 @@ class ManagerGM(Manager.Manager):
             rmGM, pos_gm = mrm.buscaRM(jgGM.movimiento())
             if rmGM is None:
                 self.analizaFinal()
-                rmGM = self.xtutor.valora(position, desdeGM, hastaGM, coronacionGM)
+                rmGM = self.xtutor.valora(position, desdeGM, hastaGM, promotionGM)
                 pos_gm = mrm.agregaRM(rmGM)
                 self.analizaInicio()
 
@@ -387,13 +387,13 @@ class ManagerGM(Manager.Manager):
             return
         Manager.Manager.analizaPosicion(self, row, key)
 
-    def mueve_rival(self, move):
+    def play_rival(self, move):
         from_sq = move[:2]
         to_sq = move[2:4]
         promotion = move[4:]
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.error = ""
 
             self.add_move(move, False)
@@ -406,7 +406,7 @@ class ManagerGM(Manager.Manager):
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
-        self.game.comprueba()
+        self.game.check()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
@@ -496,13 +496,13 @@ class ManagerGM(Manager.Manager):
         gm = self.gm
         motor_gm = self.motorGM
 
-        partida_gm = motor_gm.get_last_game()
+        game_gm = motor_gm.get_last_game()
 
-        if partida_gm:
-            event = partida_gm.event
-            oponent = partida_gm.oponent
-            fecha = partida_gm.date
-            result = partida_gm.result
+        if game_gm:
+            event = game_gm.event
+            oponent = game_gm.oponent
+            fecha = game_gm.date
+            result = game_gm.result
         else:
             event = "?"
             oponent = "?"

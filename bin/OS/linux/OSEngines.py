@@ -85,7 +85,7 @@ def read_engines(folder_engines):
 def dict_engines_fixed_elo(folder_engines):
     d = read_engines(folder_engines)
     dic = {}
-    for nm, desde, hasta in (
+    for nm, xfrom, xto in (
         ("amyan", 1000, 2400),
         ("rhetoric", 1300, 2600),
         ("cheng", 800, 2500),
@@ -94,9 +94,8 @@ def dict_engines_fixed_elo(folder_engines):
         ("rybka", 1200, 2400),
         ("ufim", 700, 2000),
         ("delfi", 1000, 1000),
-        ("spike", 1100, 2500),
     ):
-        for elo in range(desde, hasta + 100, 100):
+        for elo in range(xfrom, xto + 100, 100):
             cm = d[nm].clona()
             if elo not in dic:
                 dic[elo] = []

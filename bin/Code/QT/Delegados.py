@@ -16,7 +16,7 @@ dicNG = {}
 
 
 def generaPM(piezas):
-    dicPM["V"] = Iconos.pmComentario()
+    # dicPM["V"] = Iconos.pmComentario()
     dicPM["R"] = Iconos.pmOpening()
     dicPM["M"] = Iconos.pmComentarioMas()
     dicPM["S"] = Iconos.pmOpeningComentario()

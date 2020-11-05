@@ -267,13 +267,13 @@ class ManagerRoutesPlay(ManagerRoutes):
                 if not pv:
                     pv = self.engine.play(fen)
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, pv[:2], pv[2:4], pv[4:])
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, pv[:2], pv[2:4], pv[4:])
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
         self.siguiente_jugada()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgSel = self.check_human_move(from_sq, to_sq, promotion)
         if not jgSel:
             return False
 
@@ -488,7 +488,7 @@ class ManagerRoutesEndings(ManagerRoutes):
             else:
                 fen = self.game.last_position.fen()
                 pv = self.t4.best_move(fen)
-            self.mueve_rival(pv[:2], pv[2:4], pv[4:])
+            self.play_rival(pv[:2], pv[2:4], pv[4:])
             self.siguiente_jugada()
         else:
             self.human_is_playing = True
@@ -501,7 +501,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         QTUtil2.mensajeTemporal(self.main_window, mens, 4, physical_pos="tb", background="#C3D6E8")
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgSel = self.check_human_move(from_sq, to_sq, promotion)
         if not jgSel:
             return False
 
@@ -544,8 +544,8 @@ class ManagerRoutesEndings(ManagerRoutes):
         self.siguiente_jugada()
         return True
 
-    def mueve_rival(self, from_sq, to_sq, promotion):
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+    def play_rival(self, from_sq, to_sq, promotion):
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
         return True
@@ -598,7 +598,7 @@ class ManagerRoutesTactics(ManagerRoutes):
 
         tactica = self.route.get_tactic()
 
-        self.partida_objetivo = Game.fen_partida(tactica.fen, tactica.pgn)
+        self.game_objetivo = Game.fen_game(tactica.fen, tactica.pgn)
 
         self.is_rival_thinking = False
 
@@ -668,13 +668,13 @@ class ManagerRoutesTactics(ManagerRoutes):
             Manager.Manager.rutinaAccionDef(self, key)
 
     def jugadaObjetivo(self):
-        return self.partida_objetivo.move(self.game.num_moves())
+        return self.game_objetivo.move(self.game.num_moves())
 
     def siguiente_jugada(self):
         if self.state == ST_ENDGAME:
             return
 
-        if len(self.game) == self.partida_objetivo.num_moves():
+        if len(self.game) == self.game_objetivo.num_moves():
             self.lineaTerminada()
             return
 
@@ -691,14 +691,14 @@ class ManagerRoutesTactics(ManagerRoutes):
         siRival = is_white == self.is_engine_side_white
         if siRival:
             move = self.jugadaObjetivo()
-            self.mueve_rival(move.from_sq, move.to_sq, move.promotion)
+            self.play_rival(move.from_sq, move.to_sq, move.promotion)
             self.siguiente_jugada()
         else:
             self.human_is_playing = True
             self.activate_side(is_white)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgSel = self.check_human_move(from_sq, to_sq, promotion)
         if not jgSel:
             return False
 
@@ -718,7 +718,7 @@ class ManagerRoutesTactics(ManagerRoutes):
                     self.sigueHumano()
                     return False
             QTUtil2.mensajeTemporal(self.main_window, _("Wrong move"), 0.8, physical_pos="ad")
-            self.route.error_tactic(self.partida_objetivo.num_moves())
+            self.route.error_tactic(self.game_objetivo.num_moves())
             self.set_label2(self.route.mens_tactic(False))
             self.sigueHumano()
             return False
@@ -731,8 +731,8 @@ class ManagerRoutesTactics(ManagerRoutes):
         self.siguiente_jugada()
         return True
 
-    def mueve_rival(self, from_sq, to_sq, promotion):
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+    def play_rival(self, from_sq, to_sq, promotion):
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
         return True
@@ -745,7 +745,7 @@ class ManagerRoutesTactics(ManagerRoutes):
             liMovs.append((jg0.from_sq, jg0.to_sq, False))
         self.board.ponFlechasTmp(liMovs)
         if siQuitarPuntos:
-            self.route.error_tactic(self.partida_objetivo.num_moves())
+            self.route.error_tactic(self.game_objetivo.num_moves())
             self.set_label2(self.route.mens_tactic(False))
 
     def lineaTerminada(self):

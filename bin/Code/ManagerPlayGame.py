@@ -16,9 +16,9 @@ class ManagerPlayGame(Manager.Manager):
 
         db = WindowPlayGame.DBPlayGame(self.configuration.file_play_game())
         reg = db.leeRegistro(recno)
-        partidaObj = Game.Game()
-        partidaObj.restore(reg["GAME"])
-        nombreObj = partidaObj.get_tag("WHITE" if is_white else "BLACK")
+        gameObj = Game.Game()
+        gameObj.restore(reg["GAME"])
+        nombreObj = gameObj.get_tag("WHITE" if is_white else "BLACK")
         label = db.label(recno)
         db.close()
 
@@ -30,8 +30,8 @@ class ManagerPlayGame(Manager.Manager):
         self.siAnalizando = False
         self.is_human_side_white = is_white
         self.is_engine_side_white = not is_white
-        self.numJugadasObj = partidaObj.num_moves()
-        self.partidaObj = partidaObj
+        self.numJugadasObj = gameObj.num_moves()
+        self.gameObj = gameObj
         self.posJugadaObj = 0
         self.nombreObj = nombreObj
 
@@ -121,7 +121,7 @@ class ManagerPlayGame(Manager.Manager):
         self.siguiente_jugada()
 
     def validoMRM(self, pvUsu, pvObj, mrmActual):
-        move = self.partidaObj.move(self.posJugadaObj)
+        move = self.gameObj.move(self.posJugadaObj)
         if move.analysis:
             mrm, pos = move.analysis
             msAnalisis = mrm.getTime()
@@ -194,13 +194,13 @@ class ManagerPlayGame(Manager.Manager):
             self.iniTiempo = time.time()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgUsu = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgUsu = self.check_human_move(from_sq, to_sq, promotion)
         if not jgUsu:
             return False
 
         self.vtime += time.time() - self.iniTiempo
 
-        jgObj = self.partidaObj.move(self.posJugadaObj)
+        jgObj = self.gameObj.move(self.posJugadaObj)
 
         siAnalizaJuez = True
         if self.book:
@@ -282,7 +282,7 @@ class ManagerPlayGame(Manager.Manager):
         return True
 
     def add_move(self, siNuestra, analysis=None, comment=None):
-        move = self.partidaObj.move(self.posJugadaObj)
+        move = self.gameObj.move(self.posJugadaObj)
         self.posJugadaObj += 1
         if analysis:
             move.analysis = analysis
@@ -338,7 +338,7 @@ class ManagerPlayGame(Manager.Manager):
         reg["LIINTENTOS"].insert(0, dicIntento)
 
         if self.siSave:
-            reg["GAME"] = self.partidaObj.save()
+            reg["GAME"] = self.gameObj.save()
             self.siSave = False
 
         db.cambiaRegistro(self.recno, reg)

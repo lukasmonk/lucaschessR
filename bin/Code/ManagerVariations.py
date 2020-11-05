@@ -135,7 +135,7 @@ class ManagerVariations(Manager.Manager):
         self.refresh()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
         self.move_the_pieces(move.liMovs)
@@ -192,7 +192,7 @@ class ManagerVariations(Manager.Manager):
             self.pensando(True)
             rm = self.xrival.juega(nAjustado=self.xrival.nAjustarFuerza)
             if rm.from_sq:
-                siBien, self.error, move = Move.get_game_move(
+                ok, self.error, move = Move.get_game_move(
                     self.game, self.game.last_position, rm.from_sq, rm.to_sq, rm.promotion
                 )
                 self.add_move(move)

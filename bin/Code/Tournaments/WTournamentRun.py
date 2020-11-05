@@ -493,7 +493,7 @@ class WTournamentRun(QtWidgets.QWidget):
             promotion = rm.promotion
             analysis = mrm, 0
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         if not move:
             return False
         if analysis:

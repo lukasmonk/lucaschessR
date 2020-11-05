@@ -743,9 +743,9 @@ class WPotencia(QTVarios.WDialogo):
             from_sq, to_sq, promotion = wm.resultado()
             if from_sq:
                 cpNue = cp.copia()
-                siBien, mensaje = cpNue.mover(from_sq, to_sq, promotion)
-                wm.siCorrecto(siBien)
-                if not siBien:
+                ok, mensaje = cpNue.mover(from_sq, to_sq, promotion)
+                wm.siCorrecto(ok)
+                if not ok:
                     wm.ponError(_("Invalid move"))
                     siError = True
                     break

@@ -45,8 +45,8 @@ class ManagerCompeticion(Manager.Manager):
         self.main_window.set_activate_tutor(self.is_tutor_enabled)
         self.tutor_book = Books.BookGame(Code.tbook)
 
-        self.ayudas = categoria.ayudas
-        self.ayudas_iniciales = self.ayudas  # Se guarda para guardar el PGN
+        self.hints = categoria.hints
+        self.ayudas_iniciales = self.hints  # Se guarda para guardar el PGN
 
         self.in_the_opening = True
         self.opening = Opening.OpeningPol(nivel)  # lee las aperturas
@@ -61,7 +61,7 @@ class ManagerCompeticion(Manager.Manager):
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.ponPiezasAbajo(is_white)
-        self.ponAyudas(self.ayudas)
+        self.ponAyudas(self.hints)
         self.show_side_indicator(True)
         label = "%s: <b>%s</b><br>%s %s %d" % (_("Opponent"), self.xrival.name, categoria.name(), _("Level"), nivel)
         if self.puntos:
@@ -131,7 +131,7 @@ class ManagerCompeticion(Manager.Manager):
                 "ISWHITE": self.is_human_side_white,
                 "GAME_SAVE": self.game.save(),
                 "SITUTOR": self.is_tutor_enabled,
-                "AYUDAS": self.ayudas,
+                "AYUDAS": self.hints,
                 "CATEGORIA": self.categoria.key,
                 "LEVEL": self.nivelJugado,
                 "PUNTOS": self.puntos,
@@ -191,10 +191,10 @@ class ManagerCompeticion(Manager.Manager):
         return False
 
     def atras(self):
-        if self.ayudas and len(self.game):
+        if self.hints and len(self.game):
             if QTUtil2.pregunta(self.main_window, _("Do you want to go back in the last movement?")):
-                self.ayudas -= 1
-                self.ponAyudas(self.ayudas)
+                self.hints -= 1
+                self.ponAyudas(self.hints)
                 self.game.anulaUltimoMovimiento(self.is_human_side_white)
                 self.in_the_opening = False
                 self.game.assign_opening()
@@ -217,7 +217,7 @@ class ManagerCompeticion(Manager.Manager):
             self.muestra_resultado()
             return
 
-        if self.ayudas == 0:
+        if self.hints == 0:
             if self.categoria.sinAyudasFinal:
                 self.quitaAyudas()
                 self.is_tutor_enabled = False
@@ -235,9 +235,9 @@ class ManagerCompeticion(Manager.Manager):
 
             if self.in_the_opening:
 
-                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
+                ok, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
 
-                if siBien:
+                if ok:
                     self.rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
                     self.rm_rival.from_sq = from_sq
                     self.rm_rival.to_sq = to_sq
@@ -251,7 +251,7 @@ class ManagerCompeticion(Manager.Manager):
 
             self.pensando(False)
 
-            if self.mueve_rival(self.rm_rival):
+            if self.play_rival(self.rm_rival):
                 self.siguiente_jugada()
         else:
             self.human_is_playing = True
@@ -314,7 +314,7 @@ class ManagerCompeticion(Manager.Manager):
         self.analizaFinal()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
         movimiento = move.movimiento()
@@ -343,17 +343,17 @@ class ManagerCompeticion(Manager.Manager):
                         else:
                             liApPosibles = None
 
-                        if tutor.elegir(self.ayudas > 0, liApPosibles=liApPosibles):
-                            if self.ayudas > 0:  # doble entrada a tutor.
+                        if tutor.elegir(self.hints > 0, liApPosibles=liApPosibles):
+                            if self.hints > 0:  # doble entrada a tutor.
                                 self.set_piece_again(from_sq)
-                                self.ayudas -= 1
+                                self.hints -= 1
                                 from_sq = tutor.from_sq
                                 to_sq = tutor.to_sq
                                 promotion = tutor.promotion
-                                siBien, mens, jgTutor = Move.get_game_move(
+                                ok, mens, jgTutor = Move.get_game_move(
                                     self.game, self.game.last_position, from_sq, to_sq, promotion
                                 )
-                                if siBien:
+                                if ok:
                                     move = jgTutor
                         elif self.configuration.x_save_tutor_variations:
                             tutor.ponVariations(move, 1 + len(self.game) / 2)
@@ -371,21 +371,21 @@ class ManagerCompeticion(Manager.Manager):
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
-        self.ponAyudas(self.ayudas)
+        self.ponAyudas(self.hints)
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, respMotor):
-        from_sq = respMotor.from_sq
-        to_sq = respMotor.to_sq
+    def play_rival(self, engine_response):
+        from_sq = engine_response.from_sq
+        to_sq = engine_response.to_sq
 
-        promotion = respMotor.promotion
+        promotion = engine_response.promotion
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.error = ""
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)

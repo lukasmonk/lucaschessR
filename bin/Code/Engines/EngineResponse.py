@@ -623,11 +623,11 @@ class MultiEngineResponse:
                     fdbg.write("1. %s : %s %d <= %d\n" % (rm0.pv, _("Mate"), rm0.mate, maxmate))
                 return True
         if mindifpuntos:
-            partidaBase = self.game  # asignada por el engine_manager
-            num_moves = partidaBase.num_moves()
+            gameBase = self.game  # asignada por el engine_manager
+            num_moves = gameBase.num_moves()
             puntosPrevios = 0
             if num_moves >= 3:
-                move = partidaBase.move(num_moves - 3)
+                move = gameBase.move(num_moves - 3)
                 if hasattr(move, "puntosABS_3"):  # se graban en mejormovajustado
                     puntosPrevios = move.puntosABS_3
             difpuntos = (

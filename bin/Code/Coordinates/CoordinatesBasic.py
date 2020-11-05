@@ -6,9 +6,9 @@ from Code.Base.Constantes import WHITE
 
 
 class GenTry:
-    def __init__(self, desde, hasta):
-        letra_ini, letra_end = ord(desde[0]), ord(hasta[0])
-        num_ini, num_end = ord(desde[1]), ord(hasta[1])
+    def __init__(self, xfrom, xto):
+        letra_ini, letra_end = ord(xfrom[0]), ord(xto[0])
+        num_ini, num_end = ord(xfrom[1]), ord(xto[1])
 
         li = []
         for letra in range(letra_ini, letra_end+1):

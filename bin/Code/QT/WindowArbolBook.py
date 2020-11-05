@@ -30,7 +30,7 @@ class UnMove:
 
         pv = self.from_sq + self.to_sq + self.promotion
 
-        self.game = listaMovesPadre.partidaBase.copia()
+        self.game = listaMovesPadre.gameBase.copia()
         self.game.read_pv(pv)
 
         self.item = None
@@ -107,16 +107,16 @@ class ListaMoves:
             self.nivel = 0
             cp = Position.Position()
             cp.read_fen(fen)
-            self.partidaBase = Game.Game(cp)
+            self.gameBase = Game.Game(cp)
         else:
             self.nivel = moveOwner.listaMovesPadre.nivel + 1
-            self.partidaBase = moveOwner.game.copia()
+            self.gameBase = moveOwner.game.copia()
 
         self.book = book
         self.fen = fen
         self.moveOwner = moveOwner
         book.polyglot()
-        liMovesBook = book.miraListaJugadas(fen)
+        liMovesBook = book.get_list_moves(fen)
         self.liMoves = []
         for uno in liMovesBook:
             self.liMoves.append(UnMove(self, book, fen, uno))
@@ -124,14 +124,14 @@ class ListaMoves:
     def cambiaLibro(self, book):
         self.book = book
         book.polyglot()
-        liMovesBook = book.miraListaJugadas(self.fen)
+        liMovesBook = book.get_list_moves(self.fen)
         self.liMoves = []
         for uno in liMovesBook:
             self.liMoves.append(UnMove(self, book, self.fen, uno))
 
     def siEstaEnLibro(self, book):
         book.polyglot()
-        liMovesBook = book.miraListaJugadas(self.fen)
+        liMovesBook = book.get_list_moves(self.fen)
         return len(liMovesBook) > 0
 
 
@@ -353,13 +353,13 @@ class WindowArbolBook(QTVarios.WDialogo):
         QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, extparam)
 
         # Se lee la lista de libros1
-        self.listaLibros = Books.ListaLibros()
+        self.list_books = Books.ListBooks()
         self.fvar = manager.configuration.file_books
-        self.listaLibros.restore_pickle(self.fvar)
+        self.list_books.restore_pickle(self.fvar)
 
         # Comprobamos que todos esten accesibles
-        self.listaLibros.comprueba()
-        self.book = self.listaLibros.porDefecto()
+        self.list_books.check()
+        self.book = self.list_books.porDefecto()
 
         # fens
         fenActivo = manager.fenActivoConInicio()  # Posicion en el board
@@ -425,8 +425,8 @@ class WindowArbolBook(QTVarios.WDialogo):
         self.listaMoves.cambiaLibro(book)
         self.wmoves.tree.clear()
         self.wmoves.tree.ponMoves(self.listaMoves)
-        self.listaLibros.porDefecto(book)
-        self.listaLibros.save_pickle(self.fvar)
+        self.list_books.porDefecto(book)
+        self.list_books.save_pickle(self.fvar)
         self.ponTitulo(book)
         self.book = book
 
@@ -440,9 +440,9 @@ class WindowArbolBook(QTVarios.WDialogo):
 
     def menuLibros(self):
         menu = QTVarios.LCMenu(self)
-        nBooks = len(self.listaLibros.lista)
+        nBooks = len(self.list_books.lista)
 
-        for book in self.listaLibros.lista:
+        for book in self.list_books.lista:
             ico = Iconos.PuntoVerde() if book == self.book else Iconos.PuntoNaranja()
             menu.opcion(("x", book), book.name, ico)
 
@@ -451,7 +451,7 @@ class WindowArbolBook(QTVarios.WDialogo):
         if nBooks > 1:
             menu.separador()
             menub = menu.submenu(_("Remove a book from the list"), Iconos.Delete())
-            for book in self.listaLibros.lista:
+            for book in self.list_books.lista:
                 if not book.pordefecto:
                     menub.opcion(("b", book), book.name, Iconos.Delete())
             menu.separador()
@@ -463,23 +463,23 @@ class WindowArbolBook(QTVarios.WDialogo):
             if orden == "x":
                 self.cambiaLibro(book)
             elif orden == "n":
-                fbin = QTUtil2.leeFichero(self, self.listaLibros.path, "bin", titulo=_("Polyglot book"))
+                fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
                 if fbin:
-                    self.listaLibros.path = os.path.dirname(fbin)
+                    self.list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
                     book = Books.Libro("P", name, fbin, True)
-                    self.listaLibros.nuevo(book)
+                    self.list_books.nuevo(book)
                     self.cambiaLibro(book)
             elif orden == "b":
-                self.listaLibros.borra(book)
-                self.listaLibros.save_pickle(self.fvar)
+                self.list_books.borra(book)
+                self.list_books.save_pickle(self.fvar)
             elif orden == "1":
                 self.buscaSiguiente()
 
     def buscaSiguiente(self):
         # del siguiente al final
         si = False
-        for book in self.listaLibros.lista:
+        for book in self.list_books.lista:
             if si:
                 if self.listaMoves.siEstaEnLibro(book):
                     self.cambiaLibro(book)
@@ -487,7 +487,7 @@ class WindowArbolBook(QTVarios.WDialogo):
             if book == self.book:
                 si = True
         # del principio al actual
-        for book in self.listaLibros.lista:
+        for book in self.list_books.lista:
             if self.listaMoves.siEstaEnLibro(book):
                 self.cambiaLibro(book)
                 return

@@ -595,7 +595,7 @@ class Opening:
     def setbasepv(self, basepv):
         self.setconfig("BASEPV", basepv)
 
-    def getpartidabase(self):
+    def getgamebase(self):
         base = self.getconfig("BASEPV")
         p = Game.Game()
         if base:
@@ -635,9 +635,9 @@ class Opening:
     def __contains__(self, xpv):
         return xpv in self.li_xpv
 
-    def __setitem__(self, num, partida_nue):
+    def __setitem__(self, num, game_nue):
         xpv_ant = self.li_xpv[num]
-        xpv_nue = FasterCode.pv_xpv(partida_nue.pv())
+        xpv_nue = FasterCode.pv_xpv(game_nue.pv())
         if xpv_nue != xpv_ant:
             if xpv_ant in self.cache:
                 del self.cache[xpv_ant]
@@ -654,7 +654,7 @@ class Opening:
         sql = "UPDATE LINES SET XPV=? WHERE XPV=?"
         cursor.execute(sql, (xpv_nue, xpv_ant))
         self._conexion.commit()
-        self.add_cache(xpv_nue, partida_nue)
+        self.add_cache(xpv_nue, game_nue)
         cursor.close()
         return num
 
@@ -807,7 +807,7 @@ class Opening:
 
             conexion.close()
 
-    def importarPGN(self, owner, partidabase, ficheroPGN, maxDepth, variations):
+    def importarPGN(self, owner, gamebase, ficheroPGN, maxDepth, variations):
 
         dlTmp = QTUtil2.BarraProgreso(owner, _("Import"), _("Working..."), Util.filesize(ficheroPGN)).mostrar()
 
@@ -815,7 +815,7 @@ class Opening:
 
         cursor = self._conexion.cursor()
 
-        base = partidabase.pv() if partidabase else self.getconfig("BASEPV")
+        base = gamebase.pv() if gamebase else self.getconfig("BASEPV")
 
         sql_insert = "INSERT INTO LINES( XPV ) VALUES( ? )"
         sql_update = "UPDATE LINES SET XPV=? WHERE XPV=?"
@@ -857,12 +857,12 @@ class Opening:
     def guardaPartidas(self, label, liPartidas, minMoves=0, with_history=True):
         if with_history:
             self.saveHistory(_("Import"), label)
-        partidabase = self.getpartidabase()
+        gamebase = self.getgamebase()
         sql_insert = "INSERT INTO LINES( XPV) VALUES( ? )"
         sql_update = "UPDATE LINES SET XPV=? WHERE XPV=?"
         cursor = self._conexion.cursor()
         for game in liPartidas:
-            if minMoves <= len(game) > partidabase.num_moves():
+            if minMoves <= len(game) > gamebase.num_moves():
                 xpv = FasterCode.pv_xpv(game.pv())
                 if not (xpv in self.li_xpv):
                     updated = False
@@ -907,13 +907,13 @@ class Opening:
         bp.ponRotulo(_X(_("Reading %1"), "..."))
         bp.mostrar()
 
-        # dic_fen = {}
+        dic_fen = {}
         set_fen = FasterCode.set_fen
         make_move = FasterCode.make_move
         get_fen = FasterCode.get_fen
         control = Util.Record()
         control.liPartidas = []
-        control.num_partidas = 0
+        control.num_games = 0
         control.with_history = True
         control.label = "%s,%s,%s" % (_("Polyglot book"), bookW.name, bookB.name)
 
@@ -922,20 +922,11 @@ class Opening:
                 return
             if len(lipv_ant) > depth:
                 return
-            d1 = len(lipv_ant)
-            if d1 > depth:
-                return
-            # fenm2 = FasterCode.fen_fenm2(fen)
-            # if fenm2 in dic_fen:
-            #     if (d1 - dic_fen[fenm2]) > 3:
-            #         return
-            # else:
-            #     dic_fen[fenm2] = d1
             siWhite1 = " w " in fen
             book = bookW if siWhite1 else bookB
-            li_pv = book.miraListaPV(fen, siWhite1 == siWhite, onlyone=onlyone)
-            if li_pv and len(lipv_ant) < depth:
-                for pv in li_pv:
+            li_posible_moves = book.miraListaPV(fen, siWhite1 == siWhite, onlyone=onlyone)
+            if li_posible_moves and len(lipv_ant) < depth:
+                for pv in li_posible_moves:
                     set_fen(fen)
                     make_move(pv)
                     fenN = get_fen()
@@ -945,11 +936,13 @@ class Opening:
             else:
                 p = Game.Game()
                 p.leerLIPV(lipv_ant)
+                if p.si3repetidas():
+                    return
                 control.liPartidas.append(p)
-                control.num_partidas += 1
-                bp.ponTotal(control.num_partidas)
-                bp.pon(control.num_partidas)
-                if control.num_partidas and control.num_partidas % 3751 == 0:
+                control.num_games += 1
+                bp.ponTotal(control.num_games)
+                bp.pon(control.num_games)
+                if control.num_games and control.num_games % 3751 == 0:
                     self.guardaPartidas(control.label, control.liPartidas, minMoves, with_history=control.with_history)
                     control.liPartidas = []
                     control.with_history = False
@@ -968,7 +961,7 @@ class Opening:
 
         return True
 
-    def importarSummary(self, ventana, partidabase, ficheroSummary, depth, siWhite, onlyone, minMoves):
+    def importarSummary(self, ventana, gamebase, ficheroSummary, depth, siWhite, onlyone, minMoves):
         titulo = _("Importing the summary of a database")
         bp = QTUtil2.BarraProgreso1(ventana, titulo)
         bp.ponTotal(0)
@@ -980,8 +973,8 @@ class Opening:
         if depth == 0:
             depth = 99999
 
-        pvBase = partidabase.pv()
-        len_partidabase = len(partidabase)
+        pvBase = gamebase.pv()
+        len_gamebase = len(gamebase)
 
         liPartidas = []
 
@@ -997,7 +990,7 @@ class Opening:
             if len(liChildren) == 0 or len(lipv_ant) > depth:
                 p = Game.Game()
                 p.leerLIPV(lipv_ant)
-                if len(p) > len_partidabase:
+                if len(p) > len_gamebase:
                     liPartidas.append(p)
                     bp.ponTotal(len(liPartidas))
                     bp.pon(len(liPartidas))

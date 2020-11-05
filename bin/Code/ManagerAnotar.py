@@ -9,7 +9,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerAnotar(Manager.Manager):
-    partida_objetivo = None
+    game_objetivo = None
     total_jugadas = 0
     jugada_actual = 0
     ayudas_recibidas = 0
@@ -20,13 +20,13 @@ class ManagerAnotar(Manager.Manager):
     vtime = 0.0
     informacion_activable = False
 
-    def inicio(self, partida_objetivo, si_blancas_abajo):
+    def inicio(self, game_objetivo, si_blancas_abajo):
 
         self.game = Game.Game()
         self.game_type = GT_NOTE_DOWN
-        self.partida_objetivo = partida_objetivo
+        self.game_objetivo = game_objetivo
         self.jugada_actual = -1
-        self.total_jugadas = len(self.partida_objetivo)
+        self.total_jugadas = len(self.game_objetivo)
         self.board.showCoordenadas(False)
 
         self.ayudas_recibidas = 0
@@ -75,7 +75,7 @@ class ManagerAnotar(Manager.Manager):
         is_white = self.game.is_white()
 
         self.set_side_indicator(is_white)
-        move = self.partida_objetivo.move(self.jugada_actual)
+        move = self.game_objetivo.move(self.jugada_actual)
         self.game.add_move(move)
 
         self.move_the_pieces(move.liMovs, True)
@@ -101,7 +101,7 @@ class ManagerAnotar(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_REINIT:
-            self.inicio(self.partida_objetivo, self.si_blancas_abajo)
+            self.inicio(self.game_objetivo, self.si_blancas_abajo)
 
         elif key in (TB_CANCEL, TB_CLOSE):
             self.board.showCoordenadas(True)
@@ -128,10 +128,10 @@ class ManagerAnotar(Manager.Manager):
         self.quitaAyudas()
         self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_CONFIG, TB_UTILITIES))
         if self.cancelado:
-            self.game = self.partida_objetivo
+            self.game = self.game_objetivo
         self.goto_end()
         blancas, negras, fecha, event, result = "", "", "", "", ""
-        for key, value in self.partida_objetivo.li_tags:
+        for key, value in self.game_objetivo.li_tags:
             key = key.upper()
             if key == "WHITE":
                 blancas = value
@@ -168,7 +168,7 @@ class ManagerAnotar(Manager.Manager):
                 f = Util.today()
                 key = "%04d-%02d-%02d %02d:%02d:%02d" % (f.year, f.month, f.day, f.hour, f.minute, f.second)
                 db[key] = {
-                    "PC": self.partida_objetivo,
+                    "PC": self.game_objetivo,
                     "MOVES": numjug,
                     "TIME": self.vtime / numjug,
                     "HINTS": self.ayudas_recibidas,

@@ -834,7 +834,7 @@ class DBgames:
         dlTmp.ponContinuar()
         return si_cols_cambiados
 
-    def check_partida(self, game):
+    def check_game(self, game):
         si_completa = game.siFenInicial()
 
         if not self.allows_positions:
@@ -851,7 +851,7 @@ class DBgames:
 
         return None
 
-    def modifica(self, recno, partida_modificada):
+    def modifica(self, recno, game_modificada):
         resp = Util.Record()
         resp.ok = True
         resp.changed = False
@@ -859,20 +859,20 @@ class DBgames:
         resp.mens_error = None
         resp.inserted = False
 
-        mens_error = self.check_partida(partida_modificada)
+        mens_error = self.check_game(game_modificada)
         if mens_error:
             resp.ok = False
             resp.mens_error = mens_error
             return resp
 
-        partida_antigua = self.leePartidaRecno(recno)
+        game_antigua = self.leePartidaRecno(recno)
         #
         # # La game antigua y la nueva son iguales ? no se hace nada.
-        # if partida_antigua == partida_modificada:  # game.__eq__
+        # if game_antigua == game_modificada:  # game.__eq__
         #     return resp
 
         # Test si hay nuevos tags
-        for tag, valor in partida_modificada.li_tags:
+        for tag, valor in game_modificada.li_tags:
             if not (tag.upper() in self.li_fields):
                 self.add_column(tag)
 
@@ -880,13 +880,13 @@ class DBgames:
         li_data = []
         for campo in self.li_fields:
             if campo == "XPV":
-                dato = partida_modificada.xpv()
+                dato = game_modificada.xpv()
             elif campo == "_DATA_":
-                dato = None if partida_modificada.only_has_moves() else partida_modificada.save(False)
+                dato = None if game_modificada.only_has_moves() else game_modificada.save(False)
             elif campo == "PLYCOUNT":
-                dato = len(partida_modificada)
+                dato = len(game_modificada)
             else:
-                dato = partida_modificada.get_tag(campo)
+                dato = game_modificada.get_tag(campo)
             li_data.append(dato)
 
         resp.changed = True
@@ -899,48 +899,48 @@ class DBgames:
 
         # Summary
         if self.with_db_stat:
-            if partida_antigua.get_tag("FEN") is None:
-                pv = partida_antigua.pv()
+            if game_antigua.get_tag("FEN") is None:
+                pv = game_antigua.pv()
                 if pv:
-                    self.db_stat.append(pv, partida_antigua.resultado(), r=-1)
-            if partida_modificada.get_tag("FEN") is None:
-                pv = partida_modificada.pv()
+                    self.db_stat.append(pv, game_antigua.resultado(), r=-1)
+            if game_modificada.get_tag("FEN") is None:
+                pv = game_modificada.pv()
                 if pv:
-                    self.db_stat.append(pv, partida_modificada.resultado(), r=+1)
+                    self.db_stat.append(pv, game_modificada.resultado(), r=+1)
             resp.summary_changed = True
 
         del self.cache[rowid]
 
         return resp
 
-    def inserta(self, partida_nueva):
+    def inserta(self, game_nueva):
         resp = Util.Record()
         resp.ok = True
         resp.changed = False
         resp.summary_changed = False
         resp.inserted = True
-        resp.mens_error = self.check_partida(partida_nueva)
+        resp.mens_error = self.check_game(game_nueva)
         if resp.mens_error:
             resp.ok = False
             return resp
 
         # Test si hay nuevos tags
-        for tag, valor in partida_nueva.li_tags:
+        for tag, valor in game_nueva.li_tags:
             if not (tag.upper() in self.li_fields):
                 self.add_column(tag)
 
         li_fields = []
         li_data = []
 
-        data_nue = None if partida_nueva.only_has_moves() else partida_nueva.save()
+        data_nue = None if game_nueva.only_has_moves() else game_nueva.save()
         li_fields.append("_DATA_")
         li_data.append(data_nue)
 
-        pv_nue = partida_nueva.pv()
+        pv_nue = game_nueva.pv()
         xpv_nue = pv_xpv(pv_nue)
-        si_fen_nue = not partida_nueva.siFenInicial()
+        si_fen_nue = not game_nueva.siFenInicial()
         if si_fen_nue:
-            fen_nue = partida_nueva.first_position.fen()
+            fen_nue = game_nueva.first_position.fen()
             xpv_nue = "|%s|%s" % (fen_nue, xpv_nue)
         if not self.allows_duplicates:
             sql = "SELECT COUNT(*) FROM Games WHERE XPV = ?"
@@ -953,10 +953,10 @@ class DBgames:
         li_fields.append("XPV")
         li_data.append(xpv_nue)
         li_fields.append("PLYCOUNT")
-        li_data.append(partida_nueva.num_moves())
+        li_data.append(game_nueva.num_moves())
 
         result_nue = "*"
-        for tag, valor_nue in partida_nueva.li_tags:
+        for tag, valor_nue in game_nueva.li_tags:
             tag = tag.upper()
             if tag != "PLYCOUNT":
                 li_fields.append(tag)

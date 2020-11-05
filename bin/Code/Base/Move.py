@@ -298,8 +298,8 @@ class Move:
 def get_game_move(game, position_before, from_sq, to_sq, promotion):
     position = position_before.copia()
 
-    siBien, mensError = position.mover(from_sq, to_sq, promotion)
-    if siBien:
+    ok, mensError = position.mover(from_sq, to_sq, promotion)
+    if ok:
         move = Move(game, position_before, position, from_sq, to_sq, promotion)
         return True, None, move
     else:

@@ -180,8 +180,8 @@ class Game:
             self.add_tag("PlyCount", "%d" % self.num_moves())
 
     def readPGN(self, pgn):
-        ok, partida_tmp = pgn_game(pgn)
-        self.restore(partida_tmp.save())
+        ok, game_tmp = pgn_game(pgn)
+        self.restore(game_tmp.save())
         return self
 
     def pgn(self):
@@ -221,7 +221,7 @@ class Game:
         except:
             return self.li_moves[-1] if len(self) > 0 else None
 
-    def comprueba(self):
+    def check(self):
         if self.pending_opening:
             self.assign_opening()
         if len(self.li_moves) == 0:
@@ -246,7 +246,7 @@ class Game:
 
     def add_move(self, move):
         self.li_moves.append(move)
-        self.comprueba()
+        self.check()
 
     def siFenInicial(self):
         return self.first_position.fen() == FEN_INITIAL
@@ -316,8 +316,8 @@ class Game:
                     promotion = promotion.upper()
             else:
                 promotion = None
-            siBien, mens, move = Move.get_game_move(self, position, from_sq, to_sq, promotion)
-            if siBien:
+            ok, mens, move = Move.get_game_move(self, position, from_sq, to_sq, promotion)
+            if ok:
                 self.li_moves.append(move)
                 position = move.position
             siB = not siB
@@ -828,10 +828,10 @@ class Game:
     def shrink(self, until_move: int):
         self.li_moves = self.li_moves[:until_move+1]
 
-    def copy_raw(self, hasta):
+    def copy_raw(self, xto):
         g = Game(self.first_position)
-        if hasta not in (None, -1):
-            pv = self.pv_hasta(hasta)
+        if xto not in (None, -1):
+            pv = self.pv_hasta(xto)
             if pv:
                 g.read_pv(pv)
         return g
@@ -964,11 +964,11 @@ def pgn_game(pgn):
     if si_fen:
         game.pending_opening = False
     if jg_activa:
-        game.comprueba()
+        game.check()
     return True, game
 
 
-def fen_partida(fen, variation):
+def fen_game(fen, variation):
     pgn = '[FEN "%s"]\n\n%s' % (fen, variation)
     ok, p = pgn_game(pgn)
     return p

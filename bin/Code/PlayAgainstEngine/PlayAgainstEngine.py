@@ -161,20 +161,20 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         _label(lyG, _("Opponent"), lyV)
 
         # # Color
-        self.rbBlancas = Controles.RB(self, "").activa()
-        self.rbBlancas.setIcon(Iconos.PeonBlanco())
-        self.rbBlancas.setIconSize(QtCore.QSize(32, 32))
-        self.rbNegras = Controles.RB(self, "")
-        self.rbNegras.setIcon(Iconos.PeonNegro())
-        self.rbNegras.setIconSize(QtCore.QSize(32, 32))
+        self.rb_white = Controles.RB(self, "").activa()
+        self.rb_white.setIcon(Iconos.PeonBlanco())
+        self.rb_white.setIconSize(QtCore.QSize(32, 32))
+        self.rb_black = Controles.RB(self, "")
+        self.rb_black.setIcon(Iconos.PeonNegro())
+        self.rb_black.setIconSize(QtCore.QSize(32, 32))
         self.rbRandom = Controles.RB(self, _("Random"))
         self.rbRandom.setFont(Controles.TipoLetra(puntos=16))
         hbox = (
             Colocacion.H()
             .relleno()
-            .control(self.rbBlancas)
+            .control(self.rb_white)
             .espacio(30)
-            .control(self.rbNegras)
+            .control(self.rb_black)
             .espacio(30)
             .control(self.rbRandom)
             .relleno()
@@ -324,11 +324,11 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         # Libros
         fvar = self.configuration.file_books
-        self.listaLibros = Books.ListaLibros()
-        self.listaLibros.restore_pickle(fvar)
-        self.listaLibros.comprueba()
+        self.list_books = Books.ListBooks()
+        self.list_books.restore_pickle(fvar)
+        self.list_books.check()
 
-        li_books = [(x.name, x) for x in self.listaLibros.lista]
+        li_books = [(x.name, x) for x in self.list_books.lista]
         libInicial = li_books[0][1] if li_books else None
 
         li_resp_book = [
@@ -743,7 +743,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         dic = {}
 
         # Básico
-        dic["SIDE"] = "B" if self.rbBlancas.isChecked() else ("N" if self.rbNegras.isChecked() else "R")
+        dic["SIDE"] = "B" if self.rb_white.isChecked() else ("N" if self.rb_black.isChecked() else "R")
 
         dr = dic["RIVAL"] = {}
         dr["ENGINE"] = self.rival.key
@@ -797,8 +797,8 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         # Básico
         color = dic.get("SIDE", "B")
-        self.rbBlancas.activa(color == "B")
-        self.rbNegras.activa(color == "N")
+        self.rb_white.activa(color == "B")
+        self.rb_black.activa(color == "N")
         self.rbRandom.activa(color == "R")
 
         dr = dic.get("RIVAL", {})
@@ -814,10 +814,10 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         self.edRdepth.ponInt(dr.get("ENGINE_DEPTH", 0))
 
         # Ayudas
-        ayudas = dic.get("HINTS", 7)
+        hints = dic.get("HINTS", 7)
 
-        self.gbTutor.setChecked(ayudas > 0)
-        self.cbAyudas.ponValor(ayudas)
+        self.gbTutor.setChecked(hints > 0)
+        self.cbAyudas.ponValor(hints)
         self.sbArrows.ponValor(dic.get("ARROWS", 7))
         self.sbBoxHeight.ponValor(dic.get("BOXHEIGHT", 64))
         self.cbThoughtOp.ponValor(dic.get("THOUGHTOP", -1))
@@ -873,7 +873,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         bookRR = dic.get("BOOKRR", None)
         self.chbBookR.setChecked(bookR is not None)
         if bookR:
-            for bk in self.listaLibros.lista:
+            for bk in self.list_books.lista:
                 if bk.path == bookR.path:
                     bookR = bk
                     break
@@ -884,7 +884,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         bookP = dic.get("BOOKP", None)
         self.chbBookP.setChecked(bookP is not None)
         if bookP:
-            for bk in self.listaLibros.lista:
+            for bk in self.list_books.lista:
                 if bk.path == bookP.path:
                     bookP = bk
                     break
@@ -922,15 +922,15 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             self.motores.rehazMotoresExternos()
 
     def nuevoBook(self):
-        fbin = QTUtil2.leeFichero(self, self.listaLibros.path, "bin", titulo=_("Polyglot book"))
+        fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
-            self.listaLibros.path = os.path.dirname(fbin)
+            self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
             b = Books.Libro("P", name, fbin, False)
-            self.listaLibros.nuevo(b)
+            self.list_books.nuevo(b)
             fvar = self.configuration.file_books
-            self.listaLibros.save_pickle(fvar)
-            li = [(x.name, x) for x in self.listaLibros.lista]
+            self.list_books.save_pickle(fvar)
+            li = [(x.name, x) for x in self.list_books.lista]
             self.cbBooks.rehacer(li, b)
 
     def aperturasQuitar(self):
@@ -959,9 +959,9 @@ def play_position(procesador, titulo, is_white):
     w.posicionQuitar()
     w.btPosicion.setDisabled(True)
     if is_white:
-        w.rbBlancas.activa()
+        w.rb_white.activa()
     else:
-        w.rbNegras.activa()
+        w.rb_black.activa()
     if w.exec_():
         return w.dic
     else:
@@ -992,8 +992,8 @@ class WCambioRival(QtWidgets.QDialog):
         tb = Controles.TB(self, li_acciones)
 
         # Blancas o negras
-        self.rbBlancas = Controles.RB(self, _("White")).activa()
-        self.rbNegras = Controles.RB(self, _("Black"))
+        self.rb_white = Controles.RB(self, _("White")).activa()
+        self.rb_black = Controles.RB(self, _("Black"))
 
         # Motores
         self.motores = SelectEngines.SelectEngines(configuration)
@@ -1022,7 +1022,7 @@ class WCambioRival(QtWidgets.QDialog):
 
         # Layout
         # Color
-        hbox = Colocacion.H().relleno().control(self.rbBlancas).espacio(30).control(self.rbNegras).relleno()
+        hbox = Colocacion.H().relleno().control(self.rb_white).espacio(30).control(self.rb_black).relleno()
         gbColor = Controles.GB(self, _("Play with"), hbox)
 
         # #Color
@@ -1091,7 +1091,7 @@ class WCambioRival(QtWidgets.QDialog):
 
     def aceptar(self):
         dic = self.dic
-        dic["ISWHITE"] = self.rbBlancas.isChecked()
+        dic["ISWHITE"] = self.rb_white.isChecked()
 
         dr = dic["RIVAL"] = {}
         dr["MOTOR"] = self.rival.key
@@ -1113,8 +1113,8 @@ class WCambioRival(QtWidgets.QDialog):
     def recuperaDic(self):
         dic = self.dic
         is_white = dic.get("ISWHITE", True)
-        self.rbBlancas.activa(is_white)
-        self.rbNegras.activa(not is_white)
+        self.rb_white.activa(is_white)
+        self.rb_black.activa(not is_white)
 
         dr = dic.get("RIVAL", {})
         engine = dr.get("MOTOR", self.configuration.tutor.key)

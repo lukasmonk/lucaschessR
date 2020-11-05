@@ -268,8 +268,8 @@ class ManagerElo(Manager.Manager):
         self.is_tutor_enabled = False
         self.main_window.set_activate_tutor(self.is_tutor_enabled)
 
-        self.ayudas = 0
-        self.ayudas_iniciales = self.ayudas
+        self.hints = 0
+        self.ayudas_iniciales = self.hints
 
         self.in_the_opening = True
 
@@ -451,9 +451,9 @@ class ManagerElo(Manager.Manager):
 
                 dT, hT = 5, 5
 
-                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
+                ok, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
 
-                if siBien:
+                if ok:
                     rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
                     rm_rival.from_sq = from_sq
                     rm_rival.to_sq = to_sq
@@ -483,7 +483,7 @@ class ManagerElo(Manager.Manager):
                 time.sleep(t - difT)
 
             self.pensando(False)
-            if self.mueveRival(rm_rival):
+            if self.play_rival(rm_rival):
                 self.lirm_engine.append(rm_rival)
                 if self.valoraRMrival():
                     self.siguiente_jugada()
@@ -527,7 +527,7 @@ class ManagerElo(Manager.Manager):
         self.ponFinJuego()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -547,7 +547,7 @@ class ManagerElo(Manager.Manager):
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
-        # self.ponAyudas( self.ayudas )
+        # self.ponAyudas( self.hints )
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
@@ -557,14 +557,14 @@ class ManagerElo(Manager.Manager):
         if self.pte_tool_resigndraw:
             self.pon_toolbar()
 
-    def mueveRival(self, respMotor):
-        from_sq = respMotor.from_sq
-        to_sq = respMotor.to_sq
+    def play_rival(self, engine_response):
+        from_sq = engine_response.from_sq
+        to_sq = engine_response.to_sq
 
-        promotion = respMotor.promotion
+        promotion = engine_response.promotion
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.masJugada(move, False)
             self.move_the_pieces(move.liMovs, True)
 

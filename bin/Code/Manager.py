@@ -44,7 +44,7 @@ class Manager:
         self.state = ST_ENDGAME  # Para que siempre este definido
 
         self.game_type = None
-        self.ayudas = None
+        self.hints = None
         self.ayudas_iniciales = 0
 
         self.is_competitive = False
@@ -190,7 +190,7 @@ class Manager:
         if not li:
             return None
 
-        # Se comprueba si algun movimiento puede empezar o terminar ahi
+        # Se check si algun movimiento puede empezar o terminar ahi
         siOrigen = siDestino = False
         for mov in li:
             from_sq = mov.xfrom()
@@ -254,7 +254,7 @@ class Manager:
         if not li_moves:
             return
 
-        # Se comprueba si algun movimiento puede empezar o terminar ahi
+        # Se check si algun movimiento puede empezar o terminar ahi
         li_destinos = []
         li_origenes = []
         for mov in li_moves:
@@ -462,8 +462,8 @@ class Manager:
         self.is_tutor_enabled = False
         self.set_activate_tutor(False)
 
-    def ponAyudas(self, ayudas, siQuitarAtras=True):
-        self.main_window.ponAyudas(ayudas, siQuitarAtras)
+    def ponAyudas(self, hints, siQuitarAtras=True):
+        self.main_window.ponAyudas(hints, siQuitarAtras)
 
     def pensando(self, siPensando):
         self.main_window.pensando(siPensando)
@@ -774,7 +774,7 @@ class Manager:
             self.nonDistract = self.main_window.base.nonDistractMode(self.nonDistract)
         else:
             self.pgnInformacion()
-        self.main_window.ajustaTam()
+        # self.main_window.ajustaTam()
 
     def listado(self, tipo):
         if tipo == "pgn":
@@ -899,7 +899,7 @@ class Manager:
                 ]
                 or (self.game_type in [GT_ELO, GT_MICELO] and not self.is_competitive)
             ):
-                if siUltimo or self.ayudas == 0:
+                if siUltimo or self.hints == 0:
                     return
                 max_recursion = tam_lj - pos_jg - 3  # %#
             else:
@@ -987,7 +987,7 @@ class Manager:
 
     def finalX0(self):
         # Se llama from_sq la main_window al pulsar X
-        # Se comprueba si estamos en la pelicula
+        # Se check si estamos en la pelicula
         if self.xpelicula:
             self.xpelicula.terminar()
             return False
@@ -1085,7 +1085,7 @@ class Manager:
         self.human_is_playing = True
         self.activate_side(self.game.last_position.is_white)
 
-    def checkmueve_humano(self, from_sq, to_sq, promotion, with_premove=False):
+    def check_human_move(self, from_sq, to_sq, promotion, with_premove=False):
         if self.human_is_playing:
             if not with_premove:
                 self.paraHumano()
@@ -1104,8 +1104,8 @@ class Manager:
         if promotion:
             movimiento += promotion
 
-        siBien, self.error, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, self.error, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             return move
         else:
             self.sigueHumano()
@@ -1157,7 +1157,7 @@ class Manager:
         if (
             self.plays_instead_of_me_option
             and self.state == ST_PLAYING
-            and (self.ayudas or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
+            and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
         ):
             if not self.is_finished():
                 mrm = self.analizaTutor()
@@ -1165,10 +1165,10 @@ class Manager:
                 if rm.from_sq:
                     self.is_analyzed_by_tutor = True
                     self.player_has_moved_base(rm.from_sq, rm.to_sq, rm.promotion)
-                    if self.ayudas:
-                        self.ayudas -= 1
-                        if self.ayudas:
-                            self.ponAyudas(self.ayudas)
+                    if self.hints:
+                        self.hints -= 1
+                        if self.hints:
+                            self.ponAyudas(self.hints)
                         else:
                             self.quitaAyudas()
 
@@ -1451,7 +1451,7 @@ class Manager:
         if (
             self.plays_instead_of_me_option
             and self.state == ST_PLAYING
-            and (self.ayudas or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
+            and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
         ):
             menu.separador()
             menu.opcion("juegapormi", _("Plays instead of me") + "  [^1]", Iconos.JuegaPorMi()),
@@ -1948,7 +1948,7 @@ class Manager:
                 self.put_view()
                 link_variation_pressed("%d|%d|0" % (num_var_move, len(var_move.variations)-1))
         else:
-            # si tiene mas movimientos se comprueba si coincide con el siguiente
+            # si tiene mas movimientos se check si coincide con el siguiente
             if len(variation) > num_var_move+1:
                 cvariation_move = "|".join([cnum for cnum in self.board.variation_history.split("|")][:-1])
                 var_move = variation.move(num_var_move+1)

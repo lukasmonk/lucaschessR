@@ -34,8 +34,8 @@ class BoardLines(QtWidgets.QWidget):
 
         self.configuration = configuration
 
-        self.partidabase = panelOpening.partidabase
-        self.num_jg_inicial = len(self.partidabase)
+        self.gamebase = panelOpening.gamebase
+        self.num_jg_inicial = len(self.gamebase)
         self.pos_move = self.num_jg_inicial
 
         config_board = configuration.config_board("POSLINES", 32)
@@ -130,7 +130,7 @@ class BoardLines(QtWidgets.QWidget):
 
         self.siReloj = False
 
-        self.ponPartida(self.partidabase)
+        self.ponPartida(self.gamebase)
 
     def ponPartida(self, game):
         game.test_apertura()
@@ -179,9 +179,9 @@ class BoardLines(QtWidgets.QWidget):
         if cpActual.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(cpActual.is_white)
 
-        siBien, mens, move = Move.get_game_move(self.game, cpActual, from_sq, to_sq, promotion)
+        ok, mens, move = Move.get_game_move(self.game, cpActual, from_sq, to_sq, promotion)
 
-        if siBien:
+        if ok:
             game = Game.Game()
             game.leeOtra(self.game)
 

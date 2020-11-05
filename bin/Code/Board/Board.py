@@ -1606,9 +1606,9 @@ class Board(QtWidgets.QGraphicsView):
         self.liFlechas.append(arrow)
         arrow.show()
 
-    def creaFlechaPremove(self, desde, hasta):
+    def creaFlechaPremove(self, xfrom, xto):
         bf = copy.deepcopy(self.config_board.fActivo())
-        bf.a1h8 = desde + hasta
+        bf.a1h8 = xfrom + xto
         arrow = self.creaFlecha(bf)
         self.liFlechas.append(arrow)
         arrow.show()

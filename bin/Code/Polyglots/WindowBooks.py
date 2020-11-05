@@ -31,8 +31,8 @@ class WBooksCrear(QtWidgets.QDialog):
 
         self.configuration = Code.configuration
         fvar = self.configuration.file_books
-        self.listaLibros = Books.ListaLibros()
-        self.listaLibros.restore_pickle(fvar)
+        self.list_books = Books.ListBooks()
+        self.list_books.restore_pickle(fvar)
 
         lbFichero = Controles.LB(self, _("Book to create") + ":").ponFuente(f)
         self.btFichero = Controles.PB(self, "", self.buscaFichero, False).anchoMinimo(450).ponFuente(f)
@@ -73,10 +73,10 @@ class WBooksCrear(QtWidgets.QDialog):
 
         # Libros
         fbin = QTUtil2.salvaFichero(
-            self, _("Polyglot book"), self.listaLibros.path, _("File") + " %s (*.%s)" % ("bin", "bin")
+            self, _("Polyglot book"), self.list_books.path, _("File") + " %s (*.%s)" % ("bin", "bin")
         )
         if fbin:
-            self.listaLibros.path = os.path.dirname(fbin)
+            self.list_books.path = os.path.dirname(fbin)
             self.fichero = fbin
             self.btFichero.set_text(self.fichero)
 
@@ -139,9 +139,9 @@ class WBooksCrear(QtWidgets.QDialog):
 
         name = os.path.basename(self.fichero)[:-4]
         b = Books.Libro("P", name, self.fichero, False)
-        self.listaLibros.nuevo(b)
+        self.list_books.nuevo(b)
         fvar = self.configuration.file_books
-        self.listaLibros.save_pickle(fvar)
+        self.list_books.save_pickle(fvar)
 
         self.accept()
 

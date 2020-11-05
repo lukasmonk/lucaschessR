@@ -26,13 +26,13 @@ class DBPlayGame(UtilSQL.DictSQL):
         self.regKeys = self.keys(True, True)
 
     def appendHash(self, xhash, valor):
-        """Usado from_sq databases-partidas, el hash = hash del xpv"""
+        """Usado from_sq databases-games, el hash = hash del xpv"""
         k = str(Util.today()) + "|" + str(xhash)
         self.__setitem__(k, valor)
         self.regKeys = self.keys(True, True)
 
     def recnoHash(self, xhash):
-        """Usado from_sq databases-partidas"""
+        """Usado from_sq databases-games"""
         for recno, key in enumerate(self.regKeys):
             if "|" in key:
                 h = int(key.split("|")[1])

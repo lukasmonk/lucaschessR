@@ -189,11 +189,11 @@ class WKibitzers(QTVarios.WDialogo):
         menu.separador()
 
         submenu = menu.submenu(_("Book polyglot"), Iconos.Book())
-        listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.file_books)
-        listaLibros.comprueba()
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(self.configuration.file_books)
+        list_books.check()
         rondo = QTVarios.rondoPuntos()
-        for book in listaLibros.lista:
+        for book in list_books.lista:
             submenu.opcion(("book", book), book.name, rondo.otro())
             submenu.separador()
         submenu.opcion(("installbook", None), _("Install new book"), Iconos.Nuevo())
@@ -228,16 +228,16 @@ class WKibitzers(QTVarios.WDialogo):
                 num = self.kibitzers.nuevo_index()
                 self.goto(num)
             elif orden in "installbook":
-                self.polyglot_install(listaLibros)
+                self.polyglot_install(list_books)
 
-    def polyglot_install(self, listaLibros):
-        fbin = QTUtil2.leeFichero(self, listaLibros.path, "bin", titulo=_("Polyglot book"))
+    def polyglot_install(self, list_books):
+        fbin = QTUtil2.leeFichero(self, list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
-            listaLibros.path = os.path.dirname(fbin)
+            list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
             book = Books.Libro("P", name, fbin, True)
-            listaLibros.nuevo(book)
-            listaLibros.save_pickle(self.configuration.file_books)
+            list_books.nuevo(book)
+            list_books.save_pickle(self.configuration.file_books)
             num = self.kibitzers.nuevo_polyglot(book)
             self.goto(num)
 

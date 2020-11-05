@@ -27,9 +27,9 @@ class ManagerEverest(Manager.Manager):
         self.siAnalizando = False
         self.is_human_side_white = self.expedition.is_white
         self.is_engine_side_white = not self.expedition.is_white
-        self.partidaObj = self.expedition.game
-        self.game.set_tags(self.partidaObj.li_tags)
-        self.numJugadasObj = self.partidaObj.num_moves()
+        self.gameObj = self.expedition.game
+        self.game.set_tags(self.gameObj.li_tags)
+        self.numJugadasObj = self.gameObj.num_moves()
         self.posJugadaObj = 0
         self.nombreObj = self.expedition.name
 
@@ -231,13 +231,13 @@ class ManagerEverest(Manager.Manager):
                 self.pendienteNoContinuo = True
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgUsu = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgUsu = self.check_human_move(from_sq, to_sq, promotion)
         if not jgUsu:
             return False
 
         self.vtime += time.time() - self.iniTiempo
 
-        jgObj = self.partidaObj.move(self.posJugadaObj)
+        jgObj = self.gameObj.move(self.posJugadaObj)
         fen = jgObj.position_before.fen()
 
         siAnalizaJuez = True
@@ -336,7 +336,7 @@ class ManagerEverest(Manager.Manager):
         return True
 
     def add_move(self, siNuestra, analysis=None, comment=None):
-        move = self.partidaObj.move(self.posJugadaObj)
+        move = self.gameObj.move(self.posJugadaObj)
         self.posJugadaObj += 1
         if analysis:
             move.analysis = analysis

@@ -72,7 +72,7 @@ class WManualSave(QTVarios.WDialogo):
         ##
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siLibre=False, icon_size=24, siTiempo=False)
         ##
-        self.em_solucion = Controles.EM(self, siHTML=False).altoMinimo(40).capturaCambios(self.reset_partida)
+        self.em_solucion = Controles.EM(self, siHTML=False).altoMinimo(40).capturaCambios(self.reset_game)
         ##
         self.bt_solucion = Controles.PB(self, "   " + _("Save solution"), self.savesolucion, plano=False).ponIcono(
             Iconos.Grabar(), 24
@@ -251,7 +251,7 @@ class WManualSave(QTVarios.WDialogo):
     def grid_doble_click(self, grid, row, o_column):
         if grid == self.grid_analysis:
             self.em_solucion.set_text(self.li_analysis[row].ms_pgn)
-            self.reset_partida()
+            self.reset_game()
         self.grid_analysis.goto(row, 0)
 
     def start(self):
@@ -321,7 +321,7 @@ class WManualSave(QTVarios.WDialogo):
 
     def edit_solucion(self):
         self.reset_motor()
-        pc = self.crea_partida()
+        pc = self.crea_game()
         pc = self.procesador.managerPartida(self, pc, False, False, self.board)
         if pc:
             self.position = pc.first_position
@@ -348,7 +348,7 @@ class WManualSave(QTVarios.WDialogo):
                 QTUtil2.message_error(self, _("Error writing to file %s") % fich)
             f.close()
 
-        pc = self.crea_partida()
+        pc = self.crea_game()
 
         if self.pgn:
             f = open_file(self.pgn)
@@ -426,7 +426,7 @@ class WManualSave(QTVarios.WDialogo):
     def closeEvent(self, event):
         self.finaliza()
 
-    def crea_partida(self):
+    def crea_game(self):
         li_tags = []
         number = self.sb_number.valor()
         for key, value in self.li_labels:
@@ -451,24 +451,24 @@ class WManualSave(QTVarios.WDialogo):
         pc.readPGN(txt)
         return pc
 
-    def reset_partida(self):
+    def reset_game(self):
         if self.game is not None:
             self.game = None
             self.board.set_position(self.position)
 
-    def test_partida(self):
+    def test_game(self):
         if not self.game:
-            self.game = self.crea_partida()
+            self.game = self.crea_game()
             self.board.set_position(self.position)
             self.game.mover_jugada = -1
 
     def MoverInicio(self):
-        self.test_partida()
+        self.test_game()
         self.game.mover_jugada = -1
         self.board.set_position(self.position)
 
     def MoverAtras(self):
-        self.test_partida()
+        self.test_game()
         if self.game.mover_jugada >= 0:
             self.game.mover_jugada -= 1
             if self.game.mover_jugada == -1:
@@ -479,7 +479,7 @@ class WManualSave(QTVarios.WDialogo):
                 self.board.put_arrow_sc(move.from_sq, move.to_sq)
 
     def MoverAdelante(self):
-        self.test_partida()
+        self.test_game()
         if self.game.mover_jugada < (len(self.game) - 1):
             self.game.mover_jugada += 1
             move = self.game.move(self.game.mover_jugada)
@@ -489,7 +489,7 @@ class WManualSave(QTVarios.WDialogo):
         return False
 
     def MoverFinal(self):
-        self.test_partida()
+        self.test_game()
         if len(self.game):
             self.game.mover_jugada = len(self.game) - 1
             move = self.game.move(self.game.mover_jugada)

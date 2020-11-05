@@ -153,8 +153,6 @@ def read_engines(folder_engines):
 
     mas("demolito", "Lucas Braesch", "32bit", "https://github.com/lucasart/Demolito", "demolito_32bit_old.exe", 2627)
 
-    mas("spike", "Volker Böhm and Ralf Schäfer", "1.4", "http://spike.lazypics.de/index_en.html", "Spike1.4.exe", 2921)
-
     cm = mas("zappa", "Anthony Cozzie", "1.1", "http://www.acoz.net/zappa/", "zappa.exe", 2581)
     cm.removeLog("zappa_log.txt")
 
@@ -194,7 +192,7 @@ def read_engines(folder_engines):
 def dict_engines_fixed_elo(folder_engines):
     d = read_engines(folder_engines)
     dic = {}
-    for nm, desde, hasta in (
+    for nm, xfrom, xto in (
         ("amyan", 1000, 2400),
         ("stockfish", 1350, 2850),
         ("rhetoric", 1300, 2600),
@@ -204,9 +202,8 @@ def dict_engines_fixed_elo(folder_engines):
         ("rybka", 1200, 2400),
         ("ufim", 700, 2000),
         ("delfi", 1000, 1000),
-        ("spike", 1100, 2500),
     ):
-        for elo in range(desde, hasta + 100, 100):
+        for elo in range(xfrom, xto + 100, 100):
             cm = d[nm].clona()
             if elo not in dic:
                 dic[elo] = []

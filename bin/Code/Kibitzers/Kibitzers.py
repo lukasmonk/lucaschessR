@@ -17,6 +17,7 @@ class Tipos:
             (KIB_INDEXES, _("Indexes") + " - RodentII", Iconos.pmPuntoNegro()),
             (KIB_BESTMOVE_ONELINE, _("Best move in one line"), Iconos.pmKibitzer().scaledToWidth(16)),
             (KIB_STOCKFISH, _("Stockfish evaluation"), Iconos.pmPuntoAmarillo()),
+            (KIB_THREATS, _("Threats"), Iconos.pmPuntoAzul()),
             (KIB_POLYGLOT, _("Polyglot book"), Iconos.pmBook().scaledToWidth(16)),
             (KIB_GAVIOTA, _("Gaviota Tablebases"), Iconos.pmFinales().scaledToWidth(16)),
         )

@@ -50,8 +50,8 @@ class ManagerWashingReplay(Manager.Manager):
         self.set_dispatcher(self.player_has_moved)
         self.show_side_indicator(True)
 
-        self.partidaObj = self.dbwashing.restoreGame(self.engine)
-        self.numJugadasObj = self.partidaObj.num_moves()
+        self.gameObj = self.dbwashing.restoreGame(self.engine)
+        self.numJugadasObj = self.gameObj.num_moves()
         self.posJugadaObj = 0
 
         li_options = [TB_CLOSE]
@@ -119,9 +119,9 @@ class ManagerWashingReplay(Manager.Manager):
         siRival = is_white == self.is_engine_side_white
 
         if siRival:
-            move = self.partidaObj.move(self.posJugadaObj)
+            move = self.gameObj.move(self.posJugadaObj)
             self.posJugadaObj += 1
-            self.mueve_rival(move.from_sq, move.to_sq, move.promotion)
+            self.play_rival(move.from_sq, move.to_sq, move.promotion)
             self.siguiente_jugada()
 
         else:
@@ -146,14 +146,14 @@ class ManagerWashingReplay(Manager.Manager):
         self.mensajeEnPGN(mens)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
         movUsu = move.movimiento().lower()
         self.dbwashing.add_time(self.timekeeper.stop())
 
-        jgObj = self.partidaObj.move(self.posJugadaObj)
+        jgObj = self.gameObj.move(self.posJugadaObj)
         movObj = jgObj.movimiento().lower()
         if movUsu != movObj:
             lic = []
@@ -177,7 +177,7 @@ class ManagerWashingReplay(Manager.Manager):
                     self.dbwashing.add_hint()
 
             else:
-                # Debe ser una move de libro para aceptarla
+                # Debe ser una move de book para aceptarla
                 fen = self.last_fen()
                 siBookUsu = self.book.check_human(fen, from_sq, to_sq)
                 bmove = _("book move")
@@ -195,14 +195,14 @@ class ManagerWashingReplay(Manager.Manager):
             self.set_position(move.position_before)
 
         # Creamos un move sin analysis
-        siBien, self.error, move = Move.get_game_move(
+        ok, self.error, move = Move.get_game_move(
             self.game, self.game.last_position, jgObj.from_sq, jgObj.to_sq, jgObj.promotion
         )
 
         self.move_the_pieces(move.liMovs)
         self.add_move(move, True)
         self.posJugadaObj += 1
-        if len(self.game) == self.partidaObj.num_moves():
+        if len(self.game) == self.gameObj.num_moves():
             self.finPartida()
 
         else:
@@ -221,8 +221,8 @@ class ManagerWashingReplay(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, from_sq, to_sq, promotion):
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+    def play_rival(self, from_sq, to_sq, promotion):
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
         self.error = ""
@@ -267,7 +267,7 @@ class ManagerWashingTactics(Manager.Manager):
         self.main_window.pon_toolbar(li_options)
 
         self.num_move = -1
-        self.ayudas = 0
+        self.hints = 0
         self.errores = 0
         self.time_used = 0.0
 
@@ -342,7 +342,7 @@ class ManagerWashingTactics(Manager.Manager):
         if siRival:
             pv = self.line.get_move(self.num_move)
             from_sq, to_sq, promotion = pv[:2], pv[2:4], pv[4:]
-            self.mueve_rival(from_sq, to_sq, promotion)
+            self.play_rival(from_sq, to_sq, promotion)
             self.siguiente_jugada()
 
         else:
@@ -353,7 +353,7 @@ class ManagerWashingTactics(Manager.Manager):
             self.activate_side(is_white)
 
     def end_line(self):
-        ok = (self.ayudas + self.errores) == 0
+        ok = (self.hints + self.errores) == 0
         self.dbwashing.done_tactic(self.engine, ok)
         self.num_lines = self.engine.numTactics()
 
@@ -379,11 +379,11 @@ class ManagerWashingTactics(Manager.Manager):
             self.mensajeEnPGN(mens)
         else:
             QTUtil2.message_error(
-                self.main_window, "%s: %d, %s: %d" % (_("Errors"), self.errores, _("Hints"), self.ayudas)
+                self.main_window, "%s: %d, %s: %d" % (_("Errors"), self.errores, _("Hints"), self.hints)
             )
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             self.errores += 1
             return False
@@ -413,15 +413,15 @@ class ManagerWashingTactics(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, from_sq, to_sq, promotion):
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+    def play_rival(self, from_sq, to_sq, promotion):
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
         self.error = ""
 
     def ayuda(self):
         self.set_label1(self.line.label)
-        self.ayudas += 1
+        self.hints += 1
         mov = self.line.get_move(self.num_move).lower()
         self.board.markPosition(mov[:2])
         self.ayudasEsteMov += 1
@@ -569,10 +569,10 @@ class ManagerWashingCreate(Manager.Manager):
 
         self.pensando(False)
 
-        siBien, self.error, move = Move.get_game_move(
+        ok, self.error, move = Move.get_game_move(
             self.game, self.game.last_position, self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion
         )
-        if siBien:
+        if ok:
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
             return True
@@ -646,7 +646,7 @@ class ManagerWashingCreate(Manager.Manager):
         Manager.Manager.sigueHumano(self)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -683,10 +683,10 @@ class ManagerWashingCreate(Manager.Manager):
                         from_sq = tutor.from_sq
                         to_sq = tutor.to_sq
                         promotion = tutor.promotion
-                        siBien, mens, jgTutor = Move.get_game_move(
+                        ok, mens, jgTutor = Move.get_game_move(
                             self.game, self.game.last_position, from_sq, to_sq, promotion
                         )
-                        if siBien:
+                        if ok:
                             move = jgTutor
                             self.add_hint()
                     del tutor

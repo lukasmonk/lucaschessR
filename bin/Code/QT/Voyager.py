@@ -738,9 +738,9 @@ class WPGN(QtWidgets.QWidget):
         if not promotion and self.game.last_position.siPeonCoronando(from_sq, to_sq):
             promotion = self.board.peonCoronando(self.game.last_position.is_white)
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
 
-        if siBien:
+        if ok:
             self.game.add_move(move)
             self.board.set_position(move.position)
             self.board.put_arrow_sc(move.from_sq, move.to_sq)

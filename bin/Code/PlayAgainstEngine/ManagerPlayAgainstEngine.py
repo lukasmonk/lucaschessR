@@ -128,8 +128,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.is_tutor_enabled = (Code.dgtDispatch is None) and self.configuration.x_default_tutor_active
         self.main_window.set_activate_tutor(self.is_tutor_enabled)
 
-        self.ayudas = dic_var["HINTS"]
-        self.ayudas_iniciales = self.ayudas  # Se guarda para guardar el PGN
+        self.hints = dic_var["HINTS"]
+        self.ayudas_iniciales = self.hints  # Se guarda para guardar el PGN
         self.nArrows = dic_var.get("ARROWS", 0)
         n_box_height = dic_var.get("BOXHEIGHT", 24)
         self.thoughtOp = dic_var.get("THOUGHTOP", -1)
@@ -138,12 +138,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.nArrowsTt = dic_var.get("ARROWSTT", 0)
         self.chance = dic_var.get("2CHANCE", True)
 
-        if self.nArrowsTt != 0 and self.ayudas == 0:
+        if self.nArrowsTt != 0 and self.hints == 0:
             self.nArrowsTt = 0
 
         self.with_takeback = dic_var.get("TAKEBACK", True)
 
-        self.tutor_con_flechas = self.nArrowsTt > 0 and self.ayudas > 0
+        self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
         self.tutor_book = Books.BookGame(Code.tbook)
 
         mx = max(self.thoughtOp, self.thoughtTt)
@@ -464,7 +464,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         dic["is_tutor_enabled"] = self.is_tutor_enabled
 
-        dic["ayudas"] = self.ayudas
+        dic["hints"] = self.hints
         dic["summary"] = self.summary
 
         return dic
@@ -478,7 +478,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.vtime[BLACK].restore(dic["time_black"])
 
         self.is_tutor_enabled = dic["is_tutor_enabled"]
-        self.ayudas = dic["ayudas"]
+        self.hints = dic["hints"]
         self.summary = dic["summary"]
         self.goto_end()
 
@@ -613,9 +613,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def takeback(self):
         if len(self.game):
             self.analizaTerminar()
-            if self.ayudas:
-                self.ayudas -= 1
-                self.tutor_con_flechas = self.nArrowsTt > 0 and self.ayudas > 0
+            if self.hints:
+                self.hints -= 1
+                self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
             self.ponAyudasEM()
             self.game.anulaUltimoMovimiento(self.is_human_side_white)
             if not self.fen:
@@ -632,7 +632,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def testBook(self):
         if self.bookR:
-            resp = self.bookR.miraListaJugadas(self.last_fen())
+            resp = self.bookR.get_list_moves(self.last_fen())
             if not resp:
                 self.bookR = None
                 self.ponRotuloBasico()
@@ -769,7 +769,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         fen = self.last_fen()
 
         if bookRR == "su":
-            listaJugadas = book.miraListaJugadas(fen)
+            listaJugadas = book.get_list_moves(fen)
             if listaJugadas:
                 resp = WindowBooks.eligeJugadaBooks(self.main_window, listaJugadas, self.game.last_position.is_white)
                 return True, resp[0], resp[1], resp[2]
@@ -802,10 +802,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.premove:
             from_sq, to_sq = self.premove
             promotion = "q" if self.game.last_position.siPeonCoronando(from_sq, to_sq) else None
-            siBien, error, move = Move.get_game_move(
+            ok, error, move = Move.get_game_move(
                 self.game, self.game.last_position, self.premove[0], self.premove[1], promotion
             )
-            if siBien:
+            if ok:
                 self.player_has_moved(from_sq, to_sq, promotion)
                 return
             self.premove = None
@@ -852,7 +852,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.aperturaStd = None
 
         if not si_encontrada and self.siBookAjustarFuerza:
-            si_encontrada, from_sq, to_sq, promotion = self.eligeJugadaBookAjustada()  # libro de la personalidad
+            si_encontrada, from_sq, to_sq, promotion = self.eligeJugadaBookAjustada()  # book de la personalidad
             if not si_encontrada:
                 self.siBookAjustarFuerza = False
 
@@ -861,7 +861,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             rm_rival.from_sq = from_sq
             rm_rival.to_sq = to_sq
             rm_rival.promotion = promotion
-            self.mueve_rival(rm_rival)
+            self.play_rival(rm_rival)
         else:
             self.pensando(True)
             self.reloj_start(False)
@@ -881,9 +881,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         Manager.Manager.sigueHumano(self)
 
     def mueve_rival_base(self):
-        self.mueve_rival(self.main_window.dato_notify)
+        self.play_rival(self.main_window.dato_notify)
 
-    def mueve_rival(self, rm_rival):
+    def play_rival(self, rm_rival):
         self.reloj_stop(False)
         self.pensando(False)
         time_s = self.timekeeper.stop()
@@ -900,11 +900,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.muestra_resultado()
                 return True
 
-        siBien, self.error, move = Move.get_game_move(
+        ok, self.error, move = Move.get_game_move(
             self.game, self.game.last_position, rm_rival.from_sq, rm_rival.to_sq, rm_rival.promotion
         )
         self.rm_rival = rm_rival
-        if siBien:
+        if ok:
             fen_ultimo = self.last_fen()
             move.set_time_ms(int(time_s * 1000))
             self.add_move(move, False)
@@ -933,7 +933,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         if not self.human_is_playing:
             return self.check_premove(from_sq, to_sq)
-        move = self.checkmueve_humano(from_sq, to_sq, promotion, not self.is_tutor_enabled)
+        move = self.check_human_move(from_sq, to_sq, promotion, not self.is_tutor_enabled)
         if not move:
             return False
 
@@ -946,11 +946,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         fen_base = self.last_fen()
 
         if self.bookR and self.bookMandatory:
-            listaJugadas = self.bookR.miraListaJugadas(fen_base)
+            listaJugadas = self.bookR.get_list_moves(fen_base)
             if listaJugadas:
                 li = []
-                for apdesde, aphasta, apcoronacion, nada, nada1 in listaJugadas:
-                    mx = apdesde + aphasta + apcoronacion
+                for apdesde, aphasta, appromotion, nada, nada1 in listaJugadas:
+                    mx = apdesde + aphasta + appromotion
                     if mx.strip().lower() == movimiento:
                         is_selected = True
                         break
@@ -1038,18 +1038,18 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                         else:
                             liApPosibles = None
 
-                        if tutor.elegir(self.ayudas > 0, liApPosibles=liApPosibles):
-                            if self.ayudas > 0:  # doble entrada a tutor.
+                        if tutor.elegir(self.hints > 0, liApPosibles=liApPosibles):
+                            if self.hints > 0:  # doble entrada a tutor.
                                 self.set_piece_again(from_sq)
-                                self.ayudas -= 1
-                                self.tutor_con_flechas = self.nArrowsTt > 0 and self.ayudas > 0
+                                self.hints -= 1
+                                self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
                                 from_sq = tutor.from_sq
                                 to_sq = tutor.to_sq
                                 promotion = tutor.promotion
-                                siBien, mens, jgTutor = Move.get_game_move(
+                                ok, mens, jgTutor = Move.get_game_move(
                                     self.game, self.game.last_position, from_sq, to_sq, promotion
                                 )
-                                if siBien:
+                                if ok:
                                     move = jgTutor
                                     self.setSummary("SELECTTUTOR", True)
                         if self.configuration.x_save_tutor_variations:
@@ -1174,7 +1174,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.ponFinJuego(self.with_takeback)
 
     def ponAyudasEM(self):
-        self.ponAyudas(self.ayudas, siQuitarAtras=False)
+        self.ponAyudas(self.hints, siQuitarAtras=False)
 
     def cambioRival(self):
         dic = PlayAgainstEngine.cambioRival(self.main_window, self.configuration, self.reinicio)

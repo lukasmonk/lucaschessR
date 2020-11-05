@@ -186,13 +186,13 @@ def paramAnalisis(parent, configuration, siModoAmpliado, siTodosMotores=False):
         liGen.append((config, ""))
 
         fvar = configuration.file_books
-        listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(fvar)
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(fvar)
         # Comprobamos que todos esten accesibles
-        listaLibros.comprueba()
+        list_books.check()
         li = [("--", None)]
-        defecto = listaLibros.lista[0] if alm.book_name else None
-        for book in listaLibros.lista:
+        defecto = list_books.lista[0] if alm.book_name else None
+        for book in list_books.lista:
             if alm.book_name == book.name:
                 defecto = book
             li.append((book.name, book))
@@ -361,13 +361,13 @@ def paramAnalisisMasivo(parent, configuration, siVariosSeleccionados, siDatabase
     liGen.append(('<div align="right">' + _("Only player moves") + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"), ""))
 
     fvar = configuration.file_books
-    listaLibros = Books.ListaLibros()
-    listaLibros.restore_pickle(fvar)
+    list_books = Books.ListBooks()
+    list_books.restore_pickle(fvar)
     # Comprobamos que todos esten accesibles
-    listaLibros.comprueba()
-    defecto = listaLibros.lista[0]
+    list_books.check()
+    defecto = list_books.lista[0]
     li = [("--", None)]
-    for book in listaLibros.lista:
+    for book in list_books.lista:
         if book.name == alm.book_name:
             defecto = book
         li.append((book.name, book))

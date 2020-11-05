@@ -15,9 +15,9 @@ def pixmap(name):
     return eval("pm%s()"%name)
 
 
-def PM(desde, hasta):
+def PM(xfrom, xto):
     pm = QtGui.QPixmap()
-    pm.loadFromData(binIconos[desde:hasta])
+    pm.loadFromData(binIconos[xfrom:xto])
     return pm
 
 def pmLM():

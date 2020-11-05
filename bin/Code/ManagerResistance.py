@@ -162,8 +162,8 @@ class ManagerResistance(Manager.Manager):
             puntosRivalPrevio = self.puntosRival
 
             if self.in_the_opening:
-                siBien, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
-                if siBien:
+                ok, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
+                if ok:
                     self.rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
                     self.rm_rival.from_sq = from_sq
                     self.rm_rival.to_sq = to_sq
@@ -176,13 +176,13 @@ class ManagerResistance(Manager.Manager):
                 self.ponRotuloActual()
             self.pensando(False)
 
-            if self.mueve_rival(self.rm_rival):
+            if self.play_rival(self.rm_rival):
                 lostmovepoints = self.puntosRival - puntosRivalPrevio
                 if self.siBoxing and self.puntosRival > self.puntos:
-                    if self.comprueba():
+                    if self.check():
                         return
                 if self.siBoxing and self.maxerror and lostmovepoints > self.maxerror:
-                    if self.comprueba():
+                    if self.check():
                         return
 
                 self.siguiente_jugada()
@@ -191,7 +191,7 @@ class ManagerResistance(Manager.Manager):
             self.human_is_playing = True
             self.activate_side(is_white)
 
-    def comprueba(self):
+    def check(self):
         self.disable_all()
         if self.xrival.confMotor.key != self.xarbitro.confMotor.key:
             if self.segundos > 10:
@@ -262,7 +262,7 @@ class ManagerResistance(Manager.Manager):
         return True
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -288,14 +288,14 @@ class ManagerResistance(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, respMotor):
-        from_sq = respMotor.from_sq
-        to_sq = respMotor.to_sq
+    def play_rival(self, engine_response):
+        from_sq = engine_response.from_sq
+        to_sq = engine_response.to_sq
 
-        promotion = respMotor.promotion
+        promotion = engine_response.promotion
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.error = ""
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)

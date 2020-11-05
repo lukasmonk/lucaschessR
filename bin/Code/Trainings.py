@@ -102,7 +102,8 @@ class Entrenamientos:
 
     def menuFNS(self, menu, label, xopcion):
         td = TrainingDir(Code.path_resource("Trainings"))
-        td.addOtherFolder(self.procesador.configuration.personal_training_folder)
+        td.addOtherFolder(self.configuration.personal_training_folder)
+        td.addOtherFolder(self.configuration.folder_tactics())
         bmenu = menu.submenu(label, Iconos.Carpeta())
         td.reduce()  # Elimina carpetas vacias
         td.menu(bmenu, xopcion)
@@ -176,6 +177,9 @@ class Entrenamientos:
 
         menu_basic.separador()
         xopcion(menu_basic, "anotar", _("Writing down moves of a game"), Iconos.Write())
+
+        menu_basic.separador()
+        xopcion(menu_basic, "train_book", _("Training with a book"), Iconos.Libros())
 
     def create_menu_games(self, menu, xopcion):
         menu.separador()
@@ -264,6 +268,8 @@ class Entrenamientos:
         menu_tactics.separador()
 
         xopcion(menu_tactics, "potencia", _("Determine your calculating power"), Iconos.Potencia())
+        menu_tactics.separador()
+        xopcion(menu_tactics, "tol_oneline", _("Turn on lights in one line"), Iconos.TOLline())
 
     def create_menu_endings(self, menu, xopcion):
         menu.separador()
@@ -316,8 +322,6 @@ class Entrenamientos:
         menu3.separador()
         xopcion(menu3, "tol_uwe_calc", "%s (%s)" % (_("Uwe Auerswald"), _("Complete")), Iconos.Uwe())
         # Washing
-        menu2.separador()
-        xopcion(menu2, "tol_oneline", _("In one line"), Iconos.TOLline())
         menu_long.separador()
         xopcion(menu_long, "washing_machine", _("The Washing Machine"), Iconos.WashingMachine())
 
@@ -349,7 +353,7 @@ class Entrenamientos:
         # Cebras ---------------------------------------------------------------------------------------------------
         return menu, dicMenu
 
-    def comprueba(self):
+    def check(self):
         if self.menu is None:
             self.menu, self.dicMenu = self.creaMenu()
 
@@ -357,7 +361,7 @@ class Entrenamientos:
         self.menu, self.dicMenu = self.creaMenu()
 
     def lanza(self):
-        self.comprueba()
+        self.check()
 
         resp = self.menu.lanza()
         self.menu_run(resp)
@@ -391,6 +395,9 @@ class Entrenamientos:
 
                 elif resp == "anotar":
                     self.anotar()
+
+                elif resp == "train_book":
+                    self.train_book()
 
                 elif resp == "endings_gtb":
                     self.gaviota_endings()
@@ -599,6 +606,9 @@ class Entrenamientos:
     def anotar(self):
         self.procesador.show_anotar()
 
+    def train_book(self):
+        self.procesador.train_book()
+
     def gaviota_endings(self):
         self.procesador.gaviota_endings()
 
@@ -704,7 +714,8 @@ def selectOneFNS(owner, procesador):
     menu = QTVarios.LCMenu(owner)
     td = TrainingDir(Code.path_resource("Trainings"))
     td.addOtherFolder(procesador.configuration.personal_training_folder)
+    td.addOtherFolder(procesador.configuration.folder_tactics())
     td.reduce()
     td.menu(menu, xopcion)
     resp = menu.lanza()
-    return resp if resp is None else resp[3:]
+    return resp if resp is None else Util.relative_path(resp[3:])

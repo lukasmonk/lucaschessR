@@ -124,7 +124,7 @@ class ControlPGN:
             return self.manager.current_pgn()
 
         if game_type == GT_BOOK:
-            rival = self.manager.libro.name
+            rival = self.manager.book.name
         elif game_type in (GT_FICS, GT_FIDE):
             rival = self.manager.nombreObj
         elif self.manager.xrival:  # foncap change

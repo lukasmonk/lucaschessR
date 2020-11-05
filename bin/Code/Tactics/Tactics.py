@@ -152,7 +152,7 @@ M7=Mate in 7.fns
 
 [TACTIC1]
 MENU=Mate in 1
-# Fichero:Peso[:desde:hasta]
+# Fichero:Peso[:xfrom:xto]
 FILESW=M1:100
 
 [TACTIC2]

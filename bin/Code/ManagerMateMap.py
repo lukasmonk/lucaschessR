@@ -8,7 +8,7 @@ class ManagerMateMap(Manager.Manager):
     def inicio(self, workmap):
         self.workmap = workmap
 
-        self.ayudas = 0
+        self.hints = 0
 
         self.player_win = False
 
@@ -145,14 +145,14 @@ class ManagerMateMap(Manager.Manager):
         self.pensando(False)
         from_sq, to_sq, promotion = self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion
 
-        if self.mueve_rival(from_sq, to_sq, promotion):
+        if self.play_rival(from_sq, to_sq, promotion):
             self.is_rival_thinking = False
             self.siguiente_jugada()
         else:
             self.is_rival_thinking = False
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -173,9 +173,9 @@ class ManagerMateMap(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, from_sq, to_sq, promotion):
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+    def play_rival(self, from_sq, to_sq, promotion):
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
 

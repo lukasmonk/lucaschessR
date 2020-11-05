@@ -22,7 +22,7 @@ class EngineTournament(Engines.Engine):
 
         self.elo_current = None
 
-        self.book = "-"  # "*":por defecto "-":el propio del engine otro:path to libro polyglot
+        self.book = "-"  # "*":por defecto "-":el propio del engine otro:path to book polyglot
         self.bookRR = "ap"
 
         # listas de huellas

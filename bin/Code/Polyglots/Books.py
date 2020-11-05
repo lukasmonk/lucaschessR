@@ -9,7 +9,7 @@ from Code import Util
 import Code
 
 
-class ListaLibros:
+class ListBooks:
     def __init__(self):
         self.lista = []
         self.path = ""
@@ -83,9 +83,9 @@ class ListaLibros:
         icoL = "l"
 
         liResp = []
-        for libro in liLibros:
-            liResp.append((None, libro.name + masTitulo, icoL))
-            li = p.lista(libro.path, fen)
+        for book in liLibros:
+            liResp.append((None, book.name + masTitulo, icoL))
+            li = p.lista(book.path, fen)
             if li:
                 total = 0
                 for entry in li:
@@ -102,26 +102,26 @@ class ListaLibros:
 
         return liResp
 
-    def comprueba(self):
+    def check(self):
         for x in range(len(self.lista) - 1, -1, -1):
-            libro = self.lista[x]
-            if not libro.existe():
+            book = self.lista[x]
+            if not book.existe():
                 del self.lista[x]
         self.alMenosUno()
 
-    def nuevo(self, libro):
+    def nuevo(self, book):
         for libroA in self.lista:
-            if libroA.igualque(libro):
+            if libroA.igualque(book):
                 return
-        self.lista.append(libro)
+        self.lista.append(book)
 
-    def borra(self, libro):
+    def borra(self, book):
         for n, libroL in enumerate(self.lista):
-            if libroL == libro:
+            if libroL == book:
                 del self.lista[n]
 
     def compruebaOpening(self, game):
-        liLibros = [libro for libro in self.lista if libro.pordefecto]
+        liLibros = [book for book in self.lista if book.pordefecto]
         if (not liLibros) and self.lista:
             liLibros = [self.lista[0]]
 
@@ -129,11 +129,11 @@ class ListaLibros:
         icoL = "l"
 
         liResp = []
-        for nlibro, libro in enumerate(liLibros):
-            liResp.append((None, libro.name, icoL, None))
+        for nlibro, book in enumerate(liLibros):
+            liResp.append((None, book.name, icoL, None))
             for njug, move in enumerate(game.li_moves):
                 position = move.position_before
-                li = p.lista(libro.path, position.fen())
+                li = p.lista(book.path, position.fen())
                 if li:
                     total = 0
                     for entry in li:
@@ -210,7 +210,7 @@ class Libro:
     def polyglot(self):
         self.book = Polyglot()
 
-    def miraListaJugadas(self, fen):
+    def get_list_moves(self, fen):
         li = self.book.lista(self.path, fen)
         position = Position.Position()
         position.read_fen(fen)
@@ -1342,10 +1342,10 @@ class BookGame(Libro):
 
     def si_esta(self, fen, move):
         if self.activo:
-            listaJugadas = self.miraListaJugadas(fen)
+            listaJugadas = self.get_list_moves(fen)
             if listaJugadas:
-                for apdesde, aphasta, apcoronacion, nada, nada1 in listaJugadas:
-                    mx = apdesde + aphasta + apcoronacion
+                for apdesde, aphasta, appromotion, nada, nada1 in listaJugadas:
+                    mx = apdesde + aphasta + appromotion
                     if mx.strip().lower() == move:
                         return True
             else:

@@ -55,7 +55,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.li_histo = [self.pos_training]
 
-        self.ayudas = 99999
+        self.hints = 99999
 
         self.line_fns = FNSLine.FNSLine(self.li_trainings[self.pos_training - 1])
 
@@ -300,7 +300,7 @@ class ManagerEntPos(Manager.Manager):
             from_sq, to_sq, promotion = (self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion)
 
         self.is_rival_thinking = False
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.is_analyzed_by_tutor = False
         is_obj = self.is_playing_gameobj()
         if self.is_tutor_enabled:
@@ -342,7 +342,7 @@ class ManagerEntPos(Manager.Manager):
         return False
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 

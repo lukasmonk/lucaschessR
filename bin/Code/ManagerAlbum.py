@@ -30,7 +30,7 @@ class ManagerAlbum(Manager.Manager):
 
         self.is_tutor_enabled = False
         self.main_window.set_activate_tutor(False)
-        self.ayudas_iniciales = self.ayudas = 0
+        self.ayudas_iniciales = self.hints = 0
 
         self.xrival = Albums.ManagerMotorAlbum(self, self.cromo)
         self.main_window.pon_toolbar((TB_RESIGN, TB_ADJOURN, TB_CONFIG, TB_UTILITIES))
@@ -166,7 +166,7 @@ class ManagerAlbum(Manager.Manager):
             rm_rival = self.xrival.juega(fen)
 
             self.pensando(False)
-            if self.mueve_rival(rm_rival):
+            if self.play_rival(rm_rival):
                 self.siguiente_jugada()
 
         else:
@@ -174,7 +174,7 @@ class ManagerAlbum(Manager.Manager):
             self.activate_side(is_white)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -196,14 +196,14 @@ class ManagerAlbum(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, respMotor):
-        from_sq = respMotor.from_sq
-        to_sq = respMotor.to_sq
+    def play_rival(self, engine_response):
+        from_sq = engine_response.from_sq
+        to_sq = engine_response.to_sq
 
-        promotion = respMotor.promotion
+        promotion = engine_response.promotion
 
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
-        if siBien:
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+        if ok:
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
 

@@ -37,8 +37,8 @@ class WLines(QTVarios.WDialogo):
 
         self.procesador = procesador
         self.configuration = procesador.configuration
-        self.partidabase = self.dbop.getpartidabase()
-        self.num_jg_inicial = self.partidabase.num_moves()
+        self.gamebase = self.dbop.getgamebase()
+        self.num_jg_inicial = self.gamebase.num_moves()
         self.num_jg_actual = None
         self.game = None
 
@@ -63,7 +63,7 @@ class WLines(QTVarios.WDialogo):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("LINE", _("Line"), 35, edicion=Delegados.EtiquetaPOS(False, True))
-        inicio = self.partidabase.num_moves() // 2 + 1
+        inicio = self.gamebase.num_moves() // 2 + 1
         ancho_col = int(((self.configuration.x_pgn_width - 35 - 20) / 2) * 80 / 100)
         for x in range(inicio, 75):
             o_columns.nueva(str(x), str(x), ancho_col, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, True))
@@ -101,7 +101,7 @@ class WLines(QTVarios.WDialogo):
         self.colorNon = QTUtil.qtColor("#F1EFE9")
         self.colorLine = QTUtil.qtColor("#CDCCCB")
 
-        self.game = self.partidabase
+        self.game = self.gamebase
 
         self.pboard.MoverFinal()
 
@@ -425,10 +425,10 @@ class WLines(QTVarios.WDialogo):
             li_ext.append((config, key))
 
         liLevels = [separador]
-        listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.file_books)
-        listaLibros.comprueba()
-        libooks = [(bookx.name, bookx) for bookx in listaLibros.lista]
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(self.configuration.file_books)
+        list_books.check()
+        libooks = [(bookx.name, bookx) for bookx in list_books.lista]
         libooks.insert(0, ("--", None))
         li_books_sel = (
             ("", ""),
@@ -444,7 +444,7 @@ class WLines(QTVarios.WDialogo):
             liLevels.append(("%s. %s:" % (title, _("Time engines think in seconds")), tm))
 
             bk = books[level] if len(books) > level else ""
-            book = listaLibros.buscaLibro(bk) if bk else None
+            book = list_books.buscaLibro(bk) if bk else None
             config = FormLayout.Combobox(_("Book"), libooks)
             liLevels.append((config, book))
 
@@ -516,7 +516,7 @@ class WLines(QTVarios.WDialogo):
         QTUtil2.message_bold(self, _("The trainings have been updated"))
 
     def addPartida(self, game):
-        if game.pv().startswith(self.partidabase.pv()):
+        if game.pv().startswith(self.gamebase.pv()):
             siNueva, num_linea, siAppend = self.dbop.posPartida(game)
             if siNueva:
                 self.dbop.append(game)
@@ -525,13 +525,16 @@ class WLines(QTVarios.WDialogo):
                     self.dbop[num_linea] = game
             self.glines.refresh()
         else:
-            QTUtil2.message_error(self, _X("New line must begin with %1", self.partidabase.pgn_translated()))
+            QTUtil2.message_error(self, _X("New line must begin with %1", self.gamebase.pgn_translated()))
         self.show_lines()
 
-    def partidaActual(self):
+    def gameActual(self):
         game = Game.Game()
+        if len(self.dbop) == 0:
+            game.leeOtra(self.gamebase)
+            return game
         numcol = self.glines.posActualN()[1]
-        game.leeOtra(self.game if self.game and numcol > 0 else self.partidabase)
+        game.leeOtra(self.game if self.game and numcol > 0 else self.gamebase)
         if self.num_jg_actual is not None and self.num_jg_inicial <= self.num_jg_actual < len(game):
             game.li_moves = game.li_moves[: self.num_jg_actual + 1]
         return game
@@ -547,29 +550,29 @@ class WLines(QTVarios.WDialogo):
     def importar(self):
         menu = QTVarios.LCMenu(self)
 
-        def haz_menu(frommenu, part, all=True):
+        def haz_menu(frommenu, game_base, all=True):
             if all:
-                liOp = self.dbop.getOtras(self.configuration, part)
+                liOp = self.dbop.getOtras(self.configuration, game_base)
                 if liOp:
                     otra = frommenu.submenu(_("Other opening lines"), Iconos.OpeningLines())
                     for fichero, titulo in liOp:
-                        otra.opcion(("ol", (fichero, part)), titulo, Iconos.PuntoVerde())
+                        otra.opcion(("ol", (fichero, game_base)), titulo, Iconos.PuntoVerde())
                     frommenu.separador()
-            frommenu.opcion(("pgn", part), _("PGN with variations"), Iconos.Board())
+            frommenu.opcion(("pgn", game_base), _("PGN with variations"), Iconos.Board())
             frommenu.separador()
-            frommenu.opcion(("polyglot", part), _("Polyglot book"), Iconos.Libros())
+            frommenu.opcion(("polyglot", game_base), _("Polyglot book"), Iconos.Libros())
             frommenu.separador()
-            frommenu.opcion(("summary", part), _("Database summary"), Iconos.Database())
+            frommenu.opcion(("summary", game_base), _("Database summary"), Iconos.Database())
             if all:
                 frommenu.separador()
-                frommenu.opcion(("voyager2", part), _("Voyager 2"), Iconos.Voyager())
+                frommenu.opcion(("voyager2", game_base), _("Voyager 2"), Iconos.Voyager())
                 frommenu.separador()
-                frommenu.opcion(("opening", part), _("Opening"), Iconos.Opening())
+                frommenu.opcion(("opening", game_base), _("Opening"), Iconos.Opening())
 
-        game = self.partidaActual()
-        if len(game) > len(self.partidabase):
+        game = self.gameActual()
+        if len(game) > len(self.gamebase):
             sub2 = menu.submenu(_("From base position"), Iconos.MoverInicio())
-            haz_menu(sub2, self.partidabase)
+            haz_menu(sub2, self.gamebase)
             menu.separador()
             sub1 = menu.submenu(_("From current position"), Iconos.MoverLibre())
             haz_menu(sub1, game)
@@ -578,7 +581,7 @@ class WLines(QTVarios.WDialogo):
             sub1.opcion(("polyglot", None), _("Polyglot book"), Iconos.Libros())
             menu.separador()
         else:
-            haz_menu(menu, self.partidabase)
+            haz_menu(menu, self.gamebase)
 
         resp = menu.lanza()
         if resp is None:
@@ -670,24 +673,24 @@ class WLines(QTVarios.WDialogo):
                 self.glines.gotop()
 
     def importarPolyglot(self, game):
-        listaLibros = Books.ListaLibros()
-        listaLibros.restore_pickle(self.configuration.file_books)
-        listaLibros.comprueba()
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(self.configuration.file_books)
+        list_books.check()
 
         dicData = self.dbop.getconfig("IMPORT_POLYGLOT")
-        bookW = listaLibros.lista[0]
-        bookB = listaLibros.lista[0]
+        bookW = list_books.lista[0]
+        bookB = list_books.lista[0]
         if dicData:
-            book = listaLibros.buscaLibro(dicData["BOOKW"])
+            book = list_books.buscaLibro(dicData["BOOKW"])
             if book:
                 bookW = book
-            book = listaLibros.buscaLibro(dicData["BOOKB"])
+            book = list_books.buscaLibro(dicData["BOOKB"])
             if book:
                 bookB = book
 
         liGen = [FormLayout.separador]
 
-        li = [(bookx.name, bookx) for bookx in listaLibros.lista]
+        li = [(bookx.name, bookx) for bookx in list_books.lista]
         config = FormLayout.Combobox(_("Book that plays white side"), li)
         liGen.append((config, bookW))
         liGen.append(FormLayout.separador)
@@ -810,15 +813,15 @@ class WLines(QTVarios.WDialogo):
                 move = game.move(njug)
                 pgn = move.pgnFigurinesSP()
                 if linea:
-                    partida_ant = self.dbop[linea - 1]
-                    if partida_ant.pv_hasta(njug) == game.pv_hasta(njug):
+                    game_ant = self.dbop[linea - 1]
+                    if game_ant.pv_hasta(njug) == game.pv_hasta(njug):
                         agrisar = True
                 dic = self.dbop.getfenvalue(move.position.fenm2())
                 if dic:
                     if "COMENTARIO" in dic:
                         v = dic["COMENTARIO"]
                         if v:
-                            indicadorInicial = "V"
+                            indicadorInicial = "C"
                     if "VALORACION" in dic:
                         v = dic["VALORACION"]
                         if v:
@@ -870,10 +873,8 @@ class WLines(QTVarios.WDialogo):
             if row < self.grid_num_datos(None)-1:
                 self.glines.goto(row+1, col.posCreacion-1)
 
-
-
     def grid_doble_click(self, grid, row, o_column):
-        game = self.partidaActual()
+        game = self.gameActual()
         if game is not None:
             self.procesador.cambiaXAnalyzer()
             xanalyzer = self.procesador.xanalyzer
@@ -913,12 +914,12 @@ class WLines(QTVarios.WDialogo):
             if row % 2 == 1:
                 njug += 1
             if linea:
-                partida_ant = self.dbop[linea - 1]
-                if partida_ant.pv_hasta(njug - 1) == game.pv_hasta(njug - 1):
+                game_ant = self.dbop[linea - 1]
+                if game_ant.pv_hasta(njug - 1) == game.pv_hasta(njug - 1):
                     return self.borrar()
             if linea < len(self.dbop) - 1:
-                partida_sig = self.dbop[linea + 1]
-                if partida_sig.pv_hasta(njug - 1) == game.pv_hasta(njug - 1):
+                game_sig = self.dbop[linea + 1]
+                if game_sig.pv_hasta(njug - 1) == game.pv_hasta(njug - 1):
                     return self.borrar()
 
             if njug == self.num_jg_inicial:

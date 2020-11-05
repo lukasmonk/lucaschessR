@@ -38,7 +38,7 @@ class ManagerTurnOnLights(Manager.Manager):
         self.num_moves = 0
 
         self.total_time_used = 0.0
-        self.ayudas = 0
+        self.hints = 0
         self.errores = 0
         self.dicFENayudas = {}  # se muestra la arrow a partir de dos del mismo
 
@@ -67,7 +67,7 @@ class ManagerTurnOnLights(Manager.Manager):
             r1 += "<br><b>%s</b>" % self.lb_previous
         if self.num_line:
             av_secs, txt = self.block.calc_current(
-                self.num_line - 1, self.total_time_used, self.errores, self.ayudas, self.calculation_mode
+                self.num_line - 1, self.total_time_used, self.errores, self.hints, self.calculation_mode
             )
             r1 += '<br><b>%s: %s - %0.2f"' % (_("Current"), txt, av_secs)
         self.set_label1(r1)
@@ -135,7 +135,7 @@ class ManagerTurnOnLights(Manager.Manager):
             if self.ini_time:
                 self.total_time_used += time.time() - self.ini_time
         if self.total_time_used:
-            self.block.new_reinit(self.total_time_used, self.errores, self.ayudas)
+            self.block.new_reinit(self.total_time_used, self.errores, self.hints)
             self.total_time_used = 0.0
             TurnOnLights.write_tol(self.tol)
         self.inicio(self.num_theme, self.num_block, self.tol)
@@ -164,7 +164,7 @@ class ManagerTurnOnLights(Manager.Manager):
         if siRival:
             pv = self.line.get_move(self.num_move)
             from_sq, to_sq, promotion = pv[:2], pv[2:4], pv[4:]
-            self.mueve_rival(from_sq, to_sq, promotion)
+            self.play_rival(from_sq, to_sq, promotion)
             self.siguiente_jugada()
 
         else:
@@ -194,9 +194,9 @@ class ManagerTurnOnLights(Manager.Manager):
             ant_cat_global = self.tol.cat_global()
 
             num_moves = self.block.num_moves()
-            ta = self.total_time_used + self.errores * self.penaltyError + self.ayudas * self.penaltyHelp
+            ta = self.total_time_used + self.errores * self.penaltyError + self.hints * self.penaltyHelp
             tm = ta / num_moves
-            self.block.new_result(tm, self.total_time_used, self.errores, self.ayudas)
+            self.block.new_result(tm, self.total_time_used, self.errores, self.hints)
             TurnOnLights.write_tol(self.tol)
             cat_block, ico = TurnOnLights.qualification(tm, self.calculation_mode)
             cat_level, ico = self.tol.cat_num_level()
@@ -225,8 +225,8 @@ class ManagerTurnOnLights(Manager.Manager):
             )
             cAyudas = (
                 '<tr><td align=right> %s </td><td> %d (x%d"=%d")</td></tr>'
-                % (_("Hints"), self.ayudas, self.penaltyHelp, self.ayudas * self.penaltyHelp)
-                if self.ayudas
+                % (_("Hints"), self.hints, self.penaltyHelp, self.hints * self.penaltyHelp)
+                if self.hints
                 else ""
             )
             mens = (
@@ -272,7 +272,7 @@ class ManagerTurnOnLights(Manager.Manager):
         if self.ini_time is None:
             self.ini_time = self.base_time
         end_time = time.time()
-        move = self.checkmueve_humano(from_sq, to_sq, promotion)
+        move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
 
@@ -300,14 +300,14 @@ class ManagerTurnOnLights(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def mueve_rival(self, from_sq, to_sq, promotion):
-        siBien, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
+    def play_rival(self, from_sq, to_sq, promotion):
+        ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
         self.error = ""
 
     def ayuda(self):
-        self.ayudas += 1
+        self.hints += 1
         mov = self.line.get_move(self.num_move).lower()
         self.board.markPosition(mov[:2])
         fen = self.game.last_position.fen()

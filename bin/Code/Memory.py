@@ -8,7 +8,7 @@ class Memoria:
     def __init__(self, procesador):
 
         self.procesador = procesador
-        self.fichero = procesador.configuration.ficheroMemoria
+        self.fichero = procesador.configuration.file_memory
 
         self.dic_data = Util.restore_pickle(self.fichero)
         if self.dic_data is None:

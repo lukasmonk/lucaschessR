@@ -110,7 +110,7 @@ class ManagerSingularM(Manager.Manager):
         self.add_move(None)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        jgSel = self.checkmueve_humano(from_sq, to_sq, promotion)
+        jgSel = self.check_human_move(from_sq, to_sq, promotion)
         if not jgSel:
             return False
         self.add_move(jgSel)

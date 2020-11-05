@@ -469,7 +469,7 @@ class Guion:
         return self.winDirector is not None
 
     def saveBoard(self):
-        self.board_ultPosicion = self.board.last_position
+        self.board_last_position = self.board.last_position
         self.board_is_white_bottom = self.board.is_white_bottom
         if self.board.flechaSC and self.board.flechaSC.isVisible():
             a1h8 = self.board.flechaSC.bloqueDatos.a1h8
@@ -486,7 +486,7 @@ class Guion:
 
     def restoreBoard(self):
         self.board.dirvisual = None
-        self.board.set_position(self.board_ultPosicion, siBorraMoviblesAhora=False)
+        self.board.set_position(self.board_last_position, siBorraMoviblesAhora=False)
         if self.board_flechaSC:
             from_sq, to_sq = self.board_flechaSC
             self.board.put_arrow_sc(from_sq, to_sq)

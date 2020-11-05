@@ -82,11 +82,11 @@ class Tutor:
 
         self.cambiadoRM(0)
 
-        self.partidaUsuario = Game.Game(self.move.position)
-        self.partidaUsuario.add_move(self.move)
-        self.partidaUsuario.read_pv(self.rmUsuario.getPV())
+        self.gameUsuario = Game.Game(self.move.position)
+        self.gameUsuario.add_move(self.move)
+        self.gameUsuario.read_pv(self.rmUsuario.getPV())
         self.posUsuario = 0
-        self.maxUsuario = len(self.partidaUsuario.li_moves)
+        self.maxUsuario = len(self.gameUsuario.li_moves)
         self.boardUsuario.set_position(self.move.position)
         w.ponPuntuacionUsuario(self.rmUsuario.texto())
 
@@ -100,13 +100,13 @@ class Tutor:
                 pvBloque = ""
 
             if pvBloque:
-                self.partidaRival = Game.Game(self.last_position)
-                self.partidaRival.read_pv(pvBloque)
+                self.gameRival = Game.Game(self.last_position)
+                self.gameRival.read_pv(pvBloque)
                 self.posRival = 0
-                self.maxRival = len(self.partidaRival.li_moves) - 1
+                self.maxRival = len(self.gameRival.li_moves) - 1
                 if self.maxRival >= 0:
-                    self.boardRival.set_position(self.partidaRival.li_moves[0].position)
-                    self.mueve_rival(True)
+                    self.boardRival.set_position(self.gameRival.li_moves[0].position)
+                    self.play_rival(True)
                     w.ponPuntuacionRival(self.rm_rival.texto())
 
         self.moving_tutor(True)
@@ -114,8 +114,8 @@ class Tutor:
 
         if w.exec_():
             if w.siElegidaOpening:
-                from_sq = self.partidaOpenings.move(0).from_sq
-                to_sq = self.partidaOpenings.move(0).to_sq
+                from_sq = self.gameOpenings.move(0).from_sq
+                to_sq = self.gameOpenings.move(0).to_sq
                 if from_sq == self.from_sq and to_sq == self.to_sq:
                     return False
                 self.from_sq = from_sq
@@ -142,7 +142,7 @@ class Tutor:
 
             move.add_variation(game)
 
-            txt = self.partidaUsuario.pgnBaseRAW(numJugada)
+            txt = self.gameUsuario.pgnBaseRAW(numJugada)
             puntos = self.rmUsuario.texto()
             vusu = "%s : %s" % (puntos, txt)
             move.comment = vusu.replace("\n", "")
@@ -241,7 +241,7 @@ class Tutor:
         else:
             self.posUsuario = self.maxUsuario - 1
 
-        move = self.partidaUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
+        move = self.gameUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
         if is_base:
             self.boardUsuario.set_position(move.position_before)
         else:
@@ -269,7 +269,7 @@ class Tutor:
             self.boardTutor.set_position(move.position)
             self.boardTutor.put_arrow_sc(move.from_sq, move.to_sq)
 
-    def mueve_rival(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
+    def play_rival(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
         if nSaltar:
             pos = self.posRival + nSaltar
             if 0 <= pos < self.maxRival:
@@ -283,7 +283,7 @@ class Tutor:
         else:
             self.posRival = self.maxRival - 1
 
-        move = self.partidaRival.move(self.posRival if self.posRival > -1 else 0)
+        move = self.gameRival.move(self.posRival if self.posRival > -1 else 0)
         if is_base:
             self.boardRival.set_position(move.position_before)
         else:
@@ -304,7 +304,7 @@ class Tutor:
         else:
             self.posOpening = self.maxOpening - 1
 
-        move = self.partidaOpenings.move(self.posOpening if self.posOpening > -1 else 0)
+        move = self.gameOpenings.move(self.posOpening if self.posOpening > -1 else 0)
         if is_base:
             self.boardOpenings.set_position(move.position_before)
         else:
@@ -320,10 +320,10 @@ class Tutor:
         self.boardOpenings = boardOpenings
 
     def cambiarOpening(self, number):
-        self.partidaOpenings = Game.Game(self.last_position)
-        self.partidaOpenings.read_pv(self.liApPosibles[number].a1h8)
-        self.boardOpenings.set_position(self.partidaOpenings.move(0).position)
-        self.maxOpening = len(self.partidaOpenings)
+        self.gameOpenings = Game.Game(self.last_position)
+        self.gameOpenings.read_pv(self.liApPosibles[number].a1h8)
+        self.boardOpenings.set_position(self.gameOpenings.move(0).position)
+        self.maxOpening = len(self.gameOpenings)
         self.mueveOpening(siInicio=True)
 
     def opcionesOpenings(self):
@@ -335,7 +335,7 @@ class Tutor:
             move = self.game_tutor.move(self.pos_tutor)
             pts = rmTutor.texto()
         else:
-            move = self.partidaUsuario.move(self.posUsuario)
+            move = self.gameUsuario.move(self.posUsuario)
             pts = self.rmUsuario.texto()
 
         Analysis.AnalisisVariations(self.w, self.manager.xtutor, move, self.is_white, pts)
@@ -371,7 +371,7 @@ class Tutor:
         if number in [1, 8]:
             if siActivar:
                 # Que move esta en el board
-                move = self.partidaUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
+                move = self.gameUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
                 if self.posUsuario == -1:
                     fen = move.position_before.fen()
                 else:

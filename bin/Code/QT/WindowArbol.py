@@ -29,7 +29,7 @@ class UnMove:
 
         self.pv = pv
 
-        self.game = listaMovesPadre.partidaBase.copia()
+        self.game = listaMovesPadre.gameBase.copia()
         self.game.read_pv(self.pv)
 
         self.titulo = self.game.last_jg().pgn_translated()
@@ -136,12 +136,12 @@ class ListaMoves:
             self.nivel = 0
             cp = Position.Position()
             cp.read_fen(fen)
-            self.partidaBase = Game.Game(cp)
+            self.gameBase = Game.Game(cp)
         else:
             self.nivel = self.moveOwner.listaMovesPadre.nivel + 1
-            self.partidaBase = self.moveOwner.game.copia()
+            self.gameBase = self.moveOwner.game.copia()
 
-        self.fenm2 = self.partidaBase.last_position.fenm2()
+        self.fenm2 = self.gameBase.last_position.fenm2()
 
         dicCache = self.dbCache[self.fenm2]
 
@@ -934,7 +934,7 @@ class WindowArbol(QTVarios.WDialogo):
             self.nuevoAnalisis(lm)
 
     def nuevoAnalisis(self, lm):
-        fen = lm.partidaBase.last_position.fen()
+        fen = lm.gameBase.last_position.fen()
         alm = WindowAnalysisParam.paramAnalisis(self, Code.configuration, False, siTodosMotores=True)
         if alm is None:
             return

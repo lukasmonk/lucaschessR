@@ -71,14 +71,14 @@ class TOL_Block:
     def add_line(self, line):
         self.lines.append(line)
 
-    def new_result(self, seconds, true_time_used, errores, ayudas):
+    def new_result(self, seconds, true_time_used, errores, hints):
         today = datetime.datetime.now()
-        self.times.append((seconds, today, true_time_used, errores, ayudas))
+        self.times.append((seconds, today, true_time_used, errores, hints))
         self.times.sort(key=lambda x: x[0])
 
-    def new_reinit(self, seconds, errores, ayudas):
+    def new_reinit(self, seconds, errores, hints):
         today = datetime.datetime.now()
-        self.reinits.append((seconds, today, errores, ayudas))
+        self.reinits.append((seconds, today, errores, hints))
 
     def av_seconds(self):
         return self.times[0][0] if self.times else None
@@ -107,11 +107,11 @@ class TOL_Block:
         av_seconds = self.av_seconds()
         return qualification(av_seconds, think_mode)
 
-    def calc_current(self, current_line, current_secs, errores, ayudas, think_mode):
+    def calc_current(self, current_line, current_secs, errores, hints, think_mode):
         nmoves = 0
         for x in range(current_line + 1):
             nmoves += self.lines[x].num_moves
-        current_secs += errores * self.penaltyError(think_mode) + ayudas * self.penaltyHelp(think_mode)
+        current_secs += errores * self.penaltyError(think_mode) + hints * self.penaltyHelp(think_mode)
         av_secs = current_secs / nmoves
         return av_secs, qualification(av_secs, think_mode)[0]
 
@@ -129,7 +129,7 @@ class TOL_Line:
         li = line.strip().split("|")
         self.fen, self.label, pgn_moves = li[0], li[1], li[2]
 
-        p = Game.fen_partida(self.fen, pgn_moves)
+        p = Game.fen_game(self.fen, pgn_moves)
         self.pv = p.pv()
         self.limoves = self.pv.split(" ")
 
@@ -342,7 +342,11 @@ class TurnOnLightsOneLine(TurnOnLights):
 
     def recupera(self):
         filepath = os.path.join(Code.configuration.carpeta_results, "%s.tol" % self.name)
-        tolr = Util.restore_pickle(filepath)
+        try:
+            tolr = Util.restore_pickle(filepath)
+        except:
+            os.remove(filepath)
+            tolr = None
         if tolr is None:
             self.new()
         else:

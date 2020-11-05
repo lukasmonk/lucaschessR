@@ -64,10 +64,10 @@ class Grupos:
 
 
 class Categoria:
-    def __init__(self, key, c_icono, ayudas, sin_ayudas_final, valor_puntos):
+    def __init__(self, key, c_icono, hints, sin_ayudas_final, valor_puntos):
         self.key = key
         self.c_icono = c_icono
-        self.ayudas = ayudas
+        self.hints = hints
         self.sinAyudasFinal = sin_ayudas_final
         self.level_done = 0
         self.hecho = ""

@@ -135,15 +135,15 @@ class WTurnOnLights(QTVarios.WDialogo):
             lt += len(litimes)
             nm += block.num_moves()
             if litimes:
-                for segs, fecha, time_used, errores, ayudas in litimes:
+                for segs, fecha, time_used, errores, hints in litimes:
                     tt += time_used
                     te += errores
-                    ta += ayudas
+                    ta += hints
             if block.reinits:
-                for segs, fecha, errores, ayudas in block.reinits:
+                for segs, fecha, errores, hints in block.reinits:
                     tt += segs
                     te += errores
-                    ta += ayudas
+                    ta += hints
         menu = QTVarios.LCMenu(self)
         menu.ponTipoLetra(name="Courier New", puntos=10)
 
@@ -171,7 +171,7 @@ class WTurnOnLights(QTVarios.WDialogo):
         ta = 0
         mixed_results = False
         for dato in litimes:
-            segs, fecha, time_used, errores, ayudas = dato
+            segs, fecha, time_used, errores, hints = dato
             txt, ico = TurnOnLights.qualification(segs, self.tol.is_calculation_mode())
             menu.opcion(
                 None,
@@ -181,7 +181,7 @@ class WTurnOnLights(QTVarios.WDialogo):
             )
             tt += time_used
             te += errores
-            ta += ayudas
+            ta += hints
 
         if litimes:
             menu.separador()
@@ -191,11 +191,11 @@ class WTurnOnLights(QTVarios.WDialogo):
         if block.reinits:
             tr = 0.0
             for dato in block.reinits:
-                segs, fecha, errores, ayudas = dato
+                segs, fecha, errores, hints = dato
                 tr += segs
                 tt += segs
                 te += errores
-                ta += ayudas
+                ta += hints
             menu.separador()
             menu.opcion(None, plant % (_("Restarts"), tr, time.strftime("%H:%M:%S", time.gmtime(tr))))
         if not mixed_results:

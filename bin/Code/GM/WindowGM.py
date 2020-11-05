@@ -68,10 +68,10 @@ class WGM(QTVarios.WDialogo):
             gbPersonal = Controles.GB(self, _("Personal games"), hbox).ponFuente(flb)
 
         # Color
-        self.rbBlancas = Controles.RB(self, _("White"), rutina=self.check_color)
-        self.rbBlancas.activa(True)
-        self.rbNegras = Controles.RB(self, _("Black"), rutina=self.check_color)
-        self.rbNegras.activa(False)
+        self.rb_white = Controles.RB(self, _("White"), rutina=self.check_color)
+        self.rb_white.activa(True)
+        self.rb_black = Controles.RB(self, _("Black"), rutina=self.check_color)
+        self.rb_black.activa(False)
 
         # Contrario
         self.chContrario = Controles.CHB(
@@ -105,11 +105,11 @@ class WGM(QTVarios.WDialogo):
 
         # Libros
         fvar = self.configuration.file_books
-        self.listaLibros = Books.ListaLibros()
-        self.listaLibros.restore_pickle(fvar)
+        self.list_books = Books.ListBooks()
+        self.list_books.restore_pickle(fvar)
         # # Comprobamos que todos esten accesibles
-        self.listaLibros.comprueba()
-        li = [(x.name, x) for x in self.listaLibros.lista]
+        self.list_books.check()
+        li = [(x.name, x) for x in self.list_books.lista]
         li.insert(0, ("--", None))
         self.cbBooks, lbBooks = QTUtil2.comboBoxLB(self, li, None, _("Bypass moves in the book"))
 
@@ -131,7 +131,7 @@ class WGM(QTVarios.WDialogo):
 
         # gbBasic
         # # Color
-        hbox = Colocacion.H().relleno().control(self.rbBlancas).espacio(10).control(self.rbNegras).relleno()
+        hbox = Colocacion.H().relleno().control(self.rb_white).espacio(10).control(self.rb_black).relleno()
         gbColor = Controles.GB(self, _("Play with"), hbox).ponFuente(flb)
 
         # Tiempo
@@ -221,20 +221,20 @@ class WGM(QTVarios.WDialogo):
         self.dbHisto.close()
 
     def compruebaGM_P(self, liGMP, tgm):
-        tsiw = self.rbBlancas.isChecked()
+        tsiw = self.rb_white.isChecked()
 
         for nom, gm, siw, sib in liGMP:
             if gm == tgm:
-                self.rbBlancas.setEnabled(siw)
-                self.rbNegras.setEnabled(sib)
+                self.rb_white.setEnabled(siw)
+                self.rb_black.setEnabled(sib)
                 if tsiw:
                     if not siw:
-                        self.rbBlancas.activa(False)
-                        self.rbNegras.activa(True)
+                        self.rb_white.activa(False)
+                        self.rb_black.activa(True)
                 else:
                     if not sib:
-                        self.rbBlancas.activa(True)
-                        self.rbNegras.activa(False)
+                        self.rb_white.activa(True)
+                        self.rb_black.activa(False)
                 break
         self.compruebaHisto()
 
@@ -319,18 +319,18 @@ class WGM(QTVarios.WDialogo):
 
     def check_color(self):
         tgm = self.cbGM.valor()
-        tsiw = self.rbBlancas.isChecked()
+        tsiw = self.rb_white.isChecked()
 
         for nom, gm, siw, sib in self.liGM:
             if gm == tgm:
                 if tsiw:
                     if not siw:
-                        self.rbBlancas.activa(False)
-                        self.rbNegras.activa(True)
+                        self.rb_white.activa(False)
+                        self.rb_black.activa(True)
                 else:
                     if not sib:
-                        self.rbBlancas.activa(True)
-                        self.rbNegras.activa(False)
+                        self.rb_white.activa(True)
+                        self.rb_black.activa(False)
 
     def aceptar(self):
         if self.grabaDic():
@@ -344,8 +344,8 @@ class WGM(QTVarios.WDialogo):
 
         w = SelectGame(self, self.ogm)
         if w.exec_():
-            if w.partidaElegida is not None:
-                self.record.partidaElegida = w.partidaElegida
+            if w.gameElegida is not None:
+                self.record.gameElegida = w.gameElegida
 
                 self.accept()
 
@@ -387,8 +387,8 @@ class WGM(QTVarios.WDialogo):
                 return False
         else:
             rk.modo = "estandar"
-        rk.partidaElegida = None
-        rk.is_white = self.rbBlancas.isChecked()
+        rk.gameElegida = None
+        rk.is_white = self.rb_white.isChecked()
         rk.siJuez = self.gbJ.isChecked()
         rk.showevals = self.chbEvals.valor()
         rk.engine = self.cbJmotor.valor()
@@ -396,7 +396,7 @@ class WGM(QTVarios.WDialogo):
         rk.mostrar = self.cbJshow.valor()
         rk.depth = self.cbJdepth.valor()
         rk.multiPV = self.cbJmultiPV.valor()
-        rk.jugContrario = self.chContrario.isChecked()
+        rk.rival_name = self.chContrario.isChecked()
         rk.jugInicial = self.edJugInicial.valor()
         if rk.siJuez and rk.vtime <= 0 and rk.depth == 0:
             rk.siJuez = False
@@ -439,7 +439,7 @@ class WGM(QTVarios.WDialogo):
             depth = dic.get("DEPTH", 0)
             multiPV = dic.get("MULTIPV", "PD")
             mostrar = dic["MOSTRAR"]
-            jugContrario = dic.get("JUGCONTRARIO", False)
+            rival_name = dic.get("JUGCONTRARIO", False)
             jugInicial = dic.get("JUGINICIAL", 1)
             self.liOpeningsFavoritas = dic.get("APERTURASFAVORITAS", [])
             self.opening_block = dic.get("APERTURA", None)
@@ -459,8 +459,8 @@ class WGM(QTVarios.WDialogo):
                 self.btOpeningsFavoritas.show()
             bypassBook = dic.get("BYPASSBOOK", None)
 
-            self.rbBlancas.setChecked(is_white)
-            self.rbNegras.setChecked(not is_white)
+            self.rb_white.setChecked(is_white)
+            self.rb_black.setChecked(not is_white)
 
             self.gbJ.setChecked(siJuez)
             self.cbJmotor.ponValor(engine)
@@ -471,7 +471,7 @@ class WGM(QTVarios.WDialogo):
             self.cambiadoDepth(depth)
             self.cbJmultiPV.ponValor(multiPV)
 
-            self.chContrario.setChecked(jugContrario)
+            self.chContrario.setChecked(rival_name)
 
             self.edJugInicial.ponValor(jugInicial)
 
@@ -486,7 +486,7 @@ class WGM(QTVarios.WDialogo):
                     cb.ponValor(gm)
                     break
             if bypassBook:
-                for book in self.listaLibros.lista:
+                for book in self.list_books.lista:
                     if book.path == bypassBook.path:
                         self.cbBooks.ponValor(book)
                         break
@@ -772,7 +772,7 @@ class SelectGame(QTVarios.WDialogo):
         self.setLayout(layout)
 
         self.restore_video(anchoDefecto=400)
-        self.partidaElegida = None
+        self.gameElegida = None
 
     def grid_num_datos(self, grid):
         return len(self.liRegs)
@@ -800,7 +800,7 @@ class SelectGame(QTVarios.WDialogo):
         self.grid.gotop()
 
     def aceptar(self):
-        self.partidaElegida = self.liRegs[self.grid.recno()]["NUMBER"]
+        self.gameElegida = self.liRegs[self.grid.recno()]["NUMBER"]
         self.save_video()
         self.accept()
 
