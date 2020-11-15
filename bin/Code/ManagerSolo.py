@@ -526,7 +526,7 @@ class ManagerSolo(Manager.Manager):
                 self.opening_block = None
                 dic = self.creaDic()
                 dic["GAME"] = game.save()
-                dic["WHITEBOTTOM"] = game.last_position.is_white
+                dic["WHITEBOTTOM"] = game.first_position.is_white
                 self.reiniciar(dic)
 
         elif resp == "engine":

@@ -225,7 +225,7 @@ class PolyglotImports:
                 yield entry_ext
             pos_externas += 1
 
-        yield None
+        yield None, None
 
     def fuente_bin(self, path_bin):
         pol_bin = FasterCode.Polyglot(path_bin)

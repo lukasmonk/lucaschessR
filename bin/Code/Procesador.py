@@ -908,7 +908,7 @@ class Procesador:
         path = self.configuration.ficheroTemporal("lcdb")
         texto = QTUtil.traePortapapeles()
         if texto:
-            with open(path, "wb") as q:
+            with open(path, "wt") as q:
                 q.write(texto)
             self.read_pgn(path)
 

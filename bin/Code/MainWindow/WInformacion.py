@@ -55,17 +55,22 @@ class WVariations(QtWidgets.QWidget):
         self.selected_link = selected_link
         is_num_variation = True
         var_move = self.move
+        num_var_move = 0
         variation = None
         for num in li_variation_move[1:]:
             if is_num_variation:
                 variation = var_move.variations.get(num)
             else:
                 var_move = variation.move(num)
+                num_var_move = num
             is_num_variation = not is_num_variation
         board = self.get_board()
         board.set_base_position(var_move.position, variation_history=selected_link)
         board.put_arrow_sc(var_move.from_sq, var_move.to_sq)
         self.mostrar()
+
+        manager = self.owner.w_parent.manager
+        manager.kibitzers_manager.put_game(variation.copia(num_var_move))
 
     def link_variation_edit(self, num_variation):
         self.edit(num_variation)

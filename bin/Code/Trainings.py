@@ -178,8 +178,13 @@ class Entrenamientos:
         menu_basic.separador()
         xopcion(menu_basic, "anotar", _("Writing down moves of a game"), Iconos.Write())
 
-        menu_basic.separador()
-        xopcion(menu_basic, "train_book", _("Training with a book"), Iconos.Libros())
+    def create_menu_openings(self, menu, xopcion):
+        menu.separador()
+        menu_openings = menu.submenu(_("Openings"), Iconos.Openings())
+        menu_openings.separador()
+        xopcion(menu_openings, "train_book", _("Training with a book"), Iconos.Libros())
+
+
 
     def create_menu_games(self, menu, xopcion):
         menu.separador()
@@ -340,10 +345,11 @@ class Entrenamientos:
                 menu.opcion(key, texto, icono, is_disabled)
             dicMenu[key] = (self.menu_run, texto, icono, is_disabled)
 
-        self.create_menu_games(menu, xopcion)
-        self.create_menu_tactics(menu, xopcion)
-        self.create_menu_endings(menu, xopcion)
         self.create_menu_basic(menu, xopcion)
+        self.create_menu_tactics(menu, xopcion)
+        self.create_menu_games(menu, xopcion)
+        self.create_menu_openings(menu, xopcion)
+        self.create_menu_endings(menu, xopcion)
         self.create_menu_long(menu, xopcion)
 
 

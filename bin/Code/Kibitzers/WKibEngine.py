@@ -33,12 +33,13 @@ class WKibEngine(QtWidgets.QDialog):
 
         self.siCandidates = cpu.tipo == Kibitzers.KIB_CANDIDATES
 
+        self.type = cpu.tipo
+
         dicVideo = self.cpu.dic_video
         if not dicVideo:
             dicVideo = {}
 
         self.siTop = dicVideo.get("SITOP", True)
-        self.show_board = dicVideo.get("SHOW_BOARD", True)
         self.show_board = dicVideo.get("SHOW_BOARD", True)
         self.nArrows = dicVideo.get("NARROWS", 2)
 

@@ -1947,6 +1947,7 @@ class Manager:
                 self.main_window.pgnColocate(row, is_white)
                 self.put_view()
                 link_variation_pressed("%d|%d|0" % (num_var_move, len(var_move.variations)-1))
+                self.kibitzers_manager.put_game(game_var)
         else:
             # si tiene mas movimientos se check si coincide con el siguiente
             if len(variation) > num_var_move+1:
@@ -1966,6 +1967,7 @@ class Manager:
                 game_var.add_move(new_move)
                 var_move.add_variation(game_var)
                 link_variation_pressed("%s|%d|%d|%d" % (cvariation_move, (num_var_move + 1), len(var_move.variations)-1, 0))
+                self.kibitzers_manager.put_game(game_var)
 
             # si no tiene mas movimientos se añade al final
             else:
@@ -1977,4 +1979,4 @@ class Manager:
                 variation.add_move(new_move)
                 cvariation_move = "|".join([cnum for cnum in self.board.variation_history.split("|")][:-1])
                 link_variation_pressed("%s|%d" % (cvariation_move, (num_var_move + 1)))
-
+                self.kibitzers_manager.put_game(variation)

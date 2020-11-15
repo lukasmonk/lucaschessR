@@ -60,12 +60,11 @@ class WKibIndex(QtWidgets.QDialog):
         o_columns.nueva("titulo", "", 100, siDerecha=True)
         o_columns.nueva("valor", "", 100, centered=True)
         o_columns.nueva("info", "", 100)
-        self.grid = Grid.Grid(self, o_columns, dicVideo=dicVideo, siSelecFilas=True, siCabeceraVisible=True)
+        self.grid = Grid.Grid(self, o_columns, dicVideo=dicVideo, siSelecFilas=True, siCabeceraVisible=False)
 
         li_acciones = (
-            (_("Quit"), Iconos.Kibitzer_Terminar(), self.terminar),
-            (_("Continue"), Iconos.Kibitzer_Continuar(), self.play),
-            (_("Pause"), Iconos.Kibitzer_Pausa(), self.pause),
+            (_("Continue"), Iconos.Kibitzer_Play(), self.play),
+            (_("Pause"), Iconos.Kibitzer_Pause(), self.pause),
             (_("Takeback"), Iconos.Atras(), self.takeback),
             (_("Analyze only color"), Iconos.Kibitzer_Side(), self.color),
             (_("Show/hide board"), Iconos.Kibitzer_Board(), self.config_board),
@@ -112,8 +111,7 @@ class WKibIndex(QtWidgets.QDialog):
                 if rm and rm.depth > self.depth:
                     if mrm.li_rm:
 
-                        cp = Position.Position()
-                        cp.read_fen(self.fen)
+                        cp = self.game.last_position
 
                         self.liData = []
 
@@ -180,15 +178,15 @@ class WKibIndex(QtWidgets.QDialog):
 
     def pause(self):
         self.siPlay = False
-        self.tb.setPosVisible(1, True)
-        self.tb.setPosVisible(2, False)
+        self.tb.setPosVisible(0, True)
+        self.tb.setPosVisible(1, False)
         self.stop()
 
     def play(self):
         self.siPlay = True
-        self.tb.setPosVisible(1, False)
-        self.tb.setPosVisible(2, True)
-        self.put_game(self.fen)
+        self.tb.setPosVisible(0, False)
+        self.tb.setPosVisible(1, True)
+        self.put_game(self.game)
 
     def stop(self):
         self.siPlay = False
@@ -223,7 +221,7 @@ class WKibIndex(QtWidgets.QDialog):
         self.finalizar()
 
     def if_to_analyze(self):
-        siW = " w " in self.fen
+        siW = self.game.last_position.is_white
         if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
             return False
         return True
@@ -242,7 +240,7 @@ class WKibIndex(QtWidgets.QDialog):
             elif resp == "negras":
                 self.is_white = False
             if self.if_to_analyze():
-                self.put_game(self.fen)
+                self.put_game(self.game)
 
     def finalizar(self):
         self.save_video()
@@ -300,6 +298,7 @@ class WKibIndex(QtWidgets.QDialog):
             self.resize(w, h)
 
     def orden_game(self, game):
+        self.game = game
         position = game.last_position
         self.siW = position.is_white
         self.board.set_position(position)
@@ -317,22 +316,23 @@ class WKibIndex(QtWidgets.QDialog):
         self.board.setVisible(self.show_board)
         self.save_video()
 
-    def set_position(self):
-        cp = Position.Position()
-        cp.read_fen(self.fen)
-        resp = Voyager.voyager_position(self, cp)
-        if resp is not None:
-            self.put_game(resp.fen())
-
-    def mensajero(self, from_sq, to_sq, promocion=""):
-        FasterCode.set_fen(self.fen)
-        if FasterCode.make_move(from_sq + to_sq + promocion):
-            self.fen = FasterCode.get_fen()
-            self.pon_fen_hist(self.fen)
-
     def takeback(self):
         nmoves = len(self.game)
         if nmoves:
             self.game.shrink(nmoves-2)
             self.orden_game(self.game)
 
+    def mensajero(self, from_sq, to_sq, promocion=""):
+        FasterCode.set_fen(self.game.last_position.fen())
+        if FasterCode.make_move(from_sq + to_sq + promocion):
+            self.game.read_pv(from_sq + to_sq + promocion)
+            self.reset()
+
+    def set_position(self):
+        resp = Voyager.voyager_position(self, self.game.last_position)
+        if resp is not None:
+            game = Game.Game(ini_posicion=resp)
+            self.orden_game(game)
+
+    def reset(self):
+        self.orden_game(self.game)

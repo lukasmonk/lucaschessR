@@ -93,7 +93,13 @@ class CPU:
         elif key == KIBRUN_GAME:
             game = Game.Game()
             game.restore(orden.dv["GAME"])
-            self.ventana.orden_game(game)
+            if self.tipo == KIB_THREATS:
+                last_position = game.last_position
+                last_position.is_white = not last_position.is_white
+                game_thread = Game.Game(ini_posicion=last_position)
+                self.ventana.orden_game(game_thread)
+            else:
+                self.ventana.orden_game(game)
 
         elif key == KIBRUN_STOP:
             self.ventana.stop()
@@ -118,6 +124,9 @@ class CPU:
             self.ventana = WKibEngine.WKibEngine(self)
 
         elif self.tipo == KIB_CANDIDATES:
+            self.ventana = WKibEngine.WKibEngine(self)
+
+        elif self.tipo == KIB_THREATS:
             self.ventana = WKibEngine.WKibEngine(self)
 
         elif self.tipo == KIB_BESTMOVE_ONELINE:
