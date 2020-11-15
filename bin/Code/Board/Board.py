@@ -146,7 +146,7 @@ class Board(QtWidgets.QGraphicsView):
             # ALT-I Save image to clipboard (CTRL->no border)
             elif key == Qt.Key_I:
                 self.salvaEnImagen(siCtrl=siCtrl, is_alt=is_alt)
-                QTUtil2.message_bold(self, _("Board image is in clipboard"))
+                QTUtil2.mensajeTemporal(self.main_window, _("Board image is in clipboard"), 1.2)
 
             # ALT-J Save image to file (CTRL->no border)
             elif key == Qt.Key_J:

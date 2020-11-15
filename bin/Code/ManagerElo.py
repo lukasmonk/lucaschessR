@@ -521,7 +521,7 @@ class ManagerElo(Manager.Manager):
         self.historial(elo, nelo)
         self.configuration.graba()
 
-        mensaje += "<br><br>%s : %d<br>" % (_("New Lucas-Elo"), self.configuration.eloActivo())
+        mensaje += "\n\n%s : %d\n" % (_("New Lucas-Elo"), self.configuration.eloActivo())
 
         self.mensaje(mensaje)
         self.ponFinJuego()

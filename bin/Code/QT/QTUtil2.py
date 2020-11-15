@@ -173,16 +173,18 @@ class MensEspera(QtWidgets.QWidget):
 
         v = self.owner
         s = self.size()
-        if self.physical_pos == "c":
-            x = v.x() + (v.width() - self.width()) // 2
-            y = v.y() + (v.height() - self.height()) // 2
-        elif self.physical_pos == "ad":
+        if self.physical_pos == "ad":
             x = v.x() + v.width() - s.width()
             y = v.y() + 4
         elif self.physical_pos == "tb":
             x = v.x() + 4
             y = v.y() + 4
-        self.move(x, y)
+        else:
+            x = v.x() + (v.width() - self.width()) // 2
+            y = v.y() + (v.height() - self.height()) // 2
+
+        p = self.parent().mapToGlobal(QtCore.QPoint(x,y))
+        self.move(p)
         QTUtil.refresh_gui()
         return self
 
