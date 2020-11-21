@@ -907,7 +907,7 @@ def pgn_game(pgn):
                         si_fen = True
                 elif lbup == "RESULT":
                     game.result = vl
-                    game.add_tag(lb, vl)
+                    game.add_tag("Result", vl)
                 else:
                     game.add_tag(lb, vl)
 

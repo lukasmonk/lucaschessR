@@ -530,6 +530,9 @@ class WTournament(QTVarios.WDialogo):
             self.liEnActual.append((opcion.name, str(opcion.valor)))
 
     def gm_launch(self):
+        if self.torneo.num_games_queued() == 0:
+            QTUtil2.message(self, _("You must create some games (Queued Games tab/ New)"))
+            return
         self.grabar()
         worker_plant = os.path.join(self.configuration.folder_tournaments_workers(), "worker.%05d")
         pos = 1

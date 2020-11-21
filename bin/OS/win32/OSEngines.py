@@ -170,7 +170,7 @@ def read_engines(folder_engines):
     is64 = platform.machine().endswith("64")
     t32_64 = "64" if is64 else "32"
 
-    cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"11.01 {t32_64}bit", "http://komodochess.com/", f"komodo-11.01-{t32_64}bit.exe", 3300)
+    cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"12.1.1 {t32_64}bit", "http://komodochess.com/", f"komodo-12.1.1-{t32_64}bit.exe", 3300)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 218)
