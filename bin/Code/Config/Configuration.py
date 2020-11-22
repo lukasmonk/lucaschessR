@@ -603,6 +603,7 @@ class Configuration:
         for x in dir(self):
             if x.startswith("x_"):
                 dic[x] = getattr(self, x)
+        dic["PERFOMANCE"] = self.perfomance.save()
         Util.save_pickle(self.fichero, dic)
 
     def lee(self):
@@ -612,6 +613,10 @@ class Configuration:
                 if x.startswith("x_"):
                     if x in dic:
                         setattr(self, x, dic[x])
+            xperf = dic.get("PERFOMANCE")
+            if xperf:
+                self.perfomance.restore(xperf)
+
 
         for x in os.listdir("../.."):
             if x.endswith(".pon"):

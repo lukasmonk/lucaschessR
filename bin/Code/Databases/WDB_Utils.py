@@ -276,13 +276,10 @@ class EM_SQL(Controles.EM):
 
 class WFiltrarRaw(QTVarios.WDialogo):
     def __init__(self, w_parent, o_columns, where):
-        QtWidgets.QDialog.__init__(self, w_parent)
-
         QTVarios.WDialogo.__init__(self, w_parent, _("Filter"), Iconos.Filtrar(), "rawfilter")
 
         self.where = ""
-        li_fields = [(x.head, x.key) for x in o_columns.li_columns if x.key != "number"]
-
+        li_fields = [(x.head, x.key) for x in o_columns.li_columns if x.key != "__num__"]
         f = Controles.TipoLetra(puntos=12)  # 0, peso=75 )
 
         lbRaw = Controles.LB(self, "%s:" % _("Raw SQL")).ponFuente(f)

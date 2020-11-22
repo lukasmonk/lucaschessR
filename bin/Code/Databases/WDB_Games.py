@@ -27,6 +27,8 @@ from Code.QT import Delegados
 from Code.QT import WindowPlayGame
 from Code.QT import FormLayout
 
+import Code.Openings.WindowOpenings as WindowOpenings
+
 
 class WGames(QtWidgets.QWidget):
     def __init__(self, procesador, wb_database, dbGames, wsummary, si_select):
@@ -451,7 +453,6 @@ class WGames(QtWidgets.QWidget):
 
         def opening():
             me = QTUtil2.unMomento(self)
-            import Code.Openings.WindowOpenings as WindowOpenings
 
             w = WindowOpenings.WOpenings(self, self.configuration, self.last_opening)
             me.final()
@@ -459,6 +460,7 @@ class WGames(QtWidgets.QWidget):
                 self.last_opening = ap = w.resultado()
                 pv = getattr(ap, "a1h8", "")
                 self.dbGames.filterPV(pv)
+                self.where = self.dbGames.filter
                 self.numJugada = pv.count(" ")
                 refresh()
 

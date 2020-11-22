@@ -60,8 +60,8 @@ class Game:
 
     def set_unknown(self):
         self.set_termination(TERMINATION_UNKNOWN, RESULT_UNKNOWN)
-        if self.get_tag("RESULT"):
-            self.add_tag("RESULT", RESULT_UNKNOWN)
+        if self.get_tag("Result"):
+            self.add_tag("Result", RESULT_UNKNOWN)
 
     @property
     def last_position(self):
