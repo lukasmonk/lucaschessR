@@ -35,7 +35,7 @@ class ManagerEntPos(Manager.Manager):
         db[self.entreno] = data
         db.close()
 
-    def inicio(
+    def start(
         self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False
     ):
         if hasattr(self, "reiniciando"):
@@ -133,7 +133,7 @@ class ManagerEntPos(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_TAKEBACK:
             self.atras()
@@ -178,7 +178,7 @@ class ManagerEntPos(Manager.Manager):
     def reiniciar(self):
         if self.is_rival_thinking:
             return
-        self.inicio(
+        self.start(
             self.pos_training,
             self.num_trainings,
             self.title_training,
@@ -195,7 +195,7 @@ class ManagerEntPos(Manager.Manager):
             pos = 1
         elif pos == 0:
             pos = self.num_trainings
-        self.inicio(
+        self.start(
             pos,
             self.num_trainings,
             self.title_training,
@@ -221,11 +221,11 @@ class ManagerEntPos(Manager.Manager):
             ("T", _("Save position in 'Selected positions' file")),
         ]
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
 
     def final_x(self):
-        self.finPartida()
+        self.end_game()
         return False
 
     def atras(self):
@@ -443,7 +443,7 @@ class ManagerEntPos(Manager.Manager):
         with open(self.entreno, "rt", errors="ignore") as f:
             liBase = [linea.strip() for linea in f if linea.strip()]
 
-        # Se crea el fichero con los puzzles
+        # Se crea el file con los puzzles
         nregs = len(liBase)
         tmpBP = QTUtil2.BarraProgreso(self.main_window, name_tactic, _("Working..."), nregs)
         tmpBP.mostrar()
@@ -486,7 +486,7 @@ class ManagerEntPos(Manager.Manager):
 
         tmpBP.cerrar()
 
-        # Se crea el fichero de control
+        # Se crea el file de control
         dicIni = {}
         dicIni[nom_tactic] = d = {}
         d["MENU"] = name_tactic

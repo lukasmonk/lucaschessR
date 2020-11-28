@@ -13,8 +13,8 @@ from Code import Util
 
 
 class WNewExpedition(QTVarios.WDialogo):
-    def __init__(self, owner, fichero):
-        self.litourneys = Everest.str_file(fichero)
+    def __init__(self, owner, file):
+        self.litourneys = Everest.str_file(file)
         self.configuration = owner.configuration
         titulo = _("New expedition")
         icono = Iconos.Trekking()
@@ -308,8 +308,8 @@ class WEverest(QTVarios.WDialogo):
         resp = menu.lanza()
         if not resp:
             return
-        fichero = Code.path_resource("IntFiles", "Everest", "%s.str" % resp)
-        w = WNewExpedition(self, fichero)
+        file = Code.path_resource("IntFiles", "Everest", "%s.str" % resp)
+        w = WNewExpedition(self, file)
         if w.exec_():
             reg = w.selected
             self.db.new(reg)

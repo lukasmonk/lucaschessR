@@ -807,7 +807,7 @@ class WTournament(QTVarios.WDialogo):
         if li:
             pos = li[0]
             game = self.torneo.game_finished(pos).game()
-            game = Code.procesador.managerPartida(self, game, True, False, None)
+            game = Code.procesador.manager_game(self, game, True, False, None)
             if game is not None:
                 self.torneo.save_game_finished(pos, game)
                 self.gridGamesFinished.refresh()

@@ -19,7 +19,7 @@ class ManagerGM(Manager.Manager):
     def __init__(self, procesador):
         super().__init__(procesador)
 
-    def inicio(self, record):
+    def start(self, record):
         self.base_inicio(record)
         self.siguiente_jugada()
 
@@ -59,7 +59,7 @@ class ManagerGM(Manager.Manager):
             tutor = self.configuration.buscaRival(self.engine)
             t_t = self.vtime * 100
             self.xtutor = self.procesador.creaManagerMotor(tutor, t_t, self.depth)
-            self.xtutor.actMultiPV(self.multiPV)
+            self.xtutor.setMultiPV(self.multiPV)
             self.analysis = None
 
         self.book = Opening.OpeningPol(999)
@@ -108,7 +108,7 @@ class ManagerGM(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_REINIT:
             self.reiniciar()
@@ -131,15 +131,15 @@ class ManagerGM(Manager.Manager):
     def final_x(self):
         if self.state == ST_ENDGAME:
             return True
-        return self.finPartida()
+        return self.end_game()
 
-    def finPartida(self):
+    def end_game(self):
         self.analizaTerminar()
         siJugadas = len(self.game) > 0
         if siJugadas and self.state != ST_ENDGAME:
             self.game.set_unknown()
             self.ponFinJuego()
-        self.procesador.inicio()
+        self.procesador.start()
 
         return False
 
@@ -147,7 +147,7 @@ class ManagerGM(Manager.Manager):
         if QTUtil2.pregunta(self.main_window, _("Restart the game?")):
             self.analizaTerminar()
             self.game.set_position()
-            self.inicio(self.record)
+            self.start(self.record)
 
     def analizaInicio(self):
         if not self.is_finished():
@@ -169,7 +169,7 @@ class ManagerGM(Manager.Manager):
             self.xtutor.ac_final(-1)
 
     def siguiente_jugada(self):
-        self.analizaTerminar()
+        self.analizaFinal()
         self.disable_all()
 
         if self.state == ST_ENDGAME:
@@ -315,6 +315,9 @@ class ManagerGM(Manager.Manager):
             um = QTUtil2.analizando(self.main_window)
             mrm = self.analizaMinimo(self.vtime * 100)
 
+            import time
+            t = time.time()
+
             rmUsu, nada = mrm.buscaRM(jgUsu.movimiento())
             if rmUsu is None:
                 um = QTUtil2.analizando(self.main_window)
@@ -323,6 +326,7 @@ class ManagerGM(Manager.Manager):
                 mrm.agregaRM(rmUsu)
                 self.analizaInicio()
                 um.final()
+
 
             rmGM, pos_gm = mrm.buscaRM(jgGM.movimiento())
             if rmGM is None:

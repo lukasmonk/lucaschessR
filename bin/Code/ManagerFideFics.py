@@ -91,7 +91,7 @@ class ManagerFideFics(Manager.Manager):
         dbf.cerrar()
         db.cerrar()
 
-    def inicio(self, id_game):
+    def start(self, id_game):
         self.base_inicio(id_game)
         self.siguiente_jugada()
 
@@ -214,7 +214,7 @@ class ManagerFideFics(Manager.Manager):
             self.muestra_resultado()
         else:
             self.analizaTerminar()
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 

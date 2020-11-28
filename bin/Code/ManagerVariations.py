@@ -5,7 +5,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerVariations(Manager.Manager):
-    def inicio(self, game, is_white_bottom, with_engine_active, is_competitive):
+    def start(self, game, is_white_bottom, with_engine_active, is_competitive):
 
         self.pensando(True)
 
@@ -164,7 +164,7 @@ class ManagerVariations(Manager.Manager):
         self.refresh()
 
     def reiniciar(self):
-        self.inicio(self.fen, self.lineaPGN, self.okMasOpciones, self.is_human_side_white)
+        self.start(self.fen, self.lineaPGN, self.okMasOpciones, self.is_human_side_white)
 
     def configurar(self):
 

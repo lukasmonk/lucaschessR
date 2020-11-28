@@ -5,7 +5,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerMateMap(Manager.Manager):
-    def inicio(self, workmap):
+    def start(self, workmap):
         self.workmap = workmap
 
         self.hints = 0
@@ -81,7 +81,7 @@ class ManagerMateMap(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
             self.procesador.trainingMap(self.workmap.mapa)
 
         elif key == TB_REINIT:
@@ -99,13 +99,13 @@ class ManagerMateMap(Manager.Manager):
     def reiniciar(self):
         if self.is_rival_thinking:
             return
-        self.inicio(self.workmap)
+        self.start(self.workmap)
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
 
     def final_x(self):
-        self.finPartida()
+        self.end_game()
         return False
 
     def siguiente_jugada(self):

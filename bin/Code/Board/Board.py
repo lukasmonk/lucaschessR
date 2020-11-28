@@ -1158,10 +1158,10 @@ class Board(QtWidgets.QGraphicsView):
             self.atajosRaton = atajosRaton
         self.init_kb_buffer()
 
-    def dbVisual_setFichero(self, fichero):
-        self.dbVisual.setFichero(fichero)
+    def dbvisual_set_file(self, file):
+        self.dbVisual.setFichero(file)
 
-    def dbVisual_setShowAllways(self, ok):
+    def dbvisual_set_show_allways(self, ok):
         self.dbVisual.showAllways(ok)
 
     def dbVisual_setSaveAllways(self, ok):
@@ -1187,7 +1187,7 @@ class Board(QtWidgets.QGraphicsView):
         alm.dirvisual = self.dirvisual
         alm.guion = self.guion
         alm.lastFenM2 = self.lastFenM2
-        alm.nomdbVisual = self.dbVisual.fichero
+        alm.nomdbVisual = self.dbVisual.file
         alm.dbVisual_showAllways = self.dbVisual.showAllways()
 
     def restoreVisual(self):
@@ -1375,9 +1375,9 @@ class Board(QtWidgets.QGraphicsView):
             self.blindfold = None
             self.blindfoldReset()
 
-    def blindfoldPosicion(self, inicio, nueposicion, ultposicion):
+    def blindfoldPosicion(self, start, nueposicion, ultposicion):
         if self.blindfoldModoPosicion:
-            if inicio:
+            if start:
                 if ultposicion and nueposicion.fen() != ultposicion.fen():
                     b = self.blindfold
                     self.blindfold = None
@@ -1810,7 +1810,7 @@ class Board(QtWidgets.QGraphicsView):
         if self.exePulsadaLetra:
             self.exePulsadaLetra(siActivar, letra)
 
-    def salvaEnImagen(self, fichero=None, tipo=None, siCtrl=False, is_alt=False):
+    def salvaEnImagen(self, file=None, tipo=None, siCtrl=False, is_alt=False):
         actInd = actScr = False
         if self.indicadorSC_menu:
             if self.indicadorSC_menu.isVisible():
@@ -1839,10 +1839,10 @@ class Board(QtWidgets.QGraphicsView):
                 w -= self.margenCentro * 2
                 h -= self.margenCentro * 2
             pm = QtGui.QPixmap.grabWidget(self, x, y, w, h)
-        if fichero is None:
+        if file is None:
             QTUtil.ponPortapapeles(pm, tipo="p")
         else:
-            pm.save(fichero, tipo)
+            pm.save(file, tipo)
 
         if actInd:
             self.indicadorSC_menu.show()

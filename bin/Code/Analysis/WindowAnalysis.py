@@ -556,7 +556,7 @@ class WAnalisis(QTVarios.WDialogo):
             self.muestraActual.wmu.process_toolbar("MoverAtras")
         elif k == 16777236:  # dcha
             self.muestraActual.wmu.process_toolbar("MoverAdelante")
-        elif k == 16777232:  # inicio
+        elif k == 16777232:  # start
             self.muestraActual.wmu.process_toolbar("MoverInicio")
         elif k == 16777233:  # final
             self.muestraActual.wmu.process_toolbar("MoverFinal")
@@ -722,7 +722,7 @@ class WAnalisisVariations(QtWidgets.QDialog):
             key = "MoverAtras"
         elif k == 16777236:  # dcha
             key = "MoverAdelante"
-        elif k == 16777232:  # inicio
+        elif k == 16777232:  # start
             key = "MoverInicio"
         elif k == 16777233:  # final
             key = "MoverFinal"

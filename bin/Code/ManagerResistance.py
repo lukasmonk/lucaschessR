@@ -8,7 +8,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerResistance(Manager.Manager):
-    def inicio(self, resistance, numEngine, key):
+    def start(self, resistance, numEngine, key):
 
         self.game_type = GT_RESISTANCE
 
@@ -96,7 +96,7 @@ class ManagerResistance(Manager.Manager):
 
         elif key == TB_CLOSE:
             self.procesador.pararMotores()
-            self.procesador.inicio()
+            self.procesador.start()
             self.procesador.entrenamientos.resistance(self.resistance.tipo)
 
         elif key == TB_REINIT:
@@ -117,7 +117,7 @@ class ManagerResistance(Manager.Manager):
     def reiniciar(self):
         if len(self.game) and QTUtil2.pregunta(self.main_window, _("Restart the game?")):
             self.game.set_position()
-            self.inicio(self.resistance, self.numEngine, self.key)
+            self.start(self.resistance, self.numEngine, self.key)
 
     def final_x(self):
         return self.finJuego(False)
@@ -201,7 +201,7 @@ class ManagerResistance(Manager.Manager):
             else:
                 sc = self.segundos
 
-            um = QTUtil2.mensEspera.inicio(self.main_window, _("Checking..."))
+            um = QTUtil2.mensEspera.start(self.main_window, _("Checking..."))
 
             rm = self.xarbitro.juegaSegundos(sc)
             um.final()

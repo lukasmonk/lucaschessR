@@ -379,7 +379,7 @@ class Tactic:
         with self.dbdatos() as db:
             num = self.puzzles
 
-            # Determinamos la lista de fens, teniendo en cuenta el peso asociado a cada fichero
+            # Determinamos la lista de fens, teniendo en cuenta el peso asociado a cada file
             lif = []
 
             wt = 0

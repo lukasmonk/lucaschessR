@@ -12,7 +12,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerEverest(Manager.Manager):
-    def inicio(self, recno):
+    def start(self, recno):
 
         self.expedition = Everest.Expedition(self.configuration, recno)
         self.expedition.run()
@@ -102,7 +102,7 @@ class ManagerEverest(Manager.Manager):
     def terminar(self):
         self.analizaTerminar()
         self.terminaNoContinuo()
-        self.procesador.inicio()
+        self.procesador.start()
         self.procesador.showEverest(self.expedition.recno)
 
     def reiniciar(self):

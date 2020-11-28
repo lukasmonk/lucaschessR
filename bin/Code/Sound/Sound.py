@@ -121,12 +121,12 @@ class TallerSonido:
 
         self.centesimas = len(self.datos) * self.CHUNK * 100 / self.RATE
 
-    def leeWAV(self, fichero):
+    def leeWAV(self, file):
         try:
-            wf = wave.open(fichero, "rb")
+            wf = wave.open(file, "rb")
             self.centesimas = round(100.0 * wf.getnframes() / wf.getframerate(), 0)
             wf.close()
-            f = open(fichero, "rb")
+            f = open(file, "rb")
             self.wav = f.read()
             f.close()
             return True
@@ -270,11 +270,11 @@ class RunReplay:
     def procesa(self, io, orden):
         dv = orden.dv
         if orden.key == DATABASE:
-            fichero = dv["FICHERO"]
+            file = dv["FICHERO"]
             tabla = dv["TABLA"]
 
             self.dbw = {}  # como un reset
-            self.add_db(fichero, tabla)
+            self.add_db(file, tabla)
         elif orden.key in (PLAY_ESPERA, PLAY_SINESPERA):
 
             if "CLAVE" in dv:
@@ -289,8 +289,8 @@ class RunReplay:
 
         return None
 
-    def add_db(self, fichero, tabla):
-        db = UtilSQL.DictSQL(fichero, tabla)
+    def add_db(self, file, tabla):
+        db = UtilSQL.DictSQL(file, tabla)
         keys = db.keys()
 
         for k in keys:

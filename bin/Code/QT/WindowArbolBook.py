@@ -63,13 +63,13 @@ class UnMove:
         self.listaMovesHijos = ListaMoves(self, self.book, self.game.last_position.fen())
         return self.listaMovesHijos
 
-    def inicio(self):
+    def start(self):
         self.current_position = -1
 
     def atras(self):
         self.current_position -= 1
         if self.current_position < -1:
-            self.inicio()
+            self.start()
 
     def adelante(self):
         self.current_position += 1
@@ -278,7 +278,7 @@ class InfoMove(QtWidgets.QWidget):
         self.cpDefecto.read_fen(fenActivo)
         self.porDefecto()
 
-        btInicio = Controles.PB(self, "", self.inicio).ponIcono(Iconos.MoverInicio())
+        btInicio = Controles.PB(self, "", self.start).ponIcono(Iconos.MoverInicio())
         btAtras = Controles.PB(self, "", self.atras).ponIcono(Iconos.MoverAtras())
         btAdelante = Controles.PB(self, "", self.adelante).ponIcono(Iconos.MoverAdelante())
         btFinal = Controles.PB(self, "", self.final).ponIcono(Iconos.MoverFinal())
@@ -319,9 +319,9 @@ class InfoMove(QtWidgets.QWidget):
     def ponTituloLibro(self, titulo):
         self.lbTituloLibro.set_text("<h2>" + titulo + "</h2>")
 
-    def inicio(self):
+    def start(self):
         if self.movActual:
-            self.movActual.inicio()
+            self.movActual.start()
         self.ponValores()
 
     def atras(self):

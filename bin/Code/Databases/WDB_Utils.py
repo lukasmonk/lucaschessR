@@ -378,7 +378,7 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
             n += 1
         nom_fns = nom_fns % n
 
-    # Se crea el fichero con los puzzles
+    # Se crea el file con los puzzles
     f = open(nom_fns, "wt", encoding="utf-8", errors="ignore")
 
     nregs = len(liRegistros)
@@ -456,7 +456,7 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
     f.close()
     tmp_bp.cerrar()
 
-    # Se crea el fichero de control
+    # Se crea el file de control
     dic_ini[nom_tactic] = d = {}
     d["MENU"] = menuname
     d["FILESW"] = "%s:100" % os.path.basename(nom_fns)

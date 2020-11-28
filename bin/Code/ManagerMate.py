@@ -326,7 +326,7 @@ class ControlMate:
 
 
 class ManagerMate(Manager.Manager):
-    def inicio(self, mate):
+    def start(self, mate):
 
         self.mate = mate
 
@@ -368,7 +368,7 @@ class ManagerMate(Manager.Manager):
             self.finJuego()
 
         elif key == TB_QUIT:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_LEVEL:
             self.cambiarJuego()
@@ -389,15 +389,15 @@ class ManagerMate(Manager.Manager):
             Manager.Manager.rutinaAccionDef(self, key)
 
     def final_x(self):
-        self.finPartida()
+        self.end_game()
         return False
 
-    def finPartida(self):
+    def end_game(self):
         self.lbNivel.set_foreground_backgound("black", "white")
 
         self.board.remove_arrows()
         self.main_window.columnas60(False)
-        self.procesador.inicio()
+        self.procesador.start()
 
     def finJuego(self):
 
@@ -432,7 +432,7 @@ class ManagerMate(Manager.Manager):
                 self.main_window, "%s\n%s" % (_("Recreate all levels and start over"), _("Are you sure?"))
             ):
                 Util.remove_file(self.control_mate.file_path)
-                self.inicio(self.mate)
+                self.start(self.mate)
 
     def ponRotuloNivel(self):
         nivel = self.control_mate.current_level()

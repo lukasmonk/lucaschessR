@@ -91,8 +91,8 @@ class DirectEngine(object):
         if self.log:
             self.log_write(">>> %s" % line)
 
-    def log_open(self, fichero):
-        self.log = open(fichero, "a")
+    def log_open(self, file):
+        self.log = open(file, "a")
         self.log.write("%s %s\n\n" % (str(Util.today()), "-" * 70))
 
     def log_close(self):

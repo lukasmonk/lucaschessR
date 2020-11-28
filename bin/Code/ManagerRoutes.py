@@ -118,7 +118,7 @@ toga 1236 1495 1928 2132"""
 
 
 class ManagerRoutes(Manager.Manager):
-    def inicio(self, route):
+    def start(self, route):
         self.route = route
         if not hasattr(self, "time_start"):
             self.time_start = time.time()
@@ -126,12 +126,12 @@ class ManagerRoutes(Manager.Manager):
 
         self.game_type = GT_ROUTES
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
         self.route.add_time(time.time() - self.time_start, self.state)
 
     def final_x(self):
-        self.finPartida()
+        self.end_game()
         return False
 
     def add_move(self, move, siNuestra):
@@ -147,8 +147,8 @@ class ManagerRoutes(Manager.Manager):
 
 
 class ManagerRoutesPlay(ManagerRoutes):
-    def inicio(self, route):
-        ManagerRoutes.inicio(self, route)
+    def start(self, route):
+        ManagerRoutes.start(self, route)
 
         line = route.get_line()
 
@@ -196,18 +196,18 @@ class ManagerRoutesPlay(ManagerRoutes):
 
         self.siguiente_jugada()
 
-    def finPartida(self):
+    def end_game(self):
         self.engine.close()
-        ManagerRoutes.finPartida(self)
+        ManagerRoutes.end_game(self)
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
             self.procesador.showRoute()
 
         elif key == TB_REINIT:
             self.game.set_position()
-            self.inicio(self.route)
+            self.start(self.route)
 
         elif key == TB_CONFIG:
             self.configurar(siSonidos=True)
@@ -363,8 +363,8 @@ class ManagerRoutesPlay(ManagerRoutes):
 
 
 class ManagerRoutesEndings(ManagerRoutes):
-    def inicio(self, route):
-        ManagerRoutes.inicio(self, route)
+    def start(self, route):
+        ManagerRoutes.start(self, route)
 
         ending = self.route.get_ending()
         if "|" in ending:
@@ -432,7 +432,7 @@ class ManagerRoutesEndings(ManagerRoutes):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
             self.procesador.showRoute()
 
         elif key == TB_CONFIG:
@@ -443,9 +443,9 @@ class ManagerRoutesEndings(ManagerRoutes):
 
         elif key == TB_NEXT:
             if self.route.km_pending():
-                self.inicio(self.route)
+                self.start(self.route)
             else:
-                self.finPartida()
+                self.end_game()
                 self.procesador.showRoute()
 
         elif key == TB_UTILITIES:
@@ -457,10 +457,10 @@ class ManagerRoutesEndings(ManagerRoutes):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def finPartida(self):
+    def end_game(self):
         if self.t4:
             self.t4.close()
-        ManagerRoutes.finPartida(self)
+        ManagerRoutes.end_game(self)
 
     def siguiente_jugada(self):
         if self.state == ST_ENDGAME:
@@ -572,7 +572,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         if jgUlt.is_draw:
             mensaje = "%s<br>%s" % (_("Draw"), _("You must repeat the puzzle."))
             self.mensajeEnPGN(mensaje)
-            self.inicio(self.route)
+            self.start(self.route)
         elif self.warnings <= self.max_warnings:
             self.main_window.pon_toolbar([TB_CLOSE, TB_UTILITIES])
             self.mensajeEnPGN(_("Done"))
@@ -581,7 +581,7 @@ class ManagerRoutesEndings(ManagerRoutes):
             QTUtil2.message_bold(self.main_window)
             mensaje = "%s<br>%s" % (_("Done with errors."), _("You must repeat the puzzle."))
             self.mensajeEnPGN(mensaje)
-            self.inicio(self.route)
+            self.start(self.route)
 
     def current_pgn(self):
         resp = '[Event "%s"]\n' % _("Transsiberian Railway")
@@ -593,8 +593,8 @@ class ManagerRoutesEndings(ManagerRoutes):
 
 
 class ManagerRoutesTactics(ManagerRoutes):
-    def inicio(self, route):
-        ManagerRoutes.inicio(self, route)
+    def start(self, route):
+        ManagerRoutes.start(self, route)
 
         tactica = self.route.get_tactic()
 
@@ -642,7 +642,7 @@ class ManagerRoutesTactics(ManagerRoutes):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
             self.procesador.showRoute()
 
         elif key == TB_CONFIG:
@@ -653,9 +653,9 @@ class ManagerRoutesTactics(ManagerRoutes):
 
         elif key == TB_NEXT:
             if self.route.km_pending():
-                self.inicio(self.route)
+                self.start(self.route)
             else:
-                self.finPartida()
+                self.end_game()
                 self.procesador.showRoute()
 
         elif key == TB_UTILITIES:

@@ -39,7 +39,7 @@ class AnalizaPartida:
         # Asignacion de variables para blunders:
         # kblunders: puntos de perdida para considerar un blunder
         # tacticblunders: folder donde guardar tactic
-        # pgnblunders: fichero pgn donde guardar la games
+        # pgnblunders: file pgn donde guardar la games
         # oriblunders: si se guarda la game original
         # bmtblunders: name del entrenamiento BMT a crear
         self.kblunders = alm.kblunders
@@ -61,8 +61,8 @@ class AnalizaPartida:
 
         # dpbrilliancies: depth de control para saber si es brilliancie
         # ptbrilliancies: puntos de ganancia
-        # fnsbrilliancies: fichero fns donde guardar posiciones fen
-        # pgnbrilliancies: fichero pgn donde guardar la games
+        # fnsbrilliancies: file fns donde guardar posiciones fen
+        # pgnbrilliancies: file pgn donde guardar la games
         # oribrilliancies: si se guarda la game original
         # bmtbrilliancies: name del entrenamiento BMT a crear
         self.dpbrilliancies = alm.dpbrilliancies
@@ -137,14 +137,14 @@ class AnalizaPartida:
         """
         self.rut_dispatch_bp = rut_dispatch_bp
 
-    def save_fns(self, fichero, fen):
+    def save_fns(self, file, fen):
         """
-        Graba cada fen encontrado en el fichero "fichero"
+        Graba cada fen encontrado en el file "file"
         """
-        if not fichero:
+        if not file:
             return
 
-        f = open(fichero, "ab")
+        f = open(file, "ab")
         f.write("%s\r\n" % fen)
         f.close()
         self.procesador.entrenamientos.menu = None
@@ -206,11 +206,11 @@ class AnalizaPartida:
         if hasattr(self.procesador, "entrenamientos") and self.procesador.entrenamientos:
             self.procesador.entrenamientos.menu = None
 
-    def save_pgn(self, fichero, name, dic_cab, fen, move, rm, mj):
+    def save_pgn(self, file, name, dic_cab, fen, move, rm, mj):
         """
         Graba una game en un pgn
 
-        @param fichero: pgn donde grabar
+        @param file: pgn donde grabar
         @param name: name del engine que hace el analysis
         @param dic_cab: etiquetas de head del PGN
         @param fen: fen de la position
@@ -218,7 +218,7 @@ class AnalizaPartida:
         @param rm: respuesta engine
         @param mj: respuesta engine con la mejor move, usado en caso de blunders, para incluirla
         """
-        if not fichero:
+        if not file:
             return False
 
         p = Game.Game()
@@ -260,7 +260,7 @@ class AnalizaPartida:
         cab += '[FEN "%s"]\n' % fen
         cab += '[Result "%s"]\n' % result
 
-        with open(fichero, "at", encoding="utf-8", errors="ignore") as q:
+        with open(file, "at", encoding="utf-8", errors="ignore") as q:
             texto = (cab + "\n" + p.pgnBase() + mas + "\n\n")
             q.write(texto)
 
@@ -702,7 +702,7 @@ class MuestraAnalisis:
     def create_initial_show(self, main_window, xengine):
         move = self.move
         if move.analysis is None:
-            me = QTUtil2.mensEspera.inicio(
+            me = QTUtil2.mensEspera.start(
                 main_window, _("Analyzing the move...."), physical_pos="ad"
                 , siCancelar=True)
 
@@ -735,7 +735,7 @@ class MuestraAnalisis:
             conf_engine.actMultiPV(alm.multiPV)
             xengine = self.procesador.creaManagerMotor(conf_engine, alm.vtime, alm.depth, siMultiPV=True)
 
-        me = QTUtil2.mensEspera.inicio(main_window, _("Analyzing the move...."), physical_pos="ad")
+        me = QTUtil2.mensEspera.start(main_window, _("Analyzing the move...."), physical_pos="ad")
         mrm, pos = xengine.analyse_move(self.move, alm.vtime, alm.depth)
         me.final()
 
@@ -827,7 +827,7 @@ class AnalisisVariations:
             return False
 
     def analyse_move(self, new_move):
-        me = QTUtil2.mensEspera.inicio(self.w, _("Analyzing the move...."))
+        me = QTUtil2.mensEspera.start(self.w, _("Analyzing the move...."))
 
         secs = self.w.dameSegundos()
         self.rm = self.xtutor.analizaVariation(new_move, secs * 1000, self.is_white)

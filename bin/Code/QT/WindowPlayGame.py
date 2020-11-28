@@ -13,8 +13,8 @@ from Code.Databases import WindowDatabase
 
 
 class DBPlayGame(UtilSQL.DictSQL):
-    def __init__(self, fichero):
-        UtilSQL.DictSQL.__init__(self, fichero)
+    def __init__(self, file):
+        UtilSQL.DictSQL.__init__(self, file)
         self.regKeys = self.keys(True, True)
 
     def leeRegistro(self, num):

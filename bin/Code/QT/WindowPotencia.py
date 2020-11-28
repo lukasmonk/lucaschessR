@@ -65,9 +65,9 @@ def lee_varias_lineas_mfn(nlineas):  # WindowDailyTest
 
 
 class PotenciaHistorico:
-    def __init__(self, fichero):
-        self.fichero = fichero
-        self.db = Base.DBBase(fichero)
+    def __init__(self, file):
+        self.file = file
+        self.db = Base.DBBase(file)
         self.tabla = "datos"
 
         if not self.db.existeTabla(self.tabla):
@@ -646,7 +646,7 @@ class WPotencia(QTVarios.WDialogo):
         self.ultimaCelda = None
 
     def consultar(self):
-        self.procesador.managerPartida(self, self.game, False, True, self.board)
+        self.procesador.manager_game(self, self.game, False, True, self.board)
 
     def pulsada_celda(self, celda):
         if self.ultimaCelda:

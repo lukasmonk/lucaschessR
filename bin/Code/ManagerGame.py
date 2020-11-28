@@ -12,13 +12,14 @@ from Code.QT import Voyager
 from Code.Base.Constantes import *
 
 
-class ManagerPartida(Manager.Manager):
-    def inicio(self, game, si_completa, si_solo_consultar):
+class ManagerGame(Manager.Manager):
+    def start(self, game, is_complete, only_consult):
         self.game_type = GT_ALONE
 
         self.game = game
         self.reinicio = self.game.save()
-        self.si_completa = si_completa
+        self.is_complete = is_complete
+        self.only_consult = only_consult
 
         self.human_is_playing = True
         self.is_human_side_white = True
@@ -27,7 +28,7 @@ class ManagerPartida(Manager.Manager):
 
         self.state = ST_PLAYING
 
-        if si_solo_consultar:
+        if only_consult:
             li = [TB_CLOSE, TB_PGN_LABELS, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES]
         else:
             li = [TB_SAVE, TB_CANCEL, TB_PGN_LABELS, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES]
@@ -43,17 +44,20 @@ class ManagerPartida(Manager.Manager):
         self.ponPiezasAbajo(game.iswhite())
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        self.ponteAlPrincipio()
+        if self.game.siFenInicial():
+            self.goto_end()
+        else:
+            self.ponteAlPrincipio()
 
         self.check_boards_setposition()
 
-        self.ponInformacion()
+        self.put_information()
 
         self.refresh()
 
         self.siguiente_jugada()
 
-    def ponInformacion(self):
+    def put_information(self):
         white = black = result = None
         for key, valor in self.game.li_tags:
             key = key.upper()
@@ -73,7 +77,7 @@ class ManagerPartida(Manager.Manager):
             return
         p = Game.Game()
         p.restore(self.reinicio)
-        self.inicio(p, self.si_completa)
+        self.start(p, self.is_complete, self.only_consult)
 
     def run_action(self, key):
         if key == TB_REINIT:
@@ -109,12 +113,12 @@ class ManagerPartida(Manager.Manager):
             self.informacion()
 
         elif key in (TB_CANCEL, TB_END_GAME, TB_CLOSE):
-            self.finPartida()
+            self.end_game()
 
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def finPartida(self):
+    def end_game(self):
         # Comprobamos que no haya habido cambios from_sq el ultimo grabado
         if self.changed:
             resp = QTUtil2.preguntaCancelar(self.main_window, _("Do you want to cancel changes?"), _("Yes"), _("No"))
@@ -125,7 +129,7 @@ class ManagerPartida(Manager.Manager):
         return True
 
     def final_x(self):
-        return self.finPartida()
+        return self.end_game()
 
     def siguiente_jugada(self):
         if self.state == ST_ENDGAME:
@@ -221,7 +225,7 @@ class ManagerPartida(Manager.Manager):
         if resp:
             self.game.li_tags = resp
             self.changed = True
-            self.ponInformacion()
+            self.put_information()
 
     def informacion(self):
         menu = QTVarios.LCMenu(self.main_window)
@@ -264,7 +268,7 @@ class ManagerPartida(Manager.Manager):
             ("pastepgn", _("Paste PGN"), Iconos.Pegar16()),
             sep,
         ]
-        if not self.si_completa:
+        if not self.is_complete:
             liMasOpciones.extend(
                 [
                     ("position", _("Edit start position"), Iconos.Datos()),
@@ -289,7 +293,7 @@ class ManagerPartida(Manager.Manager):
             new_position = Voyager.voyager_position(self.main_window, ini_position)
             if new_position and new_position != ini_position:
                 self.game.set_position(new_position)
-                self.inicio(self.game, self.si_completa)
+                self.start(self.game, self.is_complete)
 
         elif resp == "pasteposicion":
             texto = QTUtil.traePortapapeles()
@@ -306,7 +310,7 @@ class ManagerPartida(Manager.Manager):
         elif resp == "leerpgn":
             game = self.procesador.select_1_pgn(self.main_window)
             if game is not None:
-                if self.si_completa and not game.siFenInicial():
+                if self.is_complete and not game.siFenInicial():
                     return
                 p = Game.Game()
                 p.leeOtra(game)
@@ -323,7 +327,7 @@ class ManagerPartida(Manager.Manager):
                         self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
                     )
                     return
-                if self.si_completa and not game.siFenInicial():
+                if self.is_complete and not game.siFenInicial():
                     return
                 self.reinicio = game.save()
                 self.reiniciar()
@@ -386,7 +390,7 @@ class ManagerPartida(Manager.Manager):
             self.play_against_engine = True
             self.configuration.escVariables("ENG_MANAGERSOLO", dic)
 
-    def tituloVentana(self):
+    def window_title(self):
         white = ""
         black = ""
         event = ""

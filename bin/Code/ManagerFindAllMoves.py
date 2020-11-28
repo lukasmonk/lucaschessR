@@ -95,7 +95,7 @@ class ControlFindAllMoves:
 
 
 class ManagerFindAllMoves(Manager.Manager):
-    def inicio(self, siJugador):
+    def start(self, siJugador):
 
         self.siJugador = siJugador
 
@@ -141,7 +141,7 @@ class ManagerFindAllMoves(Manager.Manager):
         self.main_window.board.siPosibleRotarBoard = True
         self.board.remove_arrows()
         self.main_window.columnas60(False)
-        self.procesador.inicio()
+        self.procesador.start()
 
     def finJuego(self):
         self.main_window.pon_toolbar((TB_CLOSE, TB_PLAY))
@@ -239,7 +239,7 @@ class ManagerFindAllMoves(Manager.Manager):
         )
 
     def final_x(self):
-        self.procesador.inicio()
+        self.procesador.start()
         return False
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):

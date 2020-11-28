@@ -73,7 +73,7 @@ class WSummary(QtWidgets.QWidget):
 
         # ToolBar
         li_acciones = [
-            (_("Start position"), Iconos.Inicio(), self.inicio),
+            (_("Start position"), Iconos.Inicio(), self.start),
             None,
             (_("Previous"), Iconos.AnteriorF(), self.anterior),
             (_("Next"), Iconos.SiguienteF(), self.siguiente),
@@ -239,7 +239,7 @@ class WSummary(QtWidgets.QWidget):
         #     pv = wk["pv"]
         #     analysis.exeAnalizar(self.fenm2, resp, None, fen, pv, rmAnalisis)
 
-    def inicio(self):
+    def start(self):
         self.actualizaPV("")
         self.cambiaInfoMove()
 
@@ -335,7 +335,7 @@ class WSummary(QtWidgets.QWidget):
 
         self.dbGames.rebuild_stat(dispatch, depth)
         bpTmp.cerrar()
-        self.inicio()
+        self.start()
 
     def movActivo(self):
         recno = self.grid.recno()

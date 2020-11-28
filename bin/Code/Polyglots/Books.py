@@ -22,8 +22,8 @@ class ListBooks:
 
         self.alMenosUno()
 
-    def restore_pickle(self, fichero):
-        dic_booklist = Util.restore_pickle(fichero)
+    def restore_pickle(self, file):
+        dic_booklist = Util.restore_pickle(file)
         if dic_booklist:
             self.lista = []
             for dic_book in dic_booklist["lista"]:
@@ -34,9 +34,9 @@ class ListBooks:
             self._modoAnalisis = dic_booklist["_modoAnalisis"]
             self.alMenosUno()
 
-    def save_pickle(self, fichero):
+    def save_pickle(self, file):
         dic = {"path": self.path, "_modoAnalisis": self._modoAnalisis, "lista": [book.to_dic() for book in self.lista]}
-        Util.save_pickle(fichero, dic)
+        Util.save_pickle(file, dic)
 
     def alMenosUno(self):
         if len(self.lista) == 0:
@@ -1282,10 +1282,10 @@ class Polyglot:
             else:
                 first = middle
 
-    def lista(self, fichero, fen):
+    def lista(self, file, fen):
         key = self.hash(fen)
 
-        self.f = open(fichero, "rb")
+        self.f = open(file, "rb")
 
         offset, entry = self.find_key(key)
         li = []

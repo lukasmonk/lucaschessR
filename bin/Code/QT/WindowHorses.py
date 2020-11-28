@@ -19,9 +19,9 @@ from Code import Util
 
 
 class HorsesHistorico:
-    def __init__(self, fichero, test):
-        self.fichero = fichero
-        self.db = Base.DBBase(fichero)
+    def __init__(self, file, test):
+        self.file = file
+        self.db = Base.DBBase(file)
         self.tabla = test
 
         if not self.db.existeTabla(self.tabla):

@@ -72,7 +72,15 @@ class Move:
 
     def add_nag(self, nag):
         if nag and not (nag in self.li_nags):
-            self.li_nags.append(nag)
+            if nag <= NAG_6:
+                li = []
+                for n in self.li_nags:
+                    if n > NAG_6 and not (n in li):
+                        li.append(n)
+                li.append(nag)
+                self.li_nags = li
+            else:
+                self.li_nags.append(nag)
 
     def del_nags(self):
         self.li_nags = []

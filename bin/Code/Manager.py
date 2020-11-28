@@ -135,7 +135,7 @@ class Manager:
             self.procesador.reset()
 
     def finManager(self):
-        # se llama from_sq procesador.inicio, antes de borrar el manager
+        # se llama from_sq procesador.start, antes de borrar el manager
         self.board.atajosRaton = None
         if self.nonDistract:
             self.main_window.base.tb.setVisible(True)
@@ -430,10 +430,10 @@ class Manager:
                 self.main_window.ponCapturas(dic)
             if self.main_window.siInformacionPGN:
                 if (row == 0 and column.key == "NUMBER") or row < 0:
-                    self.main_window.ponInformacionPGN(self.game, None, nomOpening)
+                    self.main_window.put_informationPGN(self.game, None, nomOpening)
                 else:
                     move.pos_in_game = pos_move
-                    self.main_window.ponInformacionPGN(None, move, nomOpening)
+                    self.main_window.put_informationPGN(None, move, nomOpening)
 
             if self.kibitzers_manager.some_working():
                 if self.si_mira_kibitzers():
@@ -906,7 +906,7 @@ class Manager:
                 max_recursion = 9999
         if move.analysis is None:
             siCancelar = self.xtutor.motorTiempoJugada > 5000 or self.xtutor.motorProfundidad > 7
-            me = QTUtil2.mensEspera.inicio(
+            me = QTUtil2.mensEspera.start(
                 self.main_window, _("Analyzing the move...."), physical_pos="ad", siCancelar=siCancelar
             )
             if siCancelar:
@@ -1514,7 +1514,7 @@ class Manager:
 
         elif resp.startswith("vol"):
             accion = resp[3:]
-            if accion == "fichero":
+            if accion == "file":
                 resp = QTUtil2.salvaFichero(
                     self.main_window,
                     _("File to save"),
@@ -1539,7 +1539,7 @@ class Manager:
 
         elif resp.startswith("fen") or resp.startswith("fns"):
             extension = resp[:3]
-            si_fichero = resp.endswith("fichero")
+            si_fichero = resp.endswith("file")
             self.salvaFEN_FNS(extension, si_fichero)
 
         return None
@@ -1594,21 +1594,21 @@ class Manager:
 
         dic = dict(GAME=self.game.save(True))
         extension = "lcsb"
-        fichero = self.configuration.x_save_lcsb
+        file = self.configuration.x_save_lcsb
         while True:
-            fichero = QTUtil2.salvaFichero(
+            file = QTUtil2.salvaFichero(
                 self.main_window,
                 _("File to save"),
-                fichero,
+                file,
                 _("File") + " %s (*.%s)" % (extension, extension),
                 siConfirmarSobreescritura=False,
             )
-            if fichero:
-                fichero = str(fichero)
-                if os.path.isfile(fichero):
+            if file:
+                file = str(file)
+                if os.path.isfile(file):
                     yn = QTUtil2.preguntaCancelar(
                         self.main_window,
-                        _X(_("The file %1 already exists, what do you want to do?"), fichero),
+                        _X(_("The file %1 already exists, what do you want to do?"), file),
                         si=_("Overwrite"),
                         no=_("Choose another"),
                     )
@@ -1616,13 +1616,13 @@ class Manager:
                         break
                     if not yn:
                         continue
-                direc = os.path.dirname(fichero)
+                direc = os.path.dirname(file)
                 if direc != self.configuration.folder_save_lcsb():
                     self.configuration.folder_save_lcsb(direc)
                     self.configuration.graba()
 
-                name = os.path.basename(fichero)
-                if Util.save_pickle(fichero, dic):
+                name = os.path.basename(file)
+                if Util.save_pickle(file, dic):
                     QTUtil2.mensajeTemporal(self.main_window, _X(_("Saved to %1"), name), 0.8)
                     return
                 else:

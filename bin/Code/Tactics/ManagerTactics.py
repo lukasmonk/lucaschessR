@@ -12,7 +12,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerTacticas(Manager.Manager):
-    def inicio(self, tactic: Tactics.Tactic):
+    def start(self, tactic: Tactics.Tactic):
         self.reiniciando = False
         self.tactic = tactic
         self.tactic.leeDatos()
@@ -89,7 +89,7 @@ class ManagerTacticas(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_CONFIG:
             if self.with_automatic_jump:
@@ -129,16 +129,16 @@ class ManagerTacticas(Manager.Manager):
 
     def ent_siguiente(self):
         if self.tactic.work_game_finished():
-            self.finPartida()
+            self.end_game()
         else:
-            self.inicio(self.tactic)
+            self.start(self.tactic)
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
         self.procesador.entrenamientos.entrenaTactica(self.tactic)
 
     def final_x(self):
-        self.finPartida()
+        self.end_game()
         return False
 
     def siguiente_jugada(self):
@@ -264,4 +264,4 @@ class ManagerTacticas(Manager.Manager):
         self.tactic.end_training()
         mensaje = "<big>%s<br>%s</big>" % (_("Congratulations goal achieved"), _("Endgame"))
         self.mensajeEnPGN(mensaje)
-        self.finPartida()
+        self.end_game()

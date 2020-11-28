@@ -4,9 +4,9 @@ from Code import Util
 
 def read_mic_engines():
     configuration = Code.configuration
-    fichero = Code.path_resource("IntFiles", "mic_tourney.eval")
+    file = Code.path_resource("IntFiles", "mic_tourney.eval")
 
-    with open(fichero) as f:
+    with open(file) as f:
         li = []
         for linea in f:
             dic = eval(linea.strip())

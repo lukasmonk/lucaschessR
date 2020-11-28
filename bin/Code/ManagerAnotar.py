@@ -20,7 +20,7 @@ class ManagerAnotar(Manager.Manager):
     vtime = 0.0
     informacion_activable = False
 
-    def inicio(self, game_objetivo, si_blancas_abajo):
+    def start(self, game_objetivo, si_blancas_abajo):
 
         self.game = Game.Game()
         self.game_type = GT_NOTE_DOWN
@@ -101,11 +101,11 @@ class ManagerAnotar(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_REINIT:
-            self.inicio(self.game_objetivo, self.si_blancas_abajo)
+            self.start(self.game_objetivo, self.si_blancas_abajo)
 
         elif key in (TB_CANCEL, TB_CLOSE):
             self.board.showCoordenadas(True)
-            self.procesador.inicio()
+            self.procesador.start()
             self.procesador.show_anotar()
 
         elif key == TB_CONFIG:

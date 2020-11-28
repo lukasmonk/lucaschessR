@@ -6,7 +6,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerSingularM(Manager.Manager):
-    def inicio(self, singularMoves):
+    def start(self, singularMoves):
         self.singularMoves = singularMoves
 
         self.pos_bloque = 0
@@ -34,7 +34,7 @@ class ManagerSingularM(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_RESIGN:
             self.resign()
@@ -54,8 +54,8 @@ class ManagerSingularM(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
         self.procesador.strenght101()
 
     def siguiente_jugada(self):

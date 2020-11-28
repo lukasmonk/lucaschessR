@@ -582,7 +582,7 @@ class Entrenamientos:
             self.procesador.game_type = GT_TACTICS
             self.procesador.state = ST_PLAYING
             self.procesador.manager = ManagerTactics.ManagerTacticas(self.procesador)
-            self.procesador.manager.inicio(tactica)
+            self.procesador.manager.start(tactica)
 
     def entrenaGM(self):
         w = WindowGM.WGM(self.procesador)
@@ -590,15 +590,15 @@ class Entrenamientos:
             self.procesador.game_type = GT_AGAINST_GM
             self.procesador.state = ST_PLAYING
             self.procesador.manager = ManagerGM.ManagerGM(self.procesador)
-            self.procesador.manager.inicio(w.record)
+            self.procesador.manager.start(w.record)
 
     def find_all_moves(self, siJugador):
         self.procesador.manager = ManagerFindAllMoves.ManagerFindAllMoves(self.procesador)
-        self.procesador.manager.inicio(siJugador)
+        self.procesador.manager.start(siJugador)
 
     def jugarMate(self, tipo):
         self.procesador.manager = ManagerMate.ManagerMate(self.procesador)
-        self.procesador.manager.inicio(tipo)
+        self.procesador.manager.start(tipo)
 
     def dailyTest(self):
         WindowDailyTest.dailyTest(self.procesador)
@@ -633,7 +633,7 @@ class Entrenamientos:
         if resp is not None:
             numEngine, key = resp
             self.procesador.manager = ManagerResistance.ManagerResistance(self.procesador)
-            self.procesador.manager.inicio(resistance, numEngine, key)
+            self.procesador.manager.start(resistance, numEngine, key)
 
     def learnPGN(self):
         w = WindowLearnPGN.WLearnBase(self.procesador)
@@ -680,7 +680,7 @@ class Entrenamientos:
             self.procesador.game_type = GT_TURN_ON_LIGHTS
             self.procesador.state = ST_PLAYING
             self.procesador.manager = ManagerTurnOnLights.ManagerTurnOnLights(self.procesador)
-            self.procesador.manager.inicio(num_theme, num_block, tol)
+            self.procesador.manager.start(num_theme, num_block, tol)
 
     def washing_machine(self):
         self.procesador.showWashing()

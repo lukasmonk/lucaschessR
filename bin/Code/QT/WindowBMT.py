@@ -986,8 +986,8 @@ class WBMT(QTVarios.WDialogo):
         bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
 
         # Motor y vtime, cogemos los estandars de analysis
-        fichero = self.configuration.file_param_analysis()
-        dic = Util.restore_pickle(fichero)
+        file = self.configuration.file_param_analysis()
+        dic = Util.restore_pickle(file)
         if dic:
             engine = dic["MOTOR"]
             vtime = dic["TIME"]
@@ -1026,7 +1026,7 @@ class WBMT(QTVarios.WDialogo):
             return
 
         dic = {"MOTOR": engine, "TIME": vtime}
-        Util.save_pickle(fichero, dic)
+        Util.save_pickle(file, dic)
 
         # Analizamos todos, creamos las games, y lo salvamos
         confMotor = self.configuration.buscaRival(engine)
@@ -1550,8 +1550,8 @@ class WBMT(QTVarios.WDialogo):
         name = TrListas.dicTraining().get(name, name)
 
         # Motor y vtime, cogemos los estandars de analysis
-        fichero = self.configuration.file_param_analysis()
-        dic = Util.restore_pickle(fichero)
+        file = self.configuration.file_param_analysis()
+        dic = Util.restore_pickle(file)
         if dic:
             engine = dic["MOTOR"]
             vtime = dic["TIME"]
@@ -1596,7 +1596,7 @@ class WBMT(QTVarios.WDialogo):
                     return
 
                 dic = {"MOTOR": engine, "TIME": vtime}
-                Util.save_pickle(fichero, dic)
+                Util.save_pickle(file, dic)
 
                 from_sq = liGen[3]
                 to_sq = liGen[4]

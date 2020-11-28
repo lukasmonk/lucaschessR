@@ -261,12 +261,12 @@ def microsegundos_rnd():
     )
 
 
-def ini2dic(fichero):
+def ini2dic(file):
     dicBase = collections.OrderedDict()
 
-    if os.path.isfile(fichero):
+    if os.path.isfile(file):
 
-        with open(fichero, "rt") as f:
+        with open(file, "rt") as f:
             for linea in f:
                 linea = linea.strip()
                 if linea and not linea.startswith("#"):
@@ -284,20 +284,20 @@ def ini2dic(fichero):
     return dicBase
 
 
-def dic2ini(fichero, dic):
-    with open(fichero, "wt") as f:
+def dic2ini(file, dic):
+    with open(file, "wt") as f:
         for k in dic:
             f.write("[%s]\n" % k)
             for key in dic[k]:
                 f.write("%s=%s\n" % (key, dic[k][key]))
 
 
-def ini_base2dic(fichero):
+def ini_base2dic(file):
     dic = {}
 
-    if os.path.isfile(fichero):
+    if os.path.isfile(file):
 
-        with open(fichero, "rt", encoding="utf-8", errors="ignore") as f:
+        with open(file, "rt", encoding="utf-8", errors="ignore") as f:
             for linea in f:
                 linea = linea.strip()
                 if linea.startswith("#"):
@@ -753,8 +753,8 @@ class Decode:
     def __init__(self, codec=None):
         self.codec = "utf-8" if codec is None else codec
 
-    def read_file(self, fichero):
-        self.codec = file_encoding(fichero)
+    def read_file(self, file):
+        self.codec = file_encoding(file)
 
     def decode(self, xbytes):
         try:

@@ -214,7 +214,7 @@ class MainWindow(QTVarios.WDialogo):
                 # self.board.set_width()
                 # self.ajustaTam()
 
-    def muestraVariations(self, titulo):
+    def show_variations(self, titulo):
         flags = (
             QtCore.Qt.Dialog
             | QtCore.Qt.WindowTitleHint
@@ -339,7 +339,7 @@ class MainWindow(QTVarios.WDialogo):
     def ponCapturas(self, dic):
         self.base.put_captures(dic)
 
-    def ponInformacionPGN(self, game, move, opening):
+    def put_informationPGN(self, game, move, opening):
         self.informacionPGN.set_move(game, move, opening)
 
     def activaJuego(self, siActivar=True, siReloj=False, siAyudas=None):
@@ -386,9 +386,9 @@ class MainWindow(QTVarios.WDialogo):
         if self.manager and hasattr(self.manager, "control0"):
             self.manager.control0()
 
-    def soloEdicionPGN(self, fichero):
-        if fichero:
-            titulo = fichero
+    def soloEdicionPGN(self, file):
+        if file:
+            titulo = file
         else:
             titulo = "<<< %s >>>" % _("Temporary file")
 

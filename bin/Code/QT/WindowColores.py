@@ -805,8 +805,8 @@ class WColores(QTVarios.WDialogo):
     def read_own_themes(self):
         self.read_themes(self.configuration.ficheroTemas)
 
-    def read_themes(self, fichero):
-        self.li_themes = Util.restore_pickle(fichero)
+    def read_themes(self, file):
+        self.li_themes = Util.restore_pickle(file)
         if self.li_themes is None:
             self.li_themes = []
         else:

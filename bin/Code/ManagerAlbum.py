@@ -7,7 +7,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerAlbum(Manager.Manager):
-    def inicio(self, album, cromo):
+    def start(self, album, cromo):
         self.base_inicio(album, cromo)
         self.siguiente_jugada()
 
@@ -110,7 +110,7 @@ class ManagerAlbum(Manager.Manager):
             self.adjourn()
 
         elif key == TB_CLOSE:
-            self.procesador.inicio()
+            self.procesador.start()
             self.procesador.reabrirAlbum(self.album)
 
         elif key in self.procesador.li_opciones_inicio:
@@ -134,7 +134,7 @@ class ManagerAlbum(Manager.Manager):
             self.xrival.cerrar()
             self.main_window.pon_toolbar((TB_CLOSE, TB_CONFIG, TB_UTILITIES))
         else:
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 

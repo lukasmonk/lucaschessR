@@ -752,7 +752,7 @@ def select_pgn(wowner):
     configuration = Code.configuration
     path = QTUtil2.leeFichero(wowner, configuration.pgn_folder(), "pgn")
     if path:
-        carpeta, fichero = os.path.split(path)
+        carpeta, file = os.path.split(path)
         configuration.save_pgn_folder(carpeta)
     return path
 
@@ -762,7 +762,7 @@ def select_pgns(wowner):
     files = QTUtil2.leeFicheros(wowner, configuration.pgn_folder(), "pgn")
     if files:
         path = files[0]
-        carpeta, fichero = os.path.split(path)
+        carpeta, file = os.path.split(path)
         configuration.save_pgn_folder(carpeta)
     return files
 
@@ -771,7 +771,7 @@ def select_ext(wowner, ext):
     configuration = Code.configuration
     path = QTUtil2.leeFichero(wowner, configuration.x_save_folder, ext)
     if path:
-        carpeta, fichero = os.path.split(path)
+        carpeta, file = os.path.split(path)
         if configuration.x_save_folder != carpeta:
             configuration.x_save_folder = carpeta
             configuration.graba()

@@ -126,6 +126,7 @@ class PGNreader:
         self.size = 0
         self.tmp_fich = None
         self.utf_bom = False
+        self.inicio = self.final = 0
         try:
             with open(self.path_file, "rb") as f:
                 si_ln = b"\n" in f.read(1000)
@@ -180,11 +181,16 @@ class PGNreader:
         pgn_stop()
         return self
 
+    def bpgn(self):
+        self.f.seek(self.inicio)
+        return self.f.read(self.final-self.inicio)
+
     def __iter__(self):
         return self
 
     def __next__(self):
         # se lee otro juego
+        self.inicio = self.f.tell()
         readline = self.f.readline
 
         # Labels
@@ -193,6 +199,7 @@ class PGNreader:
 
         body = b""
 
+        self.li_btexto = []
         def add_label(ln):
             ln = ln[1:-1].strip()
             si_barra = b'\\"' in ln
@@ -223,6 +230,7 @@ class PGNreader:
             if not linea:
                 raise StopIteration
             linea = linea.strip()
+            self.li_btexto.append(linea)
             if linea[:1] == b"[" and linea[-1:] == b"]":
                 add_label(linea)
                 while True:
@@ -255,8 +263,9 @@ class PGNreader:
         pv = pgn_pv()
         is_raw = pgn_raw()
         fens = [pgn_fen(num) for num in range(pgn_numfens())]
+        self.final = self.f.tell()
 
-        return body, is_raw, pv.decode(), fens, ulabels_values, ulabels_labels, self.f.tell()
+        return body, is_raw, pv.decode(), fens, ulabels_values, ulabels_labels, self.final
 
 
 #def xpgn_fen(num):

@@ -10,8 +10,8 @@ SEPARADOR = FormLayout.separador
 
 
 def leeDicParametros(configuration):
-    fichero = configuration.file_param_analysis()
-    dic = Util.restore_pickle(fichero)
+    file = configuration.file_param_analysis()
+    dic = Util.restore_pickle(file)
     if not dic:
         dic = {}
     alm = Util.Record()

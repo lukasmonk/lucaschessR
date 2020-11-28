@@ -15,11 +15,11 @@ from Code.Base.Constantes import *
 
 
 class ManagerOpeningEngines(Manager.Manager):
-    def inicio(self, pathFichero):
+    def start(self, pathFichero):
         self.board.saveVisual()
         self.pathFichero = pathFichero
         dbop = OpeningLines.Opening(pathFichero)
-        self.board.dbVisual_setFichero(dbop.nom_fichero)
+        self.board.dbvisual_set_file(dbop.nom_fichero)
         self.reinicio(dbop)
 
     def reinicio(self, dbop):
@@ -110,7 +110,7 @@ class ManagerOpeningEngines(Manager.Manager):
         self.dicFENm2 = self.trainingEngines["DICFENM2"]
 
         self.siAyuda = False
-        self.board.dbVisual_setShowAllways(False)
+        self.board.dbvisual_set_show_allways(False)
         self.hints = 9999  # Para que analice sin problemas
 
         self.game = Game.Game()
@@ -453,7 +453,7 @@ class ManagerOpeningEngines(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key in (TB_REINIT, TB_NEXT):
             self.reiniciar()
@@ -532,12 +532,12 @@ class ManagerOpeningEngines(Manager.Manager):
             Manager.Manager.rutinaAccionDef(self, key)
 
     def final_x(self):
-        return self.finPartida()
+        return self.end_game()
 
-    def finPartida(self):
+    def end_game(self):
         self.dbop.close()
         self.board.restoreVisual()
-        self.procesador.inicio()
+        self.procesador.start()
         self.procesador.openings()
         return False
 
@@ -559,12 +559,12 @@ class ManagerOpeningEngines(Manager.Manager):
 
 
 class ManagerOpeningLines(Manager.Manager):
-    def inicio(self, pathFichero, modo, num_linea):
+    def start(self, pathFichero, modo, num_linea):
         self.board.saveVisual()
 
         self.pathFichero = pathFichero
         dbop = OpeningLines.Opening(pathFichero)
-        self.board.dbVisual_setFichero(dbop.nom_fichero)
+        self.board.dbvisual_set_file(dbop.nom_fichero)
         self.reinicio(dbop, modo, num_linea)
 
     def reinicio(self, dbop, modo, num_linea):
@@ -594,7 +594,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.liMensBasic.append("%s: %s" % (_("Lines"), mensLines))
 
         self.siAyuda = False
-        self.board.dbVisual_setShowAllways(False)
+        self.board.dbvisual_set_show_allways(False)
 
         self.game = Game.Game()
 
@@ -632,7 +632,7 @@ class ManagerOpeningLines(Manager.Manager):
     def ayuda(self):
         self.siAyuda = True
         self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_CONFIG, TB_UTILITIES))
-        self.board.dbVisual_setShowAllways(True)
+        self.board.dbvisual_set_show_allways(True)
 
         self.muestraAyuda()
         self.muestraInformacion()
@@ -674,7 +674,7 @@ class ManagerOpeningLines(Manager.Manager):
                     mens3 += "\n %s" % dic_nags[valoracion]
             self.set_label3(mens3 if mens3 else None)
 
-    def gameTerminada(self, si_completa):
+    def gameTerminada(self, is_complete):
         self.state = ST_ENDGAME
         tm = time.time() - self.ini_time
         li = [_("Line finished.")]
@@ -683,14 +683,14 @@ class ManagerOpeningLines(Manager.Manager):
         if self.errores > 0:
             li.append("%s: %d" % (_("Errors"), self.errores))
 
-        if si_completa:
+        if is_complete:
             mensaje = "\n".join(li)
             self.mensajeEnPGN(mensaje)
         dictry = {"DATE": Util.today(), "TIME": tm, "AYUDA": self.siAyuda, "ERRORS": self.errores}
         self.game_info["TRIES"].append(dictry)
 
         sinError = self.errores == 0 and not self.siAyuda
-        if si_completa:
+        if is_complete:
             if sinError:
                 self.game_info["NOERROR"] += 1
                 noError = self.game_info["NOERROR"]
@@ -735,7 +735,7 @@ class ManagerOpeningLines(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_REINIT:
             self.reiniciar()
@@ -756,12 +756,12 @@ class ManagerOpeningLines(Manager.Manager):
             Manager.Manager.rutinaAccionDef(self, key)
 
     def final_x(self):
-        return self.finPartida()
+        return self.end_game()
 
-    def finPartida(self):
+    def end_game(self):
         self.dbop.close()
         self.board.restoreVisual()
-        self.procesador.inicio()
+        self.procesador.start()
         if self.modo == "static":
             self.procesador.openingsTrainingStatic(self.pathFichero)
         else:
@@ -875,7 +875,7 @@ class ManagerOpeningLines(Manager.Manager):
 
 
 class ManagerOpeningLinesPositions(Manager.Manager):
-    def inicio(self, pathFichero):
+    def start(self, pathFichero):
         self.pathFichero = pathFichero
         dbop = OpeningLines.Opening(pathFichero)
         self.reinicio(dbop)
@@ -1012,7 +1012,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_CONFIG:
             base = _("What to do after solving")
@@ -1038,11 +1038,11 @@ class ManagerOpeningLinesPositions(Manager.Manager):
             Manager.Manager.rutinaAccionDef(self, key)
 
     def final_x(self):
-        return self.finPartida()
+        return self.end_game()
 
-    def finPartida(self):
+    def end_game(self):
         self.dbop.close()
-        self.procesador.inicio()
+        self.procesador.start()
         self.procesador.openings()
         return False
 

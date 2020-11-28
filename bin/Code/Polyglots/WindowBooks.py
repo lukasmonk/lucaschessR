@@ -21,7 +21,7 @@ class WBooksCrear(QtWidgets.QDialog):
 
         self.w_parent = w_parent
 
-        self.fichero = ""
+        self.file = ""
 
         self.setWindowTitle(_("Create a new book"))
         self.setWindowIcon(Iconos.Libros())
@@ -77,8 +77,8 @@ class WBooksCrear(QtWidgets.QDialog):
         )
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
-            self.fichero = fbin
-            self.btFichero.set_text(self.fichero)
+            self.file = fbin
+            self.btFichero.set_text(self.file)
 
     def process_toolbar(self):
         accion = self.sender().key
@@ -88,7 +88,7 @@ class WBooksCrear(QtWidgets.QDialog):
             self.reject()
 
     def aceptar(self):
-        if not self.fichero:
+        if not self.file:
             return
 
         # Creamos el pgn
@@ -100,8 +100,8 @@ class WBooksCrear(QtWidgets.QDialog):
 
         # Creamos la linea de ordenes
         exe = "%s/_tools/polyglot/polyglot" % Code.folder_engines
-        li = [os.path.abspath(exe), "make-book", "-pgn", fichTemporal, "-bin", self.fichero]
-        Util.remove_file(self.fichero)
+        li = [os.path.abspath(exe), "make-book", "-pgn", fichTemporal, "-bin", self.file]
+        Util.remove_file(self.file)
 
         maxPly = self.sbMaxPly.valor()
         minGame = self.sbMinGame.valor()
@@ -130,15 +130,15 @@ class WBooksCrear(QtWidgets.QDialog):
 
         # Mostramos el resultado
         txt = process.stdout.read()
-        if os.path.isfile(self.fichero):
-            txt += "\n" + _X(_("Book created : %1"), self.fichero)
+        if os.path.isfile(self.file):
+            txt += "\n" + _X(_("Book created : %1"), self.file)
         me.final()
         QTUtil2.message_bold(self, txt)
 
         Util.remove_file(fichTemporal)
 
-        name = os.path.basename(self.fichero)[:-4]
-        b = Books.Libro("P", name, self.fichero, False)
+        name = os.path.basename(self.file)[:-4]
+        b = Books.Libro("P", name, self.file, False)
         self.list_books.nuevo(b)
         fvar = self.configuration.file_books
         self.list_books.save_pickle(fvar)

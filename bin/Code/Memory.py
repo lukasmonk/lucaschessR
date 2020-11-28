@@ -8,9 +8,9 @@ class Memoria:
     def __init__(self, procesador):
 
         self.procesador = procesador
-        self.fichero = procesador.configuration.file_memory
+        self.file = procesador.configuration.file_memory
 
-        self.dic_data = Util.restore_pickle(self.fichero)
+        self.dic_data = Util.restore_pickle(self.file)
         if self.dic_data is None:
             self.dic_data = {}
             for x in range(6):
@@ -80,7 +80,7 @@ class Memoria:
             if record == 0 or vtime < record:
                 li = self.dic_data[numcategoria]
                 li[nivel] = vtime
-                Util.save_pickle(self.fichero, self.dic_data)
+                Util.save_pickle(self.file, self.dic_data)
 
             return True
         return False

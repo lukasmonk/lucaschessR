@@ -562,9 +562,9 @@ class DBgames:
             self.db_stat.massive_append_set(True)
 
         def write_logs(fich, pgn):
-            with open(fich, "at", encoding="utf-8", errors="ignore") as ferr:
+            with open(fich, "ab") as ferr:
                 ferr.write(pgn)
-                ferr.write("\n")
+                ferr.write(b"\n")
 
         si_cols_cambiados = False
         select = ",".join('"%s"' % campo for campo in self.li_fields)
@@ -583,16 +583,16 @@ class DBgames:
         obj_decode = Util.Decode()
         decode = obj_decode.decode
 
-        for fichero in ficheros:
-            nomfichero = os.path.basename(fichero)
+        for file in ficheros:
+            nomfichero = os.path.basename(file)
             fich_erroneos = os.path.join(Code.configuration.carpetaTemporal(), nomfichero[:-3] + "errors.pgn")
             fich_duplicados = os.path.join(Code.configuration.carpetaTemporal(), nomfichero[:-3] + "duplicates.pgn")
             dlTmp.pon_titulo(nomfichero)
             next_n = random.randint(1000, 2000)
 
-            obj_decode.read_file(fichero)
+            obj_decode.read_file(file)
 
-            with PGNreader(fichero, self.depthStat()) as fpgn:
+            with PGNreader(file, self.depthStat()) as fpgn:
                 bsize = fpgn.size
                 for n, (body, is_raw, pv, fens, bdCab, bdCablwr, btell) in enumerate(fpgn, 1):
                     if n == next_n:
@@ -611,7 +611,7 @@ class DBgames:
                     # Sin movimientos
                     if not pv and not allows_cero_moves:
                         erroneos += 1
-                        write_logs(fich_erroneos, decode(fpgn.bpgn()))
+                        write_logs(fich_erroneos, fpgn.bpgn())
                         continue
 
                     dCab = {decode(k): decode(v) for k, v in bdCab.items()}
@@ -629,14 +629,14 @@ class DBgames:
                         else:
                             if not allows_fen:
                                 erroneos += 1
-                                write_logs(fich_erroneos, decode(fpgn.bpgn()))
+                                write_logs(fich_erroneos, fpgn.bpgn())
                                 continue
                             xpv = "|%s|%s" % (fen, xpv)
 
                     if not fen:
                         if not allows_complete_game:
                             erroneos += 1
-                            write_logs(fich_erroneos, decode(fpgn.bpgn()))
+                            write_logs(fich_erroneos, fpgn.bpgn())
                             continue
                         fen = None  # por si hay alguno vacio
 
@@ -652,7 +652,7 @@ class DBgames:
 
                         if not ok:
                             duplicados += 1
-                            write_logs(fich_duplicados, decode(fpgn.bpgn()))
+                            write_logs(fich_duplicados, fpgn.bpgn())
                             continue
 
                     st_xpv_bloque.add(xpv)
@@ -835,14 +835,14 @@ class DBgames:
         return si_cols_cambiados
 
     def check_game(self, game):
-        si_completa = game.siFenInicial()
+        is_complete = game.siFenInicial()
 
         if not self.allows_positions:
-            if not si_completa:
+            if not is_complete:
                 return _("This database does not allow games that are not complete.")
 
         if not self.allows_complete_game:
-            if si_completa:
+            if is_complete:
                 return _("This database only allows positions.")
 
         if not self.allows_zero_moves:

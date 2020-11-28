@@ -668,7 +668,7 @@ def importar_gm(owner_gm):
     web = "https://lucaschess.pythonanywhere.com/static/gm_mw"
 
     message = _("Reading the list of Grandmasters from the web")
-    me = QTUtil2.mensEspera.inicio(owner_gm, message)
+    me = QTUtil2.mensEspera.start(owner_gm, message)
 
     fich_name = "_listaGM.txt"
     url_lista = "%s/%s" % (web, fich_name)
@@ -689,8 +689,8 @@ def importar_gm(owner_gm):
             linea = linea.strip()
             if linea:
                 gm, name, ctam, cpart, wm, cyear = linea.split("|")
-                fichero = Code.path_resource("GM/%s.xgm" % gm)
-                if Util.filesize(fichero) != int(ctam):  # si no existe tam = -1
+                file = Code.path_resource("GM/%s.xgm" % gm)
+                if Util.filesize(file) != int(ctam):  # si no existe tam = -1
                     dic = {"GM": gm, "NOMBRE": name, "PARTIDAS": cpart, "ELEGIDO": False, "BORN": cyear, "WM": wm}
                     li_gm.append(dic)
 
@@ -707,7 +707,7 @@ def importar_gm(owner_gm):
             if dic["ELEGIDO"]:
                 gm = dic["GM"]
                 gm = gm[0].upper() + gm[1:].lower()
-                me = QTUtil2.mensEspera.inicio(owner_gm, _X(_("Import %1"), gm), opacity=1.0)
+                me = QTUtil2.mensEspera.start(owner_gm, _X(_("Import %1"), gm), opacity=1.0)
 
                 # Descargamos
                 fzip = gm + ".zip"
@@ -716,8 +716,8 @@ def importar_gm(owner_gm):
                 if si_bien:
                     zfobj = zipfile.ZipFile(fzip)
                     for name in zfobj.namelist():
-                        fichero = Code.path_resource("GM/%s" % name)
-                        with open(fichero, "wb") as outfile:
+                        file = Code.path_resource("GM/%s" % name)
+                        with open(file, "wb") as outfile:
                             outfile.write(zfobj.read(name))
                     zfobj.close()
                     os.remove(fzip)

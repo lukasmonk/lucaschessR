@@ -74,13 +74,13 @@ class UnMove:
         self.listaMovesHijos = ListaMoves(self, self.game.last_position.fen(), self.listaMovesPadre.dbCache)
         return self.listaMovesHijos
 
-    def inicio(self):
+    def start(self):
         self.current_position = -1
 
     def atras(self):
         self.current_position -= 1
         if self.current_position < -1:
-            self.inicio()
+            self.start()
 
     def adelante(self):
         self.current_position += 1
@@ -741,7 +741,7 @@ class InfoMove(QtWidgets.QWidget):
         self.board.crea()
         self.board.ponerPiezasAbajo(is_white_bottom)
 
-        btInicio = Controles.PB(self, "", self.inicio).ponIcono(Iconos.MoverInicio())
+        btInicio = Controles.PB(self, "", self.start).ponIcono(Iconos.MoverInicio())
         btAtras = Controles.PB(self, "", self.atras).ponIcono(Iconos.MoverAtras())
         btAdelante = Controles.PB(self, "", self.adelante).ponIcono(Iconos.MoverAdelante())
         btFinal = Controles.PB(self, "", self.final).ponIcono(Iconos.MoverFinal())
@@ -775,8 +775,8 @@ class InfoMove(QtWidgets.QWidget):
 
         self.lbAnalisis.set_text("<b>" + self.movActual.etiPuntos(True) + "</b>")
 
-    def inicio(self):
-        self.movActual.inicio()
+    def start(self):
+        self.movActual.start()
         self.ponValores()
 
     def atras(self):

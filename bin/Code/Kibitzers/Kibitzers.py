@@ -83,13 +83,13 @@ class Kibitzer(Engines.Engine):
 
 class Kibitzers:
     def __init__(self):
-        self.fichero = Code.configuration.file_kibitzers()
+        self.file = Code.configuration.file_kibitzers()
         self.lista, self.lastfolder = self.read()
 
     def read(self):
         lista = []
         lastfolder = ""
-        dic = Util.restore_pickle(self.fichero)
+        dic = Util.restore_pickle(self.file)
 
         if dic:
             lastfolder = dic.get("LASTFOLDER", "")
@@ -103,7 +103,7 @@ class Kibitzers:
 
     def save(self):
         dic = {"LISTA": [en.save() for en in self.lista], "LASTFOLDER": self.lastfolder}
-        Util.save_pickle(self.fichero, dic)
+        Util.save_pickle(self.file, dic)
 
     def nuevo_engine(self, name, engine, tipo, prioridad):
         kib = Kibitzer()

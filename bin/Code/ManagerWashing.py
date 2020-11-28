@@ -18,19 +18,19 @@ def managerWashing(procesador):
     engine = washing.last_engine(procesador.configuration)
     if engine.state == Washing.CREATING:
         procesador.manager = ManagerWashingCreate(procesador)
-        procesador.manager.inicio(dbwashing, washing, engine)
+        procesador.manager.start(dbwashing, washing, engine)
 
     elif engine.state == Washing.TACTICS:
         procesador.manager = ManagerWashingTactics(procesador)
-        procesador.manager.inicio(dbwashing, washing, engine)
+        procesador.manager.start(dbwashing, washing, engine)
 
     elif engine.state == Washing.REPLAY:
         procesador.manager = ManagerWashingReplay(procesador)
-        procesador.manager.inicio(dbwashing, washing, engine)
+        procesador.manager.start(dbwashing, washing, engine)
 
 
 class ManagerWashingReplay(Manager.Manager):
-    def inicio(self, dbwashing, washing, engine):
+    def start(self, dbwashing, washing, engine):
         self.dbwashing = dbwashing
         self.washing = washing
         self.engine = engine
@@ -129,7 +129,7 @@ class ManagerWashingReplay(Manager.Manager):
             self.timekeeper.start()
             self.activate_side(is_white)
 
-    def finPartida(self):
+    def end_game(self):
         ok = self.errores == 0
         self.dbwashing.done_reinit(self.engine)
 
@@ -203,7 +203,7 @@ class ManagerWashingReplay(Manager.Manager):
         self.add_move(move, True)
         self.posJugadaObj += 1
         if len(self.game) == self.gameObj.num_moves():
-            self.finPartida()
+            self.end_game()
 
         else:
             self.error = ""
@@ -228,16 +228,16 @@ class ManagerWashingReplay(Manager.Manager):
         self.error = ""
 
     def terminar(self):
-        self.procesador.inicio()
+        self.procesador.start()
         self.procesador.showWashing()
 
     def final_x(self):
-        self.procesador.inicio()
+        self.procesador.start()
         return False
 
 
 class ManagerWashingTactics(Manager.Manager):
-    def inicio(self, dbwashing, washing, engine):
+    def start(self, dbwashing, washing, engine):
         self.dbwashing = dbwashing
         self.washing = washing
         self.engine = engine
@@ -298,7 +298,7 @@ class ManagerWashingTactics(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_HELP:
             self.ayuda()
@@ -428,17 +428,17 @@ class ManagerWashingTactics(Manager.Manager):
         if self.ayudasEsteMov > 1 and self.erroresEsteMov > 0:
             self.board.ponFlechasTmp([(mov[:2], mov[2:], True)], 1200)
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
         self.procesador.showWashing()
 
     def final_x(self):
-        self.procesador.inicio()
+        self.procesador.start()
         return False
 
 
 class ManagerWashingCreate(Manager.Manager):
-    def inicio(self, dbwashing, washing, engine):
+    def start(self, dbwashing, washing, engine):
         self.dbwashing = dbwashing
         self.washing = washing
 
@@ -719,7 +719,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.analizaTerminar()
         self.main_window.activaJuego(False, False)
         self.quitaCapturas()
-        self.procesador.inicio()
+        self.procesador.start()
         self.procesador.showWashing()
 
     def final_x(self):
@@ -771,7 +771,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.game.set_position()
         self.dbwashing.saveGame(None, False)
 
-        self.inicio(self.dbwashing, self.washing, self.engine)
+        self.start(self.dbwashing, self.washing, self.engine)
 
     def muestra_resultado(self):
         self.state = ST_ENDGAME

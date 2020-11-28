@@ -291,14 +291,14 @@ class WTV_SVGs(QTVarios.WDialogo):
             return
 
         if resp == "@":
-            fichero = QTUtil2.leeFichero(self, "imgs", "svg", titulo=_("Image"))
-            if not fichero:
+            file = QTUtil2.leeFichero(self, "imgs", "svg", titulo=_("Image"))
+            if not file:
                 return
         else:
-            fichero = resp
-        with open(fichero, "rt", encoding="utf-8", errors="ignore") as f:
+            file = resp
+        with open(file, "rt", encoding="utf-8", errors="ignore") as f:
             contenido = f.read()
-        name = os.path.basename(fichero)[:-4]
+        name = os.path.basename(file)[:-4]
         w = WTV_SVG(self, None, xml=contenido, name=name)
         if w.exec_():
             regSVG = w.regSVG

@@ -12,7 +12,7 @@ def update_file(titulo, urlfichero, tam):
     shutil.rmtree("actual", ignore_errors=True)
     Util.create_folder("actual")
 
-    # Se trae el fichero
+    # Se trae el file
     global progreso, is_beginning
     progreso = QTUtil2.BarraProgreso(None, titulo, _("Updating..."), 100).mostrar()
     is_beginning = True
@@ -37,7 +37,7 @@ def update_file(titulo, urlfichero, tam):
     if is_canceled:
         return False
 
-    # Comprobamos que se haya traido bien el fichero
+    # Comprobamos que se haya traido bien el file
     if tam != Util.filesize(local_file):
         return False
 

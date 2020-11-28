@@ -303,7 +303,7 @@ class WWashing(QTVarios.WDialogo):
                 if path:
                     if not path.lower().endswith(".lcdb"):
                         path += ".lcdb"
-                    me = QTUtil2.mensEspera.inicio(self, _("Saving..."))
+                    me = QTUtil2.mensEspera.start(self, _("Saving..."))
                     dbn = DBgames.DBgames(path)
                     for pc in other_pc():
                         dbn.inserta(pc)

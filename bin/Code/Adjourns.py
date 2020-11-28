@@ -70,7 +70,7 @@ class Adjourns:
         else:
             manager.main_window.activaJuego(False, False)
             manager.quitaCapturas()
-            manager.procesador.inicio()
+            manager.procesador.start()
             return True
 
     def __enter__(self):

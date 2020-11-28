@@ -21,10 +21,10 @@ from Code import Util
 
 
 class PuenteHistorico:
-    def __init__(self, fichero, nivel):
-        self.fichero = fichero
+    def __init__(self, file, nivel):
+        self.file = file
         self.nivel = nivel
-        self.db = Base.DBBase(fichero)
+        self.db = Base.DBBase(file)
         self.tabla = "Nivel%d" % self.nivel
 
         if not self.db.existeTabla(self.tabla):

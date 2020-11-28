@@ -176,7 +176,7 @@ class WSave(QTVarios.WDialogo):
         self.game = game
         self.game.order_tags()
         self.body = self.game.pgnBase()
-        self.li_labels = self.game.li_tags
+        self.li_labels = [[k,v] for k, v in self.game.li_tags]
         self.configuration = configuration
         self.file = ""
         self.vars_read()
@@ -196,7 +196,7 @@ class WSave(QTVarios.WDialogo):
 
         tabs = Controles.Tab(self)
 
-        # Tab-fichero -----------------------------------------------------------------------------------------------
+        # Tab-file -----------------------------------------------------------------------------------------------
         lb_file = Controles.LB(self, _("File to save") + ": ")
         bt_history = Controles.PB(self, "", self.history).ponIcono(Iconos.Favoritos(), 24).ponToolTip(_("Previous"))
         bt_boxrooms = (
@@ -474,7 +474,7 @@ class WSave(QTVarios.WDialogo):
         n0 = self.grid_labels.recno()
         if n0 < len(self.li_labels) - 1:
             n1 = n0 + 1
-            self.li_labels[n0], self.li_labels[n1] = (self.li_labels[n1], self.li_labels[n0])
+            self.li_labels[n0], self.li_labels[n1] = self.li_labels[n1], self.li_labels[n0]
             self.grid_labels.goto(n1, 0)
             self.grid_labels.refresh()
 

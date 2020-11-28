@@ -8,7 +8,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerTrainBooks(Manager.Manager):
-    def inicio(self, book_player, player_highest, book_rival, resp_rival, is_white):
+    def start(self, book_player, player_highest, book_rival, resp_rival, is_white):
         self.type_play = GT_BOOK
 
         self.hints = 9999  # Para que analice sin problemas
@@ -57,7 +57,7 @@ class ManagerTrainBooks(Manager.Manager):
 
     def run_action(self, clave):
         if clave == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif clave == TB_REINIT:
             self.reiniciar()
@@ -78,16 +78,16 @@ class ManagerTrainBooks(Manager.Manager):
             Manager.Manager.rutinaAccionDef(self, clave)
 
     def final_x(self):
-        return self.finPartida()
+        return self.end_game()
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
         return False
 
     def reiniciar(self):
         self.game.reset()
         book_player, player_highest, book_rival, resp_rival, is_white = self.li_reinit
-        self.inicio(book_player, player_highest, book_rival, resp_rival, is_white)
+        self.start(book_player, player_highest, book_rival, resp_rival, is_white)
 
     def siguienteJugada(self):
         if self.state == ST_ENDGAME:

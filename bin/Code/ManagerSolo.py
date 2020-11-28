@@ -18,7 +18,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerSolo(Manager.Manager):
-    def inicio(self, dic=None):
+    def start(self, dic=None):
         self.game_type = GT_ALONE
 
         # self.pgn.set_variations_mode(True)
@@ -106,7 +106,7 @@ class ManagerSolo(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_TAKEBACK:
             self.atras()
@@ -156,7 +156,7 @@ class ManagerSolo(Manager.Manager):
         li = [TB_CLOSE, TB_FILE, TB_PGN_LABELS, TB_TAKEBACK, TB_HELP_TO_MOVE, TB_REINIT, TB_CONFIG, TB_UTILITIES]
         self.main_window.pon_toolbar(li)
 
-    def finPartida(self):
+    def end_game(self):
         self.board.setAcceptDropPGNs(None)
 
         # Comprobamos que no haya habido cambios from_sq el ultimo grabado
@@ -170,10 +170,10 @@ class ManagerSolo(Manager.Manager):
             elif resp:
                 self.grabarComo()
 
-        self.procesador.inicio()
+        self.procesador.start()
 
     def final_x(self):
-        self.finPartida()
+        self.end_game()
         return False
 
     def siguiente_jugada(self):
@@ -256,7 +256,7 @@ class ManagerSolo(Manager.Manager):
     def reiniciar(self, dic=None):
         if dic is None:
             dic = self.creaDic()
-        self.inicio(dic)
+        self.start(dic)
 
     def editEtiquetasPGN(self):
         resp = WindowSolo.editEtiquetasPGN(self.procesador, self.game.li_tags)
@@ -271,35 +271,35 @@ class ManagerSolo(Manager.Manager):
             self.configuration.folder_save_lcsb(direc)
             self.configuration.graba()
 
-    def grabarFichero(self, fichero):
+    def grabarFichero(self, file):
         dic = self.creaDic()
         dic["GAME"] = self.game.save()
-        dic["LAST_FILE"] = Util.dirRelativo(fichero)
+        dic["LAST_FILE"] = Util.dirRelativo(file)
         dic["WHITEBOTTOM"] = self.board.is_white_bottom
-        if Util.save_pickle(fichero, dic):
+        if Util.save_pickle(file, dic):
             self.valor_inicial = self.dame_valor_actual()
-            self.guardaDir(fichero)
+            self.guardaDir(file)
             self.changed = False
-            name = os.path.basename(fichero)
+            name = os.path.basename(file)
             QTUtil2.mensajeTemporal(self.main_window, _X(_("Saved to %1"), name), 0.8)
-            self.guardarHistorico(fichero)
+            self.guardarHistorico(file)
             return True
         else:
-            QTUtil2.message_error(self.main_window, "%s : %s" % (_("Unable to save"), fichero))
+            QTUtil2.message_error(self.main_window, "%s : %s" % (_("Unable to save"), file))
             return False
 
     def grabarComo(self):
         extension = "lcsb"
         siConfirmar = True
         if self.ultimoFichero:
-            fichero = self.ultimoFichero
+            file = self.ultimoFichero
         else:
-            fichero = self.configuration.folder_save_lcsb()
+            file = self.configuration.folder_save_lcsb()
         while True:
             resp = QTUtil2.salvaFichero(
                 self.main_window,
                 _("File to save"),
-                fichero,
+                file,
                 _("File") + " %s (*.%s)" % (extension, extension),
                 siConfirmarSobreescritura=siConfirmar,
             )

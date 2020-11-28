@@ -103,6 +103,9 @@ class EngineManager:
         self.nMultiPV = 0
 
     def setMultiPV(self, nMultiPV):
+        if type(nMultiPV) == str:
+            self.confMotor.actMultiPV(nMultiPV)
+            nMultiPV = self.confMotor.multiPV
         self.nMultiPV = nMultiPV
 
     def remove_gui_dispatch(self):
@@ -110,7 +113,7 @@ class EngineManager:
             self.engine.gui_dispatch = None
 
     def testEngine(self, nMultiPV=0):
-        if self.engine:
+        if self.engine is not None:
             return
         if self.nMultiPV:
             self.nMultiPV = min(self.nMultiPV, self.confMotor.maxMultiPV)

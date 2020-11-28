@@ -5,8 +5,8 @@ from Code.SQL import Base
 from Code import Util
 
 
-def str_file(fichero):
-    with open(fichero) as f:
+def str_file(file):
+    with open(file) as f:
         return eval(f.read())
 
 

@@ -63,9 +63,9 @@ class WLines(QTVarios.WDialogo):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("LINE", _("Line"), 35, edicion=Delegados.EtiquetaPOS(False, True))
-        inicio = self.gamebase.num_moves() // 2 + 1
+        start = self.gamebase.num_moves() // 2 + 1
         ancho_col = int(((self.configuration.x_pgn_width - 35 - 20) / 2) * 80 / 100)
-        for x in range(inicio, 75):
+        for x in range(start, 75):
             o_columns.nueva(str(x), str(x), ancho_col, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, True))
         self.glines = Grid.Grid(self, o_columns, siCabeceraMovible=False)
         self.glines.setAlternatingRowColors(False)
@@ -555,8 +555,8 @@ class WLines(QTVarios.WDialogo):
                 liOp = self.dbop.getOtras(self.configuration, game_base)
                 if liOp:
                     otra = frommenu.submenu(_("Other opening lines"), Iconos.OpeningLines())
-                    for fichero, titulo in liOp:
-                        otra.opcion(("ol", (fichero, game_base)), titulo, Iconos.PuntoVerde())
+                    for file, titulo in liOp:
+                        otra.opcion(("ol", (file, game_base)), titulo, Iconos.PuntoVerde())
                     frommenu.separador()
             frommenu.opcion(("pgn", game_base), _("PGN with variations"), Iconos.Board())
             frommenu.separador()
@@ -598,13 +598,13 @@ class WLines(QTVarios.WDialogo):
         elif tipo == "opening":
             self.importarOpening(game)
         elif tipo == "ol":
-            fichero, game = game
-            self.importarOtra(fichero, game)
+            file, game = game
+            self.importarOtra(file, game)
         self.show_lines()
 
-    def importarOtra(self, fichero, game):
+    def importarOtra(self, file, game):
         um = QTUtil2.unMomento(self)
-        pathFichero = os.path.join(self.configuration.folder_openings(), fichero)
+        pathFichero = os.path.join(self.configuration.folder_openings(), file)
         self.dbop.importarOtra(pathFichero, game)
         um.final()
         self.glines.refresh()
@@ -885,7 +885,7 @@ class WLines(QTVarios.WDialogo):
                 mrm = dic["ANALISIS"]
                 move.analysis = mrm, 0
             else:
-                me = QTUtil2.mensEspera.inicio(self, _("Analyzing the move...."), physical_pos="ad")
+                me = QTUtil2.mensEspera.start(self, _("Analyzing the move...."), physical_pos="ad")
 
                 move.analysis = xanalyzer.analizaJugadaPartida(
                     game, len(game) - 1, xanalyzer.motorTiempoJugada, xanalyzer.motorProfundidad
@@ -1191,9 +1191,9 @@ class WLines(QTVarios.WDialogo):
         self.show_lines()
 
 
-def study(procesador, fichero):
+def study(procesador, file):
     with QTUtil.EscondeWindow(procesador.main_window):
-        dbop = OpeningLines.Opening(os.path.join(procesador.configuration.folder_openings(), fichero))
+        dbop = OpeningLines.Opening(os.path.join(procesador.configuration.folder_openings(), file))
         w = WLines(procesador, dbop)
         w.exec_()
         dbop.close()

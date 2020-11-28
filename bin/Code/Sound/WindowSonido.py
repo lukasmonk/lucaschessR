@@ -326,11 +326,11 @@ class WEdicionSonido(QTVarios.WDialogo):
 
     def wav(self):
         carpeta = Util.restore_pickle(self.confich)
-        fichero = QTUtil2.leeFichero(self, carpeta, "wav")
-        if fichero:
-            carpeta = os.path.dirname(fichero)
+        file = QTUtil2.leeFichero(self, carpeta, "wav")
+        if file:
+            carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
-            if self.taller.leeWAV(fichero):
+            if self.taller.leeWAV(file):
                 self.mesa.ponCentesimas(self.taller.centesimas)
             else:
                 QTUtil2.message_error(self, _("It is impossible to read this file, it is not compatible."))
@@ -339,11 +339,11 @@ class WEdicionSonido(QTVarios.WDialogo):
     def grabar(self):
         carpeta = Util.restore_pickle(self.confich)
         filtro = _("File") + " wav (*.wav)"
-        fichero = QTUtil2.salvaFichero(self, _("Save wav"), carpeta, filtro, siConfirmarSobreescritura=True)
-        if fichero:
-            carpeta = os.path.dirname(fichero)
+        file = QTUtil2.salvaFichero(self, _("Save wav"), carpeta, filtro, siConfirmarSobreescritura=True)
+        if file:
+            carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
-            f = open(fichero, "wb")
+            f = open(file, "wb")
             f.write(self.taller.wav)
             f.close()
             self.ponBaseTB()

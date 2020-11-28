@@ -243,7 +243,7 @@ class ManagerElo(Manager.Manager):
             if mt.key == key and mt.depth == depth:
                 return mt
 
-    def inicio(self, datos_motor):
+    def start(self, datos_motor):
         self.base_inicio(datos_motor)
         self.siguiente_jugada()
 
@@ -415,7 +415,7 @@ class ManagerElo(Manager.Manager):
             self.game.resign(self.is_human_side_white)
             self.muestra_resultado()
         else:
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 

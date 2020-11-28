@@ -118,9 +118,9 @@ class ConfigTabTema(JS):
 
 class ConfigTabBase(JS):
     def __init__(self):
-        self.inicio()
+        self.start()
 
-    def inicio(self):
+    def start(self):
         self.x_nomPiezas = ""
         self.x_tipoLetra = ""
         self.x_cBold = ""
@@ -256,7 +256,7 @@ class ConfigBoard(JS):
             if is_base:
                 self.o_base.defecto()
             else:
-                self.o_base.inicio()
+                self.o_base.start()
 
     def graba(self):
         return self.save_dic()

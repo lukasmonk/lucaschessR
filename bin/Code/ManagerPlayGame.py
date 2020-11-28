@@ -12,7 +12,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerPlayGame(Manager.Manager):
-    def inicio(self, recno, is_white):
+    def start(self, recno, is_white):
 
         db = WindowPlayGame.DBPlayGame(self.configuration.file_play_game())
         reg = db.leeRegistro(recno)
@@ -70,7 +70,7 @@ class ManagerPlayGame(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.procesador.inicio()
+            self.procesador.start()
             self.procesador.play_game_show(self.recno)
 
         elif key == TB_CANCEL:
@@ -97,7 +97,7 @@ class ManagerPlayGame(Manager.Manager):
     def cancelar(self):
         self.puntos = -999
         self.analizaTerminar()
-        self.procesador.inicio()
+        self.procesador.start()
         return False
 
     def reiniciar(self, siPregunta):

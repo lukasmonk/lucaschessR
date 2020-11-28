@@ -229,8 +229,8 @@ class RunEngine:
 
             self.pid = None
 
-    def log_open(self, fichero):
-        self.log = open(fichero, "at", encoding="utf-8")
+    def log_open(self, file):
+        self.log = open(file, "at", encoding="utf-8")
         self.log.write("%s %s\n\n" % (str(Util.today()), "-" * 70))
 
     def log_close(self):

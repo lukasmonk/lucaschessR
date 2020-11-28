@@ -185,7 +185,7 @@ class WDailyTestBase(QTVarios.WDialogo):
                     for linea in f:
                         if linea.startswith("[FEN "):
                             li.append(linea[6:].split('"')[0])
-            else:  # se supone que es un fichero de fens
+            else:  # se supone que es un file de fens
                 with open(fns, "rt") as f:
                     for linea in f:
                         linea = linea.strip()

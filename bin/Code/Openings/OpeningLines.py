@@ -23,9 +23,9 @@ class ListaOpenings:
         if not self.folder or not os.path.isdir(self.folder):
             self.folder = configuration.folderBaseOpenings
 
-        self.fichero = os.path.join(self.folder, "openinglines.pk")
+        self.file = os.path.join(self.folder, "openinglines.pk")
 
-        self.lista = Util.restore_pickle(self.fichero)
+        self.lista = Util.restore_pickle(self.file)
         if self.lista is None:
             self.lista = self.read()  # file, lines, title, pv
             self.save()
@@ -33,7 +33,7 @@ class ListaOpenings:
             self.testdates()
 
     def testdates(self):
-        index_date = Util.datefile(self.fichero)
+        index_date = Util.datefile(self.file)
 
         for pos, dic in enumerate(self.lista):
             pathfile = os.path.join(self.folder, dic["file"])
@@ -82,11 +82,11 @@ class ListaOpenings:
     def read(self):
         li = []
         for entry in Util.listdir(self.folder):
-            fichero = entry.name
-            if fichero.endswith(".opk"):
+            file = entry.name
+            if file.endswith(".opk"):
                 op = Opening(entry.path)
                 dicline = {
-                    "file": fichero,
+                    "file": file,
                     "pv": op.basePV,
                     "title": op.title,
                     "lines": len(op),
@@ -98,7 +98,7 @@ class ListaOpenings:
         return li
 
     def save(self):
-        Util.save_pickle(self.fichero, self.lista)
+        Util.save_pickle(self.file, self.lista)
 
     def select_filename(self, name):
         name = name.strip().replace(" ", "_")

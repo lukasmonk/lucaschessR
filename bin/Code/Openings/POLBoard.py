@@ -44,8 +44,8 @@ class BoardLines(QtWidgets.QWidget):
         self.board.ponerPiezasAbajo(True)
         self.board.set_dispatcher(self.player_has_moved)
         self.board.dispatchSize(self.ajustaAncho)
-        self.board.dbVisual_setFichero(self.dbop.nom_fichero)
-        self.board.dbVisual_setShowAllways(True)
+        self.board.dbvisual_set_file(self.dbop.nom_fichero)
+        self.board.dbvisual_set_show_allways(True)
         self.board.dbVisual_setSaveAllways(True)
 
         self.board.ponerPiezasAbajo(self.dbop.getconfig("WHITEBOTTOM", True))

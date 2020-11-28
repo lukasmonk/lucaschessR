@@ -12,7 +12,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerCompeticion(Manager.Manager):
-    def inicio(self, categorias, categoria, nivel, is_white, puntos):
+    def start(self, categorias, categoria, nivel, is_white, puntos):
         self.base_inicio(categorias, categoria, nivel, is_white, puntos)
         self.siguiente_jugada()
 
@@ -120,7 +120,7 @@ class ManagerCompeticion(Manager.Manager):
         if len(self.game) and QTUtil2.pregunta(self.main_window, _("Restart the game?")):
             self.game.set_position()
             categoria, nivel, is_white = self.liReiniciar
-            self.inicio(self.categorias, categoria, nivel, is_white, self.puntos)
+            self.start(self.categorias, categoria, nivel, is_white, self.puntos)
 
     def adjourn(self):
         if len(self.game) and QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
@@ -170,7 +170,7 @@ class ManagerCompeticion(Manager.Manager):
             self.guardarNoTerminados()
             self.ponFinJuego()
         else:
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 
@@ -186,7 +186,7 @@ class ManagerCompeticion(Manager.Manager):
             self.guardarGanados(False)
             self.ponFinJuego()
         else:
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 

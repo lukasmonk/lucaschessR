@@ -6,7 +6,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
-    def inicio(self, dic_var):
+    def start(self, dic_var):
         self.base_inicio(dic_var)
         self.siguiente_jugada()
 

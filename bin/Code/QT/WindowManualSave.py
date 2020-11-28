@@ -293,7 +293,7 @@ class WManualSave(QTVarios.WDialogo):
         dirSalvados = self.configuration.x_save_folder
         path = QTUtil2.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PGN (*.pgn)", False)
         if path:
-            carpeta, fichero = os.path.split(path)
+            carpeta, file = os.path.split(path)
             if carpeta != self.configuration.x_save_folder:
                 self.configuration.x_save_folder = carpeta
                 self.configuration.graba()
@@ -322,7 +322,7 @@ class WManualSave(QTVarios.WDialogo):
     def edit_solucion(self):
         self.reset_motor()
         pc = self.crea_game()
-        pc = self.procesador.managerPartida(self, pc, False, False, self.board)
+        pc = self.procesador.manager_game(self, pc, False, False, self.board)
         if pc:
             self.position = pc.first_position
             self.em_solucion.set_text(pc.pgnBaseRAW())

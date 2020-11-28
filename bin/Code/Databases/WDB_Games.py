@@ -376,7 +376,7 @@ class WGames(QtWidgets.QWidget):
             self.grid.refresh()
 
     def edit(self, recno, game):
-        game = self.procesador.managerPartida(self, game, not self.dbGames.allows_positions, False, self.infoMove.board)
+        game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board)
         if game is not None:
             resp = self.dbGames.guardaPartidaRecno(recno, game)
             if resp.ok:
@@ -406,7 +406,9 @@ class WGames(QtWidgets.QWidget):
         self.edit(recno, pc)
 
     def tw_edit(self):
+        um = QTUtil2.unMomento(self, _("Reading the game"))
         game, recno = self.current_game()
+        um.final()
         if game is not None:
             self.edit(recno, game)
         elif recno is not None:
@@ -468,7 +470,7 @@ class WGames(QtWidgets.QWidget):
             self.dbGames.filterPV("")
             self.where = None
             self.summaryActivo["game"] = Game.Game()
-            self.wsummary.inicio()
+            self.wsummary.start()
             refresh()
 
         menu = QTVarios.LCMenu(self)
@@ -657,8 +659,8 @@ class WGames(QtWidgets.QWidget):
     def graphicBoardReset(self):
         showAllways, specific = self.readVarsConfig()
         fichGraphic = self.dbGames.nom_fichero if specific else None
-        self.infoMove.board.dbVisual_setFichero(fichGraphic)
-        self.infoMove.board.dbVisual_setShowAllways(showAllways)
+        self.infoMove.board.dbvisual_set_file(fichGraphic)
+        self.infoMove.board.dbvisual_set_show_allways(showAllways)
 
     def tw_dir_show_yes(self):
         self.dbGames.guardaConfig("GRAPHICS_SHOW_ALLWAYS", True)

@@ -9,7 +9,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerTurnOnLights(Manager.Manager):
-    def inicio(self, num_theme, num_block, tol):
+    def start(self, num_theme, num_block, tol):
 
         if hasattr(self, "reiniciando"):
             if self.reiniciando:
@@ -113,7 +113,7 @@ class ManagerTurnOnLights(Manager.Manager):
 
     def run_action(self, key):
         if key == TB_CLOSE:
-            self.finPartida()
+            self.end_game()
 
         elif key == TB_HELP:
             self.ayuda()
@@ -138,7 +138,7 @@ class ManagerTurnOnLights(Manager.Manager):
             self.block.new_reinit(self.total_time_used, self.errores, self.hints)
             self.total_time_used = 0.0
             TurnOnLights.write_tol(self.tol)
-        self.inicio(self.num_theme, self.num_block, self.tol)
+        self.start(self.num_theme, self.num_block, self.tol)
 
     def siguiente_jugada(self):
         if self.state == ST_ENDGAME:
@@ -318,12 +318,12 @@ class ManagerTurnOnLights(Manager.Manager):
             if self.dicFENayudas[fen] > 2:
                 self.put_arrow_sc(mov[:2], mov[2:4])
 
-    def finPartida(self):
-        self.procesador.inicio()
+    def end_game(self):
+        self.procesador.start()
         self.procesador.showTurnOnLigths(self.tol.name)
 
     def final_x(self):
-        self.procesador.inicio()
+        self.procesador.start()
         return False
 
     def current_pgn(self):

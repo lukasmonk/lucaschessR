@@ -200,7 +200,7 @@ class ControlMensEspera:
     def __init__(self):
         self.me = None
 
-    def inicio(
+    def start(
         self,
         parent,
         mensaje,
@@ -293,7 +293,7 @@ def mensajeTemporal(
         siCancelar = segundos > 3.0
     if titCancelar is None:
         titCancelar = _("Continue")
-    me = mensEspera.inicio(
+    me = mensEspera.start(
         main_window,
         mensaje,
         background=background,
@@ -309,7 +309,7 @@ def mensajeTemporal(
 
 
 def mensajeTemporalSinImagen(main_window, mensaje, segundos, background=None, puntos=12, physical_pos="c"):
-    me = mensEspera.inicio(
+    me = mensEspera.start(
         main_window, mensaje, physical_pos=physical_pos, conImagen=False, puntos=puntos, fixedSize=None, background=background
     )
     if segundos:
@@ -589,11 +589,11 @@ def comboBoxLB(parent, li_options, valor, etiqueta=None):
 def unMomento(owner, mensaje=None):
     if mensaje is None:
         mensaje = _("One moment please...")
-    return mensEspera.inicio(owner, mensaje)
+    return mensEspera.start(owner, mensaje)
 
 
 def analizando(owner):
-    return mensEspera.inicio(owner, _("Analyzing the move...."), physical_pos="ad")
+    return mensEspera.start(owner, _("Analyzing the move...."), physical_pos="ad")
 
 
 def ponIconosMotores(lista):

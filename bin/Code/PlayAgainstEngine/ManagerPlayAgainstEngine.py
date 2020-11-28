@@ -66,7 +66,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     toolbar_state = None
     premove = None
 
-    def inicio(self, dic_var):
+    def start(self, dic_var):
         self.base_inicio(dic_var)
         self.siguiente_jugada()
 
@@ -506,7 +506,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.reinicio["cache"] = self.cache
         self.game.reset()
         self.toolbar_state = ST_ENDGAME
-        self.inicio(self.reinicio)
+        self.start(self.reinicio)
 
     def adjourn(self):
         if QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
@@ -581,7 +581,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.xtutor.ac_final(-1)
             self.main_window.activaJuego(False, False)
             self.quitaCapturas()
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 
@@ -601,7 +601,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.analizaTerminar()
             self.main_window.activaJuego(False, False)
             self.quitaCapturas()
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 
@@ -1263,7 +1263,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         max_recursion = 9999
 
         if not (hasattr(move, "analysis") and move.analysis):
-            me = QTUtil2.mensEspera.inicio(self.main_window, _("Analyzing the move...."), physical_pos="ad")
+            me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad")
             mrm, pos = self.xanalyzer.analyse_move(
                 move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad
             )

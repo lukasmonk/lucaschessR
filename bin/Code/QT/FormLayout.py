@@ -228,10 +228,10 @@ class Fichero:
 
 
 class BotonFichero(QtWidgets.QPushButton):
-    def __init__(self, fichero, extension, siSave, siRelativo, anchoMinimo, ficheroDefecto):
+    def __init__(self, file, extension, siSave, siRelativo, anchoMinimo, ficheroDefecto):
         QtWidgets.QPushButton.__init__(self)
         self.clicked.connect(self.cambiaFichero)
-        self.fichero = fichero
+        self.file = file
         self.extension = extension
         self.siSave = siSave
         self.siRelativo = siRelativo
@@ -239,13 +239,13 @@ class BotonFichero(QtWidgets.QPushButton):
         if anchoMinimo:
             self.setMinimumWidth(anchoMinimo)
         self.qm = QtGui.QFontMetrics(self.font())
-        self.fichero = fichero
+        self.file = file
         self.ficheroDefecto = ficheroDefecto
         self.siPrimeraVez = True
 
     def cambiaFichero(self):
         titulo = _("File to save") if self.siSave else _("File to read")
-        fbusca = self.fichero if self.fichero else self.ficheroDefecto
+        fbusca = self.file if self.file else self.ficheroDefecto
         filtro = (
             self.extension if "(" in self.extension else (_("File") + " %s (*.%s)" % (self.extension, self.extension))
         )
@@ -257,7 +257,7 @@ class BotonFichero(QtWidgets.QPushButton):
             self.ponFichero(resp)
 
     def ponFichero(self, txt):
-        self.fichero = txt
+        self.file = txt
         if txt:
             txt = os.path.realpath(txt)
             if self.siRelativo:
@@ -276,14 +276,14 @@ class BotonFichero(QtWidgets.QPushButton):
 
 
 class LBotonFichero(QtWidgets.QHBoxLayout):
-    def __init__(self, parent, config, fichero):
+    def __init__(self, parent, config, file):
         QtWidgets.QHBoxLayout.__init__(self)
 
         if config.li_histo and not config.ficheroDefecto:
             config.ficheroDefecto = os.path.dirname(config.li_histo[0])
 
         self.boton = BotonFichero(
-            fichero, config.extension, config.siSave, config.siRelativo, config.anchoMinimo, config.ficheroDefecto
+            file, config.extension, config.siSave, config.siRelativo, config.anchoMinimo, config.ficheroDefecto
         )
         btCancelar = Controles.PB(parent, "", self.cancelar)
         btCancelar.ponIcono(Iconos.Delete()).anchoFijo(16)
@@ -296,14 +296,14 @@ class LBotonFichero(QtWidgets.QHBoxLayout):
             btHistorico = Controles.PB(parent, "", self.historico).ponIcono(Iconos.Favoritos())
             self.addWidget(btHistorico)
             self.li_histo = config.li_histo
-        self.boton.ponFichero(fichero)
+        self.boton.ponFichero(file)
 
     def historico(self):
         if self.li_histo:
             menu = Controles.Menu(self.parent, puntos=8)
             menu.setToolTip(_("To choose: <b>left button</b> <br>To erase: <b>right button</b>"))
-            for fichero in self.li_histo:
-                menu.opcion(fichero, fichero, Iconos.PuntoAzul())
+            for file in self.li_histo:
+                menu.opcion(file, file, Iconos.PuntoAzul())
 
             resp = menu.lanza()
             if resp:
@@ -620,11 +620,11 @@ class FormWidget(QtWidgets.QWidget):
 
                 # Fichero
                 elif isinstance(value, dict):
-                    fichero = value["FICHERO"]
+                    file = value["FICHERO"]
                     extension = value.get("EXTENSION", "pgn")
                     siSave = value.get("SISAVE", True)
                     siRelativo = value.get("SIRELATIVO", True)
-                    field = BotonFichero(fichero, extension, siSave, siRelativo, 250, fichero)
+                    field = BotonFichero(file, extension, siSave, siRelativo, 250, file)
                 # Texto
                 elif isinstance(value, (bytes, str)):
                     field = QtWidgets.QLineEdit(value, self)
@@ -702,14 +702,14 @@ class FormWidget(QtWidgets.QWidget):
                 elif tipo == EDITBOX:
                     value = field.valor()
                 elif tipo == FICHERO:
-                    value = field.boton.fichero
+                    value = field.boton.file
                 elif tipo == CARPETA:
                     value = field.carpeta
 
             elif isinstance(value, (bytes, str)):
                 value = field.text()
             elif isinstance(value, dict):
-                value = field.fichero
+                value = field.file
             elif isinstance(value, (list, tuple)):
                 index = int(field.currentIndex())
                 if isinstance(value[0], (list, tuple)):

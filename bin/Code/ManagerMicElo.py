@@ -107,7 +107,7 @@ class ManagerMicElo(Manager.Manager):
                 return mt
         return None
 
-    def inicio(self, datosMotor, minutos, segundos, aplazamiento=None):
+    def start(self, datosMotor, minutos, segundos, aplazamiento=None):
 
         self.game_type = GT_MICELO
 
@@ -299,7 +299,7 @@ class ManagerMicElo(Manager.Manager):
             self.game.resign(self.is_human_side_white)
             self.put_result(RS_WIN_OPPONENT)
         else:
-            self.procesador.inicio()
+            self.procesador.start()
 
         return False
 

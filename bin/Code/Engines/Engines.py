@@ -314,8 +314,8 @@ def engine_from_txt(pk_txt):
 
 
 def lee_external_engines(configuration):
-    fichero = configuration.file_external_engines()
-    db = UtilSQL.DictRawSQL(fichero)
+    file = configuration.file_external_engines()
+    db = UtilSQL.DictRawSQL(file)
     dic = db.as_dictionary()
     db.close()
     return dic

@@ -438,9 +438,9 @@ class Configuration:
 
     def set_folders(self):
 
-        self.fichero = os.path.join(self.carpeta_config, "lk.pk2")
+        self.file = os.path.join(self.carpeta_config, "lk.pk2")
 
-        self.siPrimeraVez = not Util.exist_file(self.fichero)
+        self.siPrimeraVez = not Util.exist_file(self.file)
 
         self.fichEstadElo = "%s/estad.pkli" % self.carpeta_results
         self.fichEstadMicElo = "%s/estadMic.pkli" % self.carpeta_results
@@ -604,10 +604,10 @@ class Configuration:
             if x.startswith("x_"):
                 dic[x] = getattr(self, x)
         dic["PERFOMANCE"] = self.perfomance.save()
-        Util.save_pickle(self.fichero, dic)
+        Util.save_pickle(self.file, dic)
 
     def lee(self):
-        dic = Util.restore_pickle(self.fichero)
+        dic = Util.restore_pickle(self.file)
         if dic:
             for x in dir(self):
                 if x.startswith("x_"):

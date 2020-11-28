@@ -23,7 +23,7 @@ class OpeningPol:
             si_ptz = elo < 1700
         else:
             si_ptz = 1 <= max_nivel <= 2
-        self.fichero = Code.tbookPTZ if si_ptz else Code.tbook
+        self.file = Code.tbookPTZ if si_ptz else Code.tbook
         self.book = Books.Polyglot()
         self.activa = True
         self.max_level = max_nivel * 2
@@ -40,7 +40,7 @@ class OpeningPol:
     #     self.si_obligatoria = dic["SIOBLIGATORIA"]
 
     def lee_random(self, fen):
-        li = self.book.lista(self.fichero, fen)
+        li = self.book.lista(self.file, fen)
         if not li:
             return None
         li_num = []
@@ -74,7 +74,7 @@ class OpeningPol:
         if not self.activa:
             return False
 
-        li = self.book.lista(self.fichero, fen)
+        li = self.book.lista(self.file, fen)
         if not li:
             return False
 

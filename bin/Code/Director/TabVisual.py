@@ -724,11 +724,11 @@ class Guion:
 
 
 class DBManagerVisual:
-    def __init__(self, fichero, showAllways=False, saveAllways=False):
+    def __init__(self, file, showAllways=False, saveAllways=False):
         self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = None
         self._showAllways = showAllways
         self._saveAllways = saveAllways
-        self.setFichero(fichero)
+        self.setFichero(file)
 
     def saveMoviblesBoard(self, board):
         fenm2 = board.lastFenM2
@@ -763,9 +763,9 @@ class DBManagerVisual:
     def setConfig(self, key, value):
         self.dbConfig[key] = value
 
-    def setFichero(self, fichero):
+    def setFichero(self, file):
         self.close()
-        self._fichero = fichero if fichero is not None else Code.configuration.ficheroRecursos
+        self._fichero = file if file is not None else Code.configuration.ficheroRecursos
         if not Util.exist_file(self._fichero):
             Util.file_copy(Code.path_resource("IntFiles", "recursos.dbl"), self._fichero)
 
@@ -787,7 +787,7 @@ class DBManagerVisual:
         #     dbr.close()
 
     @property
-    def fichero(self):
+    def file(self):
         return self._fichero
 
     @property

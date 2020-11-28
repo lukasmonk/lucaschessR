@@ -346,11 +346,11 @@ def gen_indexes(game, elos, elos_form, alm):
     xac = txt_levels
     prc = "%"
 
-    inicio = '<tr><td align="center">%s</td>'
+    start = '<tr><td align="center">%s</td>'
     resto = '<td align="center">%s</td><td align="center">%s</td><td align="center">%s</td></tr>'
-    plantilla_d = inicio + resto % ("%.02f%%", "%.02f%%", "-")
-    plantilla_l = inicio + resto % ("%.02f%s", "%.02f%s", "%.02f%s")
-    plantilla_c = inicio + resto % ("%s", "%s", "%s")
+    plantilla_d = start + resto % ("%.02f%%", "%.02f%%", "-")
+    plantilla_l = start + resto % ("%.02f%s", "%.02f%s", "%.02f%s")
+    plantilla_c = start + resto % ("%s", "%s", "%s")
 
     cab = (plantilla_c % (_("Result of analysis"), cw, cb, ct)).replace("<td", "<th")
     txt = plantilla_l % (_("Average lost scores"), average[True], cpt, average[False], cpt, average_t, cpt)
