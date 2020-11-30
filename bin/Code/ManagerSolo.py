@@ -66,12 +66,12 @@ class ManagerSolo(Manager.Manager):
         self.pon_toolbar()
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, False)
+        self.remove_hints(True, False)
         self.main_window.set_label1(dic.get("ROTULO1", None))
         self.pon_rotulo()
         self.set_dispatcher(self.player_has_moved)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(dic.get("WHITEBOTTOM", True))
+        self.put_pieces_bottom(dic.get("WHITEBOTTOM", True))
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
@@ -85,7 +85,7 @@ class ManagerSolo(Manager.Manager):
 
         self.valor_inicial = self.dame_valor_actual()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def pon_rotulo(self):
         li = []
@@ -176,7 +176,7 @@ class ManagerSolo(Manager.Manager):
         self.end_game()
         return False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -217,7 +217,7 @@ class ManagerSolo(Manager.Manager):
             self.juegaRival()
             self.play_against_engine = True  # Como juega por mi pasa por aqui, para que no se meta en un bucle infinito
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
@@ -613,9 +613,9 @@ class ManagerSolo(Manager.Manager):
 
     def juegaRival(self):
         if not self.is_finished():
-            self.pensando(True)
+            self.thinking(True)
             rm = self.xrival.juega(nAjustado=self.xrival.nAjustarFuerza)
-            self.pensando(False)
+            self.thinking(False)
             if rm.from_sq:
                 self.player_has_moved(rm.from_sq, rm.to_sq, rm.promotion)
 
@@ -670,7 +670,7 @@ class ManagerSolo(Manager.Manager):
             self.goto_end()
             self.state = ST_PLAYING
             self.refresh()
-            self.siguiente_jugada()
+            self.play_next_move()
 
     def current_pgn(self):
         return self.game.pgn()

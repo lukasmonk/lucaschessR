@@ -5,6 +5,7 @@ import Code
 from Code.Polyglots import Books
 from Code.GM import GM
 from Code.QT import Colocacion
+from Code.QT import Common
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
@@ -22,9 +23,9 @@ class WGM(QTVarios.WDialogo):
         self.configuration = procesador.configuration
         self.procesador = procesador
 
-        self.dbHisto = UtilSQL.DictSQL(self.configuration.ficheroGMhisto)
+        self.db_histo = UtilSQL.DictSQL(self.configuration.ficheroGMhisto)
         self.opening_block = None
-        self.liOpeningsFavoritas = []
+        self.li_preferred_openings = []
 
         w_parent = procesador.main_window
         titulo = _("Play like a Grandmaster")
@@ -33,7 +34,7 @@ class WGM(QTVarios.WDialogo):
         extparam = "gm"
         QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
 
-        flb = Controles.TipoLetra(puntos=10)
+        flb = Controles.TipoLetra(puntos=procesador.configuration.x_menu_points)
 
         # Toolbar
         li_acciones = [
@@ -48,47 +49,48 @@ class WGM(QTVarios.WDialogo):
         tb = Controles.TBrutina(self, li_acciones)
 
         # Grandes maestros
-        self.liGM = GM.lista_gm()
-        li = [(x[0], x[1]) for x in self.liGM]
+        self.li_gm = GM.lista_gm()
+        gb_style = Common.gb_style()
+        li = [(x[0], x[1]) for x in self.li_gm]
         li.insert(0, ("-", None))
-        self.cbGM = QTUtil2.comboBoxLB(self, li, li[0][1] if len(self.liGM) == 0 else li[1][1])
-        self.cbGM.capture_changes(self.compruebaGM)
-        hbox = Colocacion.H().relleno().control(self.cbGM).relleno()
+        self.cb_gm = QTUtil2.comboBoxLB(self, li, li[0][1] if len(self.li_gm) == 0 else li[1][1])
+        self.cb_gm.capture_changes(self.check_gm)
+        hbox = Colocacion.H().relleno().control(self.cb_gm).relleno()
         gbGM = Controles.GB(self, _("Choose a Grandmaster"), hbox).ponFuente(flb)
+        gbGM.setStyleSheet(gb_style)
 
         # Personales
-        self.liPersonal = GM.lista_gm_personal(self.procesador.configuration.personal_training_folder)
-        if self.liPersonal:
-            li = [(x[0], x[1]) for x in self.liPersonal]
+        self.li_personal = GM.lista_gm_personal(self.procesador.configuration.personal_training_folder)
+        if self.li_personal:
+            li = [(x[0], x[1]) for x in self.li_personal]
             li.insert(0, ("-", None))
             self.cbPersonal = QTUtil2.comboBoxLB(self, li, li[0][1])
-            self.cbPersonal.capture_changes(self.compruebaP)
-            btBorrar = Controles.PB(self, "", self.borrarPersonal, plano=False).ponIcono(Iconos.Borrar(), icon_size=16)
+            self.cbPersonal.capture_changes(self.check_personal)
+            btBorrar = Controles.PB(self, "", self.borrarPersonal).ponIcono(Iconos.Borrar(), icon_size=24)
             hbox = Colocacion.H().relleno().control(self.cbPersonal).control(btBorrar).relleno()
-            gbPersonal = Controles.GB(self, _("Personal games"), hbox).ponFuente(flb)
+            gb_personal = Controles.GB(self, _("Personal games"), hbox).ponFuente(flb)
+            gb_personal.setStyleSheet(gb_style)
 
         # Color
         self.rb_white = Controles.RB(self, _("White"), rutina=self.check_color)
+        self.rb_white.setFont(flb)
         self.rb_white.activa(True)
         self.rb_black = Controles.RB(self, _("Black"), rutina=self.check_color)
+        self.rb_black.setFont(flb)
         self.rb_black.activa(False)
 
         # Contrario
-        self.chContrario = Controles.CHB(
-            self, _("Choose the opponent's move, when there are multiple possible answers"), False
-        )
+        self.chContrario = Controles.CHB(self, _("Choose the opponent's move, when there are multiple possible answers"), False)
 
         # Juez
         liDepths = [("--", 0)]
         for x in range(1, 31):
             liDepths.append((str(x), x))
         self.liMotores = self.configuration.comboMotoresMultiPV10()
-        self.cbJmotor, self.lbJmotor = QTUtil2.comboBoxLB(
-            self, self.liMotores, self.configuration.tutor_inicial, _("Engine")
-        )
+        self.cbJmotor, self.lbJmotor = QTUtil2.comboBoxLB(self, self.liMotores, self.configuration.tutor_inicial, _("Engine"))
         self.edJtiempo = Controles.ED(self).tipoFloat().ponFloat(1.0).anchoFijo(50)
         self.lbJtiempo = Controles.LB2P(self, _("Time in seconds"))
-        self.cbJdepth = Controles.CB(self, liDepths, 0).capture_changes(self.cambiadoDepth)
+        self.cbJdepth = Controles.CB(self, liDepths, 0).capture_changes(self.change_depth)
         self.lbJdepth = Controles.LB2P(self, _("Depth"))
         self.lbJshow = Controles.LB2P(self, _("Show rating"))
         self.chbEvals = Controles.CHB(self, _("Show all evaluations"), False)
@@ -99,6 +101,23 @@ class WGM(QTVarios.WDialogo):
         for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
             li.append((str(x), str(x)))
         self.cbJmultiPV = Controles.CB(self, li, "PD")
+
+        self.li_adjudicator_controls = (
+            self.cbJmotor,
+            self.lbJmotor,
+            self.edJtiempo,
+            self.lbJtiempo,
+            self.lbJdepth,
+            self.cbJdepth,
+            self.lbJshow,
+            self.cbJshow,
+            self.lbJmultiPV,
+            self.cbJmultiPV,
+            self.chbEvals,
+        )
+
+        for control in self.li_adjudicator_controls:
+            control.setFont(flb)
 
         # Inicial
         self.edJugInicial, lbInicial = QTUtil2.spinBoxLB(self, 1, 1, 99, etiqueta=_("Initial move"), maxTam=40)
@@ -115,39 +134,26 @@ class WGM(QTVarios.WDialogo):
 
         # Openings
 
-        self.btOpening = Controles.PB(self, " " * 5 + _("Undetermined") + " " * 5, self.aperturasEditar).ponPlano(
-            False
-        )
-        self.btOpeningsFavoritas = Controles.PB(self, "", self.aperturasFavoritas).ponIcono(Iconos.Favoritos())
+        self.btOpening = Controles.PB(self, " " * 5 + _("Undetermined") + " " * 5, self.aperturasEditar).ponPlano(False)
+        self.btOpeningsFavoritas = Controles.PB(self, "", self.preferred_openings).ponIcono(Iconos.Favoritos())
         self.btOpeningsQuitar = Controles.PB(self, "", self.aperturasQuitar).ponIcono(Iconos.Motor_No())
-        hbox = (
-            Colocacion.H()
-            .control(self.btOpeningsQuitar)
-            .control(self.btOpening)
-            .control(self.btOpeningsFavoritas)
-            .relleno()
-        )
+        hbox = Colocacion.H().control(self.btOpeningsQuitar).control(self.btOpening).control(self.btOpeningsFavoritas).relleno()
         gbOpening = Controles.GB(self, _("Opening"), hbox)
 
         # gbBasic
         # # Color
         hbox = Colocacion.H().relleno().control(self.rb_white).espacio(10).control(self.rb_black).relleno()
         gbColor = Controles.GB(self, _("Play with"), hbox).ponFuente(flb)
+        gbColor.setStyleSheet(gb_style)
 
         # Tiempo
-        ly1 = (
-            Colocacion.H()
-            .control(self.lbJmotor)
-            .control(self.cbJmotor)
-            .control(self.lbJshow)
-            .control(self.cbJshow)
-            .relleno()
-        )
+        ly1 = Colocacion.H().control(self.lbJmotor).control(self.cbJmotor).relleno().control(self.lbJshow).control(self.cbJshow)
         ly2 = Colocacion.H().control(self.lbJtiempo).control(self.edJtiempo)
-        ly2.control(self.lbJdepth).control(self.cbJdepth).espacio(15).control(self.chbEvals).relleno()
+        ly2.control(self.lbJdepth).control(self.cbJdepth).relleno().control(self.chbEvals)
         ly3 = Colocacion.H().control(self.lbJmultiPV).control(self.cbJmultiPV).relleno()
         ly = Colocacion.V().otro(ly1).otro(ly2).otro(ly3)
-        self.gbJ = Controles.GB(self, _("Adjudicator"), ly).to_connect(self.cambiaJuez)
+        self.gbJ = Controles.GB(self, _("Adjudicator"), ly).to_connect(self.change_adjudicator)
+        self.gbJ.setStyleSheet(gb_style)
 
         # Opciones
         vlayout = Colocacion.V().control(gbColor)
@@ -157,16 +163,8 @@ class WGM(QTVarios.WDialogo):
         gbBasic.setFlat(True)
 
         # Opciones avanzadas
-        lyInicial = (
-            Colocacion.H()
-            .control(lbInicial)
-            .control(self.edJugInicial)
-            .relleno()
-            .control(lbBooks)
-            .control(self.cbBooks)
-            .relleno()
-        )
-        vlayout = Colocacion.V().relleno().otro(lyInicial).control(gbOpening)
+        lyInicial = Colocacion.H().control(lbInicial).control(self.edJugInicial).relleno().control(lbBooks).control(self.cbBooks).relleno()
+        vlayout = Colocacion.V().otro(lyInicial).control(gbOpening)
         vlayout.espacio(5).control(self.chContrario).margen(20).relleno()
         gbAdvanced = Controles.GB(self, "", vlayout)
         gbAdvanced.setFlat(True)
@@ -174,11 +172,11 @@ class WGM(QTVarios.WDialogo):
         # Historico
         self.liHisto = []
         o_columns = Columnas.ListaColumnas()
-        o_columns.nueva("FECHA", _("Date"), 80, centered=True)
+        o_columns.nueva("FECHA", _("Date"), 100, centered=True)
         o_columns.nueva("PACIERTOS", _("Hints"), 90, centered=True)
-        o_columns.nueva("PUNTOS", _("Points accumulated"), 120, centered=True)
+        o_columns.nueva("PUNTOS", _("Points accumulated"), 140, centered=True)
         o_columns.nueva("ENGINE", _("Adjudicator"), 100, centered=True)
-        o_columns.nueva("RESUMEN", _("Game played"), 150)
+        o_columns.nueva("RESUMEN", _("Game played"), 280)
 
         self.grid = grid = Grid.Grid(self, o_columns, siSelecFilas=True, background=None)
         self.grid.coloresAlternados()
@@ -189,27 +187,28 @@ class WGM(QTVarios.WDialogo):
         self.tab.nuevaTab(gbBasic, _("Basic"))
         self.tab.nuevaTab(gbAdvanced, _("Advanced"))
         self.tab.nuevaTab(self.grid, _("Track record"))
+        self.tab.setFont(flb)
 
         # Cabecera
         lyCab = Colocacion.H().control(gbGM)
-        if self.liPersonal:
-            lyCab.control(gbPersonal)
+        if self.li_personal:
+            lyCab.control(gb_personal)
 
         layout = Colocacion.V().control(tb).otro(lyCab).control(self.tab).margen(6)
 
         self.setLayout(layout)
 
-        self.recuperaDic()
-        self.cambiaJuez()
-        self.compruebaGM()
-        self.compruebaP()
-        self.compruebaHisto()
+        self.restore_dic()
+        self.change_adjudicator()
+        self.check_gm()
+        self.check_personal()
+        self.check_histo()
         self.aperturaMuestra()
         self.btOpeningsFavoritas.hide()
 
-        self.restore_video(anchoDefecto=450)
+        self.restore_video(anchoDefecto=750)
 
-    def cambiadoDepth(self, num):
+    def change_depth(self, num):
         vtime = self.edJtiempo.textoFloat()
         if int(vtime) * 10 == 0:
             vtime = 3.0
@@ -218,9 +217,9 @@ class WGM(QTVarios.WDialogo):
 
     def closeEvent(self, event):
         self.save_video()
-        self.dbHisto.close()
+        self.db_histo.close()
 
-    def compruebaGM_P(self, liGMP, tgm):
+    def check_gm_personal(self, liGMP, tgm):
         tsiw = self.rb_white.isChecked()
 
         for nom, gm, siw, sib in liGMP:
@@ -236,32 +235,32 @@ class WGM(QTVarios.WDialogo):
                         self.rb_white.activa(True)
                         self.rb_black.activa(False)
                 break
-        self.compruebaHisto()
+        self.check_histo()
 
-    def compruebaGM(self):
-        tgm = self.cbGM.valor()
+    def check_gm(self):
+        tgm = self.cb_gm.valor()
         if tgm:
-            if self.liPersonal:
+            if self.li_personal:
                 self.cbPersonal.ponValor(None)
-            self.compruebaGM_P(self.liGM, tgm)
+            self.check_gm_personal(self.li_gm, tgm)
 
-    def compruebaP(self):
-        if not self.liPersonal:
+    def check_personal(self):
+        if not self.li_personal:
             return
         tgm = self.cbPersonal.valor()
         if tgm:
-            if self.liGM:
-                self.cbGM.ponValor(None)
-            self.compruebaGM_P(self.liPersonal, tgm)
+            if self.li_gm:
+                self.cb_gm.ponValor(None)
+            self.check_gm_personal(self.li_personal, tgm)
 
-    def compruebaHisto(self):
-        tgmGM = self.cbGM.valor()
-        tgmP = self.cbPersonal.valor() if self.liPersonal else None
+    def check_histo(self):
+        tgmGM = self.cb_gm.valor()
+        tgmP = self.cbPersonal.valor() if self.li_personal else None
 
         if tgmGM is None and tgmP is None:
-            if len(self.liGM) > 1:
-                tgmGM = self.liGM[1][1]
-                self.cbGM.ponValor(tgmGM)
+            if len(self.li_gm) > 1:
+                tgmGM = self.li_gm[1][1]
+                self.cb_gm.ponValor(tgmGM)
             else:
                 self.liHisto = []
                 return
@@ -275,7 +274,7 @@ class WGM(QTVarios.WDialogo):
         else:
             tgm = "P_" + tgmP
 
-        self.liHisto = self.dbHisto[tgm]
+        self.liHisto = self.db_histo[tgm]
         if self.liHisto is None:
             self.liHisto = []
         self.grid.refresh()
@@ -293,8 +292,10 @@ class WGM(QTVarios.WDialogo):
             return "%d%%" % dic["PACIERTOS"]
         elif key == "PUNTOS":
             return "%d" % dic["PUNTOS"]
-        elif key == "JUEZ":
-            return "%s (%d)" % (dic["JUEZ"], dic["TIME"])
+        elif key == "ENGINE":
+            s = "%.02f" % (dic["TIME"] / 10.0,)
+            s = s.rstrip("0").rstrip(".")
+            return '%s %s"' % (dic["JUEZ"], s)
         elif key == "RESUMEN":
             return dic.get("RESUMEN", "")
 
@@ -309,19 +310,19 @@ class WGM(QTVarios.WDialogo):
         for x in "wbi":
             Util.remove_file(base + x)
 
-        self.liPersonal = GM.lista_gm_personal(self.configuration.personal_training_folder)
+        self.li_personal = GM.lista_gm_personal(self.configuration.personal_training_folder)
 
-        li = [(x[0], x[1]) for x in self.liPersonal]
+        li = [(x[0], x[1]) for x in self.li_personal]
         li.insert(0, ("-", None))
         self.cbPersonal.rehacer(li, li[0][1])
 
-        self.compruebaP()
+        self.check_personal()
 
     def check_color(self):
-        tgm = self.cbGM.valor()
+        tgm = self.cb_gm.valor()
         tsiw = self.rb_white.isChecked()
 
-        for nom, gm, siw, sib in self.liGM:
+        for nom, gm, siw, sib in self.li_gm:
             if gm == tgm:
                 if tsiw:
                     if not siw:
@@ -355,31 +356,19 @@ class WGM(QTVarios.WDialogo):
     def importar(self):
         if importar_gm(self):
             liC = GM.lista_gm()
-            self.cbGM.clear()
+            self.cb_gm.clear()
             for tp in liC:
-                self.cbGM.addItem(tp[0], tp[1])
-            self.cbGM.setCurrentIndex(0)
+                self.cb_gm.addItem(tp[0], tp[1])
+            self.cb_gm.setCurrentIndex(0)
 
-    def cambiaJuez(self):
+    def change_adjudicator(self):
         si = self.gbJ.isChecked()
-        for control in (
-            self.cbJmotor,
-            self.lbJmotor,
-            self.edJtiempo,
-            self.lbJtiempo,
-            self.lbJdepth,
-            self.cbJdepth,
-            self.lbJshow,
-            self.cbJshow,
-            self.lbJmultiPV,
-            self.cbJmultiPV,
-            self.chbEvals,
-        ):
+        for control in self.li_adjudicator_controls:
             control.setVisible(si)
 
     def grabaDic(self):
         rk = Util.Record()
-        rk.gm = self.cbGM.valor()
+        rk.gm = self.cb_gm.valor()
         if rk.gm is None:
             rk.modo = "personal"
             rk.gm = self.cbPersonal.valor()
@@ -389,8 +378,8 @@ class WGM(QTVarios.WDialogo):
             rk.modo = "estandar"
         rk.gameElegida = None
         rk.is_white = self.rb_white.isChecked()
-        rk.siJuez = self.gbJ.isChecked()
-        rk.showevals = self.chbEvals.valor()
+        rk.with_adjudicator = self.gbJ.isChecked()
+        rk.show_evals = self.chbEvals.valor()
         rk.engine = self.cbJmotor.valor()
         rk.vtime = int(self.edJtiempo.textoFloat() * 10)
         rk.mostrar = self.cbJshow.valor()
@@ -398,9 +387,9 @@ class WGM(QTVarios.WDialogo):
         rk.multiPV = self.cbJmultiPV.valor()
         rk.rival_name = self.chContrario.isChecked()
         rk.jugInicial = self.edJugInicial.valor()
-        if rk.siJuez and rk.vtime <= 0 and rk.depth == 0:
-            rk.siJuez = False
-        rk.bypassBook = self.cbBooks.valor()
+        if rk.with_adjudicator and rk.vtime <= 0 and rk.depth == 0:
+            rk.with_adjudicator = False
+        rk.bypass_book = self.cbBooks.valor()
         rk.opening = self.opening_block
 
         default = Code.path_resource("GM")
@@ -419,75 +408,75 @@ class WGM(QTVarios.WDialogo):
         for atr in dir(self.record):
             if not atr.startswith("_"):
                 dic[atr.upper()] = getattr(self.record, atr)
-        dic["APERTURASFAVORITAS"] = self.liOpeningsFavoritas
+        dic["APERTURASFAVORITAS"] = self.li_preferred_openings
 
         Util.save_pickle(self.configuration.file_gms(), dic)
 
         return True
 
-    def recuperaDic(self):
+    def restore_dic(self):
         dic = Util.restore_pickle(self.configuration.file_gms())
         if dic:
 
             gm = dic["GM"]
             modo = dic.get("MODO", "estandar")
             is_white = dic.get("IS_WHITE", True)
-            siJuez = dic["SIJUEZ"]
-            showevals = dic.get("SHOWEVALS", False)
+            with_adjudicator = dic.get("WITH_ADJUDICATOR", True)
+            show_evals = dic.get("SHOWEVALS", False)
             engine = dic["ENGINE"]
             vtime = dic["VTIME"]
             depth = dic.get("DEPTH", 0)
-            multiPV = dic.get("MULTIPV", "PD")
+            multi_pv = dic.get("MULTIPV", "PD")
             mostrar = dic["MOSTRAR"]
             rival_name = dic.get("JUGCONTRARIO", False)
-            jugInicial = dic.get("JUGINICIAL", 1)
-            self.liOpeningsFavoritas = dic.get("APERTURASFAVORITAS", [])
+            jug_inicial = dic.get("JUGINICIAL", 1)
+            self.li_preferred_openings = dic.get("APERTURASFAVORITAS", [])
             self.opening_block = dic.get("APERTURA", None)
             if self.opening_block:
-                nEsta = -1
-                for npos, bl in enumerate(self.liOpeningsFavoritas):
+                n_esta = -1
+                for npos, bl in enumerate(self.li_preferred_openings):
                     if bl.a1h8 == self.opening_block.a1h8:
-                        nEsta = npos
+                        n_esta = npos
                         break
-                if nEsta != 0:
-                    if nEsta != -1:
-                        del self.liOpeningsFavoritas[nEsta]
-                    self.liOpeningsFavoritas.insert(0, self.opening_block)
-                while len(self.liOpeningsFavoritas) > 10:
-                    del self.liOpeningsFavoritas[10]
-            if len(self.liOpeningsFavoritas):
+                if n_esta != 0:
+                    if n_esta != -1:
+                        del self.li_preferred_openings[n_esta]
+                    self.li_preferred_openings.insert(0, self.opening_block)
+                while len(self.li_preferred_openings) > 10:
+                    del self.li_preferred_openings[10]
+            if len(self.li_preferred_openings):
                 self.btOpeningsFavoritas.show()
-            bypassBook = dic.get("BYPASSBOOK", None)
+            bypass_book = dic.get("BYPASSBOOK", None)
 
             self.rb_white.setChecked(is_white)
             self.rb_black.setChecked(not is_white)
 
-            self.gbJ.setChecked(siJuez)
+            self.gbJ.setChecked(with_adjudicator)
             self.cbJmotor.ponValor(engine)
             self.edJtiempo.ponFloat(float(vtime / 10.0))
             self.cbJshow.ponValor(mostrar)
-            self.chbEvals.ponValor(showevals)
+            self.chbEvals.ponValor(show_evals)
             self.cbJdepth.ponValor(depth)
-            self.cambiadoDepth(depth)
-            self.cbJmultiPV.ponValor(multiPV)
+            self.change_depth(depth)
+            self.cbJmultiPV.ponValor(multi_pv)
 
             self.chContrario.setChecked(rival_name)
 
-            self.edJugInicial.ponValor(jugInicial)
+            self.edJugInicial.ponValor(jug_inicial)
 
-            li = self.liGM
-            cb = self.cbGM
+            li = self.li_gm
+            cb = self.cb_gm
             if modo == "personal":
-                if self.liPersonal:
-                    li = self.liPersonal
-                    cb = self.cbGM
+                if self.li_personal:
+                    li = self.li_personal
+                    cb = self.cb_gm
             for v in li:
                 if v[1] == gm:
                     cb.ponValor(gm)
                     break
-            if bypassBook:
+            if bypass_book:
                 for book in self.list_books.lista:
-                    if book.path == bypassBook.path:
+                    if book.path == bypass_book.path:
                         self.cbBooks.ponValor(book)
                         break
             self.aperturaMuestra()
@@ -502,20 +491,20 @@ class WGM(QTVarios.WDialogo):
             self.opening_block = w.resultado()
             self.aperturaMuestra()
 
-    def aperturasFavoritas(self):
-        if len(self.liOpeningsFavoritas) == 0:
+    def preferred_openings(self):
+        if len(self.li_preferred_openings) == 0:
             return
         menu = QTVarios.LCMenu(self)
         menu.setToolTip(_("To choose: <b>left button</b> <br>To erase: <b>right button</b>"))
         f = Controles.TipoLetra(puntos=8, peso=75)
         menu.ponFuente(f)
-        nPos = 0
-        for nli, bloque in enumerate(self.liOpeningsFavoritas):
+        n_pos = 0
+        for nli, bloque in enumerate(self.li_preferred_openings):
             if type(bloque) == tuple:  # compatibilidad con versiones anteriores
                 bloque = bloque[0]
-                self.liOpeningsFavoritas[nli] = bloque
+                self.li_preferred_openings[nli] = bloque
             menu.opcion(bloque, bloque.trNombre, Iconos.PuntoVerde())
-            nPos += 1
+            n_pos += 1
 
         resp = menu.lanza()
         if resp:
@@ -524,14 +513,8 @@ class WGM(QTVarios.WDialogo):
                 self.aperturaMuestra()
             elif menu.siDer:
                 opening_block = resp
-                if QTUtil2.pregunta(
-                    self,
-                    _X(
-                        _("Do you want to delete the opening %1 from the list of favourite openings?"),
-                        opening_block.trNombre,
-                    ),
-                ):
-                    del self.liOpeningsFavoritas[nPos]
+                if QTUtil2.pregunta(self, _X(_("Do you want to delete the opening %1 from the list of favourite openings?"), opening_block.trNombre)):
+                    del self.li_preferred_openings[n_pos]
 
     def aperturaMuestra(self):
         if self.opening_block:
@@ -547,7 +530,7 @@ class WGM(QTVarios.WDialogo):
         self.aperturaMuestra()
 
 
-def eligeJugada(manager, li_moves, is_gm):
+def select_move(manager, li_moves, is_gm):
     menu = QTVarios.LCMenu(manager.main_window)
 
     if is_gm:
@@ -579,9 +562,9 @@ def eligeJugada(manager, li_moves, is_gm):
 
 
 class WImportar(QTVarios.WDialogo):
-    def __init__(self, w_parent, liGM):
+    def __init__(self, w_parent, li_gm):
 
-        self.liGM = liGM
+        self.li_gm = li_gm
 
         titulo = _("Import")
         icono = Iconos.ImportarGM()
@@ -591,14 +574,7 @@ class WImportar(QTVarios.WDialogo):
         extparam = "imp_gm"
         QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
 
-        li_acciones = [
-            (_("Import"), Iconos.Aceptar(), self.importar),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.reject),
-            None,
-            (_("Mark"), Iconos.Marcar(), self.marcar),
-            None,
-        ]
+        li_acciones = [(_("Import"), Iconos.Aceptar(), self.importar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None, (_("Mark"), Iconos.Marcar(), self.marcar), None]
         tb = Controles.TBrutina(self, li_acciones)
 
         # Lista
@@ -634,21 +610,21 @@ class WImportar(QTVarios.WDialogo):
         menu.opcion(2, _("None"), Iconos.PuntoNaranja())
         resp = menu.lanza()
         if resp:
-            for obj in self.liGM:
+            for obj in self.li_gm:
                 obj["ELEGIDO"] = resp == 1
             self.grid.refresh()
 
     def grid_num_datos(self, grid):
-        return len(self.liGM)
+        return len(self.li_gm)
 
     def grid_setvalue(self, grid, row, column, valor):
-        self.liGM[row][column.key] = valor
+        self.li_gm[row][column.key] = valor
 
     def grid_dato(self, grid, row, o_column):
-        return self.liGM[row][o_column.key]
+        return self.li_gm[row][o_column.key]
 
     def grid_color_fondo(self, grid, row, col):
-        return self.qtColor[self.liGM[row]["WM"]]
+        return self.qtColor[self.li_gm[row]["WM"]]
 
     def grid_doble_clickCabecera(self, grid, oCol):
         cab, si_rev = self.last_order
@@ -658,7 +634,7 @@ class WImportar(QTVarios.WDialogo):
             si_rev = not si_rev
         else:
             si_rev = False
-        self.liGM.sort(key=key, reverse=si_rev)
+        self.li_gm.sort(key=key, reverse=si_rev)
         self.last_order = col_clave, si_rev
         self.grid.refresh()
         self.grid.gotop()
@@ -678,9 +654,7 @@ def importar_gm(owner_gm):
     me.final()
 
     if not si_bien:
-        QTUtil2.message_error(
-            owner_gm, _("List of Grandmasters currently unavailable; please check Internet connectivity")
-        )
+        QTUtil2.message_error(owner_gm, _("List of Grandmasters currently unavailable; please check Internet connectivity"))
         return False
 
     with open(fich_tmp, "rt") as f:
@@ -756,12 +730,7 @@ class SelectGame(QTVarios.WDialogo):
 
         self.register_grid(self.grid)
 
-        li_acciones = [
-            (_("Accept"), Iconos.Aceptar(), self.aceptar),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.cancelar),
-            None,
-        ]
+        li_acciones = [(_("Accept"), Iconos.Aceptar(), self.aceptar), None, (_("Cancel"), Iconos.Cancelar(), self.cancelar), None]
         if ogm.isErasable:
             li_acciones.append((_("Remove"), Iconos.Borrar(), self.remove))
             li_acciones.append(None)

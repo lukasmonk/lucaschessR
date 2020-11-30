@@ -51,7 +51,7 @@ class ManagerTurnOnLights(Manager.Manager):
         self.ayudas_iniciales = 0
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(True, True)
+        self.main_window.remove_hints(True, True)
         self.set_dispatcher(self.player_has_moved)
         self.show_side_indicator(True)
 
@@ -91,7 +91,7 @@ class ManagerTurnOnLights(Manager.Manager):
             self.is_human_side_white = is_white
             self.is_engine_side_white = not is_white
             self.set_position(self.game.last_position)
-            self.ponPiezasAbajo(is_white)
+            self.put_pieces_bottom(is_white)
             self.pgnRefresh(True)
 
             self.game.pending_opening = False
@@ -109,7 +109,7 @@ class ManagerTurnOnLights(Manager.Manager):
 
         self.state = ST_PLAYING
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -140,7 +140,7 @@ class ManagerTurnOnLights(Manager.Manager):
             TurnOnLights.write_tol(self.tol)
         self.start(self.num_theme, self.num_block, self.tol)
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -165,7 +165,7 @@ class ManagerTurnOnLights(Manager.Manager):
             pv = self.line.get_move(self.num_move)
             from_sq, to_sq, promotion = pv[:2], pv[2:4], pv[4:]
             self.play_rival(from_sq, to_sq, promotion)
-            self.siguiente_jugada()
+            self.play_next_move()
 
         else:
             self.human_is_playing = True
@@ -282,7 +282,7 @@ class ManagerTurnOnLights(Manager.Manager):
             self.add_move(move, True)
             self.error = ""
             self.total_time_used += end_time - self.ini_time
-            self.siguiente_jugada()
+            self.play_next_move()
             return True
 
         self.errores += 1

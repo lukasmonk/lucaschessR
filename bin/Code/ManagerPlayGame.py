@@ -49,11 +49,11 @@ class ManagerPlayGame(Manager.Manager):
         self.main_window.pon_toolbar((TB_CANCEL, TB_REINIT, TB_CONFIG, TB_UTILITIES))
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, True)
+        self.remove_hints(True, True)
 
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(self.is_human_side_white)
+        self.put_pieces_bottom(self.is_human_side_white)
         self.show_side_indicator(True)
         self.set_label1(label)
         self.set_label2("")
@@ -63,7 +63,7 @@ class ManagerPlayGame(Manager.Manager):
         self.check_boards_setposition()
 
         self.state = ST_PLAYING
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def ponPuntos(self):
         self.set_label2("%s : <b>%d (%d)</b>" % (_("Points"), self.puntos, -self.puntosMax))
@@ -118,7 +118,7 @@ class ManagerPlayGame(Manager.Manager):
         self.check_boards_setposition()
         self.analizaFinal()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def validoMRM(self, pvUsu, pvObj, mrmActual):
         move = self.gameObj.move(self.posJugadaObj)
@@ -161,7 +161,7 @@ class ManagerPlayGame(Manager.Manager):
             self.siAnalizando = False
             self.xanalyzer.terminar()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -183,14 +183,14 @@ class ManagerPlayGame(Manager.Manager):
 
         if siRival:
             self.add_move(False)
-            self.siguiente_jugada()
+            self.play_next_move()
 
         else:
             self.human_is_playing = True
-            self.pensando(True)
+            self.thinking(True)
             self.analizaInicio()
             self.activate_side(is_white)
-            self.pensando(False)
+            self.thinking(False)
             self.iniTiempo = time.time()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
@@ -278,7 +278,7 @@ class ManagerPlayGame(Manager.Manager):
         self.analizaFinal()
 
         self.add_move(True, analysis, comment)
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, siNuestra, analysis=None, comment=None):

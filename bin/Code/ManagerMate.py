@@ -335,9 +335,9 @@ class ManagerMate(Manager.Manager):
         self.main_window.columnas60(True, cNivel=_("Blk"))
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, False)
+        self.remove_hints(True, False)
         self.quitaCapturas()
-        self.ponPiezasAbajo(True)
+        self.put_pieces_bottom(True)
         self.set_dispatcher(self.player_has_moved)
         self.pgnRefresh(True)
         self.main_window.base.pgn.gotop()

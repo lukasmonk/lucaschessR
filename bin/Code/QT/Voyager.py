@@ -700,7 +700,7 @@ class WPGN(QtWidgets.QWidget):
         self.setLayout(ly)
 
         self.board.set_position(self.game.last_position)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def save(self):
         self.wparent.save()
@@ -708,7 +708,7 @@ class WPGN(QtWidgets.QWidget):
     def limpia(self):
         self.game.li_moves = []
         self.board.set_position(self.game.first_position)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def atras(self):
         n = len(self.game)
@@ -720,12 +720,12 @@ class WPGN(QtWidgets.QWidget):
                 self.board.put_arrow_sc(move.from_sq, move.to_sq)
             else:
                 self.board.set_position(self.game.first_position)
-            self.siguiente_jugada()
+            self.play_next_move()
 
     def inicial(self):
         self.wparent.ponModo(MODO_POSICION)
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         self.tb.setAccionVisible(self.inicial, len(self.game) == 0)
         if self.game.is_finished():
             self.board.disable_all()
@@ -745,7 +745,7 @@ class WPGN(QtWidgets.QWidget):
             self.board.set_position(move.position)
             self.board.put_arrow_sc(move.from_sq, move.to_sq)
 
-            self.siguiente_jugada()
+            self.play_next_move()
             return True
         else:
             return False

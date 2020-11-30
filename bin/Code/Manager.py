@@ -130,7 +130,7 @@ class Manager:
             li_options.append(TB_UTILITIES)
 
             self.main_window.pon_toolbar(li_options)
-            self.quitaAyudas(siQuitarAtras=not with_takeback)
+            self.remove_hints(siQuitarAtras=not with_takeback)
         else:
             self.procesador.reset()
 
@@ -454,19 +454,19 @@ class Manager:
         game_run = self.game.copy_raw(pos_move)
         self.kibitzers_manager.put_game(game_run, not all_kibitzers)
 
-    def ponPiezasAbajo(self, is_white):
+    def put_pieces_bottom(self, is_white):
         self.board.ponerPiezasAbajo(is_white)
 
-    def quitaAyudas(self, siTambienTutorAtras=True, siQuitarAtras=True):
-        self.main_window.quitaAyudas(siTambienTutorAtras, siQuitarAtras)
+    def remove_hints(self, siTambienTutorAtras=True, siQuitarAtras=True):
+        self.main_window.remove_hints(siTambienTutorAtras, siQuitarAtras)
         self.is_tutor_enabled = False
         self.set_activate_tutor(False)
 
     def ponAyudas(self, hints, siQuitarAtras=True):
         self.main_window.ponAyudas(hints, siQuitarAtras)
 
-    def pensando(self, siPensando):
-        self.main_window.pensando(siPensando)
+    def thinking(self, siPensando):
+        self.main_window.thinking(siPensando)
 
     def set_activate_tutor(self, siActivar):
         self.main_window.set_activate_tutor(siActivar)
@@ -828,13 +828,13 @@ class Manager:
             return self.game.first_position.fen()
 
     def analizaTutor(self):
-        self.pensando(True)
+        self.thinking(True)
         fen = self.game.last_position.fen()
         if not self.is_finished():
             self.mrmTutor = self.xtutor.analiza(fen)
         else:
             self.mrmTutor = None
-        self.pensando(False)
+        self.thinking(False)
         return self.mrmTutor
 
     def cambioTutor(self):
@@ -1170,7 +1170,7 @@ class Manager:
                         if self.hints:
                             self.ponAyudas(self.hints)
                         else:
-                            self.quitaAyudas()
+                            self.remove_hints()
 
     def control1(self):
         self.juegaPorMi()

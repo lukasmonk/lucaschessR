@@ -556,7 +556,7 @@ class WBase(QtWidgets.QWidget):
             if TB_TAKEBACK in self.tb.li_acciones:
                 self.dic_toolbar[TB_TAKEBACK].setVisible(False)
 
-    def quitaAyudas(self, siTambienTutorAtras, siQuitarAtras=True):
+    def remove_hints(self, siTambienTutorAtras, siQuitarAtras=True):
         if siTambienTutorAtras:
             self.bt_active_tutor.setVisible(False)
             if siQuitarAtras and (TB_TAKEBACK in self.tb.li_acciones):

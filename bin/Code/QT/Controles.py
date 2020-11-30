@@ -100,7 +100,7 @@ class ED(QtWidgets.QLineEdit):
         self.setFont(f)
         return self
 
-    def tipoFloat(self, valor: float = 0.0, from_sq: float = 0.0, to_sq: float = 36000.0, decimales: int = None) -> object:
+    def tipoFloat(self, valor: float = 0.0, from_sq: float = 0.0, to_sq: float = 36000.0, decimales: int = None):
         """
         Valida los caracteres suponiendo que es un tipo decimal con unas condiciones
         @param valor: valor inicial

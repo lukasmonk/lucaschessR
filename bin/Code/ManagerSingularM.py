@@ -20,17 +20,17 @@ class ManagerSingularM(Manager.Manager):
         self.state = ST_PLAYING
 
         self.main_window.set_activate_tutor(False)
-        self.quitaAyudas(True)
+        self.remove_hints(True)
 
         self.ayudas_iniciales = 0
 
         self.main_window.activaJuego(True, True, siAyudas=False)
-        self.main_window.quitaAyudas(True)
+        self.main_window.remove_hints(True)
         self.set_dispatcher(self.player_has_moved)
 
         self.pgnRefresh(True)
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -40,7 +40,7 @@ class ManagerSingularM(Manager.Manager):
             self.resign()
 
         elif key == TB_NEXT:
-            self.siguiente_jugada()
+            self.play_next_move()
 
         elif key == TB_UTILITIES:
             self.utilidades()
@@ -58,7 +58,7 @@ class ManagerSingularM(Manager.Manager):
         self.procesador.start()
         self.procesador.strenght101()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         self.main_window.pon_toolbar([TB_CLOSE, TB_RESIGN])
 
         self.state = ST_PLAYING
@@ -73,11 +73,11 @@ class ManagerSingularM(Manager.Manager):
         self.is_engine_side_white = not is_white
 
         self.main_window.set_activate_tutor(False)
-        self.quitaAyudas(True)
+        self.remove_hints(True)
         self.game = Game.Game(fen=self.linea_bloque.fen)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
         self.set_side_indicator(is_white)
         self.main_window.change_player_labels("%d/10" % (self.pos_bloque + 1,), _("Complete"))
 

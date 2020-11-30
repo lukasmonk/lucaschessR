@@ -35,13 +35,13 @@ class ManagerGame(Manager.Manager):
         self.main_window.pon_toolbar(li)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, False)
+        self.remove_hints(True, False)
         self.main_window.set_label1(None)
         self.main_window.set_label2(None)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.first_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(game.iswhite())
+        self.put_pieces_bottom(game.iswhite())
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
         if self.game.siFenInicial():
@@ -55,7 +55,7 @@ class ManagerGame(Manager.Manager):
 
         self.refresh()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def put_information(self):
         white = black = result = None
@@ -131,7 +131,7 @@ class ManagerGame(Manager.Manager):
     def final_x(self):
         return self.end_game()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -166,7 +166,7 @@ class ManagerGame(Manager.Manager):
 
         self.add_move(move, True)
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
@@ -350,9 +350,9 @@ class ManagerGame(Manager.Manager):
 
     def juegaRival(self):
         if not self.is_finished():
-            self.pensando(True)
+            self.thinking(True)
             rm = self.xrival.juega(nAjustado=self.xrival.nAjustarFuerza)
-            self.pensando(False)
+            self.thinking(False)
             if rm.from_sq:
                 self.player_has_moved(rm.from_sq, rm.to_sq, rm.promotion)
 
@@ -416,4 +416,4 @@ class ManagerGame(Manager.Manager):
             self.goto_end()
             self.state = ST_PLAYING
             self.refresh()
-            self.siguiente_jugada()
+            self.play_next_move()

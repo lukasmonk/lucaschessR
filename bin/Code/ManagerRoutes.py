@@ -178,7 +178,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.main_window.pon_toolbar(li_options)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(True)
+        self.main_window.remove_hints(True)
 
         self.set_label1(self.engine.label)
         if self.must_win:
@@ -187,14 +187,14 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
 
         self.pgnRefresh(True)
         QTUtil.refresh_gui()
 
         self.check_boards_setposition()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def end_game(self):
         self.engine.close()
@@ -221,7 +221,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -270,7 +270,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         ok, mens, move = Move.get_game_move(self.game, self.game.last_position, pv[:2], pv[2:4], pv[4:])
         self.add_move(move, False)
         self.move_the_pieces(move.liMovs, True)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgSel = self.check_human_move(from_sq, to_sq, promotion)
@@ -300,7 +300,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.add_move(jgSel, True)
         self.error = ""
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def lineaTerminada(self):
@@ -398,7 +398,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         self.is_engine_side_white = not is_white
 
         self.main_window.set_activate_tutor(False)
-        self.quitaAyudas(True)
+        self.remove_hints(True)
 
         self.ayudas_iniciales = 0
 
@@ -406,11 +406,11 @@ class ManagerRoutesEndings(ManagerRoutes):
         self.main_window.pon_toolbar(li_options)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(True)
+        self.main_window.remove_hints(True)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
 
         self.ponWarnings()
 
@@ -422,7 +422,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         if self.is_guided:
             self.set_label1("<b>%s</b>" % label)
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def ponWarnings(self):
         if self.warnings <= self.max_warnings:
@@ -462,7 +462,7 @@ class ManagerRoutesEndings(ManagerRoutes):
             self.t4.close()
         ManagerRoutes.end_game(self)
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -489,7 +489,7 @@ class ManagerRoutesEndings(ManagerRoutes):
                 fen = self.game.last_position.fen()
                 pv = self.t4.best_move(fen)
             self.play_rival(pv[:2], pv[2:4], pv[4:])
-            self.siguiente_jugada()
+            self.play_next_move()
         else:
             self.human_is_playing = True
             self.activate_side(is_white)
@@ -541,7 +541,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         self.add_move(jgSel, True)
         self.error = ""
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def play_rival(self, from_sq, to_sq, promotion):
@@ -626,11 +626,11 @@ class ManagerRoutesTactics(ManagerRoutes):
         self.main_window.pon_toolbar(li_options)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(True)
+        self.main_window.remove_hints(True)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
         # self.set_label1("<b>%s</b>" % tactica.label)
         self.set_label2(route.mens_tactic(False))
         self.pgnRefresh(True)
@@ -638,7 +638,7 @@ class ManagerRoutesTactics(ManagerRoutes):
 
         self.check_boards_setposition()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -670,7 +670,7 @@ class ManagerRoutesTactics(ManagerRoutes):
     def jugadaObjetivo(self):
         return self.game_objetivo.move(self.game.num_moves())
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -692,7 +692,7 @@ class ManagerRoutesTactics(ManagerRoutes):
         if siRival:
             move = self.jugadaObjetivo()
             self.play_rival(move.from_sq, move.to_sq, move.promotion)
-            self.siguiente_jugada()
+            self.play_next_move()
         else:
             self.human_is_playing = True
             self.activate_side(is_white)
@@ -728,7 +728,7 @@ class ManagerRoutesTactics(ManagerRoutes):
         self.add_move(jgSel, True)
         self.error = ""
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def play_rival(self, from_sq, to_sq, promotion):

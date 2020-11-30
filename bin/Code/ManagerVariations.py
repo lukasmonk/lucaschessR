@@ -7,7 +7,7 @@ from Code.Base.Constantes import *
 class ManagerVariations(Manager.Manager):
     def start(self, game, is_white_bottom, with_engine_active, is_competitive):
 
-        self.pensando(True)
+        self.thinking(True)
 
         self.kibitzers_manager = self.procesador.kibitzers_manager
 
@@ -31,11 +31,11 @@ class ManagerVariations(Manager.Manager):
 
         self.is_human_side_white = is_white_bottom
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, False)
+        self.remove_hints(True, False)
         self.main_window.set_label1(None)
         self.main_window.set_label2(None)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(self.is_human_side_white)
+        self.put_pieces_bottom(self.is_human_side_white)
         self.set_dispatcher(self.player_has_moved)
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
@@ -50,7 +50,7 @@ class ManagerVariations(Manager.Manager):
         else:
             self.set_position(self.game.last_position)
 
-        self.pensando(False)
+        self.thinking(False)
 
         is_white = self.game.last_position.is_white
         self.is_human_side_white = is_white
@@ -60,7 +60,7 @@ class ManagerVariations(Manager.Manager):
             self.activeEngine()
 
         if not len(self.game):
-            self.siguiente_jugada()
+            self.play_next_move()
 
     def run_action(self, key):
         if key == TB_ACCEPT:
@@ -112,9 +112,9 @@ class ManagerVariations(Manager.Manager):
                 self.game.assign_opening()
             self.goto_end()
             self.refresh()
-            self.siguiente_jugada()
+            self.play_next_move()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -147,7 +147,7 @@ class ManagerVariations(Manager.Manager):
             self.juegaRival()
             self.play_against_engine = True  # Como juega por mi pasa por aqui, para que no se meta en un bucle infinito
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move):
@@ -189,7 +189,7 @@ class ManagerVariations(Manager.Manager):
 
     def juegaRival(self):
         if not self.is_finished():
-            self.pensando(True)
+            self.thinking(True)
             rm = self.xrival.juega(nAjustado=self.xrival.nAjustarFuerza)
             if rm.from_sq:
                 ok, self.error, move = Move.get_game_move(
@@ -197,7 +197,7 @@ class ManagerVariations(Manager.Manager):
                 )
                 self.add_move(move)
                 self.move_the_pieces(move.liMovs)
-            self.pensando(False)
+            self.thinking(False)
 
     def activeEngine(self):
         dicBase = self.configuration.leeVariables("ENG_VARIANTES")

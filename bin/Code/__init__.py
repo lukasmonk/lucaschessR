@@ -52,13 +52,12 @@ mate_en_dos = 175522
 
 runSound = None
 
-VERSION = "R0.35d"
+VERSION = "R0.35e"
 DEBUG = False
 DEBUG_ENGINE = False
 
 if DEBUG:
     import builtins
-
 
     def prlk(*x):
         import sys

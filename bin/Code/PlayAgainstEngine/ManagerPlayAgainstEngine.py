@@ -68,7 +68,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def start(self, dic_var):
         self.base_inicio(dic_var)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def base_inicio(self, dic_var):
         self.reinicio = dic_var
@@ -215,8 +215,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.ayudas_iniciales:
             self.ponAyudasEM()
         else:
-            self.quitaAyudas(siQuitarAtras=False)
-        self.ponPiezasAbajo(is_white)
+            self.remove_hints(siQuitarAtras=False)
+        self.put_pieces_bottom(is_white)
 
         self.ponRotuloBasico()
         self.set_label2("")
@@ -493,7 +493,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.base_inicio(dic)
         self.game.restore(restore_game)
         self.goto_end()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def reiniciar(self, siPregunta):
         if siPregunta:
@@ -529,11 +529,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def run_adjourn(self, dic):
         self.restore_state(dic)
         self.check_boards_setposition()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def xpause(self):
         self.state = ST_PAUSE
-        self.pensando(False)
+        self.thinking(False)
         if self.is_analyzing:
             self.is_analyzing = False
             self.xtutor.ac_final(-1)
@@ -547,7 +547,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.board.set_position(self.game.last_position)
         self.pon_toolbar()
         self.main_window.show_pgn()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def final_x(self):
         return self.finalizar()
@@ -628,7 +628,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.toolbar_state = None
                 self.pon_toolbar()
             self.check_boards_setposition()
-            self.siguiente_jugada()
+            self.play_next_move()
 
     def testBook(self):
         if self.bookR:
@@ -643,7 +643,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.bookR.polyglot()
             self.ponRotuloBasico()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -830,7 +830,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.move_the_pieces(move.liMovs, True)
             if self.siTiempo:
                 self.vtime[self.is_engine_side_white].restore(move.cacheTime)
-            return self.siguiente_jugada()
+            return self.play_next_move()
 
         from_sq = to_sq = promotion = ""
         si_encontrada = False
@@ -863,7 +863,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             rm_rival.promotion = promotion
             self.play_rival(rm_rival)
         else:
-            self.pensando(True)
+            self.thinking(True)
             self.reloj_start(False)
             self.timekeeper.start()
             if self.siTiempo:
@@ -885,7 +885,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def play_rival(self, rm_rival):
         self.reloj_stop(False)
-        self.pensando(False)
+        self.thinking(False)
         time_s = self.timekeeper.stop()
         self.setSummary("TIMERIVAL", time_s)
 
@@ -913,7 +913,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.siTiempo:
                 move.cacheTime = self.vtime[self.is_engine_side_white].save()
             self.cache[fen_ultimo] = move
-            self.siguiente_jugada()
+            self.play_next_move()
             return True
 
         else:
@@ -1069,7 +1069,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         self.add_move(move, True)
         self.error = ""
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
@@ -1217,15 +1217,15 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 bl, ng = ng, bl
             self.main_window.change_player_labels(bl, ng)
 
-            # self.ponPiezasAbajo( is_white )
+            # self.put_pieces_bottom( is_white )
             self.ponRotuloBasico()
 
-            self.ponPiezasAbajo(is_white)
+            self.put_pieces_bottom(is_white)
             if is_white != self.is_human_side_white:
                 self.is_human_side_white = is_white
                 self.is_engine_side_white = not is_white
 
-                self.siguiente_jugada()
+                self.play_next_move()
 
     def show_dispatch(self, tp, rm):
         if rm.time or rm.depth:

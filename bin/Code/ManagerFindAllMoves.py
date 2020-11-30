@@ -106,11 +106,11 @@ class ManagerFindAllMoves(Manager.Manager):
         self.finJuego()
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, False)
+        self.remove_hints(True, False)
         self.main_window.set_label1(None)
         self.main_window.set_label2(None)
         self.show_side_indicator(False)
-        self.ponPiezasAbajo(True)
+        self.put_pieces_bottom(True)
         self.set_dispatcher(self.player_has_moved)
         self.pgnRefresh(True)
         self.main_window.base.pgn.gotop()
@@ -179,7 +179,7 @@ class ManagerFindAllMoves(Manager.Manager):
             siP = self.siJugador
         else:
             siP = not self.siJugador
-        self.ponPiezasAbajo(siP)
+        self.put_pieces_bottom(siP)
         self.set_position(cp)
         self.cp = cp
         self.refresh()

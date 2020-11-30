@@ -45,8 +45,8 @@ class ManagerResistance(Manager.Manager):
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(is_white)
-        self.quitaAyudas()
+        self.put_pieces_bottom(is_white)
+        self.remove_hints()
         self.set_activate_tutor(False)
         self.show_side_indicator(True)
         self.ponRotuloObjetivo()
@@ -70,7 +70,7 @@ class ManagerResistance(Manager.Manager):
                     b = True
             self.board.mostrarPiezas(b, n)
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def ponRotuloObjetivo(self):
         label = self.resistance.rotuloActual()
@@ -122,7 +122,7 @@ class ManagerResistance(Manager.Manager):
     def final_x(self):
         return self.finJuego(False)
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -154,7 +154,7 @@ class ManagerResistance(Manager.Manager):
         self.refresh()
 
         if siRival:
-            self.pensando(True)
+            self.thinking(True)
             self.disable_all()
 
             siPensar = True
@@ -174,7 +174,7 @@ class ManagerResistance(Manager.Manager):
                 self.rm_rival = self.xrival.juegaSegundos(self.segundos)
                 self.puntosRival = self.rm_rival.centipawns_abs()
                 self.ponRotuloActual()
-            self.pensando(False)
+            self.thinking(False)
 
             if self.play_rival(self.rm_rival):
                 lostmovepoints = self.puntosRival - puntosRivalPrevio
@@ -185,7 +185,7 @@ class ManagerResistance(Manager.Manager):
                     if self.check():
                         return
 
-                self.siguiente_jugada()
+                self.play_next_move()
         else:
 
             self.human_is_playing = True
@@ -274,7 +274,7 @@ class ManagerResistance(Manager.Manager):
         self.add_move(move, True)
         self.error = ""
         self.movimientos += 1
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):

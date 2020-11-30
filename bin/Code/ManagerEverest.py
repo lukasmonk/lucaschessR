@@ -43,11 +43,11 @@ class ManagerEverest(Manager.Manager):
         self.main_window.pon_toolbar((TB_CANCEL, TB_REINIT, TB_CONFIG))
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas(True, True)
+        self.remove_hints(True, True)
 
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(self.is_human_side_white)
+        self.put_pieces_bottom(self.is_human_side_white)
         self.show_side_indicator(True)
         self.set_label1(self.expedition.label())
         self.set_label2("")
@@ -57,7 +57,7 @@ class ManagerEverest(Manager.Manager):
         self.check_boards_setposition()
 
         self.state = ST_PLAYING
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def ponPuntos(self):
         self.set_label2("%s : <b>%d</b>" % (_("Points"), self.puntos))
@@ -121,7 +121,7 @@ class ManagerEverest(Manager.Manager):
 
         self.set_label1(self.expedition.label())
         self.ponPuntos()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def restart(self, lost_points):
         self.terminaNoContinuo()
@@ -184,7 +184,7 @@ class ManagerEverest(Manager.Manager):
             self.tiempoNoContinuo = 99999
             self.pendienteNoContinuo = False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -216,14 +216,14 @@ class ManagerEverest(Manager.Manager):
 
         if siRival:
             self.add_move(False)
-            self.siguiente_jugada()
+            self.play_next_move()
 
         else:
             self.human_is_playing = True
-            self.pensando(True)
+            self.thinking(True)
             self.analizaInicio()
             self.activate_side(is_white)
-            self.pensando(False)
+            self.thinking(False)
             self.iniTiempo = time.time()
             if not self.continueTt:
                 QtCore.QTimer.singleShot(1000, self.analizaNoContinuo)
@@ -332,7 +332,7 @@ class ManagerEverest(Manager.Manager):
 
         self.add_move(True, analysis, comment)
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, siNuestra, analysis=None, comment=None):

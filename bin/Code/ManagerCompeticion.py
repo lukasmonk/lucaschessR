@@ -14,7 +14,7 @@ from Code.Base.Constantes import *
 class ManagerCompeticion(Manager.Manager):
     def start(self, categorias, categoria, nivel, is_white, puntos):
         self.base_inicio(categorias, categoria, nivel, is_white, puntos)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def base_inicio(self, categorias, categoria, nivel, is_white, puntos):
         self.game_type = GT_COMPETITION_WITH_TUTOR
@@ -60,7 +60,7 @@ class ManagerCompeticion(Manager.Manager):
         self.main_window.activaJuego(True, False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
         self.ponAyudas(self.hints)
         self.show_side_indicator(True)
         label = "%s: <b>%s</b><br>%s %s %d" % (_("Opponent"), self.xrival.name, categoria.name(), _("Level"), nivel)
@@ -154,7 +154,7 @@ class ManagerCompeticion(Manager.Manager):
         self.goto_end()
 
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def final_x(self):
         return self.finalizar()
@@ -201,9 +201,9 @@ class ManagerCompeticion(Manager.Manager):
                 self.goto_end()
                 self.is_analyzed_by_tutor = False
                 self.refresh()
-                self.siguiente_jugada()
+                self.play_next_move()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -219,7 +219,7 @@ class ManagerCompeticion(Manager.Manager):
 
         if self.hints == 0:
             if self.categoria.sinAyudasFinal:
-                self.quitaAyudas()
+                self.remove_hints()
                 self.is_tutor_enabled = False
 
         siRival = is_white == self.is_engine_side_white
@@ -228,7 +228,7 @@ class ManagerCompeticion(Manager.Manager):
         self.refresh()
 
         if siRival:
-            self.pensando(True)
+            self.thinking(True)
             self.disable_all()
 
             siPensar = True
@@ -249,10 +249,10 @@ class ManagerCompeticion(Manager.Manager):
             if siPensar:
                 self.rm_rival = self.xrival.juega()
 
-            self.pensando(False)
+            self.thinking(False)
 
             if self.play_rival(self.rm_rival):
-                self.siguiente_jugada()
+                self.play_next_move()
         else:
             self.human_is_playing = True
             self.activate_side(is_white)
@@ -362,7 +362,7 @@ class ManagerCompeticion(Manager.Manager):
 
         self.move_the_pieces(move.liMovs)
         self.add_move(move, True)
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):

@@ -284,8 +284,8 @@ class MainWindow(QTVarios.WDialogo):
     def ponAyudas(self, puntos, with_takeback=True):
         self.base.ponAyudas(puntos, with_takeback)
 
-    def quitaAyudas(self, siTambienTutorAtras, with_takeback=True):
-        self.base.quitaAyudas(siTambienTutorAtras, with_takeback)
+    def remove_hints(self, siTambienTutorAtras, with_takeback=True):
+        self.base.remove_hints(siTambienTutorAtras, with_takeback)
 
     def enable_option_toolbar(self, opcion, siHabilitar):
         self.base.enable_option_toolbar(opcion, siHabilitar)
@@ -401,7 +401,7 @@ class MainWindow(QTVarios.WDialogo):
 
         QtGui.QCursor.setPos(p)
 
-    def pensando(self, si_pensando):
+    def thinking(self, si_pensando):
         self.refresh()
         pass
         # if si_pensando:

@@ -8,6 +8,7 @@ from Code.Polyglots import Books
 from Code.Base import Position
 from Code import Personalities
 from Code.QT import Colocacion
+from Code.QT import Common
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
@@ -77,22 +78,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             ly_g.setMargin(10)
             return ly_g
 
-        gbStyle = """
-            QGroupBox {
-                font: bold 16px;
-                background-color: #F2F2EC;/*qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #E0E0E0, stop: 1 #FFFFFF);*/
-                border: 1px solid gray;
-                border-radius: 3px;
-                padding: 18px;
-                margin-top: 5ex; /* leave space at the top for the title */
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                subcontrol-position: top left; /* position at the top center */
-                padding: 8px;
-                border: 1px solid gray;
-             }
-        """
+        gb_style = Common.gb_style()
 
         def _label(ly_g, txt, xlayout, rutinaCHB=None, siCheck: object = False):
             groupbox = Controles.GB(self, txt, xlayout)
@@ -102,7 +88,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
                 groupbox.setCheckable(True)
                 groupbox.setChecked(False)
 
-            groupbox.setStyleSheet(gbStyle)
+            groupbox.setStyleSheet(gb_style)
             groupbox.setMinimumWidth(640)
             groupbox.setFont(font)
             ly_g.controlc(groupbox, ly_g.filaActual, 0)
@@ -130,7 +116,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         ly_tiempo = Colocacion.H().control(self.edRtiempo).control(bt_cancelar_tiempo).relleno(1)
 
         lb_depth = Controles.LB2P(self, _("Fixed depth")).ponFuente(font)
-        self.edRdepth = Controles.ED(self).tipoInt().anchoMaximo(50).ponFuente(font).capture_changes(self.cambiadoDepth)
+        self.edRdepth = Controles.ED(self).tipoInt().anchoMaximo(50).ponFuente(font).capture_changes(self.change_depth)
         bt_cancelar_depth = Controles.PB(self, "", rutina=self.cancelar_depth).ponIcono(Iconos.S_Cancelar())
         ly_depth = Colocacion.H().control(self.edRdepth).control(bt_cancelar_depth).relleno(1)
 
@@ -235,7 +221,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         self.gbTutor = Controles.GB(self, _("Activate the tutor's help"), ly)
         self.gbTutor.setCheckable(True)
-        self.gbTutor.setStyleSheet(gbStyle)
+        self.gbTutor.setStyleSheet(gb_style)
 
         lb = Controles.LB(self, _("It is showed") + ":").ponFuente(font)
         self.cbThoughtOp = Controles.CB(self, liThinks, -1).ponFuente(font)
@@ -244,7 +230,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         ly = Colocacion.H().control(lb).control(self.cbThoughtOp).relleno()
         ly.control(lbArrows).control(self.sbArrows).relleno()
         gbThoughtOp = Controles.GB(self, _("Opponent's thought information"), ly)
-        gbThoughtOp.setStyleSheet(gbStyle)
+        gbThoughtOp.setStyleSheet(gb_style)
 
         ly = Colocacion.V().espacio(16).control(self.gbTutor).control(gbThoughtOp)
         ly.espacio(16).control(self.chbSummary).control(self.chbTakeback).margen(6)
@@ -310,7 +296,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             .ponFuente(font)
         )
         self.opening_block = None
-        self.btOpeningsFavoritas = Controles.PB(self, "", self.aperturasFavoritas).ponIcono(Iconos.Favoritos())
+        self.btOpeningsFavoritas = Controles.PB(self, "", self.preferred_openings).ponIcono(Iconos.Favoritos())
         self.btOpeningsQuitar = Controles.PB(self, "", self.aperturasQuitar).ponIcono(Iconos.Motor_No())
         hbox = (
             Colocacion.H()
@@ -426,7 +412,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         self.setLayout(layout)
 
-        self.liOpeningsFavoritas = []
+        self.li_preferred_openings = []
         self.btOpeningsFavoritas.hide()
 
         dic = Util.restore_pickle(self.configuration.ficheroEntMaquina)
@@ -632,7 +618,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         if resp is None:
             self.cbAjustarRival.ponValor(ADJUST_HIGH_LEVEL)
 
-    def cambiadoDepth(self):
+    def change_depth(self):
         num = self.edRdepth.textoInt()
         if num > 0:
             self.edRtiempo.ponFloat(0.0)
@@ -650,7 +636,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
     def cancelar_depth(self):
         self.edRdepth.ponInt(0)
-        self.cambiadoDepth()
+        self.change_depth()
 
     def posicionEditar(self):
         cp = Position.Position()
@@ -697,18 +683,18 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             self.opening_block = w.resultado()
             self.muestraOpening()
 
-    def aperturasFavoritas(self):
-        if len(self.liOpeningsFavoritas) == 0:
+    def preferred_openings(self):
+        if len(self.li_preferred_openings) == 0:
             return
         menu = QTVarios.LCMenu(self)
         menu.setToolTip(_("To choose: <b>left button</b> <br>To erase: <b>right button</b>"))
         f = Controles.TipoLetra(puntos=8, peso=75)
         menu.ponFuente(f)
         nPos = 0
-        for nli, bloque in enumerate(self.liOpeningsFavoritas):
+        for nli, bloque in enumerate(self.li_preferred_openings):
             if type(bloque) == tuple:  # compatibilidad con versiones anteriores
                 bloque = bloque[0]
-                self.liOpeningsFavoritas[nli] = bloque
+                self.li_preferred_openings[nli] = bloque
             menu.opcion(bloque, bloque.trNombre, Iconos.PuntoVerde())
             nPos += 1
 
@@ -726,7 +712,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
                         opening_block.trNombre,
                     ),
                 ):
-                    del self.liOpeningsFavoritas[nPos]
+                    del self.li_preferred_openings[nPos]
 
     def muestraOpening(self):
         if self.opening_block:
@@ -774,7 +760,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             dic["ZEITNOT"] = self.edZeitnot.value()
 
         # Mov. iniciales
-        dic["OPENIGSFAVORITES"] = self.liOpeningsFavoritas
+        dic["OPENIGSFAVORITES"] = self.li_preferred_openings
         dic["OPENING"] = self.opening_block
         dic["FEN"] = self.fen
 
@@ -850,23 +836,23 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             self.cbBooksP.ponValor(dic["BOOKP"])
             self.edDepthBookP.ponInt(dic["BOOKPDEPTH"])
 
-        self.liOpeningsFavoritas = dic.get("OPENIGSFAVORITES", [])
+        self.li_preferred_openings = dic.get("OPENIGSFAVORITES", [])
         self.opening_block = dic.get("OPENING", None)
         self.fen = dic.get("FEN", "")
 
         if self.opening_block:
             nEsta = -1
-            for npos, bl in enumerate(self.liOpeningsFavoritas):
+            for npos, bl in enumerate(self.li_preferred_openings):
                 if bl.a1h8 == self.opening_block.a1h8:
                     nEsta = npos
                     break
             if nEsta != 0:
                 if nEsta != -1:
-                    del self.liOpeningsFavoritas[nEsta]
-                self.liOpeningsFavoritas.insert(0, self.opening_block)
-            while len(self.liOpeningsFavoritas) > 10:
-                del self.liOpeningsFavoritas[10]
-        if len(self.liOpeningsFavoritas):
+                    del self.li_preferred_openings[nEsta]
+                self.li_preferred_openings.insert(0, self.opening_block)
+            while len(self.li_preferred_openings) > 10:
+                del self.li_preferred_openings[10]
+        if len(self.li_preferred_openings):
             self.btOpeningsFavoritas.show()
 
         bookR = dic.get("BOOKR", None)
@@ -1007,7 +993,7 @@ class WCambioRival(QtWidgets.QDialog):
         self.rivalTipo = SelectEngines.INTERNO
         self.btRival = Controles.PB(self, "", self.cambiaRival, plano=False)
         self.edRtiempo = Controles.ED(self).tipoFloat().anchoMaximo(50)
-        self.cbRdepth = Controles.CB(self, liDepths, 0).capture_changes(self.cambiadoDepth)
+        self.cbRdepth = Controles.CB(self, liDepths, 0).capture_changes(self.change_depth)
         lbTiempoSegundosR = Controles.LB2P(self, _("Time"))
         lbNivel = Controles.LB2P(self, _("Depth"))
 
@@ -1048,7 +1034,7 @@ class WCambioRival(QtWidgets.QDialog):
         self.setLayout(layout)
 
         self.dic = dic
-        self.recuperaDic()
+        self.restore_dic()
 
         self.ajustesCambiado()
         self.ponRival()
@@ -1073,7 +1059,7 @@ class WCambioRival(QtWidgets.QDialog):
         if resp is None:
             self.cbAjustarRival.ponValor(ADJUST_HIGH_LEVEL)
 
-    def cambiadoDepth(self, num):
+    def change_depth(self, num):
         if num > 0:
             self.edRtiempo.ponFloat(0.0)
         self.edRtiempo.setEnabled(num == 0)
@@ -1110,7 +1096,7 @@ class WCambioRival(QtWidgets.QDialog):
             self.ajustesCambiado()
             self.motores.rehazMotoresExternos()
 
-    def recuperaDic(self):
+    def restore_dic(self):
         dic = self.dic
         is_white = dic.get("ISWHITE", True)
         self.rb_white.activa(is_white)

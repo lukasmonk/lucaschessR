@@ -188,8 +188,8 @@ class ManagerMicElo(Manager.Manager):
         self.main_window.activaJuego(True, True, siAyudas=False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(is_white)
-        self.quitaAyudas(True, siQuitarAtras=True)
+        self.put_pieces_bottom(is_white)
+        self.remove_hints(True, siQuitarAtras=True)
         self.show_side_indicator(True)
 
         nbsp = "&nbsp;" * 3
@@ -232,7 +232,7 @@ class ManagerMicElo(Manager.Manager):
             mensaje = _("Press the continue button to start.")
             self.mensajeEnPGN(mensaje)
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def pon_toolbar(self):
         if self.pte_tool_resigndraw:
@@ -303,7 +303,7 @@ class ManagerMicElo(Manager.Manager):
 
         return False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
 
         if self.state == ST_ENDGAME:
             return
@@ -342,7 +342,7 @@ class ManagerMicElo(Manager.Manager):
 
         if siRival:
             self.reloj_start(False)
-            self.pensando(True)
+            self.thinking(True)
             self.disable_all()
 
             siEncontrada = False
@@ -366,17 +366,17 @@ class ManagerMicElo(Manager.Manager):
                 tiempoNegras = self.vtime[False].tiempoPendiente
                 mrm = self.xrival.juegaTiempoTorneo(self.game, tiempoBlancas, tiempoNegras, self.segundosJugada)
                 if mrm is None:
-                    self.pensando(False)
+                    self.thinking(False)
                     return False
                 rm_rival = mrm.mejorMov()
 
             self.reloj_stop(False)
 
-            self.pensando(False)
+            self.thinking(False)
             if self.play_rival(rm_rival):
                 self.lirm_engine.append(rm_rival)
                 if self.valoraRMrival(rm_rival):
-                    self.siguiente_jugada()
+                    self.play_next_move()
             else:
                 self.put_result(RS_WIN_PLAYER)
         else:
@@ -394,7 +394,7 @@ class ManagerMicElo(Manager.Manager):
         self.reloj_stop(True)
 
         self.add_move(move, True)
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
@@ -595,4 +595,4 @@ class ManagerMicElo(Manager.Manager):
             self.game.assign_opening()
             self.goto_end()
             self.refresh()
-            self.siguiente_jugada()
+            self.play_next_move()

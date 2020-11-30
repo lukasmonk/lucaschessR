@@ -59,11 +59,11 @@ class ManagerMateMap(Manager.Manager):
         self.main_window.pon_toolbar(li_options)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(True, True)
+        self.main_window.remove_hints(True, True)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
         self.set_label1(etiqueta)
         self.set_label2(workmap.nameAim())
         self.pgnRefresh(True)
@@ -77,7 +77,7 @@ class ManagerMateMap(Manager.Manager):
 
         self.reiniciando = False
         self.is_rival_thinking = False
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -108,7 +108,7 @@ class ManagerMateMap(Manager.Manager):
         self.end_game()
         return False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
         self.siPiensaHumano = False
@@ -137,17 +137,17 @@ class ManagerMateMap(Manager.Manager):
 
     def piensa_rival(self):
         self.is_rival_thinking = True
-        self.pensando(True)
+        self.thinking(True)
         self.disable_all()
 
         self.rm_rival = self.xrival.juega()
 
-        self.pensando(False)
+        self.thinking(False)
         from_sq, to_sq, promotion = self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion
 
         if self.play_rival(from_sq, to_sq, promotion):
             self.is_rival_thinking = False
-            self.siguiente_jugada()
+            self.play_next_move()
         else:
             self.is_rival_thinking = False
 
@@ -159,7 +159,7 @@ class ManagerMateMap(Manager.Manager):
         self.move_the_pieces(move.liMovs)
         self.add_move(move, True)
         self.error = ""
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):

@@ -9,7 +9,7 @@ from Code.Base.Constantes import *
 class ManagerAlbum(Manager.Manager):
     def start(self, album, cromo):
         self.base_inicio(album, cromo)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def base_inicio(self, album, cromo):
         self.reinicio = {"ALBUM": album, "CROMO": cromo, "ISWHITE": cromo.is_white}
@@ -38,8 +38,8 @@ class ManagerAlbum(Manager.Manager):
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(is_white)
-        self.quitaAyudas(True, siQuitarAtras=True)
+        self.put_pieces_bottom(is_white)
+        self.remove_hints(True, siQuitarAtras=True)
         self.show_side_indicator(True)
 
         self.main_window.base.lbRotulo1.ponImagen(self.cromo.pixmap_level())
@@ -83,7 +83,7 @@ class ManagerAlbum(Manager.Manager):
 
     def run_adjourn(self, dic):
         self.restore_state(dic)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def adjourn(self):
         if QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
@@ -138,7 +138,7 @@ class ManagerAlbum(Manager.Manager):
 
         return False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -159,15 +159,15 @@ class ManagerAlbum(Manager.Manager):
         self.refresh()
 
         if is_rival:
-            self.pensando(True)
+            self.thinking(True)
             self.disable_all()
 
             fen = self.last_fen()
             rm_rival = self.xrival.juega(fen)
 
-            self.pensando(False)
+            self.thinking(False)
             if self.play_rival(rm_rival):
-                self.siguiente_jugada()
+                self.play_next_move()
 
         else:
             self.human_is_playing = True
@@ -182,7 +182,7 @@ class ManagerAlbum(Manager.Manager):
 
         self.add_move(move, True)
         self.error = ""
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):

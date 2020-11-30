@@ -102,11 +102,11 @@ class ManagerEntPos(Manager.Manager):
         self.main_window.pon_toolbar(li_options)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(False, False)
+        self.main_window.remove_hints(False, False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
         titulo = "<b>%s</b>" % TrListas.dicTraining().get(self.title_training, self.title_training)
         if self.line_fns.label:
             titulo += "<br>%s" % self.line_fns.label
@@ -129,7 +129,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.reiniciando = False
         self.is_rival_thinking = False
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -237,9 +237,9 @@ class ManagerEntPos(Manager.Manager):
             self.is_analyzed_by_tutor = False
             self.state = ST_PLAYING
             self.refresh()
-            self.siguiente_jugada()
+            self.play_next_move()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             if self.game_obj and self.is_automatic_jump:
                 self.ent_siguiente(TB_NEXT)
@@ -294,9 +294,9 @@ class ManagerEntPos(Manager.Manager):
             from_sq, to_sq, promotion = move.from_sq, move.to_sq, move.promotion
 
         else:
-            self.pensando(True)
+            self.thinking(True)
             self.rm_rival = self.xrival.juega()
-            self.pensando(False)
+            self.thinking(False)
             from_sq, to_sq, promotion = (self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion)
 
         self.is_rival_thinking = False
@@ -313,14 +313,14 @@ class ManagerEntPos(Manager.Manager):
 
         if is_obj:
             self.lineaTerminadaOpciones()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def sigue(self):
         self.state = ST_PLAYING
         if TB_CONTINUE in self.li_options_toolbar:
             del self.li_options_toolbar[self.li_options_toolbar.index(TB_CONTINUE)]
             self.main_window.pon_toolbar(self.li_options_toolbar)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def lineaTerminadaOpciones(self):
         self.state = ST_ENDGAME
@@ -394,7 +394,7 @@ class ManagerEntPos(Manager.Manager):
         if self.game_obj and self.pos_obj >= len(self.game_obj):
             self.lineaTerminadaOpciones()
 
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):

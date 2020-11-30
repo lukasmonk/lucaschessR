@@ -266,7 +266,7 @@ class WDailyTest(QTVarios.WDialogo):
         self.position = Position.Position()
         self.restore_video()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def terminar(self):
         self.xtutor.terminar()
@@ -284,9 +284,9 @@ class WDailyTest(QTVarios.WDialogo):
         elif accion in "terminar":
             self.terminar()
         elif accion == "empezar":
-            self.siguiente_jugada()
+            self.play_next_move()
         elif accion == "seguir":
-            self.siguiente_jugada()
+            self.play_next_move()
         elif accion == "analizar":
             self.analizar()
 
@@ -300,7 +300,7 @@ class WDailyTest(QTVarios.WDialogo):
         self.tb.li_acciones = li_acciones
         self.tb.update()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         self.pon_toolbar(["abandonar"])
 
         if self.juego == self.nFens:

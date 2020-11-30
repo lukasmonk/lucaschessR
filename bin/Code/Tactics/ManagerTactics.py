@@ -53,11 +53,11 @@ class ManagerTacticas(Manager.Manager):
 
         self.main_window.set_activate_tutor(False)
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.main_window.quitaAyudas(True, True)
+        self.main_window.remove_hints(True, True)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.ponPiezasAbajo(is_white)
+        self.put_pieces_bottom(is_white)
 
         li_opciones = [TB_CLOSE, TB_REINIT, TB_CONFIG]
         self.main_window.pon_toolbar(li_opciones)
@@ -77,7 +77,7 @@ class ManagerTacticas(Manager.Manager):
         self.reiniciando = False
 
         self.num_bad_tries = 0
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def show_label_positions(self):
         html = self.tactic.work_info_position()
@@ -141,7 +141,7 @@ class ManagerTacticas(Manager.Manager):
         self.end_game()
         return False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -165,7 +165,7 @@ class ManagerTacticas(Manager.Manager):
             move = self.game_obj.move(self.pos_obj)
             self.move_the_pieces(move.liMovs, True)
             self.add_move(move, False)
-            self.siguiente_jugada()
+            self.play_next_move()
 
         else:
             self.human_is_playing = True
@@ -229,7 +229,7 @@ class ManagerTacticas(Manager.Manager):
 
         self.add_move(move, True)
         self.num_bad_tries = 0
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, si_nuestra):

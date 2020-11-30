@@ -35,7 +35,7 @@ class ManagerAnotar(Manager.Manager):
 
         self.main_window.set_activate_tutor(False)
         self.si_blancas_abajo = si_blancas_abajo
-        self.ponPiezasAbajo(self.si_blancas_abajo)
+        self.put_pieces_bottom(self.si_blancas_abajo)
         self.show_side_indicator(True)
         self.si_terminar = False
         self.main_window.pon_toolbar((TB_CLOSE,))
@@ -44,7 +44,7 @@ class ManagerAnotar(Manager.Manager):
         self.main_window.activaInformacionPGN(False)
         self.main_window.activaJuego(False, False, siAyudas=False)
         self.set_activate_tutor(False)
-        self.quitaAyudas()
+        self.remove_hints()
         self.put_view()
         self.set_label1("")
         self.set_label2("")
@@ -55,9 +55,9 @@ class ManagerAnotar(Manager.Manager):
 
         self.vtime = 0.0
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return False
 
@@ -68,7 +68,7 @@ class ManagerAnotar(Manager.Manager):
             self.finalizar()
             return False
 
-        self.ponPiezasAbajo(self.si_blancas_abajo)
+        self.put_pieces_bottom(self.si_blancas_abajo)
 
         self.set_position(self.game.last_position)
 
@@ -97,7 +97,7 @@ class ManagerAnotar(Manager.Manager):
 
         self.refresh()
 
-        return self.siguiente_jugada()
+        return self.play_next_move()
 
     def run_action(self, key):
         if key == TB_REINIT:
@@ -125,7 +125,7 @@ class ManagerAnotar(Manager.Manager):
         self.informacion_activable = True
         self.board.showCoordenadas(True)
         self.main_window.activaJuego(True, False, siAyudas=False)
-        self.quitaAyudas()
+        self.remove_hints()
         self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_CONFIG, TB_UTILITIES))
         if self.cancelado:
             self.game = self.game_objetivo

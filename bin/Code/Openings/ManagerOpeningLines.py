@@ -120,8 +120,8 @@ class ManagerOpeningEngines(Manager.Manager):
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.quitaAyudas()
-        self.ponPiezasAbajo(self.is_human_side_white)
+        self.remove_hints()
+        self.put_pieces_bottom(self.is_human_side_white)
         self.pgnRefresh(True)
 
         self.ponCapInfoPorDefecto()
@@ -133,9 +133,9 @@ class ManagerOpeningEngines(Manager.Manager):
         self.errores = 0
         self.ini_time = time.time()
         self.muestraInformacion()
-        self.siguiente_jugada()
+        self.play_next_move()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         self.muestraInformacion()
         if self.state == ST_ENDGAME:
             return
@@ -156,7 +156,7 @@ class ManagerOpeningEngines(Manager.Manager):
             if siRival:
                 self.disable_all()
                 if self.play_rival():
-                    self.siguiente_jugada()
+                    self.play_next_move()
 
             else:
                 self.activate_side(is_white)
@@ -241,7 +241,7 @@ class ManagerOpeningEngines(Manager.Manager):
         self.move_the_pieces(move.liMovs)
 
         self.add_move(move, True)
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
@@ -608,8 +608,8 @@ class ManagerOpeningLines(Manager.Manager):
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.quitaAyudas()
-        self.ponPiezasAbajo(self.is_human_side_white)
+        self.remove_hints()
+        self.put_pieces_bottom(self.is_human_side_white)
         self.pgnRefresh(True)
 
         self.ponCapInfoPorDefecto()
@@ -621,7 +621,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.errores = 0
         self.ini_time = time.time()
         self.muestraInformacion()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def calc_totalTiempo(self):
         self.tm = 0
@@ -773,7 +773,7 @@ class ManagerOpeningLines(Manager.Manager):
             self.gameTerminada(False)
         self.reinicio(self.dbop, self.modo, self.num_linea)
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         self.muestraInformacion()
         if self.state == ST_ENDGAME:
             return
@@ -805,7 +805,7 @@ class ManagerOpeningLines(Manager.Manager):
             self.rm_rival.promotion = pv[4:]
 
             self.play_rival(self.rm_rival)
-            self.siguiente_jugada()
+            self.play_next_move()
 
         else:
             self.activate_side(is_white)
@@ -841,7 +841,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.move_the_pieces(move.liMovs)
 
         self.add_move(move, True)
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
@@ -913,8 +913,8 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         self.set_dispatcher(self.player_has_moved)
         self.set_position(cp)
         self.show_side_indicator(True)
-        self.quitaAyudas()
-        self.ponPiezasAbajo(self.is_human_side_white)
+        self.remove_hints()
+        self.put_pieces_bottom(self.is_human_side_white)
         self.pgnRefresh(True)
 
         self.ponCapInfoPorDefecto()
@@ -928,7 +928,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         self.errores = 0
         self.ini_time = time.time()
         self.muestraInformacion()
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def ayuda(self):
         self.siAyuda = True
@@ -1046,7 +1046,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         self.procesador.openings()
         return False
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         self.muestraInformacion()
         if self.state == ST_ENDGAME:
             return

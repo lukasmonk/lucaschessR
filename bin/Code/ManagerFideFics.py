@@ -93,7 +93,7 @@ class ManagerFideFics(Manager.Manager):
 
     def start(self, id_game):
         self.base_inicio(id_game)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def base_inicio(self, id_game):
         self.resultado = None
@@ -132,8 +132,8 @@ class ManagerFideFics(Manager.Manager):
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.ponPiezasAbajo(self.is_human_side_white)
-        self.quitaAyudas(True, siQuitarAtras=True)
+        self.put_pieces_bottom(self.is_human_side_white)
+        self.remove_hints(True, siQuitarAtras=True)
         self.show_side_indicator(True)
         label = "%s: <b>%d</b> | %s: <b>%d</b>" % (self._titulo, self.eloUsu, _("Elo rival"), self.eloObj)
         label += " | %+d %+d %+d" % (self.pwin, self.pdraw, self.plost)
@@ -197,7 +197,7 @@ class ManagerFideFics(Manager.Manager):
         self.mueveJugada(GO_END)
         self.ponPuntos()
 
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def final_x(self):
         return self.rendirse()
@@ -242,7 +242,7 @@ class ManagerFideFics(Manager.Manager):
             self.siAnalizando = False
             self.xtutor.terminar()
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.state == ST_ENDGAME:
             return
 
@@ -264,15 +264,15 @@ class ManagerFideFics(Manager.Manager):
 
         if siRival:
             self.add_move(False)
-            self.siguiente_jugada()
+            self.play_next_move()
         else:
 
             self.human_is_playing = True
-            self.pensando(True)
+            self.thinking(True)
             if self.continueTt:
                 self.analizaInicio()
             self.activate_side(is_white)
-            self.pensando(False)
+            self.thinking(False)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         jgUsu = self.check_human_move(from_sq, to_sq, promotion)
@@ -373,7 +373,7 @@ class ManagerFideFics(Manager.Manager):
         self.analizaFinal()
 
         self.add_move(True, comment, analysis)
-        self.siguiente_jugada()
+        self.play_next_move()
         return True
 
     def add_move(self, siNuestra, comment=None, analysis=None):
@@ -472,4 +472,4 @@ class ManagerFideFics(Manager.Manager):
             self.analysis = None
             self.goto_end()
             self.refresh()
-            self.siguiente_jugada()
+            self.play_next_move()

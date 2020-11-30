@@ -8,7 +8,7 @@ from Code.Base.Constantes import *
 class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
     def start(self, dic_var):
         self.base_inicio(dic_var)
-        self.siguiente_jugada()
+        self.play_next_move()
 
     def base_inicio(self, dic_var):
         self.reinicio = dic_var
@@ -61,7 +61,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         self.main_window.set_notify(self.mueve_rival_base)
 
 
-        self.pensando(True)
+        self.thinking(True)
 
         self.main_window.set_activate_tutor(False)
 
@@ -80,7 +80,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
 
             self.vtime = {WHITE: Util.Timer(self.maxSegundos), BLACK: Util.Timer(self.maxSegundos)}
 
-        self.pensando(False)
+        self.thinking(False)
 
         li = [TB_CANCEL, TB_RESIGN, TB_TAKEBACK, TB_REINIT, TB_ADJOURN, TB_PAUSE, TB_CONFIG, TB_UTILITIES]
         self.main_window.pon_toolbar(li)
@@ -90,8 +90,8 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
-        self.quitaAyudas(True, siQuitarAtras=False)
-        self.ponPiezasAbajo(is_white)
+        self.remove_hints(True, siQuitarAtras=False)
+        self.put_pieces_bottom(is_white)
 
         imagen = getattr(Iconos, "pm%s" % self.rival_name)
 

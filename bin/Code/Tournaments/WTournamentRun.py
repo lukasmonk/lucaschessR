@@ -304,7 +304,7 @@ class WTournamentRun(QtWidgets.QWidget):
             eti, eti2 = ot.etiquetaDif2()
             self.pon_reloj_side(side, eti, eti2)
 
-        while self.state == ST_PAUSE or self.siguiente_jugada():
+        while self.state == ST_PAUSE or self.play_next_move():
             if self.state == ST_PAUSE:
                 QTUtil.refresh_gui()
                 time.sleep(0.1)
@@ -457,7 +457,7 @@ class WTournamentRun(QtWidgets.QWidget):
             tipo = "ms" if tipo == "mt" else "mt"
         return True
 
-    def siguiente_jugada(self):
+    def play_next_move(self):
         if self.test_is_finished():
             return False
 
