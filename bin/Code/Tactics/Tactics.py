@@ -366,12 +366,11 @@ class Tactic:
         for f, w, d, h in self.filesw:
             t = 0
             for fich in self.listaFicheros(f):
-                q = open(fich)
-                for linea in q:
-                    linea = linea.strip()
-                    if linea and "|" in linea:
-                        t += 1
-                q.close()
+                with Util.OpenCodec(fich, "rt") as q:
+                    for linea in q:
+                        linea = linea.strip()
+                        if linea and "|" in linea:
+                            t += 1
             li.append(t)
         return li
 

@@ -240,7 +240,7 @@ class PGNreader:
                     linea = linea.strip()
                     if linea[:1] == b"[" and linea[-1:] == b"]":
                         add_label(linea)
-                    else:
+                    elif len(linea) > 0:
                         body = linea
                         break
                 break

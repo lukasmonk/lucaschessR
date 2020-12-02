@@ -17,6 +17,3 @@ copy /B Faster_Irina.pyx+Faster_Polyglot.pyx FasterCode.pyx
 %FOLDER_PYTHON3%\python setup.py build_ext --inplace -i clean
 
 copy FasterCode.cp37-win32.pyd ..\..\OS\win32
-REM ~ pause
-REM ~ del c:\lucaschess\pyLCR\FasterCode.cp37-win32.pyd
-REM ~ copy c:\lucaschess\pyLCR\bin\.fastercode\source\FasterCode.cp37-win32.pyd c:\lucaschess\pyLCR\FasterCode.cp37-win32.pyd
