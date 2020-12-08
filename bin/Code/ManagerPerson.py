@@ -114,3 +114,5 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
             self.refresh()
 
         self.check_boards_setposition()
+
+        self.game.tag_timestart()

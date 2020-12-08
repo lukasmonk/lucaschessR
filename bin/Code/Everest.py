@@ -301,7 +301,7 @@ class Expeditions:
         self.dbf.modificarReg(recno, reg)
 
     def borrar_lista(self, lirecnos):
-        self.dbf.borrarLista(lirecnos)
+        self.dbf.remove_list_recnos(lirecnos)
         self.dbf.pack()
         self.dbf.leer()
 

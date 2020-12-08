@@ -94,8 +94,8 @@ class WGM(QTVarios.WDialogo):
         self.lbJdepth = Controles.LB2P(self, _("Depth"))
         self.lbJshow = Controles.LB2P(self, _("Show rating"))
         self.chbEvals = Controles.CHB(self, _("Show all evaluations"), False)
-        liOptions = [(_("All moves"), None), (_("Moves are different"), True), (_("Never"), False)]
-        self.cbJshow = Controles.CB(self, liOptions, True)
+        li_options = [(_("All moves"), None), (_("Moves are different"), True), (_("Never"), False)]
+        self.cbJshow = Controles.CB(self, li_options, True)
         self.lbJmultiPV = Controles.LB2P(self, _("Number of moves evaluated by engine(MultiPV)"))
         li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
         for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):

@@ -203,7 +203,7 @@ def opciones(parent, configuration):
 
     # Salvado automatico #############################################################################################
     form.separador()
-    form.file(_("Autosave to a PGN file"), "pgn", True, configuration.pgn_folder())
+    form.file(_("Autosave to a PGN file"), "pgn", True, configuration.x_save_pgn)
     form.checkbox(_("Won games"), configuration.x_save_won)
     form.checkbox(_("Lost/Drawn games"), configuration.x_save_lost)
     form.checkbox(_("Unfinished games"), configuration.x_save_unfinished)
@@ -340,7 +340,7 @@ def opciones(parent, configuration):
             configuration.x_save_tutor_variations,
             configuration.x_save_csv,
         ) = li_sa
-        configuration.x_save_csv = Util.dirRelativo(configuration.x_save_csv)
+        configuration.x_save_csv = Util.relative_path(configuration.x_save_csv)
 
         return True
     else:

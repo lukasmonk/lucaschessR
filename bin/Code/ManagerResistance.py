@@ -135,6 +135,7 @@ class ManagerResistance(Manager.Manager):
         is_white = self.game.last_position.is_white
 
         if self.game.is_finished():
+            self.autosave()
             if self.game.is_mate():
                 si_ganado = self.is_human_side_white != is_white
                 if si_ganado:

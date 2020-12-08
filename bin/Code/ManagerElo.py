@@ -414,6 +414,7 @@ class ManagerElo(Manager.Manager):
                 return False  # no abandona
             self.game.resign(self.is_human_side_white)
             self.muestra_resultado()
+            self.autosave()
         else:
             self.procesador.start()
 
@@ -525,6 +526,7 @@ class ManagerElo(Manager.Manager):
 
         self.mensaje(mensaje)
         self.ponFinJuego()
+        self.autosave()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)

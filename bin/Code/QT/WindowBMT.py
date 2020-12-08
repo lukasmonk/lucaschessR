@@ -1323,7 +1323,7 @@ class WBMT(QTVarios.WDialogo):
             siConfirmarSobreescritura=False,
         )
         if fbmt:
-            fbmt = Util.dirRelativo(fbmt)
+            fbmt = Util.relative_path(fbmt)
             abmt = self.bmt
             try:
                 self.bmt = BMT.BMT(fbmt)
@@ -1432,7 +1432,7 @@ class WBMT(QTVarios.WDialogo):
             base = _("the following training")
             if QTUtil2.pregunta(self, _X(_("Delete %1?"), base) + tit):
                 um = QTUtil2.unMomento(self)
-                dbf.borrarLista(li)
+                dbf.remove_list_recnos(li)
                 dbf.pack()
                 self.releer()
                 um.final()

@@ -308,7 +308,7 @@ class WTV_Markers(QTVarios.WDialogo):
             self.grid.refresh()
             self.grid.setFocus()
 
-    def intercambia(self, fila1, fila2):
+    def interchange(self, fila1, fila2):
         regMarker1, regMarker2 = self.liPMarkers[fila1], self.liPMarkers[fila2]
         regMarker1.ordenVista, regMarker2.ordenVista = regMarker2.ordenVista, regMarker1.ordenVista
         self.dbMarkers[regMarker1.id] = regMarker1
@@ -321,9 +321,9 @@ class WTV_Markers(QTVarios.WDialogo):
     def arriba(self):
         row = self.grid.recno()
         if row > 0:
-            self.intercambia(row, row - 1)
+            self.interchange(row, row - 1)
 
     def abajo(self):
         row = self.grid.recno()
         if 0 <= row < (len(self.liPMarkers) - 1):
-            self.intercambia(row, row + 1)
+            self.interchange(row, row + 1)

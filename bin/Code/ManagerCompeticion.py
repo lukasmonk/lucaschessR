@@ -84,6 +84,8 @@ class ManagerCompeticion(Manager.Manager):
 
         self.check_boards_setposition()
 
+        self.game.tag_timestart()
+
     def xrotulo2(self):
         self.set_label2(
             "%s: <b>%s</b><br>%s: %d %s"
@@ -169,6 +171,7 @@ class ManagerCompeticion(Manager.Manager):
                 return False  # no termina
             self.guardarNoTerminados()
             self.ponFinJuego()
+            self.autosave()
         else:
             self.procesador.start()
 
@@ -185,6 +188,7 @@ class ManagerCompeticion(Manager.Manager):
             self.game.resign(self.is_human_side_white)
             self.guardarGanados(False)
             self.ponFinJuego()
+            self.autosave()
         else:
             self.procesador.start()
 
@@ -288,6 +292,7 @@ class ManagerCompeticion(Manager.Manager):
         self.guardarGanados(player_win)
         self.mensaje(mensaje)
         self.ponFinJuego()
+        self.autosave()
 
     def analizaInicio(self):
         self.siAnalizando = False

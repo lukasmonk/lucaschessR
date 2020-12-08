@@ -292,6 +292,7 @@ class ManagerOpeningEngines(Manager.Manager):
                     lista.append(move)
                     move.fenm2 = fenm2
         total = len(lista)
+        move_max = 0
         for pos, move in enumerate(lista, 1):
             if self.is_canceled():
                 break
@@ -314,6 +315,11 @@ class ManagerOpeningEngines(Manager.Manager):
 
             move.analysis = mrm, pos
             self.main_window.base.pgnRefresh()
+            if pos == 0:
+                move_max += 1
+
+        return move_max < total  # si todos son lo máximo aunque pierda algo hay que darlo por probado
+
 
     def mensEspera(self, siFinal=False, siCancelar=False, masTitulo=None):
         if siFinal:
@@ -441,9 +447,14 @@ class ManagerOpeningEngines(Manager.Manager):
 
         if not ok:
             if self.auto_analysis:
-                self.run_auto_analysis()
+                si_suspendido = self.run_auto_analysis()
+            else:
+                si_suspendido = true
             self.mensEspera(siFinal=True)
-            suspendido()
+            if si_suspendido:
+                suspendido()
+            else:
+                aprobado()
         else:
             self.mensEspera(siFinal=True)
             aprobado()
@@ -923,7 +934,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
 
         self.check_boards_setposition()
 
-        self.quitaInformacion()
+        self.remove_info()
 
         self.errores = 0
         self.ini_time = time.time()

@@ -363,7 +363,7 @@ class WTV_Flechas(QTVarios.WDialogo):
             self.grid.refresh()
             self.grid.setFocus()
 
-    def intercambia(self, fila1, fila2):
+    def interchange(self, fila1, fila2):
         regFlecha1, regFlecha2 = self.liPFlechas[fila1], self.liPFlechas[fila2]
         regFlecha1.ordenVista, regFlecha2.ordenVista = regFlecha2.ordenVista, regFlecha1.ordenVista
         self.dbFlechas[regFlecha1.id] = regFlecha1.save_dic()
@@ -376,9 +376,9 @@ class WTV_Flechas(QTVarios.WDialogo):
     def arriba(self):
         row = self.grid.recno()
         if row > 0:
-            self.intercambia(row, row - 1)
+            self.interchange(row, row - 1)
 
     def abajo(self):
         row = self.grid.recno()
         if 0 <= row < (len(self.liPFlechas) - 1):
-            self.intercambia(row, row + 1)
+            self.interchange(row, row + 1)

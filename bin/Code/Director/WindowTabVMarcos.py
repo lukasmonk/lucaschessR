@@ -297,7 +297,7 @@ class WTV_Marcos(QTVarios.WDialogo):
             self.grid.refresh()
             self.grid.setFocus()
 
-    def intercambia(self, fila1, fila2):
+    def interchange(self, fila1, fila2):
         regMarco1, regMarco2 = self.liPMarcos[fila1], self.liPMarcos[fila2]
         regMarco1.ordenVista, regMarco2.ordenVista = regMarco2.ordenVista, regMarco1.ordenVista
         self.dbMarcos[regMarco1.id] = regMarco1
@@ -310,9 +310,9 @@ class WTV_Marcos(QTVarios.WDialogo):
     def arriba(self):
         row = self.grid.recno()
         if row > 0:
-            self.intercambia(row, row - 1)
+            self.interchange(row, row - 1)
 
     def abajo(self):
         row = self.grid.recno()
         if 0 <= row < (len(self.liPMarcos) - 1):
-            self.intercambia(row, row + 1)
+            self.interchange(row, row + 1)

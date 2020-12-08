@@ -795,7 +795,12 @@ class ElemDB:
     def __init__(self, path, is_folder):
         self.is_folder = is_folder
         self.path = path
+
+        self.is_autosave = Util.same_path(Code.configuration.file_autosave(), self.path)
+
         self.name = os.path.basename(path)
+        if self.is_autosave:
+            self.name = "%s: %s" % (_("Autosave"), self.name)
         if is_folder:
             self.li_elems = self.read(path)
         else:
@@ -842,7 +847,7 @@ class ElemDB:
                 del self.li_elems[n]
 
     def add_submenu(self, submenu, rondo, indicador_previo=None):
-        self.li_elems.sort(key=lambda x: x.name.lower())
+        self.li_elems.sort(key=lambda x: ("Z" if x.is_autosave else "A") + x.name.lower())
         previo = "" if indicador_previo is None else indicador_previo
         for elem in self.li_elems:
             if elem.is_folder:

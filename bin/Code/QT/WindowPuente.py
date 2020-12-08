@@ -111,8 +111,8 @@ class PuenteHistorico:
         reg.FECHA = self.txt2fecha(reg.FECHA)
         return reg
 
-    def borrarLista(self, liNum):
-        self.dbf.borrarLista(liNum)
+    def remove_list_recnos(self, liNum):
+        self.dbf.remove_list_recnos(liNum)
         self.dbf.pack()
         self.dbf.leer()
         self.calculaMedia()
@@ -364,7 +364,7 @@ class WPuenteBase(QTVarios.WDialogo):
         li = self.ghistorico.recnosSeleccionados()
         if len(li) > 0:
             if QTUtil2.pregunta(self, _("Do you want to delete all selected records?")):
-                self.historico.borrarLista(li)
+                self.historico.remove_list_recnos(li)
         self.ghistorico.gotop()
         self.ghistorico.refresh()
 

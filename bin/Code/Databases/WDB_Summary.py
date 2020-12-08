@@ -311,7 +311,7 @@ class WSummary(QtWidgets.QWidget):
             liGen.append((None, None))
 
             config = FormLayout.Spinbox(_("Depth"), 3, 255, 50)
-            liGen.append((config, self.dbGames.depthStat()))
+            liGen.append((config, self.dbGames.depth_stat()))
 
             resultado = FormLayout.fedit(liGen, title=_("Rebuild"), parent=self, icon=Iconos.Reindexar())
             if resultado is None:

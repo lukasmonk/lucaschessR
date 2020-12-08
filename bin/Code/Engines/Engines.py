@@ -19,7 +19,7 @@ class Engine:
         self.nomDebug = None
         self.siExterno = False
         self.url = url
-        self.path_exe = Util.dirRelativo(path_exe) if path_exe else ""
+        self.path_exe = Util.relative_path(path_exe) if path_exe else ""
         self._nombre = None
         self.elo = 0
         self.id_info = ""
@@ -322,7 +322,7 @@ def lee_external_engines(configuration):
 
 
 def read_engine_uci(exe, args=None):
-    path_exe = Util.dirRelativo(exe)
+    path_exe = Util.relative_path(exe)
 
     if args is None:
         args = []

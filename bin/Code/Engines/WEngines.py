@@ -403,10 +403,10 @@ def wgen_options_engine(owner, engine):
         elif tipo == "check":
             control = Controles.CHB(owner, " ", opcion.valor)
         elif tipo == "combo":
-            liVars = []
+            li_vars = []
             for var in opcion.li_vars:
-                liVars.append((var, var))
-            control = Controles.CB(owner, liVars, opcion.valor)
+                li_vars.append((var, var))
+            control = Controles.CB(owner, li_vars, opcion.valor)
         elif tipo == "string":
             control = Controles.ED(owner, opcion.valor)
         # elif tipo == "button":
@@ -465,7 +465,7 @@ def selectEngine(wowner):
     )
     if not exeMotor:
         return None
-    folderEngines = Util.dirRelativo(os.path.dirname(exeMotor))
+    folderEngines = Util.relative_path(os.path.dirname(exeMotor))
     Code.configuration.escVariables("FOLDER_ENGINES", folderEngines)
 
     # Leemos el UCI

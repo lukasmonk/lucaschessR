@@ -117,7 +117,7 @@ class ManagerFindAllMoves(Manager.Manager):
         self.main_window.board.siPosibleRotarBoard = False
 
         self.board.exePulsadoNum = None
-        self.quitaInformacion()
+        self.remove_info()
         self.refresh()
 
     def num_rows(self):

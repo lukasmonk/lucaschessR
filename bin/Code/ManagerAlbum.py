@@ -56,6 +56,8 @@ class ManagerAlbum(Manager.Manager):
         self.game.add_tag("White", w)
         self.game.add_tag("Black", b)
 
+        self.game.tag_timestart()
+
     def save_state(self):
         dic = {
             "ALBUMES_PRECLAVE": self.album.claveDB.split("_")[0],
@@ -133,6 +135,7 @@ class ManagerAlbum(Manager.Manager):
             self.ponFinJuego()
             self.xrival.cerrar()
             self.main_window.pon_toolbar((TB_CLOSE, TB_CONFIG, TB_UTILITIES))
+            self.autosave()
         else:
             self.procesador.start()
 
@@ -238,4 +241,5 @@ class ManagerAlbum(Manager.Manager):
             self.mensaje(mensaje)
         self.ponFinJuego()
         self.xrival.cerrar()
+        self.autosave()
         self.main_window.pon_toolbar((TB_CLOSE, TB_CONFIG, TB_UTILITIES))

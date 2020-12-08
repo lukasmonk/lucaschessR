@@ -359,7 +359,7 @@ class WPanelDirector(QTVarios.WDialogo):
         path = self.configuration.ficheroFEN
         fich = QTUtil2.leeCreaFichero(self, path, "dbl")
         if fich:
-            self.configuration.ficheroFEN = Util.dirRelativo(fich)
+            self.configuration.ficheroFEN = Util.relative_path(fich)
             self.configuration.graba()
 
             self.board.dbVisual_close()

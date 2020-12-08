@@ -670,19 +670,6 @@ def listdir(txt):
     return os.scandir(txt)
 
 
-def dirRelativo(dr):
-    if dr:
-        try:
-            nr = os.path.relpath(dr)
-            if not nr.startswith(".."):
-                dr = nr
-        except:
-            pass
-    else:
-        dr = ""
-    return dr
-
-
 class Timekeeper:
     def __init__(self):
         self._begin = None
@@ -783,9 +770,14 @@ def relative_path(*args):
             for x in range(2, n_args):
                 path = os.path.join(path, args[x])
     try:
-        return os.path.relpath(path)
+        path = os.path.abspath(path)
+        rel = os.path.relpath(path)
+        if not rel.startswith(".."):
+            path = rel
     except ValueError:
-        return path
+        pass
+
+    return path
 
 
 def memory_python():

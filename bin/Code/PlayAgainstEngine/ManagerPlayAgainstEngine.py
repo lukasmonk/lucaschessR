@@ -255,6 +255,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         self.is_analyzed_by_tutor = False
 
+        self.game.tag_timestart()
+
         self.check_boards_setposition()
 
     def pon_toolbar(self):
@@ -506,6 +508,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.reinicio["cache"] = self.cache
         self.game.reset()
         self.toolbar_state = ST_ENDGAME
+        self.autosave()
         self.start(self.reinicio)
 
     def adjourn(self):
@@ -573,6 +576,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.game.set_unknown()
             self.guardarNoTerminados()
             self.ponFinJuego(self.with_takeback)
+            self.autosave()
         else:
             if self.siTiempo:
                 self.main_window.stop_clock()
@@ -597,6 +601,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.guardarGanados(False)
             self.saveSummary()
             self.ponFinJuego(self.with_takeback)
+            self.autosave()
         else:
             self.analizaTerminar()
             self.main_window.activaJuego(False, False)
@@ -1167,6 +1172,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.beepResultado(beep)
         self.saveSummary()
         self.guardarGanados(player_win)
+        self.autosave()
         QTUtil.refresh_gui()
         if QTUtil2.pregunta(self.main_window, mensaje + "\n\n" + _("Do you want to play again?")):
             self.reiniciar(False)

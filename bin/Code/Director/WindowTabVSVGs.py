@@ -358,7 +358,7 @@ class WTV_SVGs(QTVarios.WDialogo):
             self.grid.refresh()
             self.grid.setFocus()
 
-    def intercambia(self, fila1, fila2):
+    def interchange(self, fila1, fila2):
         regSVG1, regSVG2 = self.liPSVGs[fila1], self.liPSVGs[fila2]
         regSVG1.ordenVista, regSVG2.ordenVista = regSVG2.ordenVista, regSVG1.ordenVista
         self.dbSVGs[regSVG1.id] = regSVG1
@@ -371,9 +371,9 @@ class WTV_SVGs(QTVarios.WDialogo):
     def arriba(self):
         row = self.grid.recno()
         if row > 0:
-            self.intercambia(row, row - 1)
+            self.interchange(row, row - 1)
 
     def abajo(self):
         row = self.grid.recno()
         if 0 <= row < (len(self.liPSVGs) - 1):
-            self.intercambia(row, row + 1)
+            self.interchange(row, row + 1)

@@ -261,7 +261,7 @@ class DBF:
         """
         self.cursor.close()
 
-    def borrarLista(self, listaRecnos, dispatch=None):
+    def remove_list_recnos(self, listaRecnos, dispatch=None):
         for n, recno in enumerate(listaRecnos):
             if dispatch:
                 dispatch(n)

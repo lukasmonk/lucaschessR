@@ -417,6 +417,8 @@ class Opening:
         lilipv = [FasterCode.xpv_pv(xpv).split(" ") for xpv in self.li_xpv]
         cp = Position.Position()
         dicFENm2 = {}
+        if not lilipv and self.basePV:
+            lilipv.append(self.basePV.split(" "))
         for lipv in lilipv:
             FasterCode.set_init_fen()
             for pv in lipv:

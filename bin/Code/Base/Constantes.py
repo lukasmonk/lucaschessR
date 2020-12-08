@@ -256,6 +256,8 @@ STANDARD_TAGS = [
     "UTCTime",
     "UTCDate",
     "TimeControl",
+    "TimeStart",
+    "TimeEnd",
     "SetUp",
     "FEN",
     "PlyCount",

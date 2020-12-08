@@ -63,6 +63,14 @@ class Game:
         if self.get_tag("Result"):
             self.add_tag("Result", RESULT_UNKNOWN)
 
+    def tag_timestart(self):
+        t = Util.today()
+        self.add_tag("TimeStart", str(t)[:19])
+
+    def tag_timeend(self):
+        t = Util.today()
+        self.add_tag("TimeEnd", str(t)[:19])
+
     @property
     def last_position(self):
         if self.li_moves:

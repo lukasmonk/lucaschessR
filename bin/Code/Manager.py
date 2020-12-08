@@ -4,6 +4,11 @@ import time
 
 import FasterCode
 
+import Code
+from Code import Util
+from Code import XRun
+from Code.Base.Constantes import *
+
 from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis
 from Code.Openings import OpeningsStd
 from Code import ControlPGN
@@ -23,10 +28,6 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.Board import BoardTypes
-from Code import Util
-import Code
-from Code import XRun
-from Code.Base.Constantes import *
 
 
 class Manager:
@@ -688,11 +689,11 @@ class Manager:
             self.main_window.activaInformacionPGN()
             self.put_view()
 
-    def quitaInformacion(self, siActivable=False):
+    def remove_info(self, siActivable=False):
         self.main_window.activaInformacionPGN(False)
         self.informacionActivable = siActivable
 
-    def guardarPGN(self):
+    def save_to_pgn(self):
         conf = self.configuration
 
         if conf.x_save_pgn:
@@ -722,7 +723,7 @@ class Manager:
             siSalvar = conf.x_save_lost
 
         if siSalvar:
-            self.guardarPGN()
+            self.save_to_pgn()
 
     def guardarNoTerminados(self):
         if len(self.game) < 2:
@@ -733,7 +734,12 @@ class Manager:
         if conf.x_save_unfinished:
             if not QTUtil2.pregunta(self.main_window, _("Do you want to save this game?")):
                 return
-            self.guardarPGN()
+            self.save_to_pgn()
+
+    def autosave(self):
+        if len(self.game) > 1:
+            self.game.tag_timeend()
+            DBgames.autosave(self.game)
 
     def ponCapPorDefecto(self):
         self.capturasActivable = True
@@ -1402,7 +1408,7 @@ class Manager:
         menuSave.separador()
 
         menuDB = menuSave.submenu(_("Database"), Iconos.DatabaseMas())
-        QTVarios.menuDB(menuDB, self.configuration, True, indicador_previo="dbf_")
+        QTVarios.menuDB(menuDB, self.configuration, True, indicador_previo="dbf_") #, remove_autosave=True)
         menuSave.separador()
 
         menuV = menuSave.submenu(_("Board -> Image"), icoCamara)
@@ -1584,7 +1590,7 @@ class Manager:
         resp = db.inserta(pc)
         db.close()
         if resp:
-            QTUtil2.message_bold(self.main_window, _("Saved"))
+            QTUtil2.message_bold(self.main_window, _("Saved") + ": " + db.nom_fichero)
         else:
             QTUtil2.message_error(self.main_window, _("This game already exists."))
 

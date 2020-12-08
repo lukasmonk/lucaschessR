@@ -247,6 +247,7 @@ class Configuration:
         self.x_save_unfinished = False
 
         self.x_save_csv = ""
+        self.x_save_pgn = ""
 
         self.x_rival_inicial = "rocinante" if Code.isLinux else "irina"
 
@@ -411,6 +412,9 @@ class Configuration:
 
     def folder_databases(self):
         return self.create_base_folder("Databases")
+
+    def file_autosave(self):
+        return os.path.join(self.folder_databases(), "__Autosave__.lcdb")
 
     def folder_databases_pgn(self):
         return self.create_base_folder("TemporaryDatabases")

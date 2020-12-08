@@ -355,7 +355,7 @@ class ManagerMate(Manager.Manager):
         li_depth = [0, 3, 5, 6, 7, 8, 10, 12]
         self.xrival = self.procesador.creaManagerMotor(rival, None, li_depth[self.mate])
 
-        self.quitaInformacion()
+        self.remove_info()
 
         self.refresh()
 

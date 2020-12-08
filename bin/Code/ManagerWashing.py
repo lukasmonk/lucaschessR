@@ -792,6 +792,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.main_window.pon_toolbar(li_options)
         self.remove_hints()
 
+        self.autosave()
         if player_win:
             self.saveGame(True)
         else:

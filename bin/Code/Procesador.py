@@ -917,7 +917,7 @@ class Procesador:
         db = DBgames.DBgames(file_miniatures)
         db.all_reccount()
         num_game = random.randint(0, db.reccount() - 1)
-        game = db.leePartidaRecno(num_game)
+        game = db.read_game_recno(num_game)
         db.close()
         dic = {"GAME": game.save()}
         manager = ManagerSolo.ManagerSolo(self)
@@ -959,8 +959,6 @@ class Procesador:
 
     def juegaExterno(self, fich_tmp):
         dic_sended = Util.restore_pickle(fich_tmp)
-        fich = Util.relative_path(self.configuration.ficheroTemporal(".pkd"))
-
         dic = PlayAgainstEngine.play_position(self, _("Play a position"), dic_sended["ISWHITE"])
         if dic is None:
             self.run_action(TB_QUIT)

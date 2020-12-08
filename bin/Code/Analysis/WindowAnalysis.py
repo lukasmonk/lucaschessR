@@ -3,6 +3,7 @@ from PySide2 import QtCore, QtWidgets
 import Code
 from Code.Base import Game
 from Code import XRun
+from Code import Util
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -418,9 +419,16 @@ class WMuestra(QtWidgets.QWidget):
 
     def jugarPosicion(self):
         position, from_sq, to_sq = self.um.active_base_position()
-        fen = position.fen()
+        game = Game.Game(ini_posicion=position)
+        dic_sended = {
+            "ISWHITE": position.is_white,
+            "GAME": game.save()
+        }
 
-        XRun.run_lucas("-play", fen)
+        fichero = Code.configuration.ficheroTemporal("pk")
+        Util.save_pickle(fichero, dic_sended)
+
+        XRun.run_lucas("-play", fichero)
 
     def lanzaTiempo(self):
         self.siTiempoActivo = not self.siTiempoActivo
@@ -490,13 +498,14 @@ class WAnalisis(QTVarios.WDialogo):
         self.board = Board.Board(self, config_board)
         self.board.crea()
         self.board.ponerPiezasAbajo(is_white)
+        self.board.dispatchSize(self.size_board_changed)
 
         self.lbMotor = Controles.LB(self).align_center()
         self.lbTiempo = Controles.LB(self).align_center()
         self.lbPuntuacion = (
             Controles.LB(self).align_center().ponTipoLetra(puntos=configuration.x_pgn_fontpoints, peso=75)
         )
-        self.lbPGN = Controles.LB(self).set_wrap().ponTipoLetra(puntos=configuration.x_pgn_fontpoints)
+        self.lbPGN = Controles.LB(self).set_wrap().ponTipoLetra(puntos=configuration.x_pgn_fontpoints).anchoFijo(self.board.ancho)
 
         self.setStyleSheet(
             "QStatusBar::item { border-style: outset; border-width: 1px; border-color: LightSlateGray ;}"
@@ -544,6 +553,9 @@ class WAnalisis(QTVarios.WDialogo):
         self.restore_video(siTam=False)
         wm.cambiadoRM(muestraInicial.pos_selected)
         self.activaMuestra(muestraInicial)
+
+    def size_board_changed(self):
+        self.lbPGN.anchoFijo(self.board.ancho)
 
     def keyPressEvent(self, event):
         k = event.key()

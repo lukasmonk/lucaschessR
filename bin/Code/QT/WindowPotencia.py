@@ -163,7 +163,7 @@ class PotenciaHistorico:
         return reg
 
     def borrar_lista(self, linum):
-        self.dbf.borrarLista(linum)
+        self.dbf.remove_list_recnos(linum)
         self.dbf.pack()
         self.dbf.leer()
 

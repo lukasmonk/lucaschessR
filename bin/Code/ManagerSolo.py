@@ -266,7 +266,7 @@ class ManagerSolo(Manager.Manager):
             self.pon_rotulo()
 
     def guardaDir(self, resp):
-        direc = Util.dirRelativo(os.path.dirname(resp))
+        direc = Util.relative_path(os.path.dirname(resp))
         if direc != self.configuration.folder_save_lcsb():
             self.configuration.folder_save_lcsb(direc)
             self.configuration.graba()
@@ -274,7 +274,7 @@ class ManagerSolo(Manager.Manager):
     def grabarFichero(self, file):
         dic = self.creaDic()
         dic["GAME"] = self.game.save()
-        dic["LAST_FILE"] = Util.dirRelativo(file)
+        dic["LAST_FILE"] = Util.relative_path(file)
         dic["WHITEBOTTOM"] = self.board.is_white_bottom
         if Util.save_pickle(file, dic):
             self.valor_inicial = self.dame_valor_actual()

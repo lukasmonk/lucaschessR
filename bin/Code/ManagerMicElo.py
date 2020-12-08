@@ -520,6 +520,7 @@ class ManagerMicElo(Manager.Manager):
         self.puestoResultado = True
         self.mensajeEnPGN(mensaje)
         self.ponFinJuego()
+        self.autosave()
 
     def historial(self, elo, nelo):
         dic = {}

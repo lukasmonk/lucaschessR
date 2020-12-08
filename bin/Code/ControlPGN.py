@@ -176,8 +176,8 @@ class ControlPGN:
                 resp += '[Category "%s"]\n' % self.manager.categoria.name()
 
         if not (game_type in [GT_BOOK, GT_RESISTANCE]):
-            if self.manager.ayudasPGN:
-                resp += '[Hints "%d"]\n' % self.manager.ayudasPGN
+            if self.manager.hints:
+                resp += '[Hints "%d"]\n' % self.manager.hints
 
         if game_type in (GT_ELO, GT_MICELO):
             resp += '[WhiteElo "%d"]\n' % self.manager.whiteElo

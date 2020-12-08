@@ -409,7 +409,7 @@ class WPlayer(QtWidgets.QWidget):
         for alias in (alias1, alias2, alias3):
             if alias:
                 filtro += "or WHITE = '%s' or BLACK = '%s'" % (alias, alias)
-        pb.ponTotal(self.dbGames.countData(filtro))
+        pb.ponTotal(self.dbGames.count_data(filtro))
 
         for n, alm in enumerate(self.dbGames.yieldData(liFields, filtro)):
             pb.pon(n)

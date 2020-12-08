@@ -41,7 +41,7 @@ class DBgames:
             self.external_folder = os.path.dirname(nom_fichero)
         else:
             self.external_folder = ""
-        self.nom_fichero = Util.dirRelativo(nom_fichero)
+        self.nom_fichero = Util.relative_path(nom_fichero)
 
         self.conexion = sqlite3.connect(self.nom_fichero)
         self.conexion.row_factory = sqlite3.Row
@@ -59,7 +59,7 @@ class DBgames:
         self.allows_complete_game = self.recuperaConfig("ALLOWS_COMPLETE_GAMES", True)
         self.allows_zero_moves = self.recuperaConfig("ALLOWS_ZERO_MOVES", True)
 
-        self.liOrden = []
+        self.li_order = []
 
         summary_depth = self.recuperaConfig("SUMMARY_DEPTH", 0)
         self.with_db_stat = summary_depth > 0
@@ -149,7 +149,7 @@ class DBgames:
             self.cache = ncache
         self.cache[rowid] = reg
 
-    def intercambia(self, nfila, siUP):
+    def interchange(self, nfila, siUP):
         rowid = self.li_row_ids[nfila]
         if siUP:
             # buscamos el mayor, menor que rowid
@@ -196,7 +196,7 @@ class DBgames:
 
         return filOther
 
-    def getROWID(self, nfila):
+    def get_rowid(self, nfila):
         return self.li_row_ids[nfila]
 
     def field(self, nfila, name):
@@ -210,12 +210,12 @@ class DBgames:
         except:
             return ""
 
-    def siFaltanRegistrosPorLeer(self):
+    def if_there_are_records_to_read(self):
         if not self.rowidReader:
             return False
         return not self.rowidReader.terminado()
 
-    def filterPV(self, pv, condicionAdicional=None):
+    def filter_pv(self, pv, condicionAdicional=None):
         condicion = ""
         if type(pv) == list:  # transpositions
             if pv:
@@ -273,7 +273,7 @@ class DBgames:
     def label(self):
         return Util.relative_path(self.nom_fichero)
 
-    def depthStat(self):
+    def depth_stat(self):
         return self.db_stat.depth if self.db_stat else 0
 
     def read_xpv(self, xpv):
@@ -284,27 +284,27 @@ class DBgames:
         pv = xpv_pv(xpv) if xpv else ""
         return fen, pv
 
-    def damePV(self, row):
+    def get_pv(self, row):
         xpv = self.field(row, "XPV")
         return self.read_xpv(xpv)
 
-    def ponOrden(self, liOrden):
+    def ponOrden(self, li_order):
         li = []
-        for campo, tipo in liOrden:
+        for campo, tipo in li_order:
             li.append("%s %s" % (campo, tipo))
         self.order = ",".join(li)
         self.li_row_ids = []
         self.rowidReader.run(self.li_row_ids, self.filter, self.order)
-        self.liOrden = liOrden
+        self.li_order = li_order
 
-    def dameOrden(self):
-        return self.liOrden
+    def get_order(self):
+        return self.li_order
 
-    def borrarLista(self, lista_recnos):
+    def remove_list_recnos(self, lista_recnos):
         cSQL = "DELETE FROM Games WHERE rowid = ?"
         lista_recnos.sort(reverse=True)
         for recno in lista_recnos:
-            fen, pv = self.damePV(recno)
+            fen, pv = self.get_pv(recno)
             result = self.field(recno, "RESULT")
             if not fen and self.with_db_stat:
                 self.db_stat.append(pv, result, -1)
@@ -322,8 +322,8 @@ class DBgames:
         self.db_stat.depth = depth
         self.db_stat.reset()
         if self.filter:
-            self.filterPV("")
-        while self.siFaltanRegistrosPorLeer():
+            self.filter_pv("")
+        while self.if_there_are_records_to_read():
             time.sleep(0.1)
             dispatch(0, self.reccount())
         reccount = self.reccount()
@@ -370,7 +370,7 @@ class DBgames:
             dic[campo] = raw[campo]
         return dic
 
-    def countData(self, filtro):
+    def count_data(self, filtro):
         sql = "SELECT COUNT(*) FROM Games"
         if self.filter:
             sql += " WHERE %s" % self.filter
@@ -442,11 +442,11 @@ class DBgames:
         lista.sort()
         return lista
 
-    def leePartidaRecno(self, recno):
+    def read_game_recno(self, recno):
         raw = self.leeAllRecno(recno)
-        return self.leePartidaRaw(raw)
+        return self.read_game_raw(raw)
 
-    def leePartidaRaw(self, raw):
+    def read_game_raw(self, raw):
         p = Game.Game()
         xpgn = raw["_DATA_"]
         ok = False
@@ -471,7 +471,7 @@ class DBgames:
             if not (field in ("XPV", "_DATA_", "PLYCOUNT")):
                 v = raw[field]
                 if v:
-                    litags.append((drots.get(field, field), v if type(v) == str else str(v)))
+                    litags.append((drots.get(field, Util.primera_mayuscula(field)), v if type(v) == str else str(v)))
         litags.append(("PlyCount", str(raw["PLYCOUNT"])))
 
         p.set_tags(litags)
@@ -511,12 +511,12 @@ class DBgames:
         pgn = sp.join(tags) + sp + sp + pgn
         return pgn, result
 
-    def blankPartida(self):
+    def blank_game(self):
         hoy = Util.today()
         liTags = [["Date", "%d.%02d.%02d" % (hoy.year, hoy.month, hoy.day)]]
         return Game.Game(li_tags=liTags)
 
-    def guardaPartidaRecno(self, recno, game):
+    def save_game_recno(self, recno, game):
         return self.inserta(game) if recno is None else self.modifica(recno, game)
 
     def fill(self, li_field_value):
@@ -592,7 +592,7 @@ class DBgames:
 
             obj_decode.read_file(file)
 
-            with PGNreader(file, self.depthStat()) as fpgn:
+            with PGNreader(file, self.depth_stat()) as fpgn:
                 bsize = fpgn.size
                 for n, (body, is_raw, pv, fens, bdCab, bdCablwr, btell) in enumerate(fpgn, 1):
                     if n == next_n:
@@ -726,7 +726,7 @@ class DBgames:
 
         return si_cols_cambiados
 
-    def appendDB(self, db, liRecnos, dlTmp):
+    def append_db(self, db, liRecnos, dlTmp):
         erroneos = duplicados = importados = 0
 
         xtime = time.time()
@@ -865,7 +865,7 @@ class DBgames:
             resp.mens_error = mens_error
             return resp
 
-        game_antigua = self.leePartidaRecno(recno)
+        game_antigua = self.read_game_recno(recno)
         #
         # # La game antigua y la nueva son iguales ? no se hace nada.
         # if game_antigua == game_modificada:  # game.__eq__
@@ -992,6 +992,19 @@ class DBgames:
 def get_random_game():
     db = DBgames(Code.path_resource("IntFiles", "last_games.lcdb"))
     recno = random.randint(0, db.all_reccount() - 1)
-    game = db.leePartidaRecno(recno)
+    game = db.read_game_recno(recno)
     db.close()
     return game
+
+
+def autosave(game:Game.Game):
+    path_db = Code.configuration.file_autosave()
+    exist = os.path.isfile(path_db)
+    db = DBgames(path_db)
+    if not exist:
+        db.guardaConfig("SUMMARY_DEPTH", 30)
+        db.close()
+        db = DBgames(path_db)
+
+    db.inserta(game)
+    db.close()

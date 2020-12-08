@@ -125,7 +125,7 @@ class WKibitzers(QTVarios.WDialogo):
                 self.kibitzers.save()
                 self.goto(nk)
             elif tipo == "combo":
-                lista = [(var, var) for var in opcion.liVars]
+                lista = [(var, var) for var in opcion.li_vars]
                 control = "cb"
             elif tipo == "string":
                 control = "ed"
@@ -433,7 +433,7 @@ class WKibitzerLive(QTVarios.WDialogo):
     def leeOpciones(self):
         li = []
         li.append([_("Priority"), self.kibitzer.cpriority(), "prioridad"])
-        for num, opcion in enumerate(self.kibitzer.li_uci_options()):
+        for num, opcion in enumerate(self.kibitzer.li_uci_options_editable()):
             default = opcion.label_default()
             label_default = " (%s)" % default if default else ""
             valor = str(opcion.valor)
@@ -474,19 +474,19 @@ class WKibitzerLive(QTVarios.WDialogo):
             lista = Priorities.priorities.combo()
             valor = self.kibitzer.prioridad
         else:
-            opcion = self.kibitzer.li_options[int(key)]
+            opcion = self.kibitzer.li_uci_options_editable()[int(key)]
             tipo = opcion.tipo
             valor = opcion.valor
             if tipo == "spin":
                 control = "sb"
-                minimo = opcion.min
-                maximo = opcion.max
+                minimo = opcion.minimo
+                maximo = opcion.maximo
             elif tipo in ("check", "button"):
                 opcion.valor = not valor
                 self.li_options[recno][1] = opcion.valor
                 self.gridValores.refresh()
             elif tipo == "combo":
-                lista = [(var, var) for var in opcion.liVars]
+                lista = [(var, var) for var in opcion.li_vars]
                 control = "cb"
             elif tipo == "string":
                 control = "ed"

@@ -315,6 +315,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         siwin = (jgUlt.is_white() == self.is_human_side_white) and not jgUlt.is_draw
 
         self.guardarGanados(siwin)
+        self.autosave()
 
         if siwin:
             if self.route.end_playing():

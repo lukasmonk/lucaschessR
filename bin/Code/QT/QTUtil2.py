@@ -180,10 +180,11 @@ class MensEspera(QtWidgets.QWidget):
             x = v.x() + 4
             y = v.y() + 4
         else:
-            x = v.x() + (v.width() - self.width()) // 2
-            y = v.y() + (v.height() - self.height()) // 2
+            x = v.x() + (v.width() - s.width()) // 2
+            y = v.y() + (v.height() - s.height()) // 2
 
-        p = self.parent().mapToGlobal(QtCore.QPoint(x,y))
+        # p = self.parent().mapToGlobal(QtCore.QPoint(x,y))
+        p = QtCore.QPoint(x,y)
         self.move(p)
         QTUtil.refresh_gui()
         return self

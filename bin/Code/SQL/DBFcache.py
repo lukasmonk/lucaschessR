@@ -225,7 +225,7 @@ class DBFcache:
             self.cursorBuffer.close()
             self.cursorBuffer = None
 
-    def borrarLista(self, listaRecnos, dispatch=None):
+    def remove_list_recnos(self, listaRecnos, dispatch=None):
         self.delListCache(listaRecnos)
         for n, recno in enumerate(listaRecnos):
             if dispatch:
