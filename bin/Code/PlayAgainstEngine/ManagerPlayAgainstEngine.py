@@ -1005,6 +1005,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 difporc = self.configuration.x_tutor_difporc
                 if self.mrmTutor.mejorRMQue(rmUser, difpts, difporc):
                     if not move.is_mate:
+                        si_tutor = True
                         if self.chance:
                             num = self.mrmTutor.numMejorMovQue(movimiento)
                             if num:
@@ -1031,36 +1032,36 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                     self.sigueHumanoAnalisis()
                                     return False
                                 elif resp == "user":
-                                    siTutor = False
+                                    si_tutor = False
                                 elif resp != "tutor":
                                     self.sigueHumanoAnalisis()
                                     return False
+                        if si_tutor:
+                            tutor = Tutor.Tutor(self, self, move, from_sq, to_sq, False)
 
-                        tutor = Tutor.Tutor(self, self, move, from_sq, to_sq, False)
+                            if self.aperturaStd:
+                                liApPosibles = self.listaOpeningsStd.list_possible_openings(self.game)
+                            else:
+                                liApPosibles = None
 
-                        if self.aperturaStd:
-                            liApPosibles = self.listaOpeningsStd.list_possible_openings(self.game)
-                        else:
-                            liApPosibles = None
+                            if tutor.elegir(self.hints > 0, liApPosibles=liApPosibles):
+                                if self.hints > 0:  # doble entrada a tutor.
+                                    self.set_piece_again(from_sq)
+                                    self.hints -= 1
+                                    self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
+                                    from_sq = tutor.from_sq
+                                    to_sq = tutor.to_sq
+                                    promotion = tutor.promotion
+                                    ok, mens, jgTutor = Move.get_game_move(
+                                        self.game, self.game.last_position, from_sq, to_sq, promotion
+                                    )
+                                    if ok:
+                                        move = jgTutor
+                                        self.setSummary("SELECTTUTOR", True)
+                            if self.configuration.x_save_tutor_variations:
+                                tutor.ponVariations(move, 1 + len(self.game) / 2)
 
-                        if tutor.elegir(self.hints > 0, liApPosibles=liApPosibles):
-                            if self.hints > 0:  # doble entrada a tutor.
-                                self.set_piece_again(from_sq)
-                                self.hints -= 1
-                                self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
-                                from_sq = tutor.from_sq
-                                to_sq = tutor.to_sq
-                                promotion = tutor.promotion
-                                ok, mens, jgTutor = Move.get_game_move(
-                                    self.game, self.game.last_position, from_sq, to_sq, promotion
-                                )
-                                if ok:
-                                    move = jgTutor
-                                    self.setSummary("SELECTTUTOR", True)
-                        if self.configuration.x_save_tutor_variations:
-                            tutor.ponVariations(move, 1 + len(self.game) / 2)
-
-                        del tutor
+                            del tutor
 
         self.setSummary("TIMEUSER", self.timekeeper.stop())
         self.reloj_stop(True)

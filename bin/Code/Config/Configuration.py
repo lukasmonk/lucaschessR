@@ -220,7 +220,7 @@ class Configuration:
         self.x_pgn_selbackground = None
         self.x_pgn_headerbackground = None
 
-        self.x_pgn_width = 350
+        self.x_pgn_width = 400
         self.x_pgn_fontpoints = 11
         self.x_pgn_rowheight = 28
         self.x_pgn_withfigurines = True

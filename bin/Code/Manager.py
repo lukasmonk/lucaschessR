@@ -971,14 +971,14 @@ class Manager:
     def cambiaRival(self, nuevo):
         self.procesador.cambiaRival(nuevo)
 
-    def pelicula(self):
+    def replay(self):
         resp = Pelicula.paramPelicula(self.configuration, self.main_window)
         if resp is None:
             return
 
-        segundos, siInicio, siPGN = resp
+        segundos, if_start, if_pgn, if_beep = resp
 
-        self.xpelicula = Pelicula.Pelicula(self, segundos, siInicio, siPGN)
+        self.xpelicula = Pelicula.Pelicula(self, segundos, if_start, if_pgn, if_beep)
 
     def ponRutinaAccionDef(self, rutina):
         self.xRutinaAccionDef = rutina
@@ -993,7 +993,7 @@ class Manager:
 
     def finalX0(self):
         # Se llama from_sq la main_window al pulsar X
-        # Se check si estamos en la pelicula
+        # Se check si estamos en la replay
         if self.xpelicula:
             self.xpelicula.terminar()
             return False
@@ -1439,7 +1439,7 @@ class Manager:
 
         # Pelicula
         if siJugadas:
-            menu.opcion("pelicula", _("Replay game"), Iconos.Pelicula())
+            menu.opcion("replay", _("Replay game"), Iconos.Pelicula())
             menu.separador()
 
         # Kibitzers
@@ -1509,8 +1509,8 @@ class Manager:
         elif resp == "borrar":
             self.borrar()
 
-        elif resp == "pelicula":
-            self.pelicula()
+        elif resp == "replay":
+            self.replay()
 
         elif resp.startswith("kibitzer_"):
             self.kibitzers(resp[9:])

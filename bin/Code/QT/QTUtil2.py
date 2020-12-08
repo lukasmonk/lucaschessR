@@ -274,6 +274,7 @@ class ControlMensEspera:
 
         self.ms = secs * 1000
         QtCore.QTimer.singleShot(100, test)
+        QTUtil.refresh_gui()
 
 
 mensEspera = ControlMensEspera()

@@ -1,3 +1,4 @@
+import Code
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.Base.Constantes import *
@@ -9,43 +10,47 @@ def paramPelicula(configuration, parent):
     dicVar = configuration.leeVariables(nomVar)
 
     # Datos
-    liGen = [(None, None)]
+    form = FormLayout.FormLayout(parent, _("Replay game"), Iconos.Pelicula(), anchoMinimo=460)
+    form.separador()
 
-    # # Segundos
-    liGen.append((_("Number of seconds between moves") + ":", dicVar.get("SECONDS", 2)))
-    liGen.append(FormLayout.separador)
+    form.float(_("Number of seconds between moves"), dicVar.get("SECONDS", 2.0))
+    form.separador()
 
-    # # Si from_sq el principio
-    liGen.append((_("Start from first move") + ":", dicVar.get("START", True)))
-    liGen.append(FormLayout.separador)
+    form.checkbox(_("Start from first move"), dicVar.get("START", True))
+    form.separador()
 
-    liGen.append((_("Show PGN") + ":", dicVar.get("PGN", True)))
+    form.checkbox(_("Show PGN"), dicVar.get("PGN", True))
+    form.separador()
 
-    # Editamos
-    resultado = FormLayout.fedit(liGen, title=_("Replay game"), parent=parent, anchoMinimo=460, icon=Iconos.Pelicula())
+    form.checkbox(_("Beep after each move"), dicVar.get("BEEP", False))
+    form.separador()
+
+    resultado = form.run()
 
     if resultado:
         accion, liResp = resultado
 
-        segundos, siPrincipio, siPGN = liResp
+        segundos, if_start, if_pgn, if_beep = liResp
         dicVar["SECONDS"] = segundos
-        dicVar["START"] = siPrincipio
-        dicVar["PGN"] = siPGN
+        dicVar["START"] = if_start
+        dicVar["PGN"] = if_pgn
+        dicVar["BEEP"] = if_beep
         configuration.escVariables(nomVar, dicVar)
-        return segundos, siPrincipio, siPGN
+        return segundos, if_start, if_pgn, if_beep
     else:
         return None
 
 
 class Pelicula:
-    def __init__(self, manager, segundos, siInicio, siPGN):
+    def __init__(self, manager, segundos, if_start, siPGN, if_beep):
         self.manager = manager
         self.procesador = manager.procesador
         self.main_window = manager.main_window
         self.if_starts_with_black = manager.game.if_starts_with_black
         self.board = manager.board
         self.segundos = segundos
-        self.siInicio = siInicio
+        self.if_start = if_start
+        self.if_beep = if_beep
         self.rapidez = 1.0
 
         self.w_pgn = self.main_window.base.pgn
@@ -65,7 +70,7 @@ class Pelicula:
         self.num_moves, self.jugInicial, self.filaInicial, self.is_white = self.manager.jugadaActual()
 
         self.li_moves = self.manager.game.li_moves
-        self.current_position = 0 if siInicio else self.jugInicial
+        self.current_position = 0 if if_start else self.jugInicial
 
         self.siStop = False
 
@@ -124,7 +129,10 @@ class Pelicula:
         for movim in liMovs:
             if movim[0] == "c":
                 cpu.cambiaPieza(movim[1], movim[2], siExclusiva=True)
+
         cpu.runLineal()
+        if self.if_beep:
+            Code.runSound.playBeep()
         self.manager.put_arrow_sc(move.from_sq, move.to_sq)
 
         self.board.set_position(move.position)
@@ -184,7 +192,7 @@ class Pelicula:
         self.muestraActual()
 
     def repetir(self):
-        self.current_position = 0 if self.siInicio else self.jugInicial
+        self.current_position = 0 if self.if_start else self.jugInicial
         self.siStop = False
         self.muestraPausa(True)
         self.muestraActual()

@@ -349,19 +349,21 @@ class ManagerEntPos(Manager.Manager):
         a1h8 = move.movimiento()
         ok = False
         if self.is_playing_gameobj():
-            move = self.game_obj.move(self.pos_obj)
-            is_main, is_var = move.test_a1h8(a1h8)
+            move_obj = self.game_obj.move(self.pos_obj)
+            is_main, is_var = move_obj.test_a1h8(a1h8)
             if is_main:
                 ok = True
                 self.pos_obj += 1
             elif is_var:
-                li_movs = [(move.from_sq, move.to_sq, True)]
+                li_movs = [(move_obj.from_sq, move_obj.to_sq, True)]
                 for a1h8_m in move.variations.list_movimientos():
                     li_movs.append((a1h8_m[:2], a1h8[2:4], False))
                 self.board.ponFlechasTmp(li_movs)
             else:
-                if a1h8[:2] != move.from_sq:
-                    self.board.markPosition(move.from_sq)
+                if a1h8[:2] != move_obj.from_sq:
+                    self.board.markPosition(move_obj.from_sq)
+                else:
+                    self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
             if not ok:
                 self.sigueHumano()
                 return False
