@@ -272,7 +272,7 @@ class WGames(QtWidgets.QWidget):
             li_order.insert(0, (key, "ASC"))
             col.antigua = col.head
             col.head = col.antigua + "+"
-        self.dbGames.ponOrden(li_order)
+        self.dbGames.put_order(li_order)
         self.grid.refresh()
         self.updateStatus()
 
@@ -293,6 +293,10 @@ class WGames(QtWidgets.QWidget):
             self.tw_gotop()
         elif k == QtCore.Qt.Key_End:
             self.tw_gobottom()
+        elif k == QtCore.Qt.Key_Up:
+            self.tw_up()
+        elif k == QtCore.Qt.Key_Down:
+            self.tw_down()
 
     def closeEvent(self, event):
         self.tw_terminar()
@@ -375,8 +379,7 @@ class WGames(QtWidgets.QWidget):
             self.grid.goto(filaNueva, 0)
             self.grid.refresh()
 
-    def edit(self, recno, game):
-        game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board)
+    def edit_save(self, recno, game):
         if game is not None:
             resp = self.dbGames.save_game_recno(recno, game)
             if resp.ok:
@@ -399,6 +402,36 @@ class WGames(QtWidgets.QWidget):
 
             else:
                 QTUtil2.message_error(self, resp.mens_error)
+
+    def edit_previous_next(self, order, game):
+        if order == "save":
+            self.edit_save(game.recno, game)
+        elif order == "with_previous_next":
+            return game.recno > 0, game.recno < self.grid_num_datos(self.grid)
+        elif order == "previous":
+            recno = game.recno - 1
+            if recno >= 0:
+                self.grid.goto(recno, 0)
+                game, recno = self.current_game()
+                game.recno = recno
+            return game
+        elif order == "next":
+            recno = game.recno + 1
+            if recno < len(self.dbGames):
+                self.grid.goto(recno, 0)
+                game, recno = self.current_game()
+                game.recno = recno
+            return game
+
+    def edit(self, recno, game):
+        if recno is None:
+            with_previous_next = None
+        else:
+            with_previous_next = self.edit_previous_next
+        game.recno = recno
+        game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board, with_previous_next=with_previous_next)
+        if game:
+            self.edit_save(game.recno, game)
 
     def tw_nuevo(self):
         recno = None
@@ -591,7 +624,7 @@ class WGames(QtWidgets.QWidget):
         new_depth = dic_data["SUMMARY_DEPTH"]
         if new_depth != self.dbGames.depth_stat():
             self.wsummary.reindexar(new_depth)
-            self.dbGames.guardaConfig("SUMMARY_DEPTH", new_depth)
+            self.dbGames.save_config("SUMMARY_DEPTH", new_depth)
 
         # Si ha cambiado la localización, se cierra, se mueve y se reabre en la nueva
         new_path = dic_data["FILEPATH"]
@@ -628,7 +661,7 @@ class WGames(QtWidgets.QWidget):
             for dic in dic_cambios["RENAME"]:
                 dcabs[dic["KEY"]] = dic["LABEL"]
 
-            self.dbGames.guardaConfig("dcabs", dcabs)
+            self.dbGames.save_config("dcabs", dcabs)
 
             # Cuarto REMOVE
             lir = dic_cambios["REMOVE"]
@@ -663,19 +696,19 @@ class WGames(QtWidgets.QWidget):
         self.infoMove.board.dbvisual_set_show_allways(showAllways)
 
     def tw_dir_show_yes(self):
-        self.dbGames.guardaConfig("GRAPHICS_SHOW_ALLWAYS", True)
+        self.dbGames.save_config("GRAPHICS_SHOW_ALLWAYS", True)
         self.graphicBoardReset()
 
     def tw_dir_show_no(self):
-        self.dbGames.guardaConfig("GRAPHICS_SHOW_ALLWAYS", False)
+        self.dbGames.save_config("GRAPHICS_SHOW_ALLWAYS", False)
         self.graphicBoardReset()
 
     def tw_locale_yes(self):
-        self.dbGames.guardaConfig("GRAPHICS_SPECIFIC", True)
+        self.dbGames.save_config("GRAPHICS_SPECIFIC", True)
         self.graphicBoardReset()
 
     def tw_locale_no(self):
-        self.dbGames.guardaConfig("GRAPHICS_SPECIFIC", False)
+        self.dbGames.save_config("GRAPHICS_SPECIFIC", False)
         self.graphicBoardReset()
 
     def tw_resize_columns(self):
@@ -949,7 +982,7 @@ class WGames(QtWidgets.QWidget):
                 pb.ponTotal(len(li_sel))
                 for n, recno in enumerate(li_sel):
                     pb.pon(n)
-                    pgn, result = self.dbGames.leePGNRecno(recno, sp)
+                    pgn, result = self.dbGames.read_pgn_recno(recno, sp)
                     if pb.is_canceled():
                         break
                     if n > 0 or not ws.is_new:
@@ -971,7 +1004,7 @@ class WGames(QtWidgets.QWidget):
         if self.dbGames.allows_duplicates:
             dlTmp.hide_duplicates()
         dlTmp.show()
-        self.dbGames.leerPGNs(files, dlTmp)
+        self.dbGames.import_pgns(files, dlTmp)
 
         self.rehaz_columnas()
         self.actualiza(True)
@@ -1238,7 +1271,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         db = DBgames.DBgames(filepath)
         for key, value in self.dic_data_resp.items():
-            db.guardaConfig(key, value)
+            db.save_config(key, value)
         db.close()
 
         self.dic_data_resp["FILEPATH"] = file

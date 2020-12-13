@@ -80,6 +80,9 @@ class Procesador:
         self.blog = "https://lucaschess.blogspot.com"
         self.github = "https://github.com/lukasmonk/lucaschessR"
 
+        self.main_window = None
+        self.kibitzers_manager = KibitzersManager.Manager(self)
+
     def start_with_user(self, user):
         self.user = user
 
@@ -853,9 +856,9 @@ class Procesador:
             db = DBgames.DBgames(file_db)
             dlTmp = QTVarios.ImportarFicheroPGN(self.main_window)
             dlTmp.show()
-            db.leerPGNs([fichero_pgn], dlTmp=dlTmp)
-            db.guardaConfig("PGN_DATE", cfecha_pgn)
-            db.guardaConfig("PGN_FILE", fichero_pgn)
+            db.import_pgns([fichero_pgn], dlTmp=dlTmp)
+            db.save_config("PGN_DATE", cfecha_pgn)
+            db.save_config("PGN_FILE", fichero_pgn)
             db.close()
             dlTmp.close()
 
@@ -892,9 +895,9 @@ class Procesador:
                 db = DBgames.DBgames(file_db)
                 dlTmp = QTVarios.ImportarFicheroPGN(wparent)
                 dlTmp.show()
-                db.leerPGNs([fichero_pgn], dlTmp=dlTmp)
-                db.guardaConfig("PGN_DATE", cfecha_pgn)
-                db.guardaConfig("PGN_FILE", fichero_pgn)
+                db.import_pgns([fichero_pgn], dlTmp=dlTmp)
+                db.save_config("PGN_DATE", cfecha_pgn)
+                db.save_config("PGN_FILE", fichero_pgn)
                 db.close()
                 dlTmp.close()
 
@@ -1109,12 +1112,12 @@ class Procesador:
             window, xtutor, is_competitive=is_competitive, kibitzers_manager=self.kibitzers_manager
         )
 
-    def manager_game(self, window, game, is_complete, only_consult, father_board):
+    def manager_game(self, window, game, is_complete, only_consult, father_board, with_previous_next=None):
         clon_procesador = ProcesadorVariations(
             window, self.xtutor, is_competitive=False, kibitzers_manager=self.kibitzers_manager
         )
         clon_procesador.manager = ManagerGame.ManagerGame(clon_procesador)
-        clon_procesador.manager.start(game, is_complete, only_consult)
+        clon_procesador.manager.start(game, is_complete, only_consult, with_previous_next)
 
         board = clon_procesador.main_window.board
         if father_board:

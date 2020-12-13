@@ -382,6 +382,8 @@ class Board(QtWidgets.QGraphicsView):
         self.siInicializado = True
         self.init_kb_buffer()
 
+        # self.setMinimumSize(QtCore.QSize(self.ancho+6, self.ancho+6))
+
     def rehaz(self):
         self.escena.clear()
         self.liPiezas = []

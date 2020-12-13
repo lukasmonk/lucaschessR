@@ -160,7 +160,7 @@ class WBDatabase(QTVarios.WDialogo):
 
         dic = {}
         self.wgames.grid.save_video(dic)
-        self.dbGames.guardaConfig("dic_grid", dic)
+        self.dbGames.save_config("dic_grid", dic)
 
     def reinit(self):
         self.salvar()

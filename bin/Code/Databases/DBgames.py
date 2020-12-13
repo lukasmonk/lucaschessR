@@ -70,6 +70,8 @@ class DBgames:
 
         self.rowidReader = UtilSQL.RowidReader(self.nom_fichero, "Games")
 
+        self.with_plycount = "PLYCOUNT" in self.recuperaConfig("dcabs", {})
+
     def remove_columns(self, lista):
         self.rowidReader.stopnow()
 
@@ -131,9 +133,11 @@ class DBgames:
     def reset_cache(self):
         self.cache = {}
 
-    def guardaConfig(self, key, valor):
+    def save_config(self, key, valor):
         with UtilSQL.DictRawSQL(self.nom_fichero, "Config") as dbconf:
             dbconf[key] = valor
+            if key == "dcabs":
+                self.with_plycount = "PLYCOUNT" in self.recuperaConfig("dcabs", {})
 
     def recuperaConfig(self, key, default=None):
         with UtilSQL.DictRawSQL(self.nom_fichero, "Config") as dbconf:
@@ -288,7 +292,7 @@ class DBgames:
         xpv = self.field(row, "XPV")
         return self.read_xpv(xpv)
 
-    def ponOrden(self, li_order):
+    def put_order(self, li_order):
         li = []
         for campo, tipo in li_order:
             li.append("%s %s" % (campo, tipo))
@@ -318,7 +322,7 @@ class DBgames:
         return self.db_stat.get_summary(pvBase, dicAnalisis, si_figurines_pgn, allmoves)
 
     def rebuild_stat(self, dispatch, depth):
-        self.guardaConfig("SUMMARY_DEPTH", depth)
+        self.save_config("SUMMARY_DEPTH", depth)
         self.db_stat.depth = depth
         self.db_stat.reset()
         if self.filter:
@@ -351,24 +355,10 @@ class DBgames:
             self.db_stat.massive_append_set(False)
             self.db_stat.commit()
 
-    def leeAllRecno(self, recno):
+    def read_complete_recno(self, recno):
         rowid = self.li_row_ids[recno]
         cursor = self.conexion.execute("SELECT %s FROM Games WHERE rowid =%d" % (self.select, rowid))
         return cursor.fetchone()
-
-    def leeRegAllRecno(self, recno):
-        raw = self.leeAllRecno(recno)
-        alm = Util.Record()
-        for campo in self.li_fields:
-            setattr(alm, campo, raw[campo])
-        return alm, raw
-
-    def leeDicAllRecno(self, recno):
-        raw = self.leeAllRecno(recno)
-        dic = {}
-        for campo in self.li_fields:
-            dic[campo] = raw[campo]
-        return dic
 
     def count_data(self, filtro):
         sql = "SELECT COUNT(*) FROM Games"
@@ -383,7 +373,7 @@ class DBgames:
         cursor = self.conexion.execute(sql)
         return cursor.fetchone()[0]
 
-    def yieldData(self, liFields, filtro):
+    def yield_data(self, liFields, filtro):
         select = ",".join(liFields)
         sql = "SELECT %s FROM Games" % (select,)
         if self.filter:
@@ -443,7 +433,7 @@ class DBgames:
         return lista
 
     def read_game_recno(self, recno):
-        raw = self.leeAllRecno(recno)
+        raw = self.read_complete_recno(recno)
         return self.read_game_raw(raw)
 
     def read_game_raw(self, raw):
@@ -479,8 +469,8 @@ class DBgames:
         p.resultado()
         return p
 
-    def leePGNRecno(self, recno, sp):
-        raw = self.leeAllRecno(recno)
+    def read_pgn_recno(self, recno, sp):
+        raw = self.read_complete_recno(recno)
         litags = []
         result = "*"
         for field in self.li_fields:
@@ -490,8 +480,9 @@ class DBgames:
                     litags.append((drots.get(field, field), v if type(v) == str else str(v)))
                     if field == "RESULT":
                         result = v if type(v) == str else str(v)
-
-        litags.append(("PlyCount", str(raw["PLYCOUNT"])))
+        dcabs = self.recuperaConfig("dcabs")
+        if "Plycount" in dcabs:
+            litags.append(("PlyCount", str(raw["PLYCOUNT"])))
         xpgn = raw["_DATA_"]
         if xpgn:
             if xpgn.startswith(BODY_SAVE):
@@ -517,7 +508,7 @@ class DBgames:
         return Game.Game(li_tags=liTags)
 
     def save_game_recno(self, recno, game):
-        return self.inserta(game) if recno is None else self.modifica(recno, game)
+        return self.insert(game) if recno is None else self.modify(recno, game)
 
     def fill(self, li_field_value):
         lset = ",".join(field + "=?" for field, value in li_field_value)
@@ -536,7 +527,7 @@ class DBgames:
         dic = Util.restore_pickle(path_lcsb)
         game = Game.Game()
         game.restore(dic)
-        return self.inserta(game)
+        return self.insert(game)
 
     def li_tags(self):
         return [tag for tag in self.li_fields if not (tag in ("XPV", "_DATA_"))]
@@ -548,7 +539,7 @@ class DBgames:
         self.conexion.commit()
         self.li_fields.append(column)
 
-    def leerPGNs(self, ficheros, dlTmp):
+    def import_pgns(self, ficheros, dlTmp):
         erroneos = duplicados = importados = 0
 
         allows_fen = self.allows_positions
@@ -722,7 +713,7 @@ class DBgames:
         conexion.commit()
         dlTmp.ponContinuar()
 
-        self.guardaConfig("dcabs", dcabs)
+        self.save_config("dcabs", dcabs)
 
         return si_cols_cambiados
 
@@ -773,7 +764,7 @@ class DBgames:
                     t1 = time.time()
                 next_n = btell + random.randint(1000, 2000)
 
-            row = db.leeAllRecno(recno)
+            row = db.read_complete_recno(recno)
 
             xpv = row[0]
 
@@ -851,7 +842,7 @@ class DBgames:
 
         return None
 
-    def modifica(self, recno, game_modificada):
+    def modify(self, recno, game_modificada):
         resp = Util.Record()
         resp.ok = True
         resp.changed = False
@@ -913,34 +904,34 @@ class DBgames:
 
         return resp
 
-    def inserta(self, game_nueva):
+    def insert(self, game_new):
         resp = Util.Record()
         resp.ok = True
         resp.changed = False
         resp.summary_changed = False
         resp.inserted = True
-        resp.mens_error = self.check_game(game_nueva)
+        resp.mens_error = self.check_game(game_new)
         if resp.mens_error:
             resp.ok = False
             return resp
 
         # Test si hay nuevos tags
-        for tag, valor in game_nueva.li_tags:
+        for tag, valor in game_new.li_tags:
             if not (tag.upper() in self.li_fields):
                 self.add_column(tag)
 
         li_fields = []
         li_data = []
 
-        data_nue = None if game_nueva.only_has_moves() else game_nueva.save()
+        data_nue = None if game_new.only_has_moves() else game_new.save()
         li_fields.append("_DATA_")
         li_data.append(data_nue)
 
-        pv_nue = game_nueva.pv()
+        pv_nue = game_new.pv()
         xpv_nue = pv_xpv(pv_nue)
-        si_fen_nue = not game_nueva.siFenInicial()
+        si_fen_nue = not game_new.siFenInicial()
         if si_fen_nue:
-            fen_nue = game_nueva.first_position.fen()
+            fen_nue = game_new.first_position.fen()
             xpv_nue = "|%s|%s" % (fen_nue, xpv_nue)
         if not self.allows_duplicates:
             sql = "SELECT COUNT(*) FROM Games WHERE XPV = ?"
@@ -953,10 +944,10 @@ class DBgames:
         li_fields.append("XPV")
         li_data.append(xpv_nue)
         li_fields.append("PLYCOUNT")
-        li_data.append(game_nueva.num_moves())
+        li_data.append(game_new.num_moves())
 
         result_nue = "*"
-        for tag, valor_nue in game_nueva.li_tags:
+        for tag, valor_nue in game_new.li_tags:
             tag = tag.upper()
             if tag != "PLYCOUNT":
                 li_fields.append(tag)
@@ -1002,9 +993,9 @@ def autosave(game:Game.Game):
     exist = os.path.isfile(path_db)
     db = DBgames(path_db)
     if not exist:
-        db.guardaConfig("SUMMARY_DEPTH", 30)
+        db.save_config("SUMMARY_DEPTH", 30)
         db.close()
         db = DBgames(path_db)
 
-    db.inserta(game)
+    db.insert(game)
     db.close()

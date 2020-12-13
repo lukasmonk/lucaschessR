@@ -183,7 +183,7 @@ class BoardLines(QtWidgets.QWidget):
 
         if ok:
             game = Game.Game()
-            game.leeOtra(self.game)
+            game.assign_other_game(self.game)
 
             if self.pos_move < len(self.game) - 1:
                 game.li_moves = game.li_moves[: self.pos_move + 1]

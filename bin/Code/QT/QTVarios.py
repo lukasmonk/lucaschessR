@@ -319,6 +319,7 @@ def lyBotonesMovimiento(
             li_acciones.append((trad, icono, key + tit))
 
     tb = Controles.TB(owner, li_acciones, False, icon_size=icon_size, rutina=rutina)
+    tb.setMinimumHeight(icon_size+4)
     ly = Colocacion.H().relleno().control(tb).relleno()
     return ly, tb
 

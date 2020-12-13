@@ -592,7 +592,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         li_fens = []
         datadb = DBgames.DBgames(path_db)
         if "FEN" in datadb.li_tags():
-            for reg in datadb.yieldData(["FEN"], "FEN <> ''"):
+            for reg in datadb.yield_data(["FEN"], "FEN <> ''"):
                 li_fens.append(reg.FEN)
         self.import_lifens("db", li_fens, um)
 

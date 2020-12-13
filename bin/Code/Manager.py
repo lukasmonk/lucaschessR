@@ -1584,10 +1584,10 @@ class Manager:
                 break
 
         pc = Game.Game(li_tags=liTags)
-        pc.leeOtra(self.game)
+        pc.assign_other_game(self.game)
 
         db = DBgames.DBgames(database)
-        resp = db.inserta(pc)
+        resp = db.insert(pc)
         db.close()
         if resp:
             QTUtil2.message_bold(self.main_window, _("Saved") + ": " + db.nom_fichero)

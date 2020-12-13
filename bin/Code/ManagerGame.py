@@ -13,26 +13,19 @@ from Code.Base.Constantes import *
 
 
 class ManagerGame(Manager.Manager):
-    def start(self, game, is_complete, only_consult):
+    def start(self, game, is_complete, only_consult, with_previous_next):
         self.game_type = GT_ALONE
 
         self.game = game
         self.reinicio = self.game.save()
         self.is_complete = is_complete
         self.only_consult = only_consult
+        self.with_previous_next = with_previous_next
 
         self.human_is_playing = True
         self.is_human_side_white = True
 
-        self.changed = False
-
         self.state = ST_PLAYING
-
-        if only_consult:
-            li = [TB_CLOSE, TB_PGN_LABELS, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES]
-        else:
-            li = [TB_SAVE, TB_CANCEL, TB_PGN_LABELS, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES]
-        self.main_window.pon_toolbar(li)
 
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.remove_hints(True, False)
@@ -44,18 +37,33 @@ class ManagerGame(Manager.Manager):
         self.put_pieces_bottom(game.iswhite())
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        if self.game.siFenInicial():
-            self.goto_end()
-        else:
-            self.ponteAlPrincipio()
+        # if self.game.siFenInicial():
+        #     self.goto_end()
+        # else:
+        self.ponteAlPrincipio()
 
         self.check_boards_setposition()
 
         self.put_information()
+        self.put_toolbar()
 
         self.refresh()
 
         self.play_next_move()
+
+    def put_toolbar(self):
+        li = [TB_CLOSE, TB_PGN_LABELS, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES]
+        if_previous, if_next = False, False
+        if self.with_previous_next:
+            pos = li.index(TB_PGN_LABELS)
+            li.insert(pos, TB_NEXT)
+            li.insert(pos, TB_PREVIOUS)
+        tb = self.main_window.pon_toolbar(li)
+        if self.with_previous_next:
+            if_previous, if_next = self.with_previous_next("with_previous_next", self.game)
+            self.main_window.enable_option_toolbar(TB_PREVIOUS, if_previous)
+            self.main_window.enable_option_toolbar(TB_NEXT, if_next)
+            QTUtil.refresh_gui()
 
     def put_information(self):
         white = black = result = None
@@ -73,11 +81,14 @@ class ManagerGame(Manager.Manager):
         self.set_label2("%s : <b>%s</b>" % (_("Result"), result) if result else "")
 
     def reiniciar(self):
-        if self.changed and not QTUtil2.pregunta(self.main_window, _("You will loose all changes, are you sure?")):
+        changed = self.game.save() != self.reinicio
+        if changed and not QTUtil2.pregunta(self.main_window, _("You will loose all changes, are you sure?")):
             return
         p = Game.Game()
         p.restore(self.reinicio)
-        self.start(p, self.is_complete, self.only_consult)
+        p.recno = getattr(self.game, "recno", None)
+
+        self.start(p, self.is_complete, self.only_consult, self.with_previous_next)
 
     def run_action(self, key):
         if key == TB_REINIT:
@@ -115,18 +126,30 @@ class ManagerGame(Manager.Manager):
         elif key in (TB_CANCEL, TB_END_GAME, TB_CLOSE):
             self.end_game()
 
+        elif key in (TB_PREVIOUS, TB_NEXT):
+            if self.save_game():
+                self.with_previous_next("save", self.game)
+            game1 = self.with_previous_next("previous" if key == TB_PREVIOUS else "next", self.game)
+            self.start(game1, self.is_complete, self.only_consult, self.with_previous_next)
+
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def end_game(self):
-        # Comprobamos que no haya habido cambios from_sq el ultimo grabado
-        if self.changed:
-            resp = QTUtil2.preguntaCancelar(self.main_window, _("Do you want to cancel changes?"), _("Yes"), _("No"))
-            if not resp:
-                return False
+    def save_game(self):
+        if self.game.save() != self.reinicio:
+            return QTUtil2.preguntaCancelar(self.main_window, _("Do you want to save changes?"), _("Yes"), _("No"))
+        return False
 
-        self.main_window.reject()
-        return True
+    def end_game(self):
+        ok = False
+        if not self.only_consult:
+            ok = self.save_game()
+
+        if ok:
+            self.main_window.accept()
+        else:
+            self.main_window.reject()
+        return ok
 
     def final_x(self):
         return self.end_game()
@@ -170,8 +193,6 @@ class ManagerGame(Manager.Manager):
         return True
 
     def add_move(self, move, siNuestra):
-        self.changed = True
-
         self.game.add_move(move)
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
@@ -182,49 +203,10 @@ class ManagerGame(Manager.Manager):
 
         self.check_boards_setposition()
 
-    def current_pgn(self):
-        resp = ""
-        st = set()
-        for eti, valor in self.game.li_tags:
-            etiU = eti.upper()
-            if etiU in st:
-                continue
-            st.add(etiU)
-            resp += '[%s "%s"]\n' % (eti, valor)
-            if etiU == "RESULT":
-                result = valor
-
-        if not ("RESULT" in st):
-            if self.resultado == RS_UNKNOWN:
-                result = "*"
-
-            elif self.resultado == RS_DRAW:
-                result = "1/2-1/2"
-
-            else:
-                result = "1-0" if self.resultadoSiBlancas else "0-1"
-
-            resp += '[Result "%s"]\n' % result
-
-        if self.fen:
-            resp += '[FEN "%s"]\n' % self.fen
-
-        ap = self.game.opening
-        if ap:
-            if not ("ECO" in st):
-                resp += '[ECO "%s"]\n' % ap.eco
-            if not ("OPENING" in st):
-                resp += '[Opening "%s"]\n' % ap.trNombre
-
-        resp += "\n" + self.game.pgnBase() + " " + result
-
-        return resp
-
     def editEtiquetasPGN(self):
         resp = WindowSolo.editEtiquetasPGN(self.procesador, self.game.li_tags)
         if resp:
             self.game.li_tags = resp
-            self.changed = True
             self.put_information()
 
     def informacion(self):
@@ -293,60 +275,56 @@ class ManagerGame(Manager.Manager):
             new_position = Voyager.voyager_position(self.main_window, ini_position)
             if new_position and new_position != ini_position:
                 self.game.set_position(new_position)
-                self.start(self.game, self.is_complete)
+                self.start(self.game, self.is_complete, self.with_previous_next)
 
         elif resp == "pasteposicion":
             texto = QTUtil.traePortapapeles()
             if texto:
-                cp = Position.Position()
+                new_position = Position.Position()
                 try:
-                    cp.read_fen(str(texto))
-                    self.fen = cp.fen()
-                    self.posicOpening = None
-                    self.reiniciar()
+                    new_position.read_fen(str(texto))
+                    ini_position = self.game.first_position
+                    if new_position and new_position != ini_position:
+                        self.game.set_position(new_position)
+                        self.start(self.game, self.is_complete, self.with_previous_next)
                 except:
                     pass
 
         elif resp == "leerpgn":
             game = self.procesador.select_1_pgn(self.main_window)
-            if game is not None:
-                if self.is_complete and not game.siFenInicial():
-                    return
-                p = Game.Game()
-                p.leeOtra(game)
-                p.assign_opening()
-                self.reinicio = p.save()
-                self.reiniciar()
+            self.replace_game(game)
 
         elif resp == "pastepgn":
-            texto = QTUtil.traePortapapeles()
-            if texto:
-                ok, game = Game.pgn_game(texto)
-                if not ok:
-                    QTUtil2.message_error(
-                        self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
-                    )
-                    return
-                if self.is_complete and not game.siFenInicial():
-                    return
-                self.reinicio = game.save()
-                self.reiniciar()
+            self.paste_pgn()
 
         elif resp == "voyager":
-            ptxt = Voyager.voyagerPartida(self.main_window, self.game)
-            if ptxt:
-                dic = self.creaDic()
-                dic["GAME"] = ptxt.save()
-                dic["FEN"] = None if ptxt.siFenInicial() else ptxt.first_position.fen()
-                dic["WHITEBOTTOM"] = self.board.is_white_bottom
-                self.reiniciar(dic)
+            game = Voyager.voyagerPartida(self.main_window, self.game)
+            self.replace_game(game)
+
+    def replace_game(self, game):
+        if not game:
+            return
+        if self.is_complete and not game.siFenInicial():
+            return
+        p = Game.Game()
+        p.assign_other_game(game)
+        p.recno = getattr(self.game, "recno", None)
+        self.start(p, self.is_complete, self.only_consult, self.with_previous_next)
 
     def control_teclado(self, nkey):
         if nkey == ord("V"):  # V
-            self.paste(QTUtil.traePortapapeles())
+            self.paste_pgn()
 
-    def listHelpTeclado(self):
-        return [("V", _("Paste position"))]
+    def paste_pgn(self):
+        texto = QTUtil.traePortapapeles()
+        if texto:
+            ok, game = Game.pgn_game(texto)
+            if not ok:
+                QTUtil2.message_error(
+                    self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
+                )
+                return
+            self.replace_game(game)
 
     def juegaRival(self):
         if not self.is_finished():

@@ -113,7 +113,7 @@ class PotenciaHistorico:
         else:
             nat = key
             orden = "DESC" if key == "FECHA" else "ASC"
-        self.dbf.ponOrden(nat + " " + orden)
+        self.dbf.put_order(nat + " " + orden)
         self.orden = nat, orden
 
         self.dbf.leer()

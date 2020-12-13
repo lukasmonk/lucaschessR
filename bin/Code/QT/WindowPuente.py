@@ -69,14 +69,14 @@ class PuenteHistorico:
     def goto(self, num):
         self.dbf.goto(num)
 
-    def ponOrden(self, key):
+    def put_order(self, key):
         nat, orden = self.orden
         if key == nat:
             orden = "DESC" if orden == "ASC" else "ASC"
         else:
             nat = key
             orden = "DESC" if key == "FECHA" else "ASC"
-        self.dbf.ponOrden(nat + " " + orden)
+        self.dbf.put_order(nat + " " + orden)
         self.orden = nat, orden
 
         self.dbf.leer()
@@ -316,7 +316,7 @@ class WPuenteBase(QTVarios.WDialogo):
         self.ghistorico.gotop()
 
     def grid_doble_clickCabecera(self, grid, o_column):
-        self.historico.ponOrden(o_column.key)
+        self.historico.put_order(o_column.key)
         self.ghistorico.gotop()
         self.ghistorico.refresh()
 

@@ -52,7 +52,7 @@ mate_en_dos = 175522
 
 runSound = None
 
-VERSION = "R0.36a"
+VERSION = "R0.37"
 DEBUG = False
 DEBUG_ENGINE = False
 

@@ -75,7 +75,7 @@ class DBF:
         self.select = select.upper()
         self.li_fields = [campo.strip() for campo in self.select.split(",")]
 
-    def ponOrden(self, orden):
+    def put_order(self, orden):
         """
         Cambia el orden de lectura, previo a una lectura completa.
         """

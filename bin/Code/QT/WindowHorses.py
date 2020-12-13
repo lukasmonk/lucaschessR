@@ -54,14 +54,14 @@ class HorsesHistorico:
     def goto(self, num):
         self.dbf.goto(num)
 
-    def ponOrden(self, key):
+    def put_order(self, key):
         nat, orden = self.orden
         if key == nat:
             orden = "DESC" if orden == "ASC" else "ASC"
         else:
             nat = key
             orden = "DESC" if key == "FECHA" else "ASC"
-        self.dbf.ponOrden(nat + " " + orden)
+        self.dbf.put_order(nat + " " + orden)
         self.orden = nat, orden
 
         self.dbf.leer()
@@ -150,7 +150,7 @@ class WHorsesBase(QTVarios.WDialogo):
     def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
         if key in ("FECHA", "MOVES", "HINTS"):
-            self.historico.ponOrden(key)
+            self.historico.put_order(key)
             self.ghistorico.gotop()
             self.ghistorico.refresh()
 

@@ -274,7 +274,7 @@ class Game:
     def last_jg(self):
         return self.li_moves[-1]
 
-    def leeOtra(self, otra):
+    def assign_other_game(self, otra):
         txt = otra.save()
         self.restore(txt)
 
@@ -540,7 +540,7 @@ class Game:
 
     def copia(self, hastaJugada=None):
         p = Game()
-        p.leeOtra(self)
+        p.assign_other_game(self)
         if hastaJugada is not None:
             if hastaJugada == -1:
                 p.li_moves = []

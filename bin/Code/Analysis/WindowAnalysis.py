@@ -299,20 +299,23 @@ class WMuestra(QtWidgets.QWidget):
 
         self.colorNegativo = QTUtil.qtColorRGB(255, 0, 0)
         self.colorImpares = QTUtil.qtColorRGB(231, 244, 254)
+
+        configuration = Code.configuration
+
+        self.si_figurines_pgn = configuration.x_pgn_withfigurines
+        with_col = (configuration.x_pgn_width - 52 - 24) // 2
         o_columns = Columnas.ListaColumnas()
-        self.si_figurines_pgn = Code.configuration.x_pgn_withfigurines
         o_columns.nueva(
             "JUGADAS",
             "%d %s" % (len(self.list_rm_name), _("Moves")),
-            120,
+            with_col,
             centered=True,
             edicion=Delegados.EtiquetaPGN(um.move.is_white() if self.si_figurines_pgn else None),
         )
         self.wrm = Grid.Grid(self, o_columns, siLineas=False)
-
-        self.wrm.tipoLetra(puntos=Code.configuration.x_pgn_fontpoints)
-        nAncho = self.wrm.anchoColumnas() + 20
-        self.wrm.setFixedWidth(nAncho)
+        self.wrm.tipoLetra(puntos=configuration.x_pgn_fontpoints)
+        n_with = self.wrm.anchoColumnas() + 20
+        self.wrm.setFixedWidth(n_with)
         self.wrm.goto(self.um.pos_selected, 0)
 
         # Layout

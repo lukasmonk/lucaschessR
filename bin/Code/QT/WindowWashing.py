@@ -260,7 +260,7 @@ class WWashing(QTVarios.WDialogo):
                     if engine.state == Washing.ENDED:
                         game = self.dbwashing.restoreGame(engine)
                         pc = Game.Game()
-                        pc.leeOtra(game)
+                        pc.assign_other_game(game)
                         dt = engine.date if engine.date else Util.today()
                         if engine.color:
                             white = self.configuration.x_player
@@ -306,7 +306,7 @@ class WWashing(QTVarios.WDialogo):
                     me = QTUtil2.mensEspera.start(self, _("Saving..."))
                     dbn = DBgames.DBgames(path)
                     for pc in other_pc():
-                        dbn.inserta(pc)
+                        dbn.insert(pc)
                     me.final()
                     QTUtil2.message_bold(self, _X(_("Saved to %1"), path))
             else:

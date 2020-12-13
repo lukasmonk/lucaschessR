@@ -9,6 +9,7 @@ import Code.Translate as Translate
 
 Translate.install()
 
+# sys.argv.append(r"c:\lucaschess\pyLCR\.installer\LucasChessR\73- Understanding_Rook_vs._Minor_Piece_Endgames_By_Karsten_Müller & Yakov_Konoval.pgn")
 n_args = len(sys.argv)
 if n_args == 1:
     import Code.Base.Init

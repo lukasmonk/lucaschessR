@@ -531,10 +531,10 @@ class WLines(QTVarios.WDialogo):
     def gameActual(self):
         game = Game.Game()
         if len(self.dbop) == 0:
-            game.leeOtra(self.gamebase)
+            game.assign_other_game(self.gamebase)
             return game
         numcol = self.glines.posActualN()[1]
-        game.leeOtra(self.game if self.game and numcol > 0 else self.gamebase)
+        game.assign_other_game(self.game if self.game and numcol > 0 else self.gamebase)
         if self.num_jg_actual is not None and self.num_jg_inicial <= self.num_jg_actual < len(game):
             game.li_moves = game.li_moves[: self.num_jg_actual + 1]
         return game

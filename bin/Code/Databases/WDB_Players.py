@@ -323,7 +323,7 @@ class WPlayer(QtWidgets.QWidget):
         return self.dbGames.recuperaConfig(var, default)
 
     def escVariable(self, var, valor):
-        self.dbGames.guardaConfig(var, valor)
+        self.dbGames.save_config(var, valor)
 
     def listaPlayers(self):
         return self.leeVariable("LISTA_PLAYERS", [])
@@ -411,7 +411,7 @@ class WPlayer(QtWidgets.QWidget):
                 filtro += "or WHITE = '%s' or BLACK = '%s'" % (alias, alias)
         pb.ponTotal(self.dbGames.count_data(filtro))
 
-        for n, alm in enumerate(self.dbGames.yieldData(liFields, filtro)):
+        for n, alm in enumerate(self.dbGames.yield_data(liFields, filtro)):
             pb.pon(n)
             if pb.is_canceled():
                 self.rebuilding = False
