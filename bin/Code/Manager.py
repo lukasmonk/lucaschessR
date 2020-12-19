@@ -689,9 +689,9 @@ class Manager:
             self.main_window.activaInformacionPGN()
             self.put_view()
 
-    def remove_info(self, siActivable=False):
+    def remove_info(self, is_activatable=False):
         self.main_window.activaInformacionPGN(False)
-        self.informacionActivable = siActivable
+        self.informacionActivable = is_activatable
 
     def save_to_pgn(self):
         conf = self.configuration

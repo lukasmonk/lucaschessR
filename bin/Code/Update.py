@@ -1,11 +1,11 @@
 import shutil
-import urllib
+import urllib.request
 import zipfile
 
 from Code.QT import QTUtil2
 from Code import Util
 
-WEBUPDATES = "https://lucaschess.pythonanywhere.com/static/updates11/updates.txt"
+WEBUPDATES = "https://lucaschess.pythonanywhere.com/static/updater/updates_win32.txt"
 
 
 def update_file(titulo, urlfichero, tam):
@@ -29,7 +29,7 @@ def update_file(titulo, urlfichero, tam):
 
     local_file = urlfichero.split("/")[-1]
     local_file = "actual/%s" % local_file
-    urllib.urlretrieve(urlfichero, local_file, hook)
+    urllib.request.urlretrieve(urlfichero, local_file, hook)
 
     is_canceled = progreso.is_canceled()
     progreso.cerrar()

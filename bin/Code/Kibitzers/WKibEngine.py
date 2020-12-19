@@ -278,7 +278,7 @@ class WKibEngine(QtWidgets.QDialog):
 
     def lanzaMotor(self):
         if self.siCandidates:
-            self.numMultiPV = self.kibitzer.multiPV
+            self.numMultiPV = self.kibitzer.current_multipv()
             if self.numMultiPV <= 1:
                 self.numMultiPV = min(self.kibitzer.maxMultiPV, 20)
         else:

@@ -160,6 +160,13 @@ class Engine:
                 return op.maximo > 3
         return False
 
+    def current_multipv(self):
+        for op in self.li_uci_options_editable():
+            if op.name == "MultiPV":
+                return int(op.valor)
+        return self.multiPV
+
+
 
 class OpcionUCI:
     name = ""
@@ -169,6 +176,9 @@ class OpcionUCI:
     minimo = 0
     maximo = 0
     li_vars = []
+
+    def __str__(self):
+        return "Name:%s - Type:%s - Default:%s - Value:%s - Min:%d - Max:%d - Vars:%s" % (self.name, self.tipo, self.default, self.valor, self.minimo, self.maximo, str(self.li_vars))
 
     def lee(self, txt):
         while "  " in txt:

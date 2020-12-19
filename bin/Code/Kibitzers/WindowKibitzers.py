@@ -455,8 +455,7 @@ class WKibitzerLive(QTVarios.WDialogo):
                     priorities = Priorities.priorities
                     xprioridad = priorities.value(prioridad)
                 else:
-                    numopcion = int(key)
-                    opcion = self.kibitzer.li_options[numopcion]
+                    opcion = self.kibitzer.li_uci_options_editable()[int(key)]
                     lidif_opciones.append((opcion.name, opcion.valor))
 
         self.result_xprioridad = xprioridad
@@ -519,7 +518,7 @@ class WKibitzerLive(QTVarios.WDialogo):
             self.kibitzer.prioridad = valor
         else:
             nopcion = int(self.me_key)
-            opcion = self.kibitzer.li_options[nopcion]
+            opcion = self.kibitzer.li_uci_options_editable()[nopcion]
             opcion.valor = valor
             self.li_options[nopcion + 1][1] = valor
             self.kibitzer.ordenUCI(opcion.name, valor)

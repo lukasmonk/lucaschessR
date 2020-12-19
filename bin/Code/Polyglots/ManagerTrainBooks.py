@@ -45,7 +45,7 @@ class ManagerTrainBooks(Manager.Manager):
 
         self.compruebaDGT(True)
 
-        self.remove_info(siActivable=True)
+        self.remove_info(is_activatable=True)
 
         w, b = self.book_player.name, self.book_rival.name
         if not is_white:

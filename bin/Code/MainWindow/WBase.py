@@ -136,7 +136,7 @@ class WBase(QtWidgets.QWidget):
 
     def create_board(self):
         ae = QTUtil.altoEscritorio()
-        mx = 64 if ae >= 750 else 48
+        mx = int(ae *0.08)
         config_board = self.manager.configuration.config_board("BASE", mx)
         self.board = Board.Board(self, config_board)
         self.board.crea()

@@ -10,6 +10,7 @@ from Code.Board import ConfBoards
 from Code import TrListas
 from Code import Translate
 from Code import Util
+from Code.QT import QTUtil
 from Code.SQL import UtilSQL
 from Code.Base.Constantes import MENU_PLAY_BOTH, POS_TUTOR_HORIZONTAL
 
@@ -799,6 +800,7 @@ class Configuration:
         if not ("BASE" in self.dic_conf_boards_pk):
             with open(Code.path_resource("IntFiles", "basepk.board"), "rb") as f:
                 var = pickle.loads(f.read())
+                var['x_anchoPieza'] = int(QTUtil.altoEscritorio()*8/100)
                 db["BASE"] = self.dic_conf_boards_pk["BASE"] = var
         # with open("../resources/IntFiles/basepk.board", "wb") as f:
         #      f.write(pickle.dumps(db["BASE"]))

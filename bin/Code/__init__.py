@@ -1,6 +1,11 @@
 import sys
 import os
 
+current_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
+
+if current_dir:
+    os.chdir(current_dir)
+
 lucas_chess = None  # asignado en Translate
 
 folder_OS = os.path.realpath(os.path.join("OS", sys.platform))
@@ -20,11 +25,7 @@ def path_resource(*lista):
     return os.path.realpath(p)
 
 
-current_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
-if current_dir:
-    os.chdir(current_dir)
-
-sys.path.append(os.path.join(current_dir, "Code"))
+# sys.path.append(os.path.join(current_dir, "Code"))
 
 isLinux = sys.platform == "linux"
 isWindows = not isLinux
@@ -52,7 +53,7 @@ mate_en_dos = 175522
 
 runSound = None
 
-VERSION = "R0.37"
+VERSION = "R0.38"
 DEBUG = False
 DEBUG_ENGINE = False
 

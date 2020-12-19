@@ -37,10 +37,10 @@ class ManagerGame(Manager.Manager):
         self.put_pieces_bottom(game.iswhite())
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        # if self.game.siFenInicial():
-        #     self.goto_end()
-        # else:
-        self.ponteAlPrincipio()
+        if self.game.siFenInicial():
+            self.goto_end()
+        else:
+            self.ponteAlPrincipio()
 
         self.check_boards_setposition()
 

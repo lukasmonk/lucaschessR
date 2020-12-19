@@ -65,21 +65,21 @@ class MainWindow(QTVarios.WDialogo):
         self.setLayout(ly)
 
         ctrl1 = QtWidgets.QShortcut(self)
-        ctrl1.setKey("Ctrl+1")
+        ctrl1.setKey(QtGui.QKeySequence("Ctrl+1"))
         ctrl1.activated.connect(self.pulsadoShortcutCtrl1)
 
         ctrlF10 = QtWidgets.QShortcut(self)
-        ctrlF10.setKey("Ctrl+0")
+        ctrlF10.setKey(QtGui.QKeySequence("Ctrl+0"))
         ctrlF10.activated.connect(self.pulsadoShortcutCtrl0)
 
         F11 = QtWidgets.QShortcut(self)
-        F11.setKey("F11")
+        F11.setKey(QtGui.QKeySequence("F11"))
         F11.activated.connect(self.pulsadoShortcutF11)
         self.activadoF11 = False
 
         if QtWidgets.QSystemTrayIcon.isSystemTrayAvailable():
             F12 = QtWidgets.QShortcut(self)
-            F12.setKey("F12")
+            F12.setKey(QtGui.QKeySequence("F12"))
             F12.activated.connect(self.pulsadoShortcutF12)
             self.trayIcon = None
 
