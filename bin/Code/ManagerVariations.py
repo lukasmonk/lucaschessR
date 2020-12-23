@@ -83,9 +83,9 @@ class ManagerVariations(Manager.Manager):
             self.configurar()
 
         elif key == TB_UTILITIES:
-            liMasOpciones = (("libros", _("Consult a book"), Iconos.Libros()),)
+            liMasOpciones = (("books", _("Consult a book"), Iconos.Libros()),)
             resp = self.utilidades(liMasOpciones)
-            if resp == "libros":
+            if resp == "books":
                 liMovs = self.librosConsulta(True)
                 if liMovs:
                     for x in range(len(liMovs) - 1, -1, -1):

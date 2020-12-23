@@ -24,9 +24,6 @@ def path_resource(*lista):
         p = os.path.join(p, x)
     return os.path.realpath(p)
 
-
-# sys.path.append(os.path.join(current_dir, "Code"))
-
 isLinux = sys.platform == "linux"
 isWindows = not isLinux
 if isLinux:
@@ -53,7 +50,7 @@ mate_en_dos = 175522
 
 runSound = None
 
-VERSION = "R0.38"
+VERSION = "R0.38b"
 DEBUG = False
 DEBUG_ENGINE = False
 

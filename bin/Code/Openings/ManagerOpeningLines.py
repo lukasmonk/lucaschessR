@@ -481,7 +481,7 @@ class ManagerOpeningEngines(Manager.Manager):
 
         elif key == TB_UTILITIES:
             liMasOpciones = []
-            liMasOpciones.append(("libros", _("Consult a book"), Iconos.Libros()))
+            liMasOpciones.append(("books", _("Consult a book"), Iconos.Libros()))
             liMasOpciones.append((None, None, None))
             liMasOpciones.append((None, _("Options"), Iconos.Opciones()))
             mens = _("cancel") if self.auto_analysis else _("activate")
@@ -502,7 +502,7 @@ class ManagerOpeningEngines(Manager.Manager):
             liMasOpciones.append(("add_line", _("Add this line"), Iconos.OpeningLines()))
 
             resp = self.utilidades(liMasOpciones)
-            if resp == "libros":
+            if resp == "books":
                 self.librosConsulta(False)
 
             elif resp == "add_line":

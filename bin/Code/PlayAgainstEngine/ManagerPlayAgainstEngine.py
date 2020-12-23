@@ -425,12 +425,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         elif key == TB_UTILITIES:
             liMasOpciones = []
             if self.human_is_playing or self.is_finished():
-                liMasOpciones.append(("libros", _("Consult a book"), Iconos.Libros()))
+                liMasOpciones.append(("books", _("Consult a book"), Iconos.Libros()))
                 liMasOpciones.append((None, None, None))
                 liMasOpciones.append(("play", _("Play current position"), Iconos.MoverJugar()))
 
             resp = self.utilidades(liMasOpciones)
-            if resp == "libros":
+            if resp == "books":
                 siEnVivo = self.human_is_playing and not self.is_finished()
                 liMovs = self.librosConsulta(siEnVivo)
                 if liMovs and siEnVivo:

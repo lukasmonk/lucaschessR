@@ -262,7 +262,7 @@ def microsegundos_rnd():
 
 
 def ini2dic(file):
-    dicBase = collections.OrderedDict()
+    dic_base = collections.OrderedDict()
 
     if os.path.isfile(file):
 
@@ -273,7 +273,7 @@ def ini2dic(file):
                     if linea.startswith("["):
                         key = linea[1:-1]
                         dic = collections.OrderedDict()
-                        dicBase[key] = dic
+                        dic_base[key] = dic
                     else:
                         n = linea.find("=")
                         if n > 0:
@@ -281,7 +281,7 @@ def ini2dic(file):
                             valor = linea[n + 1 :].strip()
                             dic[clave1] = valor
 
-    return dicBase
+    return dic_base
 
 
 def dic2ini(file, dic):

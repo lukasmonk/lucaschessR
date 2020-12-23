@@ -132,7 +132,6 @@ class G(QtWidgets.QGridLayout):
         # super(FlowLayout, self).__init__(parent)
 
         # if parent is not None:
-        # self.setMargin(margin)
 
         # self.setSpacing(spacing)
 

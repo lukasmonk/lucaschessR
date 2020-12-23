@@ -75,7 +75,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         def nuevoG():
             ly_g = Colocacion.G()
             ly_g.filaActual = 0
-            ly_g.setMargin(10)
+            ly_g.margen(10)
             return ly_g
 
         gb_style = Common.gb_style()

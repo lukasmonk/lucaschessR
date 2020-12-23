@@ -13,14 +13,16 @@ from Code.Base.Constantes import *
 
 
 class ManagerGame(Manager.Manager):
-    def start(self, game, is_complete, only_consult, with_previous_next):
+    def start(self, game, is_complete, only_consult, with_previous_next, save_routine):
         self.game_type = GT_ALONE
 
         self.game = game
-        self.reinicio = self.game.save()
+        self.game.is_finished() # Necesario para que no haya cambios a posteriori y close pregunte si grabar
         self.is_complete = is_complete
         self.only_consult = only_consult
         self.with_previous_next = with_previous_next
+        self.save_routine = save_routine
+        self.changed = False
 
         self.human_is_playing = True
         self.is_human_side_white = True
@@ -37,10 +39,10 @@ class ManagerGame(Manager.Manager):
         self.put_pieces_bottom(game.iswhite())
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        if self.game.siFenInicial():
-            self.goto_end()
-        else:
-            self.ponteAlPrincipio()
+        # if self.game.siFenInicial():
+        #     self.goto_end()
+        # else:
+        self.ponteAlPrincipio()
 
         self.check_boards_setposition()
 
@@ -49,10 +51,23 @@ class ManagerGame(Manager.Manager):
 
         self.refresh()
 
+        self.reinicio = self.game.save()
+
         self.play_next_move()
+
+    def is_changed(self):
+        return self.changed or self.game.save() != self.reinicio
+
+    def ask_for_save_game(self):
+        if self.is_changed():
+            return QTUtil2.preguntaCancelar(self.main_window, _("Do you want to save changes?"), _("Yes"), _("No"))
+        return False
 
     def put_toolbar(self):
         li = [TB_CLOSE, TB_PGN_LABELS, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES]
+        if self.changed and self.save_routine:
+            pos = li.index(TB_PGN_LABELS)
+            li.insert(pos, TB_SAVE)
         if_previous, if_next = False, False
         if self.with_previous_next:
             pos = li.index(TB_PGN_LABELS)
@@ -81,8 +96,7 @@ class ManagerGame(Manager.Manager):
         self.set_label2("%s : <b>%s</b>" % (_("Result"), result) if result else "")
 
     def reiniciar(self):
-        changed = self.game.save() != self.reinicio
-        if changed and not QTUtil2.pregunta(self.main_window, _("You will loose all changes, are you sure?")):
+        if self.is_changed() and not QTUtil2.pregunta(self.main_window, _("You will loose all changes, are you sure?")):
             return
         p = Game.Game()
         p.restore(self.reinicio)
@@ -98,20 +112,26 @@ class ManagerGame(Manager.Manager):
             self.atras()
 
         elif key == TB_SAVE:
-            self.main_window.accept()
+            if self.save_routine:
+                self.save_routine(self.game.recno, self.game)
+                self.changed = False
+                self.reinicio = self.game.save()
+                self.put_toolbar()
+            else:
+                self.main_window.accept()
 
         elif key == TB_CONFIG:
             self.configurarGS()
 
         elif key == TB_UTILITIES:
             liMasOpciones = (
-                ("libros", _("Consult a book"), Iconos.Libros()),
+                ("books", _("Consult a book"), Iconos.Libros()),
                 (None, None, None),
                 ("play", _("Play current position"), Iconos.MoverJugar()),
             )
 
             resp = self.utilidades(liMasOpciones)
-            if resp == "libros":
+            if resp == "books":
                 liMovs = self.librosConsulta(True)
                 if liMovs:
                     for x in range(len(liMovs) - 1, -1, -1):
@@ -127,7 +147,7 @@ class ManagerGame(Manager.Manager):
             self.end_game()
 
         elif key in (TB_PREVIOUS, TB_NEXT):
-            if self.save_game():
+            if self.ask_for_save_game():
                 self.with_previous_next("save", self.game)
             game1 = self.with_previous_next("previous" if key == TB_PREVIOUS else "next", self.game)
             self.start(game1, self.is_complete, self.only_consult, self.with_previous_next)
@@ -135,15 +155,11 @@ class ManagerGame(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def save_game(self):
-        if self.game.save() != self.reinicio:
-            return QTUtil2.preguntaCancelar(self.main_window, _("Do you want to save changes?"), _("Yes"), _("No"))
-        return False
 
     def end_game(self):
         ok = False
         if not self.only_consult:
-            ok = self.save_game()
+            ok = self.ask_for_save_game()
 
         if ok:
             self.main_window.accept()
@@ -190,6 +206,9 @@ class ManagerGame(Manager.Manager):
         self.add_move(move, True)
 
         self.play_next_move()
+        if not self.changed:
+            self.changed = True
+            self.put_toolbar()
         return True
 
     def add_move(self, move, siNuestra):
@@ -208,6 +227,10 @@ class ManagerGame(Manager.Manager):
         if resp:
             self.game.li_tags = resp
             self.put_information()
+            if not self.changed:
+                if self.is_changed():
+                    self.changed = True
+                    self.put_toolbar()
 
     def informacion(self):
         menu = QTVarios.LCMenu(self.main_window)
@@ -310,6 +333,8 @@ class ManagerGame(Manager.Manager):
         p.assign_other_game(game)
         p.recno = getattr(self.game, "recno", None)
         self.start(p, self.is_complete, self.only_consult, self.with_previous_next)
+        self.changed = True
+        self.put_toolbar()
 
     def control_teclado(self, nkey):
         if nkey == ord("V"):  # V
@@ -394,4 +419,6 @@ class ManagerGame(Manager.Manager):
             self.goto_end()
             self.state = ST_PLAYING
             self.refresh()
+            self.changed = True
+            self.put_toolbar()
             self.play_next_move()

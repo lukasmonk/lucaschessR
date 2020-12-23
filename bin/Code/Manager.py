@@ -968,9 +968,6 @@ class Manager:
             self.main_window.base.pgnRefresh()
             self.refresh()
 
-    def cambiaRival(self, nuevo):
-        self.procesador.cambiaRival(nuevo)
-
     def replay(self):
         resp = Pelicula.paramPelicula(self.configuration, self.main_window)
         if resp is None:
@@ -1796,10 +1793,10 @@ class Manager:
         if self.is_competitive:
             self.utilidades(siArbol=False)
         else:
-            liMasOpciones = (("libros", _("Consult a book"), Iconos.Libros()),)
+            liMasOpciones = (("books", _("Consult a book"), Iconos.Libros()),)
 
             resp = self.utilidades(liMasOpciones, siArbol=True)
-            if resp == "libros":
+            if resp == "books":
                 liMovs = self.librosConsulta(True)
                 if liMovs:
                     for x in range(len(liMovs) - 1, -1, -1):

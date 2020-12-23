@@ -332,13 +332,6 @@ class Procesador:
             DGT.desactivar()
     # ------------        
 
-    def cambiaRival(self, nuevo):
-        """
-        Llamado from_sq DatosNueva, cuando elegimos otro engine para jugar.
-        """
-        self.configuration.rival = self.configuration.buscaRival(nuevo)
-        self.configuration.graba()
-
     def menuplay(self):
         resp = BasicMenus.menuplay(self)
         if resp:
@@ -1112,12 +1105,12 @@ class Procesador:
             window, xtutor, is_competitive=is_competitive, kibitzers_manager=self.kibitzers_manager
         )
 
-    def manager_game(self, window, game, is_complete, only_consult, father_board, with_previous_next=None):
+    def manager_game(self, window, game, is_complete, only_consult, father_board, with_previous_next=None, save_routine=None):
         clon_procesador = ProcesadorVariations(
             window, self.xtutor, is_competitive=False, kibitzers_manager=self.kibitzers_manager
         )
         clon_procesador.manager = ManagerGame.ManagerGame(clon_procesador)
-        clon_procesador.manager.start(game, is_complete, only_consult, with_previous_next)
+        clon_procesador.manager.start(game, is_complete, only_consult, with_previous_next, save_routine)
 
         board = clon_procesador.main_window.board
         if father_board:

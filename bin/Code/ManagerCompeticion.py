@@ -268,6 +268,7 @@ class ManagerCompeticion(Manager.Manager):
         self.human_is_playing = False
 
         mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+
         self.beepResultado(beep)
         if player_win:
             hecho = "B" if self.is_human_side_white else "N"

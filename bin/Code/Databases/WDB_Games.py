@@ -429,7 +429,8 @@ class WGames(QtWidgets.QWidget):
         else:
             with_previous_next = self.edit_previous_next
         game.recno = recno
-        game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board, with_previous_next=with_previous_next)
+        game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board,
+                                            with_previous_next=with_previous_next, save_routine=self.edit_save)
         if game:
             self.edit_save(game.recno, game)
 

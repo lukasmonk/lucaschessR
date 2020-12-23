@@ -50,7 +50,6 @@ class ManagerSolo(Manager.Manager):
         self.play_against_engine = dic.get("PLAY_AGAINST_ENGINE", False) if not self.xrival else True
 
         self.ultimoFichero = dic.get("LAST_FILE", "")
-        self.changed = False
 
         self.auto_rotate = dic.get("AUTO_ROTATE", False)
 
@@ -122,13 +121,13 @@ class ManagerSolo(Manager.Manager):
 
         elif key == TB_UTILITIES:
             liMasOpciones = (
-                ("libros", _("Consult a book"), Iconos.Libros()),
+                ("books", _("Consult a book"), Iconos.Libros()),
                 (None, None, None),
                 ("play", _("Play current position"), Iconos.MoverJugar()),
             )
 
             resp = self.utilidades(liMasOpciones)
-            if resp == "libros":
+            if resp == "books":
                 liMovs = self.librosConsulta(True)
                 if liMovs:
                     for x in range(len(liMovs) - 1, -1, -1):
@@ -160,8 +159,7 @@ class ManagerSolo(Manager.Manager):
         self.board.setAcceptDropPGNs(None)
 
         # Comprobamos que no haya habido cambios from_sq el ultimo grabado
-        self.changed = self.changed or self.valor_inicial != self.dame_valor_actual()
-        if self.changed and len(self.game):
+        if self.is_changed() and len(self.game):
             resp = QTUtil2.preguntaCancelar(
                 self.main_window, _("Do you want to save changes to a file?"), _("Yes"), _("No")
             )
@@ -221,8 +219,6 @@ class ManagerSolo(Manager.Manager):
         return True
 
     def add_move(self, move, siNuestra):
-        self.changed = True
-
         self.game.add_move(move)
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
@@ -241,6 +237,11 @@ class ManagerSolo(Manager.Manager):
         dic = self.creaDic()
         dic["GAME"] = self.game.save()
         return Util.var2txt(dic)
+
+    def is_changed(self):
+        dic_inicial = Util.txt2var(self.valor_inicial)
+        dic_actual = Util.txt2var(self.dame_valor_actual())
+        return dic_inicial["GAME"] != dic_actual["GAME"]
 
     def creaDic(self):
         dic = {}
@@ -262,7 +263,6 @@ class ManagerSolo(Manager.Manager):
         resp = WindowSolo.editEtiquetasPGN(self.procesador, self.game.li_tags)
         if resp:
             self.game.set_tags(resp)
-            self.changed = True
             self.pon_rotulo()
 
     def guardaDir(self, resp):
@@ -279,7 +279,6 @@ class ManagerSolo(Manager.Manager):
         if Util.save_pickle(file, dic):
             self.valor_inicial = self.dame_valor_actual()
             self.guardaDir(file)
-            self.changed = False
             name = os.path.basename(file)
             QTUtil2.mensajeTemporal(self.main_window, _X(_("Saved to %1"), name), 0.8)
             self.guardarHistorico(file)

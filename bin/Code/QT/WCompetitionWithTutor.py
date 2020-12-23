@@ -133,7 +133,7 @@ def dameCategoria(w_parent, configuration, procesador):
         return None
 
     elif resp.startswith("MT_"):
-        procesador.cambiaRival(resp[3:])
+        dbm.set_current_rival_key(resp[3:])
         QtGui.QCursor.setPos(cursor)
         procesador.competicion()
         return None
