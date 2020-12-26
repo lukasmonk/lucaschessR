@@ -48,7 +48,7 @@ class EngineManager:
     def set_direct(self):
         self.direct = True
 
-    def opciones(self, tiempoJugada, profundidad, siMultiPV):
+    def options(self, tiempoJugada, profundidad, siMultiPV):
         self.motorTiempoJugada = tiempoJugada
         self.motorProfundidad = profundidad
         self.nMultiPV = self.confMotor.multiPV if siMultiPV else 0

@@ -271,7 +271,7 @@ class WColores(QTVarios.WDialogo):
             ly_temas.otro(ly)
         ly_temas.relleno(1)
 
-        def creaLB(txt):
+        def crea_lb(txt):
             return Controles.LB(self, txt + ": ").align_right()
 
         # Casillas
@@ -279,19 +279,19 @@ class WColores(QTVarios.WDialogo):
         lbPNG = Controles.LB(self, _("Image"))
 
         # # Blancas
-        lbBlancas = creaLB(_("White squares"))
+        lbBlancas = crea_lb(_("White squares"))
         self.btBlancas = BotonColor(self, self.config_board.colorBlancas, self.actualizaBoard)
         self.btBlancasPNG = BotonImagen(self, self.config_board.png64Blancas, self.actualizaBoard, self.btBlancas)
         self.dialBlancasTrans = DialNum(self, self.config_board.transBlancas, self.actualizaBoard)
 
         # # Negras
-        lbNegras = creaLB(_("Black squares"))
+        lbNegras = crea_lb(_("Black squares"))
         self.btNegras = BotonColor(self, self.config_board.colorNegras, self.actualizaBoard)
         self.btNegrasPNG = BotonImagen(self, self.config_board.png64Negras, self.actualizaBoard, self.btNegras)
         self.dialNegrasTrans = DialNum(self, self.config_board.transNegras, self.actualizaBoard)
 
         # Background
-        lbFondo = creaLB(_("Background"))
+        lbFondo = crea_lb(_("Background"))
         self.btFondo = BotonColor(self, self.config_board.colorFondo, self.actualizaBoard)
         self.btFondoPNG = BotonImagen(self, self.config_board.png64Fondo, self.actualizaBoard, self.btFondo)
         self.chbExtended = Controles.CHB(
@@ -306,29 +306,29 @@ class WColores(QTVarios.WDialogo):
             self.chbTemas.ponValor(False)
             self.chbTemas.setVisible(False)
         # Exterior
-        lbExterior = creaLB(_("Outer Border"))
+        lbExterior = crea_lb(_("Outer Border"))
         self.btExterior = BotonColor(self, self.config_board.colorExterior, self.actualizaBoard)
         # Texto
-        lbTexto = creaLB(_("Coordinates"))
+        lbTexto = crea_lb(_("Coordinates"))
         self.btTexto = BotonColor(self, self.config_board.colorTexto, self.actualizaBoard)
         # Frontera
-        lbFrontera = creaLB(_("Inner Border"))
+        lbFrontera = crea_lb(_("Inner Border"))
         self.btFrontera = BotonColor(self, self.config_board.colorFrontera, self.actualizaBoard)
 
         # Flechas
-        lbFlecha = creaLB(_("Move indicator"))
+        lbFlecha = crea_lb(_("Move indicator"))
         self.lyF = BotonFlecha(
             self, self.config_board.fTransicion, self.config_board.flechaDefecto, self.actualizaBoard
         )
-        lbFlechaAlternativa = creaLB(_("Arrow alternative"))
+        lbFlechaAlternativa = crea_lb(_("Arrow alternative"))
         self.lyFAlternativa = BotonFlecha(
             self, self.config_board.fAlternativa, self.config_board.flechaAlternativaDefecto, self.actualizaBoard
         )
-        lbFlechaActivo = creaLB(_("Active moves"))
+        lbFlechaActivo = crea_lb(_("Active moves"))
         self.lyFActual = BotonFlecha(
             self, self.config_board.fActivo, self.config_board.flechaActivoDefecto, self.actualizaBoard
         )
-        lbFlechaRival = creaLB(_("Opponent moves"))
+        lbFlechaRival = crea_lb(_("Opponent moves"))
         self.lyFRival = BotonFlecha(
             self, self.config_board.fRival, self.config_board.flechaRivalDefecto, self.actualizaBoard
         )
@@ -360,7 +360,7 @@ class WColores(QTVarios.WDialogo):
         gbTemas = Controles.GB(self, "", ly)
         gbTemas.setFlat(True)
 
-        # mas opciones ################################################################################################
+        # mas options ################################################################################################
         def xDefecto(siDefecto):
             if self.is_base:
                 siDefecto = False
@@ -379,7 +379,7 @@ class WColores(QTVarios.WDialogo):
         # Coordenadas
         lyG = Colocacion.G()
         # _nCoordenadas
-        lbCoordenadas = creaLB(_("Number"))
+        lbCoordenadas = crea_lb(_("Number"))
         li_options = [("0", 0), ("4", 4), ("2a", 2), ("2b", 3), ("2c", 5), ("2d", 6)]
         self.cbCoordenadas = Controles.CB(self, li_options, self.config_board.nCoordenadas()).capture_changes(
             self.actualizaBoardM
@@ -388,7 +388,7 @@ class WColores(QTVarios.WDialogo):
         l2mas1(lyG, 0, lbCoordenadas, self.cbCoordenadas, self.chbDefCoordenadas)
 
         # _tipoLetra
-        lbTipoLetra = creaLB(_("Font"))
+        lbTipoLetra = crea_lb(_("Font"))
         self.cbTipoLetra = QtWidgets.QFontComboBox()
         self.cbTipoLetra.setEditable(False)
         self.cbTipoLetra.setFontFilters(self.cbTipoLetra.ScalableFonts)
@@ -405,7 +405,7 @@ class WColores(QTVarios.WDialogo):
         l2mas1(lyG, 2, None, self.chbBold, self.chbDefBold)
 
         # _tamLetra
-        lbTamLetra = creaLB(_("Size") + " %")
+        lbTamLetra = crea_lb(_("Size") + " %")
         self.sbTamLetra = (
             Controles.SB(self, self.config_board.tamLetra(), 1, 200)
             .tamMaximo(50)
@@ -415,7 +415,7 @@ class WColores(QTVarios.WDialogo):
         l2mas1(lyG, 3, lbTamLetra, self.sbTamLetra, self.chbDefTamLetra)
 
         # _sepLetras
-        lbSepLetras = creaLB(_("Separation") + " %")
+        lbSepLetras = crea_lb(_("Separation") + " %")
         self.sbSepLetras = (
             Controles.SB(self, self.config_board.sepLetras(), -1000, 1000)
             .tamMaximo(50)
@@ -426,39 +426,39 @@ class WColores(QTVarios.WDialogo):
 
         gbCoordenadas = Controles.GB(self, _("Coordinates"), lyG)
 
-        lyOtros = Colocacion.G()
+        ly_otros = Colocacion.G()
         # _nomPiezas
         li = []
-        lbPiezas = creaLB(_("Pieces"))
+        lbPiezas = crea_lb(_("Pieces"))
         for entry in Util.listdir(Code.path_resource("Pieces")):
             if entry.is_dir():
                 li.append((entry.name, entry.name))
         li.sort(key=lambda x: x[0])
         self.cbPiezas = Controles.CB(self, li, self.config_board.nomPiezas()).capture_changes(self.actualizaBoardM)
         self.chbDefPiezas = xDefecto(self.config_board.siDefPiezas())
-        l2mas1(lyOtros, 0, lbPiezas, self.cbPiezas, self.chbDefPiezas)
+        l2mas1(ly_otros, 0, lbPiezas, self.cbPiezas, self.chbDefPiezas)
 
         # _tamRecuadro
-        lbTamRecuadro = creaLB(_("Outer Border Size") + " %")
+        lbTamRecuadro = crea_lb(_("Outer Border Size") + " %")
         self.sbTamRecuadro = (
             Controles.SB(self, self.config_board.tamRecuadro(), 0, 10000)
             .tamMaximo(50)
             .capture_changes(self.actualizaBoardM)
         )
         self.chbDefTamRecuadro = xDefecto(self.config_board.siDefTamRecuadro())
-        l2mas1(lyOtros, 1, lbTamRecuadro, self.sbTamRecuadro, self.chbDefTamRecuadro)
+        l2mas1(ly_otros, 1, lbTamRecuadro, self.sbTamRecuadro, self.chbDefTamRecuadro)
 
         # _tamFrontera
-        lbTamFrontera = creaLB(_("Inner Border Size") + " %")
+        lbTamFrontera = crea_lb(_("Inner Border Size") + " %")
         self.sbTamFrontera = (
             Controles.SB(self, self.config_board.tamFrontera(), 0, 10000)
             .tamMaximo(50)
             .capture_changes(self.actualizaBoardM)
         )
         self.chbDefTamFrontera = xDefecto(self.config_board.siDefTamFrontera())
-        l2mas1(lyOtros, 2, lbTamFrontera, self.sbTamFrontera, self.chbDefTamFrontera)
+        l2mas1(ly_otros, 2, lbTamFrontera, self.sbTamFrontera, self.chbDefTamFrontera)
 
-        ly = Colocacion.V().control(gbCoordenadas).espacio(50).otro(lyOtros).relleno()
+        ly = Colocacion.V().control(gbCoordenadas).espacio(50).otro(ly_otros).relleno()
 
         gbOtros = Controles.GB(self, "", ly)
         gbOtros.setFlat(True)
@@ -830,6 +830,8 @@ class WColores(QTVarios.WDialogo):
                 return
 
         if accion == "grabar":
+            png64 = self.board.thumbnail(64)
+            self.config_board.png64Thumb(base64.b64encode(png64))
             self.current_theme["o_tema"] = self.config_board.grabaTema()
             self.current_theme["o_base"] = self.config_board.grabaBase()
             if not self.current_theme.get("WITH_PIECES", False):
@@ -840,6 +842,8 @@ class WColores(QTVarios.WDialogo):
         elif accion == "grabarComo":
             theme = dict(self.current_theme)
             if self.rename_theme(theme):
+                png64 = self.board.thumbnail(64)
+                self.config_board.png64Thumb(base64.b64encode(png64))
                 theme["o_tema"] = self.config_board.grabaTema()
                 theme["o_base"] = self.config_board.grabaBase()
                 self.test_if_pieces(theme)

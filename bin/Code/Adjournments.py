@@ -4,9 +4,9 @@ from Code.SQL import UtilSQL
 from Code.QT import QTUtil2
 
 
-class Adjourns:
+class Adjournments:
     def __init__(self):
-        self.file = Code.configuration.file_adjourns()
+        self.file = Code.configuration.file_Adjournments()
 
     def open(self):
         return UtilSQL.DictSQL(self.file)

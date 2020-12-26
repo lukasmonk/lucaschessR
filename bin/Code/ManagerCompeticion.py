@@ -4,7 +4,7 @@ from Code import Manager
 from Code.Base import Move
 from Code.QT import QTUtil2
 from Code import Tutor
-from Code import Adjourns
+from Code import Adjournments
 from Code import CompetitionWithTutor
 import Code
 from Code.Engines import EngineResponse
@@ -140,7 +140,7 @@ class ManagerCompeticion(Manager.Manager):
                 "RIVAL_KEY": self.dbm.get_current_rival_key(),
             }
 
-            with Adjourns.Adjourns() as adj:
+            with Adjournments.Adjournments() as adj:
                 adj.add(self.game_type, dic, label_menu)
                 adj.si_seguimos(self)
 

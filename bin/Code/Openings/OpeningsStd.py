@@ -207,7 +207,7 @@ class ListaOpeningsStd:
 
         for k in lik:
             if k.startswith(a1h8) and len(k) > len(a1h8):
-                # Comprobamos que no sea una variante de las a_adidas, no nos interesan para mostrar opciones al usuario
+                # Comprobamos que no sea una variante de las a_adidas, no nos interesan para mostrar options al usuario
                 si_mas = True
                 for xap in li:
                     if k.startswith(xap.a1h8):

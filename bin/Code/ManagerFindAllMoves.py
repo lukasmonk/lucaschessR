@@ -251,7 +251,7 @@ class ManagerFindAllMoves(Manager.Manager):
             if (mov.xfrom() + mov.xto()) == a1h8:
                 if not mov.is_selected:
                     if mov.piece() == self.ordenPZ[0]:
-                        self.board.creaFlechaMulti(a1h8, False, opacidad=0.4)
+                        self.board.creaFlechaMulti(a1h8, False, opacity=0.4)
                         mov.is_selected = True
                         self.ordenPZ = self.ordenPZ[1:]
                         if len(self.ordenPZ) == 0:

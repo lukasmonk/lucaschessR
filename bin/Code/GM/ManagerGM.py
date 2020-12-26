@@ -5,7 +5,7 @@ import Code
 from Code.Openings import Opening
 from Code.GM import GM
 from Code import Manager
-from Code import Adjourns
+from Code import Adjournments
 from Code.Base import Move
 from Code.GM import WindowGM
 from Code.QT import WindowJuicio
@@ -489,7 +489,7 @@ class ManagerGM(Manager.Manager):
             label_menu = "%s %s" % (_("Play like a Grandmaster"), self.nombreGM)
             self.state = ST_ENDGAME
 
-            with Adjourns.Adjourns() as adj:
+            with Adjournments.Adjournments() as adj:
                 adj.add(self.game_type, dic, label_menu)
                 adj.si_seguimos(self)
 

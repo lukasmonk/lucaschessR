@@ -30,7 +30,7 @@ class BloqueEspSC(QtWidgets.QGraphicsItem):
             self.board.registraMovible(self)
 
         self.setZValue(bloqueDatos.physical_pos.orden)
-        self.setOpacity(bloqueDatos.opacidad)
+        self.setOpacity(bloqueDatos.opacity)
 
         self.activa(False)
 

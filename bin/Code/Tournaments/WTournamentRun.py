@@ -246,7 +246,7 @@ class WTournamentRun(QtWidgets.QWidget):
         if self.torneo.adjudicator_active():
             conf_engine = Code.configuration.buscaRival(self.torneo.adjudicator())
             self.xadjudicator = EngineManager.EngineManager(self, conf_engine)
-            self.xadjudicator.opciones(self.torneo.adjudicator_time() * 1000, 0, False)
+            self.xadjudicator.options(self.torneo.adjudicator_time() * 1000, 0, False)
             self.xadjudicator.anulaMultiPV()
         else:
             self.xadjudicator = None
@@ -273,7 +273,7 @@ class WTournamentRun(QtWidgets.QWidget):
         for side in (WHITE, BLACK):
             rv = rival[side]
             self.xengine[side] = EngineManager.EngineManager(self, rv)
-            self.xengine[side].opciones(rv.time * 1000, rv.depth, False)
+            self.xengine[side].options(rv.time * 1000, rv.depth, False)
             self.xengine[side].ponGuiDispatch(self.gui_dispatch)
 
             self.vtime[side] = Util.Timer(self.max_segundos)
@@ -438,7 +438,7 @@ class WTournamentRun(QtWidgets.QWidget):
             return True
         self.board.remove_arrows()
         tipo = "mt"
-        opacidad = 100
+        opacity = 100
         pv = pv.strip()
         while "  " in pv:
             pv = pv.replace("  ", " ")
@@ -450,9 +450,9 @@ class WTournamentRun(QtWidgets.QWidget):
 
         for n in range(nbloques):
             pv = lipv[n]
-            self.board.creaFlechaMov(pv[:2], pv[2:4], tipo + str(opacidad))
+            self.board.creaFlechaMov(pv[:2], pv[2:4], tipo + str(opacity))
             if n % 2 == 1:
-                opacidad -= cambio
+                opacity -= cambio
                 cambio = salto
             tipo = "ms" if tipo == "mt" else "mt"
         return True

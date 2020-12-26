@@ -78,9 +78,9 @@ class WTV_Flecha(QtWidgets.QDialog):
         config = FormLayout.Colorbox(_("Internal color"), 80, 20, siChecked=True)
         liGen.append((config, regFlecha.colorinterior))
 
-        # ( "opacidad", "n", 1.0 ),
+        # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regFlecha.opacidad * 100)))
+        liGen.append((config, 100 - int(regFlecha.opacity * 100)))
 
         # liGen.append( (None,None) )
 
@@ -155,7 +155,7 @@ class WTV_Flecha(QtWidgets.QDialog):
                 regFlecha.color = li[n + 2]
                 regFlecha.colorinterior = li[n + 3]
                 # regFlecha.colorinterior2 = li[4]
-                regFlecha.opacidad = (100.0 - float(li[n + 4])) / 100.0
+                regFlecha.opacity = (100.0 - float(li[n + 4])) / 100.0
                 regFlecha.redondeos = li[n + 5]
                 regFlecha.grosor = li[n + 6]
                 regFlecha.altocabeza = li[n + 7]
@@ -164,8 +164,8 @@ class WTV_Flecha(QtWidgets.QDialog):
                 regFlecha.descuelgue = li[n + 10]
                 regFlecha.destino = li[n + 11]
                 regFlecha.physical_pos.orden = li[n + 12]
-                arrow.posicion2xy()  # posible cambio en destino
-                arrow.setOpacity(regFlecha.opacidad)
+                arrow.physical_pos2xy()  # posible cambio en destino
+                arrow.setOpacity(regFlecha.opacity)
                 arrow.setZValue(regFlecha.physical_pos.orden)
             self.board.escena.update()
             QTUtil.refresh_gui()

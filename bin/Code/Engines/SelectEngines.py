@@ -32,7 +32,7 @@ class SelectEngines:
 
         self.liElo = self.genEnginesElo()
 
-        self.dic_huellas = {}  # se crea para no repetir la lectura de opciones uci
+        self.dic_huellas = {}  # se crea para no repetir la lectura de options uci
 
     def rehazMotoresExternos(self):
         self.liMotoresExternos = self.configuration.lista_motores_externos()

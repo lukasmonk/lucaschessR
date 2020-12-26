@@ -8,7 +8,6 @@ from Code.Board import BoardBlocks
 class FlechaSC(BoardBlocks.BloqueEspSC):
     def __init__(self, escena, bloqueFlecha, rutinaPulsada=None):
         super(FlechaSC, self).__init__(escena, bloqueFlecha)
-
         self.rutinaPulsada = rutinaPulsada
         self.rutinaPulsadaCarga = None
 
@@ -16,7 +15,7 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
         self.poligonoSizeBottom = None
         self.poligonoMove = None
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
     def ponRutinaPulsada(self, rutina, carga):
         self.rutinaPulsada = rutina
@@ -24,16 +23,16 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
 
     def ponA1H8(self, a1h8):
         self.bloqueDatos.a1h8 = a1h8
-        self.posicion2xy()
+        self.physical_pos2xy()
 
     def reset(self):
-        self.posicion2xy()
+        self.physical_pos2xy()
         bf = self.bloqueDatos
-        self.setOpacity(bf.opacidad)
+        self.setOpacity(bf.opacity)
         self.setZValue(bf.physical_pos.orden)
         self.update()
 
-    def posicion2xy(self):
+    def physical_pos2xy(self):
         bf = self.bloqueDatos
         physical_pos = bf.physical_pos
         ac = bf.width_square
@@ -65,7 +64,7 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
         physical_pos.ancho = hx
         physical_pos.alto = hy
 
-    def xy2posicion(self):
+    def xy2physical_pos(self):
 
         bf = self.bloqueDatos
         physical_pos = bf.physical_pos
@@ -83,9 +82,9 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
             if dc != hc or df != hf:
                 bf.a1h8 = self.board.fc_a1h8(df, dc, hf, hc)
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
-    def contiene(self, p):
+    def contain(self, p):
         p = self.mapFromScene(p)
         for x in (self.poligonoSizeTop, self.poligonoSizeBottom, self.poligonoMove):
             if x:
@@ -172,7 +171,7 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
         QtWidgets.QGraphicsItem.mouseReleaseEvent(self, event)
         if self.siActivo:
             if self.siMove or self.siSizeTop or self.siSizeBottom:
-                self.xy2posicion()
+                self.xy2physical_pos()
                 self.escena.update()
                 self.siMove = self.siSizeTop = self.siSizeBottom = False
             self.activa(False)
@@ -184,7 +183,7 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
                 self.rutinaPulsada()
 
     def mouseReleaseExt(self):
-        self.xy2posicion()
+        self.xy2physical_pos()
         self.escena.update()
         self.siMove = self.siSizeTop = self.siSizeBottom = False
         self.activa(False)

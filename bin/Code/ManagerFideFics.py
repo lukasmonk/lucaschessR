@@ -8,7 +8,7 @@ import Code
 from Code.Openings import Opening
 from Code import Manager
 from Code.Base import Game
-from Code import Adjourns
+from Code import Adjournments
 from Code.QT import WindowJuicio
 from Code.QT import QTUtil2
 from Code.SQL import Base
@@ -183,7 +183,7 @@ class ManagerFideFics(Manager.Manager):
                 "PUNTOS": self.puntos,
             }
 
-            with Adjourns.Adjourns() as adj:
+            with Adjournments.Adjournments() as adj:
                 adj.add(self.game_type, dic, self._titulo)
                 self.analizaTerminar()
                 adj.si_seguimos(self)

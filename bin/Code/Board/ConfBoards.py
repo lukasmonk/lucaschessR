@@ -57,7 +57,7 @@ class ConfigTabTema(JS):
         bf.width_square = 32
         bf.color = 4293848576
         bf.colorinterior = 4292532736
-        bf.opacidad = 0.8
+        bf.opacity = 0.8
         bf.redondeos = True
         bf.forma = "3"
         bf.ancho = 4

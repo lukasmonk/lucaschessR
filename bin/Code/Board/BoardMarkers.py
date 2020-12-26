@@ -14,7 +14,7 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
 
         self.pixmap = QtSvg.QSvgRenderer(QtCore.QByteArray(bloqueMarker.xml.encode()))
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
         self.siMove = False
         self.tpSize = None
@@ -38,13 +38,13 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         self.rutinaPulsadaCarga = carga
 
     def reset(self):
-        self.posicion2xy()
+        self.physical_pos2xy()
         bm = self.bloqueDatos
-        self.setOpacity(bm.opacidad)
+        self.setOpacity(bm.opacity)
         self.setZValue(bm.physical_pos.orden)
         self.update()
 
-    def posicion2xy(self):
+    def physical_pos2xy(self):
 
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
@@ -62,7 +62,7 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         physical_pos.ancho = (hc - dc + 1) * ac
         physical_pos.alto = (hf - df + 1) * ac
 
-    def xy2posicion(self):
+    def xy2physical_pos(self):
 
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
@@ -79,13 +79,13 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         if bien(dc) and bien(df) and bien(hc) and bien(hf):
             bm.a1h8 = self.board.fc_a1h8(df, dc, hf, hc)
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
     def ponA1H8(self, a1h8):
         self.bloqueDatos.a1h8 = a1h8
-        self.posicion2xy()
+        self.physical_pos2xy()
 
-    def contiene(self, p):
+    def contain(self, p):
         p = self.mapFromScene(p)
 
         def distancia(p1, p2):
@@ -172,7 +172,7 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         QtWidgets.QGraphicsItem.mouseReleaseEvent(self, event)
         if self.siActivo:
             if self.siMove or self.tpSize:
-                self.xy2posicion()
+                self.xy2physical_pos()
                 self.escena.update()
                 self.siMove = False
                 self.tpSize = None
@@ -187,7 +187,7 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
     def mouseReleaseExt(self):
         if self.siActivo:
             if self.siMove or self.tpSize:
-                self.xy2posicion()
+                self.xy2physical_pos()
                 self.escena.update()
                 self.siMove = False
                 self.tpSize = None

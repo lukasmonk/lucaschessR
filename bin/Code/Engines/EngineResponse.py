@@ -542,7 +542,7 @@ class MultiEngineResponse:
                 return rm, n
         return None, -1
 
-    def contiene(self, movimiento):
+    def contain(self, movimiento):
         movimiento = movimiento.lower()
         for n, rm in enumerate(self.li_rm):
             if rm.movimiento() == movimiento:
@@ -1021,7 +1021,7 @@ class MultiEngineResponse:
         return EngineResponse(self.name, self.is_white)
 
     def miraBrilliancies(self, mindepth, minpuntos):
-        # Que hay un minimo de opciones
+        # Que hay un minimo de options
         if len(self.li_rm) < 5:
             return
 

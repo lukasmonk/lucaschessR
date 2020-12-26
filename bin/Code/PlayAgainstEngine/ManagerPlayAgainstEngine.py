@@ -15,7 +15,7 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code import Tutor
 from Code import Util
-from Code import Adjourns
+from Code import Adjournments
 from Code.Engines import EngineResponse, SelectEngines
 from Code.PlayAgainstEngine import PlayAgainstEngine
 
@@ -515,7 +515,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
             dic = self.save_state()
 
-            # se guarda en una bd adjourns dic key = fecha y hora y tipo
+            # se guarda en una bd Adjournments dic key = fecha y hora y tipo
             label_menu = _("Play against an engine") + ". " + self.xrival.name
 
             self.state = ST_ENDGAME
@@ -525,7 +525,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.is_analyzing = False
                 self.xtutor.ac_final(-1)
 
-            with Adjourns.Adjourns() as adj:
+            with Adjournments.Adjournments() as adj:
                 adj.add(self.game_type, dic, label_menu)
                 adj.si_seguimos(self)
 

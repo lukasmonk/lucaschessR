@@ -56,9 +56,9 @@ class WTV_Marco(QtWidgets.QDialog):
         config = FormLayout.Colorbox(_("Internal color"), 80, 20, siChecked=True)
         liGen.append((config, regMarco.colorinterior))
 
-        # ( "opacidad", "n", 1.0 ),
+        # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regMarco.opacidad * 100)))
+        liGen.append((config, 100 - int(regMarco.opacity * 100)))
 
         # ( "grosor", "n", 1 ), # ancho del trazo
         config = FormLayout.Spinbox(_("Thickness"), 1, 20, 50)
@@ -102,11 +102,11 @@ class WTV_Marco(QtWidgets.QDialog):
                 regMarco.color = li[2]
                 regMarco.colorinterior = li[3]
                 # regMarco.colorinterior2 = li[]
-                regMarco.opacidad = (100.0 - float(li[4])) / 100.0
+                regMarco.opacity = (100.0 - float(li[4])) / 100.0
                 regMarco.grosor = li[5]
                 regMarco.redEsquina = li[6]
                 regMarco.position.orden = li[7]
-                box.setOpacity(regMarco.opacidad)
+                box.setOpacity(regMarco.opacity)
                 box.setZValue(regMarco.position.orden)
                 box.update()
             self.board.escena.update()

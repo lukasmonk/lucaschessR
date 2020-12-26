@@ -150,16 +150,16 @@ class WKibEngine(QtWidgets.QDialog):
                     if len(game):
                         self.board.remove_arrows()
                         tipo = "mt"
-                        opacidad = 100
+                        opacity = 100
                         salto = (80 - 15) * 2 // (self.nArrows - 1) if self.nArrows > 1 else 1
                         cambio = max(30, salto)
 
                         for njg in range(min(len(game), self.nArrows)):
                             tipo = "ms" if tipo == "mt" else "mt"
                             move = game.move(njg)
-                            self.board.creaFlechaMov(move.from_sq, move.to_sq, tipo + str(opacidad))
+                            self.board.creaFlechaMov(move.from_sq, move.to_sq, tipo + str(opacity))
                             if njg % 2 == 1:
-                                opacidad -= cambio
+                                opacity -= cambio
                                 cambio = salto
 
                     self.grid.refresh()

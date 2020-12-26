@@ -21,7 +21,7 @@ class WUsuarios(QTVarios.WDialogo):
 
         self.leeUsuarios()
 
-        titulo = _("Usuarios")
+        titulo = _("Users")
         icono = Iconos.Usuarios()
         extparam = "users"
         QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)

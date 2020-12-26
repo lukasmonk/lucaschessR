@@ -6,7 +6,6 @@
 # ==============================================================================
 import sys
 
-
 import Code.Translate as Translate
 
 Translate.install()

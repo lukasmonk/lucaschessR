@@ -821,7 +821,7 @@ class WPanelDirector(QTVarios.WDialogo):
                 "color",
                 "colorinterior",
                 "colorinterior2",
-                "opacidad",
+                "opacity",
                 "redondeos",
                 "forma",
                 "ancho",
@@ -836,10 +836,10 @@ class WPanelDirector(QTVarios.WDialogo):
                 "grosor",
                 "redEsquina",
                 "tipo",
-                "opacidad",
+                "opacity",
             ),
-            TabVisual.TP_SVG: ("name", "opacidad"),
-            TabVisual.TP_MARKER: ("name", "opacidad"),
+            TabVisual.TP_SVG: ("name", "opacity"),
+            TabVisual.TP_MARKER: ("name", "opacity"),
         }
         dicDB = {
             TabVisual.TP_FLECHA: self.dbFlechas,

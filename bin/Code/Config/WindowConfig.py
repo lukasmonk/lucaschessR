@@ -9,7 +9,7 @@ from Code import Util
 from Code.Base.Constantes import *
 
 
-def opciones(parent, configuration):
+def options(parent, configuration):
     form = FormLayout.FormLayout(parent, _("Configuration"), Iconos.Opciones(), anchoMinimo=640)
 
     # Datos generales ##############################################################################################

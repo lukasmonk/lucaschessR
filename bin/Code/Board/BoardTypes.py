@@ -255,7 +255,7 @@ class Flecha(Bloque):
     color: int
     colorinterior: int
     colorinterior2: int
-    opacidad: int
+    opacity: int
     redondeos: bool
     forma: str
     ancho: int
@@ -275,7 +275,7 @@ class Flecha(Bloque):
             ("color", "n", 0),
             ("colorinterior", "n", -1),  # si es cerrada
             ("colorinterior2", "n", -1),  # para el gradiente
-            ("opacidad", "n", 1.0),
+            ("opacity", "n", 1.0),
             ("redondeos", "l", False),
             ("forma", "t", "a"),
             # a = abierta -> ,  c = cerrada la cabeza, 1 = poligono cuadrado, 
@@ -299,7 +299,7 @@ class Flecha(Bloque):
         c.color = self.color
         c.colorinterior = self.colorinterior
         c.colorinterior2 = self.colorinterior2
-        c.opacidad = self.opacidad
+        c.opacity = self.opacity
         c.redondeos = self.redondeos
         c.forma = self.forma
         c.ancho = self.ancho
@@ -318,7 +318,7 @@ class Marco(Bloque):
     grosor: int
     redEsquina: int
     tipo: int
-    opacidad: int
+    opacity: int
     width_square: int
     png: str
     
@@ -332,7 +332,7 @@ class Marco(Bloque):
             ("grosor", "n", 1),
             ("redEsquina", "n", 0),
             ("tipo", "n", 1),  # 1=SolidLine, 2=DashLine, 3=DotLine, 4=DashDotLine, 5=DashDotDotLine, 0=Sin borde
-            ("opacidad", "n", 1.0),
+            ("opacity", "n", 1.0),
             ("width_square", "n", 1),
             ("png", "c", ""),  # png para usar como boton
         ]
@@ -343,7 +343,7 @@ class SVG(Bloque):
     physical_pos: Physicalphysical_pos
     fa1h8: str
     xml: str
-    opacidad: int
+    opacity: int
     width_square: int
     psize: int
     png: str
@@ -356,7 +356,7 @@ class SVG(Bloque):
             # se indica en unidades de ancho de square, podra tener valores negativos para que se pueda mover
             # fuera de main_window
             ("xml", "c", ""),
-            ("opacidad", "n", 1.0),
+            ("opacity", "n", 1.0),
             ("width_square", "n", 1),
             ("psize", "n", 100),  # ajustetama_o
             ("png", "c", ""),  # png para usar como boton
@@ -368,7 +368,7 @@ class Marker(Bloque):
     physical_pos: Physicalphysical_pos
     fa1h8: str
     xml: str
-    opacidad: int
+    opacity: int
     width_square: int
     psize: int
     poscelda: int
@@ -382,7 +382,7 @@ class Marker(Bloque):
             # se indica en unidades de ancho de square, podra tener valores negativos
             # para que se pueda mover fuera de main_window
             ("xml", "c", ""),
-            ("opacidad", "n", 1.0),
+            ("opacity", "n", 1.0),
             ("width_square", "n", 1),
             ("psize", "n", 100),  # % ajustetama_o
             ("poscelda", "n", 1),  # 0 = Up-Left 1 = Up-Right 2 = Down-Right 3 = Down-Left

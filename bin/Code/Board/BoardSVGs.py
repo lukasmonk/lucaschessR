@@ -15,7 +15,7 @@ class SVGSC(BoardBlocks.BloqueEspSC):
 
         self.pixmap = QtSvg.QSvgRenderer(QtCore.QByteArray(bloqueImgSVG.xml.encode("utf-8")))
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
         self.siMove = False
         self.tpSize = None
@@ -37,18 +37,18 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         self.rutinaPulsadaCarga = carga
 
     def reset(self):
-        self.posicion2xy()
+        self.physical_pos2xy()
         bm = self.bloqueDatos
         self.pixmap = QtSvg.QSvgRenderer(QtCore.QByteArray(bm.xml.encode()))
-        self.setOpacity(bm.opacidad)
+        self.setOpacity(bm.opacity)
         self.setZValue(bm.physical_pos.orden)
         self.update()
 
     def ponA1H8(self, a1h8):
         self.bloqueDatos.a1h8 = a1h8
-        self.posicion2xy()
+        self.physical_pos2xy()
 
-    def posicion2xy(self):
+    def physical_pos2xy(self):
 
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
@@ -78,7 +78,7 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         physical_pos.ancho = int(posiciono.ancho * xk)
         physical_pos.alto = int(posiciono.alto * xk)
 
-    def contiene(self, p):
+    def contain(self, p):
         p = self.mapFromScene(p)
 
         def distancia(p1, p2):
@@ -246,7 +246,7 @@ class SVGSC(BoardBlocks.BloqueEspSC):
 
 
 class SVGCandidate(SVGSC):
-    def posicion2xy(self):
+    def physical_pos2xy(self):
 
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos

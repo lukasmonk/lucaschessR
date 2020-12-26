@@ -202,7 +202,7 @@ class ManagerTrainBooks(Manager.Manager):
                         paux = p
                         saux = True
                     opacity = 1.0 if p == paux else max(p, 0.25)
-                self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacidad=opacity)
+                self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
 
             resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.is_human_side_white, siSelectSiempre=False)
             self.board.remove_arrows()
@@ -247,7 +247,7 @@ class ManagerTrainBooks(Manager.Manager):
                     paux = p
                     saux = True
                 opacity = 1.0 if p == paux else max(p, 0.25)
-            self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacidad=opacity)
+            self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
 
         resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.is_human_side_white, siSelectSiempre=False)
         self.board.quitaFlechas()

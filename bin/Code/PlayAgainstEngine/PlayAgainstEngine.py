@@ -61,7 +61,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         self.tab_advanced = 4  # está en la posición 4
         self.tab_advanced_active = (
             False
-        )  # Para no tener que leer las opciones uci to_sq que no sean necesarias, afecta a gridNumDatos
+        )  # Para no tener que leer las options uci to_sq que no sean necesarias, afecta a gridNumDatos
 
         def nueva_tab(layout, titulo):
             ly = Colocacion.V()

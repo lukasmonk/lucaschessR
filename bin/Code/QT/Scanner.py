@@ -84,14 +84,14 @@ class Scanner(QtWidgets.QDialog):
         height = point.y() - self.y
         modifiers = QtWidgets.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.AltModifier:
-            if width > 0 and height > 0:
-                self.width = width
-                self.height = height
-                self.setPathW()
-        else:
             width = max(width, height)
             if width > 0:
                 self.height = self.width = width
+                self.setPathW()
+        else:
+            if width > 0 and height > 0:
+                self.width = width
+                self.height = height
                 self.setPathW()
 
     def setPathW(self):

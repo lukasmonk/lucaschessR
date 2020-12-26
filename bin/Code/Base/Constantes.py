@@ -105,7 +105,7 @@ GO_FORWARD, GO_BACK, GO_START, GO_END, GO_FREE, GO_CLOCK = range(6)
     TB_REINIT,
     TB_TAKEBACK,
     TB_ADJOURN,
-    TB_ADJOURNS,
+    TB_Adjournments,
     TB_END_GAME,
     TB_CLOSE,
     TB_PREVIOUS,

@@ -45,7 +45,7 @@ class WCountsCaptures(QTVarios.WDialogo):
             None,
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
-            (_("Options"), Iconos.Opciones(), self.opciones),
+            (_("Options"), Iconos.Opciones(), self.options),
             None,
         )
         tb = QTVarios.LCTB(self, li_acciones)
@@ -145,7 +145,7 @@ class WCountsCaptures(QTVarios.WDialogo):
                     w = WRunCounts.WRunCounts(self, self.db, count_capture)
                 w.exec_()
 
-    def opciones(self):
+    def options(self):
         showall = self.configuration.x_captures_showall if self.is_captures else self.configuration.x_counts_showall
         menu = QTVarios.LCMenu(self)
         menu.opcion(True, _("Show all moves"), siChecked=showall)

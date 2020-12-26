@@ -126,9 +126,9 @@ class ManagerPlayGame(Manager.Manager):
             mrm, pos = move.analysis
             msAnalisis = mrm.getTime()
             if msAnalisis > self.minTiempo:
-                if mrmActual.getTime() > msAnalisis and mrmActual.contiene(pvUsu) and mrmActual.contiene(pvObj):
+                if mrmActual.getTime() > msAnalisis and mrmActual.contain(pvUsu) and mrmActual.contain(pvObj):
                     return None
-                if mrm.contiene(pvObj) and mrm.contiene(pvUsu):
+                if mrm.contain(pvObj) and mrm.contain(pvUsu):
                     return mrm
         return None
 

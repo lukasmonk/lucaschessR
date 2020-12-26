@@ -452,7 +452,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         fen = self.game.last_position.fen()
         lif = [x[:2] for x in self.t4.best_mvs(fen)]
         if lif:
-            self.board.put_arrow_scvar(lif, opacidad=1.0)
+            self.board.put_arrow_scvar(lif, opacity=1.0)
 
     def pon_position(self):
         if self.pos_game == -1:
@@ -466,7 +466,7 @@ class WEndingsGTB(QTVarios.WDialogo):
 
         lif = [x[:2] for x in self.t4.best_mvs(position.fen())]
         if lif:
-            self.board.put_arrow_scvar(lif, opacidad=1.0)
+            self.board.put_arrow_scvar(lif, opacity=1.0)
             if (self.pos_game + 1) < len(self.game):
                 move = self.game.move(self.pos_game + 1)
                 ok = True

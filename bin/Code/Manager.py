@@ -1047,7 +1047,7 @@ class Manager:
                         regMarco.siMovible = True
                         regMarco.color = color
                         regMarco.colorinterior = color
-                        regMarco.opacidad = 0.5
+                        regMarco.opacity = 0.5
                         box = self.board.creaMarco(regMarco)
                         self.liMarcosTmp.append(box)
                         st.add(h8)
@@ -1853,7 +1853,7 @@ class Manager:
             return True
         self.board.remove_arrows()
         tipo = "mt"
-        opacidad = 100
+        opacity = 100
         pv = pv.strip()
         while "  " in pv:
             pv = pv.replace("  ", " ")
@@ -1865,9 +1865,9 @@ class Manager:
 
         for n in range(nbloques):
             pv = lipv[n]
-            self.board.creaFlechaMov(pv[:2], pv[2:4], tipo + str(opacidad))
+            self.board.creaFlechaMov(pv[:2], pv[2:4], tipo + str(opacity))
             if n % 2 == 1:
-                opacidad -= cambio
+                opacity -= cambio
                 cambio = salto
             tipo = "ms" if tipo == "mt" else "mt"
         return True

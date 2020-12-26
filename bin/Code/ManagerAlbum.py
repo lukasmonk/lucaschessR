@@ -1,7 +1,7 @@
 from Code import Albums
 from Code import Manager
 from Code.Base import Move
-from Code import Adjourns
+from Code import Adjournments
 from Code.QT import QTUtil2
 from Code.Base.Constantes import *
 
@@ -94,7 +94,7 @@ class ManagerAlbum(Manager.Manager):
             label_menu = "%s %s/%s" % (_("Album"), _F(self.album.name), _F(self.cromo.name))
             self.state = ST_ENDGAME
 
-            with Adjourns.Adjourns() as adj:
+            with Adjournments.Adjournments() as adj:
                 adj.add(self.game_type, dic, label_menu)
                 adj.si_seguimos(self)
 

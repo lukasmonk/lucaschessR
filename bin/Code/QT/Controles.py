@@ -185,7 +185,7 @@ class SB(QtWidgets.QSpinBox):
 
 class CB(QtWidgets.QComboBox):
     """
-    ComboBox : entrada de una lista de opciones = etiqueta,key[,icono]
+    ComboBox : entrada de una lista de options = etiqueta,key[,icono]
     """
 
     def __init__(self, parent, li_options, valorInicial):

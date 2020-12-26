@@ -77,7 +77,7 @@ class WBase(QtWidgets.QWidget):
             TB_REINIT: (_("Reinit"), Iconos.Reiniciar()),
             TB_TAKEBACK: (_("Takeback"), Iconos.Atras()),
             TB_ADJOURN: (_("Adjourn"), Iconos.Aplazar()),
-            TB_ADJOURNS: (_("Adjourns"), Iconos.Aplazamientos()),
+            TB_Adjournments: (_("Adjournments"), Iconos.Aplazamientos()),
             TB_END_GAME: (_("End game"), Iconos.FinPartida()),
             TB_CLOSE: (_("Close"), Iconos.MainMenu()),
             TB_PREVIOUS: (_("Previous"), Iconos.Anterior()),

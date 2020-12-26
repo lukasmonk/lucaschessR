@@ -13,7 +13,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
 
         self.distBordes = 0.20 * bloqueMarco.width_square
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
         self.siMove = False
         self.tpSize = None
@@ -32,13 +32,13 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
         self.rutinaPulsadaCarga = carga
 
     def reset(self):
-        self.posicion2xy()
+        self.physical_pos2xy()
         bm = self.bloqueDatos
-        self.setOpacity(bm.opacidad)
+        self.setOpacity(bm.opacity)
         self.setZValue(bm.physical_pos.orden)
         self.update()
 
-    def posicion2xy(self):
+    def physical_pos2xy(self):
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
         ac = bm.width_square
@@ -55,7 +55,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
         physical_pos.ancho = (hc - dc + 1) * ac
         physical_pos.alto = (hf - df + 1) * ac
 
-    def xy2posicion(self):
+    def xy2physical_pos(self):
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
         ac = bm.width_square
@@ -71,13 +71,13 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
         if bien(dc) and bien(df) and bien(hc) and bien(hf):
             bm.a1h8 = self.board.fc_a1h8(df, dc, hf, hc)
 
-        self.posicion2xy()
+        self.physical_pos2xy()
 
     def ponA1H8(self, a1h8):
         self.bloqueDatos.a1h8 = a1h8
-        self.posicion2xy()
+        self.physical_pos2xy()
 
-    def contiene(self, p):
+    def contain(self, p):
         p = self.mapFromScene(p)
 
         def distancia(p1, p2):
@@ -183,7 +183,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
         QtWidgets.QGraphicsItem.mouseReleaseEvent(self, event)
         if self.siActivo:
             if self.siMove or self.tpSize:
-                self.xy2posicion()
+                self.xy2physical_pos()
                 self.escena.update()
                 self.siMove = False
                 self.tpSize = None
@@ -196,7 +196,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
                 self.rutinaPulsada()
 
     def mouseReleaseExt(self):
-        self.xy2posicion()
+        self.xy2physical_pos()
         self.escena.update()
         self.siMove = False
         self.tpSize = None

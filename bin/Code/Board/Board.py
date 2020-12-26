@@ -459,7 +459,7 @@ class Board(QtWidgets.QGraphicsView):
                 square.colorRelleno = color
             square.physical_pos.orden = 4
             square.physical_pos.alto = square.physical_pos.ancho = self.width_square
-            opacidad = 100.0 - transparencia * 1.0
+            opacity = 100.0 - transparencia * 1.0
             for x in range(4):
                 for y in range(8):
                     una = square.copia()
@@ -474,8 +474,8 @@ class Board(QtWidgets.QGraphicsView):
                         pixmap = casillaSC.pixmap
                     else:
                         casillaSC = BoardElements.CajaSC(self.escena, una)
-                    if opacidad != 100.0:
-                        casillaSC.setOpacity(opacidad / 100.0)
+                    if opacity != 100.0:
+                        casillaSC.setOpacity(opacity / 100.0)
 
         hazCasillas(1, self.png64Blancas, self.colorBlancas, self.transBlancas)
         hazCasillas(0, self.png64Negras, self.colorNegras, self.transNegras)
@@ -1317,7 +1317,7 @@ class Board(QtWidgets.QGraphicsView):
         self.colocaPieza(bloque_pieza, posA1H8)
         piezaSC = BoardElements.PiezaSC(self.escena, bloque_pieza, self)
 
-        # piezaSC.setOpacity(self.opacidad[0 if cpieza.isupper() else 1])
+        # piezaSC.setOpacity(self.opacity[0 if cpieza.isupper() else 1])
 
         self.liPiezas.append([cpieza, piezaSC, True])
         return piezaSC
@@ -1571,23 +1571,23 @@ class Board(QtWidgets.QGraphicsView):
         self.flechaSC.ponA1H8(a1h8)
         self.flechaSC.update()
 
-    def put_arrow_scvar(self, liArrows, destino=None, opacidad=None):
+    def put_arrow_scvar(self, liArrows, destino=None, opacity=None):
         if destino is None:
             destino = "m"
-        if opacidad is None:
-            opacidad = 0.4
+        if opacity is None:
+            opacity = 0.4
         for from_sq, to_sq in liArrows:
             if from_sq and to_sq:
-                self.creaFlechaMulti(from_sq + to_sq, False, destino=destino, opacidad=opacidad)
+                self.creaFlechaMulti(from_sq + to_sq, False, destino=destino, opacity=opacity)
 
     def pulsadaFlechaSC(self):
         self.flechaSC.hide()
 
-    def creaFlechaMulti(self, a1h8, siMain, destino="c", opacidad=0.9):
+    def creaFlechaMulti(self, a1h8, siMain, destino="c", opacity=0.9):
         bf = copy.deepcopy(self.config_board.fTransicion() if siMain else self.config_board.fAlternativa())
         bf.a1h8 = a1h8
         bf.destino = destino
-        bf.opacidad = opacidad
+        bf.opacity = opacity
 
         arrow = self.creaFlecha(bf)
         self.liFlechas.append(arrow)
@@ -1619,7 +1619,7 @@ class Board(QtWidgets.QGraphicsView):
     def creaFlechaTutor(self, desdeA1h8, hastaA1h8, factor):
         bf = copy.deepcopy(self.config_board.fTransicion())
         bf.a1h8 = desdeA1h8 + hastaA1h8
-        bf.opacidad = max(factor, 0.20)
+        bf.opacity = max(factor, 0.20)
         bf.ancho = max(bf.ancho * 2 * (factor ** 2.2), bf.ancho / 3)
         bf.altocabeza = max(bf.altocabeza * (factor ** 2.2), bf.altocabeza / 3)
         bf.vuelo = bf.altocabeza / 3
@@ -1716,19 +1716,19 @@ class Board(QtWidgets.QGraphicsView):
         elif modo.startswith("ms"):
             resto = modo[2:]
             bf = copy.deepcopy(self.config_board.fActivo())
-            bf.opacidad = float(resto) / 100.0
+            bf.opacity = float(resto) / 100.0
             bf.width_square = self.width_square
 
         elif modo.startswith("mt"):
             resto = modo[2:]
             bf = self.config_board.fRival().copia()
-            bf.opacidad = float(resto) / 100.0
+            bf.opacity = float(resto) / 100.0
             bf.width_square = self.width_square
 
         elif modo.startswith("m1"):
             resto = modo[2:]
             bf = self.config_board.fTransicion().copia()
-            bf.opacidad = float(resto) / 100.0
+            bf.opacity = float(resto) / 100.0
             bf.width_square = self.width_square
 
         if self.anchoPieza > 24:
@@ -1929,7 +1929,7 @@ class Board(QtWidgets.QGraphicsView):
         return BoardMarkers.MarkerSC(self.escena, bloqueMarkerN, siEditando=siEditando)
 
     def creaFlecha(self, bloqueFlecha, rutina=None):
-        bloqueFlechaN = copy.copy(bloqueFlecha)
+        bloqueFlechaN = copy.deepcopy(bloqueFlecha)
         bloqueFlechaN.width_square = self.width_square
 
         return BoardArrows.FlechaSC(self.escena, bloqueFlechaN, rutina)
@@ -1946,9 +1946,9 @@ class Board(QtWidgets.QGraphicsView):
         bd = self.side_indicator_sc.bloqueDatos
         self.set_side_indicator(bd.colorRelleno == self.colorBlancas)
         for k, uno in self.dicMovibles.items():
-            uno.posicion2xy()
+            uno.physical_pos2xy()
         for arrow in self.liFlechas:
-            arrow.posicion2xy()
+            arrow.physical_pos2xy()
         self.escena.update()
 
         if hasattr(self.main_window, "capturas"):

@@ -382,7 +382,7 @@ class WEngine(QtWidgets.QDialog):
             self.motorExterno.book = pbook
             self.motorExterno.bookRR = self.cbBooksRR.valor()
 
-        # Grabamos opciones
+        # Grabamos options
         wsave_options_engine(self.motorExterno)
 
         self.accept()

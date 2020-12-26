@@ -87,9 +87,9 @@ class WTV_SVG(QtWidgets.QDialog):
         config = FormLayout.Editbox(_("Name"), ancho=120)
         liGen.append((config, regSVG.name))
 
-        # ( "opacidad", "n", 1.0 ),
+        # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regSVG.opacidad * 100)))
+        liGen.append((config, 100 - int(regSVG.opacity * 100)))
 
         # ( "psize", "n", 100 ),
         config = FormLayout.Spinbox(_("Size") + " %", 1, 1600, 50)
@@ -97,7 +97,7 @@ class WTV_SVG(QtWidgets.QDialog):
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        liGen.append((config, regSVG.position.orden))
+        liGen.append((config, regSVG.physical_pos.orden))
 
         self.form = FormLayout.FormWidget(liGen, dispatch=self.cambios)
 
@@ -125,11 +125,11 @@ class WTV_SVG(QtWidgets.QDialog):
             for n, svg in enumerate(self.liEjemplos):
                 regSVG = svg.bloqueDatos
                 regSVG.name = li[0]
-                regSVG.opacidad = (100.0 - float(li[1])) / 100.0
+                regSVG.opacity = (100.0 - float(li[1])) / 100.0
                 regSVG.psize = li[2]
-                regSVG.position.orden = li[3]
-                svg.setOpacity(regSVG.opacidad)
-                svg.setZValue(regSVG.position.orden)
+                regSVG.physical_pos.orden = li[3]
+                svg.setOpacity(regSVG.opacity)
+                svg.setZValue(regSVG.physical_pos.orden)
                 svg.update()
             self.board.escena.update()
             QTUtil.refresh_gui()

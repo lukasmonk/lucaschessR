@@ -34,7 +34,7 @@ from Code import Presentacion
 from Code import ManagerWashing
 from Code import ManagerPlayGame
 from Code import ManagerAnotar
-from Code import Adjourns
+from Code import Adjournments
 from Code.QT import WCompetitionWithTutor, BasicMenus
 from Code.QT import Iconos
 from Code.QT import About
@@ -102,8 +102,8 @@ class Procesador:
         Code.procesador = self
         OpeningsStd.reset()
 
-        # Tras crear configuración miramos si hay adjourns
-        self.test_opcion_adjourns()
+        # Tras crear configuración miramos si hay Adjournments
+        self.test_opcion_Adjournments()
 
         Code.todasPiezas = Piezas.TodasPiezas()
 
@@ -122,15 +122,15 @@ class Procesador:
         self.replay = None
         self.replayBeep = None
 
-    def test_opcion_adjourns(self):
-        must_adjourn = len(Adjourns.Adjourns()) > 0
-        if TB_ADJOURNS in self.li_opciones_inicio:
+    def test_opcion_Adjournments(self):
+        must_adjourn = len(Adjournments.Adjournments()) > 0
+        if TB_Adjournments in self.li_opciones_inicio:
             if not must_adjourn:
-                pos = self.li_opciones_inicio.index(TB_ADJOURNS)
+                pos = self.li_opciones_inicio.index(TB_Adjournments)
                 del self.li_opciones_inicio[pos]
         else:
             if must_adjourn:
-                self.li_opciones_inicio.insert(1, TB_ADJOURNS)
+                self.li_opciones_inicio.insert(1, TB_Adjournments)
 
     def set_version(self, version):
         self.version = version
@@ -194,7 +194,7 @@ class Procesador:
         self.main_window.set_manager_active(self)  # Necesario, no borrar
         self.board.side_indicator_sc.setVisible(False)
         self.board.blindfoldQuitar()
-        self.test_opcion_adjourns()
+        self.test_opcion_Adjournments()
         self.main_window.pon_toolbar(self.li_opciones_inicio, atajos=True)
         self.main_window.activaJuego(False, False)
         self.board.exePulsadoNum = None
@@ -281,7 +281,7 @@ class Procesador:
     def creaXTutor(self):
         xtutor = EngineManager.EngineManager(self, self.configuration.tutor)
         xtutor.name += "(%s)" % _("tutor")
-        xtutor.opciones(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
+        xtutor.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         if self.configuration.x_tutor_multipv == 0:
             xtutor.maximizaMultiPV()
         else:
@@ -303,7 +303,7 @@ class Procesador:
     def creaXAnalyzer(self):
         xanalyzer = EngineManager.EngineManager(self, self.configuration.tutor)
         xanalyzer.name += "(%s)" % _("analyzer")
-        xanalyzer.opciones(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
+        xanalyzer.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         if self.configuration.x_tutor_multipv == 0:
             xanalyzer.maximizaMultiPV()
         else:
@@ -319,7 +319,7 @@ class Procesador:
 
     def creaManagerMotor(self, confMotor, vtime, nivel, siMultiPV=False, priority=None):
         xmanager = EngineManager.EngineManager(self, confMotor)
-        xmanager.opciones(vtime, nivel, siMultiPV)
+        xmanager.options(vtime, nivel, siMultiPV)
         xmanager.setPriority(priority)
         return xmanager
 
@@ -501,7 +501,7 @@ class Procesador:
             self.entrenamientos.lanza()
 
         elif key == TB_OPTIONS:
-            self.opciones()
+            self.options()
 
         elif key == TB_TOOLS:
             self.menu_tools()
@@ -509,26 +509,26 @@ class Procesador:
         elif key == TB_INFORMATION:
             self.informacion()
 
-        elif key == TB_ADJOURNS:
-            self.adjourns()
+        elif key == TB_Adjournments:
+            self.Adjournments()
 
-    def adjourns(self):
+    def Adjournments(self):
         menu = QTVarios.LCMenu(self.main_window)
-        li_adjourns = Adjourns.Adjourns().list_menu()
-        for key, label, tp in li_adjourns:
+        li_Adjournments = Adjournments.Adjournments().list_menu()
+        for key, label, tp in li_Adjournments:
             menu.opcion((True, key, tp), label, Iconos.PuntoMagenta())
             menu.addSeparator()
         menu.addSeparator()
         mr = menu.submenu(_("Remove"), Iconos.Borrar())
-        for key, label, tp in li_adjourns:
+        for key, label, tp in li_Adjournments:
             mr.opcion((False, key, tp), label, Iconos.Delete())
 
         resp = menu.lanza()
         if resp:
             si_run, key, tp = resp
             if si_run:
-                dic = Adjourns.Adjourns().get(key)
-                Adjourns.Adjourns().remove(key)
+                dic = Adjournments.Adjournments().get(key)
+                Adjournments.Adjournments().remove(key)
                 if tp == GT_AGAINST_ENGINE:
                     self.manager = ManagerPlayAgainstEngine.ManagerPlayAgainstEngine(self)
                     self.manager.run_adjourn(dic)
@@ -551,9 +551,9 @@ class Procesador:
                 return
 
             else:
-                Adjourns.Adjourns().remove(key)
+                Adjournments.Adjournments().remove(key)
 
-            self.test_opcion_adjourns()
+            self.test_opcion_Adjournments()
             self.main_window.pon_toolbar(self.li_opciones_inicio, atajos=True)
 
     def lanza_atajos(self):
@@ -562,7 +562,7 @@ class Procesador:
     def lanzaAtajosALT(self, key):
         BasicMenus.atajosALT(self, key)
 
-    def opciones(self):
+    def options(self):
         menu = QTVarios.LCMenu(self.main_window)
 
         menu.opcion(self.cambiaconfiguration, _("Configuration"), Iconos.Opciones())
@@ -580,7 +580,7 @@ class Procesador:
 
         if self.configuration.is_main:
             menu.separador()
-            menu.opcion(self.usuarios, _("Usuarios"), Iconos.Usuarios())
+            menu.opcion(self.usuarios, _("Users"), Iconos.Usuarios())
             menu.separador()
 
             menu1 = menu.submenu(_("User data folder"), Iconos.Carpeta())
@@ -597,7 +597,7 @@ class Procesador:
                 resp()
 
     def cambiaconfiguration(self):
-        if WindowConfig.opciones(self.main_window, self.configuration):
+        if WindowConfig.options(self.main_window, self.configuration):
             self.configuration.graba()
             self.reiniciar()
 
@@ -1086,10 +1086,10 @@ class Procesador:
         return 0
 
     def competicion(self):
-        opciones = WCompetitionWithTutor.datos(self.main_window, self.configuration, self)
-        if opciones:
+        options = WCompetitionWithTutor.datos(self.main_window, self.configuration, self)
+        if options:
             # self.game_type = GT_COMPETITION_WITH_TUTOR
-            categorias, categoria, nivel, is_white, puntos = opciones
+            categorias, categoria, nivel, is_white, puntos = options
 
             self.manager = ManagerCompeticion.ManagerCompeticion(self)
             self.manager.start(categorias, categoria, nivel, is_white, puntos)

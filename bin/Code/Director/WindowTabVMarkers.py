@@ -55,9 +55,9 @@ class WTV_Marker(QtWidgets.QDialog):
         config = FormLayout.Editbox(_("Name"), ancho=120)
         liGen.append((config, regMarker.name))
 
-        # ( "opacidad", "n", 1.0 ),
+        # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regMarker.opacidad * 100)))
+        liGen.append((config, 100 - int(regMarker.opacity * 100)))
 
         # ( "psize", "n", 100 ),
         config = FormLayout.Spinbox(_("Size") + " %", 1, 1600, 50)
@@ -99,11 +99,11 @@ class WTV_Marker(QtWidgets.QDialog):
             for n, marker in enumerate(self.liEjemplos):
                 regMarker = marker.bloqueDatos
                 regMarker.name = li[0]
-                regMarker.opacidad = (100.0 - float(li[1])) / 100.0
+                regMarker.opacity = (100.0 - float(li[1])) / 100.0
                 regMarker.psize = li[2]
                 regMarker.poscelda = li[3]
                 regMarker.position.orden = li[4]
-                marker.setOpacity(regMarker.opacidad)
+                marker.setOpacity(regMarker.opacity)
                 marker.setZValue(regMarker.position.orden)
                 marker.update()
             self.board.escena.update()

@@ -306,7 +306,7 @@ class GT_Action(GTarea):
         "PR",
     )
     dicTxt = {
-        GTA_INICIO: _("Initial physical_pos"),
+        GTA_INICIO: _("Initial physical pos"),
         GTA_MAINARROW_REMOVE: _("Remove main arrow"),
         GTA_PIECES_REMOVEALL: _("Remove all pieces"),
         GTA_GRAPHICS_REMOVEALL: _("Remove all graphics"),
@@ -560,7 +560,7 @@ class Guion:
     def tareasPosicion(self, pos):
         li = []
         for n, tarea in enumerate(self.liGTareas):
-            if isinstance(tarea, GT_Item) and tarea.itemSC().contiene(pos):
+            if isinstance(tarea, GT_Item) and tarea.itemSC().contain(pos):
                 li.append((n, tarea))
         return li
 
