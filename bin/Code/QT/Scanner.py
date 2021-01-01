@@ -151,7 +151,7 @@ class Scanner(QtWidgets.QDialog):
     def keyPressEvent(self, event):
         k = event.key()
         m = int(event.modifiers())
-        siCtrl = (m & QtCore.Qt.ControlModifier) > 0
+        is_ctrl = (m & QtCore.Qt.ControlModifier) > 0
         is_alt = (m & QtCore.Qt.AltModifier) > 0
         x = self.x
         y = self.y
@@ -178,7 +178,7 @@ class Scanner(QtWidgets.QDialog):
 
         else:
             if k == QtCore.Qt.Key_Right:
-                if siCtrl:
+                if is_ctrl:
                     width += 8
                     height += 8
                 elif is_alt:
@@ -186,7 +186,7 @@ class Scanner(QtWidgets.QDialog):
                 else:
                     x += 1
             elif k == QtCore.Qt.Key_Left:
-                if siCtrl:
+                if is_ctrl:
                     width -= 8
                     height -= 8
                 elif is_alt:
@@ -194,7 +194,7 @@ class Scanner(QtWidgets.QDialog):
                 else:
                     x -= 1
             elif k == QtCore.Qt.Key_Up:
-                if siCtrl:
+                if is_ctrl:
                     height -= 8
                     width -= 8
                 elif is_alt:
@@ -202,7 +202,7 @@ class Scanner(QtWidgets.QDialog):
                 else:
                     y -= 1
             elif k == QtCore.Qt.Key_Down:
-                if siCtrl:
+                if is_ctrl:
                     height += 8
                     width += 8
                 elif is_alt:

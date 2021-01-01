@@ -660,7 +660,7 @@ class WColores(QTVarios.WDialogo):
             if self.current_theme:
                 tema["NOMBRE"] = self.current_theme.get("NOMBRE", "")
                 tema["SECCION"] = self.current_theme.get("SECCION", "")
-                tema["WITH_PIECES"] = self.current_theme.get("WITH_PIECES", False)
+                tema["CHANGE_PIECES"] = self.current_theme.get("CHANGE_PIECES", False)
             tema["o_tema"] = self.config_board.grabaTema()
             tema["o_base"] = self.config_board.grabaBase()
             self.test_if_pieces(tema)
@@ -813,35 +813,37 @@ class WColores(QTVarios.WDialogo):
             self.li_themes.sort(key=lambda x: "%20s%s" % (x.get("SECCION", ""), x.get("NOMBRE")))
 
     def test_if_pieces(self, theme):
-        if not theme.get("WITH_PIECES", False):
+        if not theme.get("CHANGE_PIECES", False):
             if "o_base" in theme and "x_nomPiezas" in theme["o_base"]:
                 del theme["o_base"]["x_nomPiezas"]
 
     def menu_save(self):
-        accion = "grabarComo"
+        accion = "save_as"
         if self.own_theme_selected and self.current_theme.get("NOMBRE"):
             menu = QTVarios.LCMenu(self)
-            menu.opcion("grabar", _("Save") + " " + self.current_theme.get("NOMBRE"), Iconos.Grabar())
+            menu.opcion("save", _("Save") + " " + self.current_theme.get("NOMBRE"), Iconos.Grabar())
             menu.separador()
-            menu.opcion("grabarComo", _("Save as"), Iconos.GrabarComo())
+            menu.opcion("save_as", _("Save as"), Iconos.GrabarComo())
             menu.separador()
             accion = menu.lanza()
             if accion is None:
                 return
 
-        if accion == "grabar":
+        if accion == "save":
+            self.read_own_themes()
             png64 = self.board.thumbnail(64)
             self.config_board.png64Thumb(base64.b64encode(png64))
             self.current_theme["o_tema"] = self.config_board.grabaTema()
             self.current_theme["o_base"] = self.config_board.grabaBase()
-            if not self.current_theme.get("WITH_PIECES", False):
+            if not self.current_theme.get("CHANGE_PIECES", False):
                 self.test_if_pieces(self.current_theme)
 
             self.save_own_themes()
 
-        elif accion == "grabarComo":
+        elif accion == "save_as":
             theme = dict(self.current_theme)
             if self.rename_theme(theme):
+                self.read_own_themes()
                 png64 = self.board.thumbnail(64)
                 self.config_board.png64Thumb(base64.b64encode(png64))
                 theme["o_tema"] = self.config_board.grabaTema()
@@ -854,6 +856,9 @@ class WColores(QTVarios.WDialogo):
 
     def save_own_themes(self):
         Util.save_pickle(self.configuration.ficheroTemas, self.li_themes)
+        if self.cbTemas.valor() != self.configuration.ficheroTemas:
+            self.cbTemas.ponValor(self.configuration.ficheroTemas)
+            self.cambiadoTema()
 
     def rename_theme(self, tema):
         w = WNameTheme(self, tema, self.li_themes)

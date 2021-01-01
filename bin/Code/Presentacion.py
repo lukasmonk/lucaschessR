@@ -32,6 +32,17 @@ class ManagerChallenge101:
 
         self.siguiente_posicion()
 
+        # for n, linea in enumerate(self.li_lineas_posicion):
+        #     path = r"c:\lucaschess\_WEB_R\blog\positions\pos%04d.png" % n
+        #     fen, result, pgn_result, pgn, difficult = linea.strip().split("|")
+        #     cp = Position.Position()
+        #     cp.read_fen(fen)
+        #     self.board.set_position(cp)
+        #     is_w = cp.is_white
+        #     self.board.ponerPiezasAbajo(is_w)
+        #     self.board.set_side_indicator(is_w)
+        #     self.board.save_as_img(path, "png", is_alt=True)
+
     def siguiente_posicion(self):
         num_lineas_posicion = len(self.li_lineas_posicion)
         while True:

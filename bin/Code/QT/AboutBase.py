@@ -1,4 +1,3 @@
-# -*- coding: latin-1 -*-
 import os
 import random
 
@@ -118,8 +117,8 @@ class ThanksTo:
             "Giovanni di Maria",
             "vga",
             "Remes",
-            "Péter Rabi",
-            "Iñaki Rodriguez",
+            "PÃ©ter Rabi",
+            "IÃ±aki Rodriguez",
         ]
         li_resto = ["Immortalchess forum"]
         txt += version(11, li_base, li_resto)
@@ -143,7 +142,7 @@ class ThanksTo:
             "Laudecir Daniel",
             "Reinhard",
             "Giovanni di Maria",
-            "Filomeno Marmalé",
+            "Filomeno MarmalÃ©",
             "Max Aloyau",
         ]
         li_resto = ["Chessindia forum", "Immortalchess forum"]
@@ -167,7 +166,7 @@ class ThanksTo:
             "bbbaro25us",
             "Victor Perez",
             "M.Larson",
-            "Filomeno Marmalé",
+            "Filomeno MarmalÃ©",
             "Shahin Jafarli (shahinjy)",
             "Heikki Junes",
             "Toan Luong",
@@ -189,9 +188,9 @@ class ThanksTo:
             "Felicia",
             "Shahin Jafarli (shahinjy)",
             "Alfons",
-            "Raúl Giorgi",
+            "RaÃºl Giorgi",
             "Red Hood",
-            "Filomeno Marmalé",
+            "Filomeno MarmalÃ©",
             "Roberto Mizzoni",
             "bolokay",
             "Istolacio",
@@ -199,10 +198,10 @@ class ThanksTo:
             "Rui Grafino",
             "Georg Pfefferle",
             "Lolo S.",
-            "Joaquín Alvarez",
+            "JoaquÃ­n Alvarez",
             "Ransith Fernando",
         ]
-        li_resto = ["Gianfranco Cutipa", "Daniel Trebejo", "Jose Luis García", "Carmen Martínez"]  # "Ezequiel Canario"
+        li_resto = ["Gianfranco Cutipa", "Daniel Trebejo", "Jose Luis GarcÃ­a", "Carmen MartÃ­nez"]  # "Ezequiel Canario"
         txt += version("1..7", li_base, li_resto, False)
 
         txt += self.dl_end()
@@ -253,7 +252,7 @@ class ThanksTo:
             ("SnowIsh SVG", "Saki", "http://gnome-look.org/content/show.php/SnowIsh+SVG+%26+PNG?content=32599", "GPL"),
             (
                 "Cartoon animal icons",
-                "Martin Bérubé",
+                "Martin BÃ©rubÃ©",
                 "http://www.how-to-draw-funny-cartoons.com/",
                 "Free for personal non-commercial use",
             ),
@@ -263,7 +262,7 @@ class ThanksTo:
                 "http://www.icons-land.com/vista-icons-transport-icon-set.php",
                 "Icons-Land Demo License Agreement",
             ),
-            ("Figurines", "Armando H. Marroquín", "http://www.enpassant.dk/chess/fonteng.htm", _("Freeware")),
+            ("Figurines", "Armando H. MarroquÃ­n", "http://www.enpassant.dk/chess/fonteng.htm", _("Freeware")),
             (
                 "Icons for Windows8",
                 "Icons8",
@@ -382,7 +381,7 @@ class ThanksTo:
             ),
             (
                 "Magnetic-Leipzig<br>AlfonsoX-Maya<br>Condal",
-                '<a href="http://www.enpassant.dk/chess/fonteng.htm">Armando H. Marroquín</a>',
+                '<a href="http://www.enpassant.dk/chess/fonteng.htm">Armando H. MarroquÃ­n</a>',
                 _("Freeware"),
             ),
             ("Chess Pirat", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Klaus Wolf</a>', _("Freeware")),
@@ -394,7 +393,7 @@ class ThanksTo:
             ),
             (
                 "Cartoon",
-                '<a href="http://www.how-to-draw-funny-cartoons.com">Based on work by <br>Martin Bérubé</a>',
+                '<a href="http://www.how-to-draw-funny-cartoons.com">Based on work by <br>Martin BÃ©rubÃ©</a>',
                 _("Free for personal non-commercial use"),
             ),
             (
@@ -414,7 +413,7 @@ class ThanksTo:
                 _("Permission of author"),
             ),
             (
-                "Book Diagram<br>Book Engraved<br>Book Good Companions<br>Book Leipzig",
+                "Book Classic<br>Book Diagram",
                 '<a href="https://www.linkedin.com/in/benjamin-citak-04982714">Ben Citak</a>',
                 _("Permission of author"),
             ),

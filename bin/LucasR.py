@@ -8,7 +8,9 @@ import sys
 
 import Code.Translate as Translate
 
+
 Translate.install()
+
 
 n_args = len(sys.argv)
 

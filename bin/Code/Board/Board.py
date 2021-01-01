@@ -22,7 +22,7 @@ from Code.Director import TabVisual, WindowDirector
 from Code import Util
 import Code
 from Code.Base.Constantes import *
-import Code.QT.WindowColores as WindowColores
+import Code.QT.WindowColors as WindowColores
 
 
 class RegKB:
@@ -119,18 +119,18 @@ class Board(QtWidgets.QGraphicsView):
                 return
 
         is_alt = (flags & QtCore.Qt.AltModifier) > 0
-        siCtrl = (flags & QtCore.Qt.ControlModifier) > 0
+        is_ctrl = (flags & QtCore.Qt.ControlModifier) > 0
 
         okseguir = False
 
-        if is_alt or siCtrl:
+        if is_alt or is_ctrl:
 
             # CTRL-C : copy fen al clipboard
-            if siCtrl and key == Qt.Key_C:
+            if is_ctrl and key == Qt.Key_C:
                 QTUtil.ponPortapapeles(self.last_position.fen())
                 QTUtil2.message_bold(self, _("FEN is in clipboard"))
 
-            if siCtrl and (key in (Qt.Key_Plus, Qt.Key_Minus)):
+            if is_ctrl and (key in (Qt.Key_Plus, Qt.Key_Minus)):
                 ap = self.config_board.anchoPieza()
                 ap += 2 *(1 if key == Qt.Key_Plus else -1)
                 if ap >= 10:
@@ -145,7 +145,7 @@ class Board(QtWidgets.QGraphicsView):
 
             # ALT-I Save image to clipboard (CTRL->no border)
             elif key == Qt.Key_I:
-                self.salvaEnImagen(siCtrl=siCtrl, is_alt=is_alt)
+                self.save_as_img(is_ctrl=is_ctrl, is_alt=is_alt)
                 QTUtil2.mensajeTemporal(self.main_window, _("Board image is in clipboard"), 1.2)
 
             # ALT-J Save image to file (CTRL->no border)
@@ -154,7 +154,7 @@ class Board(QtWidgets.QGraphicsView):
                     self, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
                 )
                 if path:
-                    self.salvaEnImagen(path, "png", siCtrl=siCtrl, is_alt=is_alt)
+                    self.save_as_img(path, "png", is_ctrl=is_ctrl, is_alt=is_alt)
                     self.configuration.x_save_folder = os.path.dirname(path)
                     self.configuration.graba()
 
@@ -1812,7 +1812,7 @@ class Board(QtWidgets.QGraphicsView):
         if self.exePulsadaLetra:
             self.exePulsadaLetra(siActivar, letra)
 
-    def salvaEnImagen(self, file=None, tipo=None, siCtrl=False, is_alt=False):
+    def save_as_img(self, file=None, tipo=None, is_ctrl=False, is_alt=False):
         actInd = actScr = False
         if self.indicadorSC_menu:
             if self.indicadorSC_menu.isVisible():
@@ -1823,19 +1823,19 @@ class Board(QtWidgets.QGraphicsView):
                 actScr = True
                 self.scriptSC_menu.hide()
 
-        if is_alt and not siCtrl:
+        if is_alt and not is_ctrl:
             pm = QtGui.QPixmap.grabWidget(self)
         else:
             x = 0
             y = 0
             w = self.width()
             h = self.height()
-            if siCtrl and not is_alt:
+            if is_ctrl and not is_alt:
                 x = self.tamFrontera
                 y = self.tamFrontera
                 w -= self.tamFrontera * 2 + 2
                 h -= self.tamFrontera * 2 + 2
-            elif is_alt and siCtrl:
+            elif is_alt and is_ctrl:
                 x += self.margenCentro
                 y += self.margenCentro
                 w -= self.margenCentro * 2

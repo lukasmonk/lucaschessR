@@ -12,6 +12,9 @@ class WAbout(QtWidgets.QDialog):
     def __init__(self, procesador):
         super(WAbout, self).__init__(procesador.main_window)
 
+        # gen_web_bootstrap()
+
+
         self.setWindowTitle(_("About"))
         self.setWindowIcon(Iconos.Aplicacion64())
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
@@ -19,24 +22,13 @@ class WAbout(QtWidgets.QDialog):
 
         f = Controles.TipoLetra(puntos=10)  # 0, peso=75 )
 
-        head = (
-            '<span style="font-size:30pt; font-weight="700"; font-family:arial; color:#2D2B2B">%s</span><br>'
-            % Code.lucas_chess
-        )
+        head = '<span style="font-size:30pt; font-weight="700"; font-family:arial; color:#2D2B2B">%s</span><br>' % Code.lucas_chess
         head += '<span style="font-size:15pt;">%s</span><br>' % _X(_("version %1"), procesador.version)
-        head += '<span style="font-size:10pt;color:2D2B2B">%s: %s</span>' % (
-            _("Author"),
-            '<a href="mailto:lukasmonk@gmail.com">Lucas Monge</a>',
-        )
+        head += '<span style="font-size:10pt;color:2D2B2B">%s: %s</span>' % (_("Author"), '<a href="mailto:lukasmonk@gmail.com">Lucas Monge</a>')
         head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">%s</a>' % (procesador.web, procesador.web)
         head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Blog : Fresh news</a>' % (procesador.blog,)
-        head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Sources: github</a><br>' % (
-            procesador.github,
-        )
-        head += (
-            '%s <a style="font-size:10pt; color:2D2B2B" href="http://www.gnu.org/copyleft/gpl.html"> GPL</a>'
-            % _("License")
-        )
+        head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Sources: github</a><br>' % (procesador.github,)
+        head += '%s <a style="font-size:10pt; color:2D2B2B" href="http://www.gnu.org/copyleft/gpl.html"> GPL</a>' % _("License")
 
         lb_ico = Controles.LB(self).ponImagen(Iconos.pmAplicacion64())
         lb_titulo = Controles.LB(self, head)
@@ -48,7 +40,7 @@ class WAbout(QtWidgets.QDialog):
         ib = AboutBase.ThanksTo()
 
         sub_tab = None
-        for n, (k, titulo) in enumerate(ib.dic.items()):
+        for k, titulo in ib.dic.items():
             txt = ib.texto(k)
             lb = Controles.LB(self, txt)
             lb.set_background("#F6F3EE")
@@ -71,6 +63,106 @@ class WAbout(QtWidgets.QDialog):
 
         self.setLayout(layout)
 
+#
+# def gen_web_bootstrap():
+#     """
+#     <nav>
+#   <div class="nav nav-tabs" id="nav-tab" role="tablist">
+#     <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Home</a>
+#     <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</a>
+#     <a class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a>
+#   </div>
+# </nav>
+# <div class="tab-content" id="nav-tabContent">
+#   <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">...</div>
+#   <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">...</div>
+#   <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">...</div>
+# </div>
+#     """
+#     ib = AboutBase.ThanksTo()
+#
+#     dic = ib.dic
+#
+#     with open(r"c:\lucaschess\_WEB_R\mysite\templates\Thanksto.html", "wt", encoding="utf-8") as q:
+#
+#         li = ['{% extends "base.html" %}',
+#               '{% block contenido %}',
+#               "<nav>",
+#               '<div class="nav nav-tabs" id="nav-tab" role="tablist">'
+#               ]
+#         first = True
+#         for clave, rotulo in dic.items():
+#             if first:
+#                 first = False
+#                 active = " active"
+#                 selected = "true"
+#             else:
+#                 active = ""
+#                 selected = "false"
+#
+#             # engines
+#             if "-" in clave:
+#                 if not clave.endswith("-1"):
+#                     continue
+#                 clave = clave[:-2]
+#                 rotulo = rotulo[:-2]
+#             html = (
+#                 '<a class="nav-link%s" id="nav-%s-tab" '
+#                 'data-bs-toggle="tab" href="#nav-%s" role="tab" '
+#                 'aria-controls="nav-%s" aria-selected="%s"><h5 class="mb-0 text-secondary">{{_("%s")}}</h5></a>' % (active, clave, clave, clave, selected, rotulo)
+#             )
+#             li.append(html)
+#
+#         li.extend(["</div>", "</nav>", "<br>"])
+#
+#         li.append('<div class="tab-content" id="nav-tabContent">')
+#         first = True
+#         for clave, rotulo in dic.items():
+#             if first:
+#                 first = False
+#                 active = " show active"
+#             else:
+#                 active = ""
+#
+#             # engines
+#             if "-" in clave:
+#                 if not clave.endswith("-1"):
+#                     continue
+#                 clave = clave[:-2]
+#                 li_eng_txt = []
+#                 li_eng_txt.append('<table class="table table-bordered">')
+#                 li_eng_txt.append('<tr>')
+#                 li_eng_txt.append('<th></th>')
+#                 li_eng_txt.append('<th>{{_("Engine")}}</th>')
+#                 li_eng_txt.append('<th>{{_("Author")}}</th>')
+#                 li_eng_txt.append('<th>{{_("Web")}}</th>')
+#                 li_eng_txt.append('</tr>')
+#
+#                 li_eng = Code.configuration.list_engines(si_externos=False)
+#                 li_eng.sort(key=lambda xt: xt[0])
+#                 # for n, x in enumerate(li_eng, 1):
+#                 #     x[0] = "%d. %s" % (n, x[0])
+#
+#                 for pos, (name, autor, url) in enumerate(li_eng, 1):
+#                     li_eng_txt.append("<tr>")
+#                     li_eng_txt.append("<td>%02d</td>" % pos)
+#                     li_eng_txt.append("<td>%s</td>" % name)
+#                     li_eng_txt.append("<td>%s</td>" % autor)
+#                     li_eng_txt.append('<td><a href="%s">%s</a></td>' % (url, url))
+#                     li_eng_txt.append("</tr>")
+#                 li_eng_txt.append('</table>')
+#                 txt = "\n".join(li_eng_txt)
+#             else:
+#                 txt = ib.texto(clave)
+#
+#             html = '<div class="tab-pane fade%s" id="nav-%s" role="tabpanel" aria-labelledby="nav-%s-tab">%s</div>' % (active, clave, clave, txt)
+#             li.append(html)
+#
+#         li.append("</div>")
+#         li.append("{% endblock contenido %}")
+#
+#         q.write("\n".join(li))
+#
 
 class WInfo(QtWidgets.QDialog):
     def __init__(self, wparent, titulo, head, txt, min_tam, pm_icon):

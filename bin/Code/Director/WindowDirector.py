@@ -125,15 +125,15 @@ class WPanelDirector(QTVarios.WDialogo):
             self.owner.setChange(False)
             self.board.disable_all()
 
-    def funcion(self, number, siCtrl=False):
+    def funcion(self, number, is_ctrl=False):
         if number == 9:
-            if siCtrl:
+            if is_ctrl:
                 self.selectBanda.seleccionar(None)
             else:
                 self.addText()
-        elif number == 0 and siCtrl:  # Ctrl+F1
+        elif number == 0 and is_ctrl:  # Ctrl+F1
             self.borraUltimo()
-        elif number == 1 and siCtrl:  # Ctrl+F2
+        elif number == 1 and is_ctrl:  # Ctrl+F2
             self.borraTodos()
         else:
             self.selectBanda.seleccionarNum(number)
@@ -675,7 +675,7 @@ class WPanelDirector(QTVarios.WDialogo):
         self.terminar()
 
     def portapapeles(self):
-        self.board.salvaEnImagen()
+        self.board.save_as_img()
         txt = _("Clipboard")
         QTUtil2.mensajeTemporal(self, _X(_("Saved to %1"), txt), 0.8)
 
@@ -683,7 +683,7 @@ class WPanelDirector(QTVarios.WDialogo):
         dirSalvados = self.configuration.x_save_folder
         resp = QTUtil2.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PNG (*.png)", False)
         if resp:
-            self.board.salvaEnImagen(resp, "png")
+            self.board.save_as_img(resp, "png")
             txt = resp
             QTUtil2.mensajeTemporal(self, _X(_("Saved to %1"), txt), 0.8)
             direc = os.path.dirname(resp)
@@ -863,12 +863,12 @@ class WPanelDirector(QTVarios.WDialogo):
         self.creaTarea("P", None, from_sq + to_sq, -1)
         self.board.muevePieza(from_sq, to_sq)
 
-    def boardPress(self, event, origin, siRight, is_shift, is_alt, siCtrl):
+    def boardPress(self, event, origin, siRight, is_shift, is_alt, is_ctrl):
         if origin:
             if not siRight:
                 lb_sel = self.selectBanda.seleccionada
             else:
-                if siCtrl:
+                if is_ctrl:
                     if is_alt:
                         pos = 4
                     elif is_shift:
@@ -991,8 +991,8 @@ class Director:
         if QtCore.Qt.Key_F1 <= k <= QtCore.Qt.Key_F10:
             f = k - QtCore.Qt.Key_F1
             m = int(event.modifiers())
-            siCtrl = (m & QtCore.Qt.ControlModifier) > 0
-            self.w.funcion(f, siCtrl)
+            is_ctrl = (m & QtCore.Qt.ControlModifier) > 0
+            self.w.funcion(f, is_ctrl)
             return True
         else:
             return False
@@ -1002,7 +1002,7 @@ class Director:
         p = event.pos()
         a1h8 = self.punto2a1h8(p)
         m = int(event.modifiers())
-        siCtrl = (m & QtCore.Qt.ControlModifier) > 0
+        is_ctrl = (m & QtCore.Qt.ControlModifier) > 0
         is_shift = (m & QtCore.Qt.ShiftModifier) > 0
         is_alt = (m & QtCore.Qt.AltModifier) > 0
 
@@ -1047,7 +1047,7 @@ class Director:
         if self.director:
             return self.mousePressEvent_Drop(event)
 
-        self.w.boardPress(event, a1h8, siRight, is_shift, is_alt, siCtrl)
+        self.w.boardPress(event, a1h8, siRight, is_shift, is_alt, is_ctrl)
 
         return True
 

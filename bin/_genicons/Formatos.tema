@@ -149,17 +149,11 @@ Motor_No silk delete.png
 Motor_Actual silk accept.png
 Motor silk cog.png
 
-#           MoverInicio silk control_start.png
 MoverInicio windows8 icons8_Skip_to_Start_16px.png
-#           MoverFinal silk control_end.png
 MoverFinal windows8 icons8_End_16px.png
-#           MoverAdelante silk control_fastforward.png
 MoverAdelante windows8 icons8_Fast_Forward_16px.png
-#           MoverAtras silk control_rewind.png
 MoverAtras windows8 icons8_Rewind_16px.png
-#           MoverLibre silk control_eject.png
 MoverLibre windows8 icons8_tree_structure_16px.png
-#           MoverTiempo silk clock.png
 MoverTiempo windows8 icons8_Restart_16px.png
 MoverMas nuvola viewmagfit.png
 MoverGrabar silk comment_edit.png

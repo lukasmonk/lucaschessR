@@ -112,7 +112,6 @@ class Entrenamientos:
         menu.separador()
         menu_basic = menu.submenu(_("Basics"), Iconos.Training_Basic())
 
-        # menu1 = menu.submenu(_("Resources for zebras"), Iconos.Cebra())
         menu2 = menu_basic.submenu(_("Check your memory on a chessboard"), Iconos.Memoria())
 
         mem = Memory.Memoria(self.procesador)
@@ -183,8 +182,6 @@ class Entrenamientos:
         menu_openings = menu.submenu(_("Openings"), Iconos.Openings())
         menu_openings.separador()
         xopcion(menu_openings, "train_book", _("Training with a book"), Iconos.Libros())
-
-
 
     def create_menu_games(self, menu, xopcion):
         menu.separador()
@@ -274,7 +271,29 @@ class Entrenamientos:
 
         xopcion(menu_tactics, "potencia", _("Determine your calculating power"), Iconos.Potencia())
         menu_tactics.separador()
-        xopcion(menu_tactics, "tol_oneline", _("Turn on lights in one line"), Iconos.TOLline())
+        # TOL
+        menu_tactics.separador()
+        menu2 = menu_tactics.submenu(_("Turn on the lights"), Iconos.TOL())
+        menu.separador()
+        menu3 = menu2.submenu(_("Memory mode"), Iconos.TOL())
+        xopcion(menu3, "tol_uned_easy", "%s (%s)" % (_("UNED chess school"), _("Initial")), Iconos.Uned())
+        menu3.separador()
+        xopcion(menu3, "tol_uned", "%s (%s)" % (_("UNED chess school"), _("Complete")), Iconos.Uned())
+        menu3.separador()
+        xopcion(menu3, "tol_uwe_easy", "%s (%s)" % (_("Uwe Auerswald"), _("Initial")), Iconos.Uwe())
+        menu3.separador()
+        xopcion(menu3, "tol_uwe", "%s (%s)" % (_("Uwe Auerswald"), _("Complete")), Iconos.Uwe())
+        menu2.separador()
+        menu3 = menu2.submenu(_("Calculation mode"), Iconos.Calculo())
+        xopcion(menu3, "tol_uned_easy_calc", "%s (%s)" % (_("UNED chess school"), _("Initial")), Iconos.Uned())
+        menu3.separador()
+        xopcion(menu3, "tol_uned_calc", "%s (%s)" % (_("UNED chess school"), _("Complete")), Iconos.Uned())
+        menu3.separador()
+        xopcion(menu3, "tol_uwe_easy_calc", "%s (%s)" % (_("Uwe Auerswald"), _("Initial")), Iconos.Uwe())
+        menu3.separador()
+        xopcion(menu3, "tol_uwe_calc", "%s (%s)" % (_("Uwe Auerswald"), _("Complete")), Iconos.Uwe())
+        menu2.separador()
+        xopcion(menu2, "tol_oneline", _("Turn on lights in one line"), Iconos.TOLline())
 
     def create_menu_endings(self, menu, xopcion):
         menu.separador()
@@ -305,27 +324,6 @@ class Entrenamientos:
         # Everest
         menu_long.separador()
         xopcion(menu_long, "everest", _("Expeditions to the Everest"), Iconos.Trekking())
-        # TOL
-        menu_long.separador()
-        menu2 = menu_long.submenu(_("Turn on the lights"), Iconos.TOL())
-        menu.separador()
-        menu3 = menu2.submenu(_("Memory mode"), Iconos.TOL())
-        xopcion(menu3, "tol_uned_easy", "%s (%s)" % (_("UNED chess school"), _("Initial")), Iconos.Uned())
-        menu3.separador()
-        xopcion(menu3, "tol_uned", "%s (%s)" % (_("UNED chess school"), _("Complete")), Iconos.Uned())
-        menu3.separador()
-        xopcion(menu3, "tol_uwe_easy", "%s (%s)" % (_("Uwe Auerswald"), _("Initial")), Iconos.Uwe())
-        menu3.separador()
-        xopcion(menu3, "tol_uwe", "%s (%s)" % (_("Uwe Auerswald"), _("Complete")), Iconos.Uwe())
-        menu2.separador()
-        menu3 = menu2.submenu(_("Calculation mode"), Iconos.Calculo())
-        xopcion(menu3, "tol_uned_easy_calc", "%s (%s)" % (_("UNED chess school"), _("Initial")), Iconos.Uned())
-        menu3.separador()
-        xopcion(menu3, "tol_uned_calc", "%s (%s)" % (_("UNED chess school"), _("Complete")), Iconos.Uned())
-        menu3.separador()
-        xopcion(menu3, "tol_uwe_easy_calc", "%s (%s)" % (_("Uwe Auerswald"), _("Initial")), Iconos.Uwe())
-        menu3.separador()
-        xopcion(menu3, "tol_uwe_calc", "%s (%s)" % (_("Uwe Auerswald"), _("Complete")), Iconos.Uwe())
         # Washing
         menu_long.separador()
         xopcion(menu_long, "washing_machine", _("The Washing Machine"), Iconos.WashingMachine())
@@ -352,11 +350,6 @@ class Entrenamientos:
         self.create_menu_endings(menu, xopcion)
         self.create_menu_long(menu, xopcion)
 
-
-
-        # Longs ----------------------------------------------------------------------------------------
-
-        # Cebras ---------------------------------------------------------------------------------------------------
         return menu, dicMenu
 
     def check(self):

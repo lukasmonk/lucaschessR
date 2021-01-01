@@ -185,11 +185,9 @@ class ManagerOpeningEngines(Manager.Manager):
                 si_pensar = False
 
         if si_pensar:
-            move = None
+            move = self.dbop.get_cache_engines(self.keyengine, self.time, fenm2)
             if self.book:
                 move = self.book.eligeJugadaTipo(self.game.last_position.fen(), self.book.mode)
-            if not move:
-                move = self.dbop.get_cache_engines(self.keyengine, self.time, fenm2)
             if not move:
                 rm_rival = self.xrival.juegaPartida(self.game)
                 move = rm_rival.movimiento()
@@ -449,7 +447,7 @@ class ManagerOpeningEngines(Manager.Manager):
             if self.auto_analysis:
                 si_suspendido = self.run_auto_analysis()
             else:
-                si_suspendido = true
+                si_suspendido = True
             self.mensEspera(siFinal=True)
             if si_suspendido:
                 suspendido()

@@ -56,7 +56,7 @@ def update(current_version, main_window):
     mens_error = None
 
     try:
-        f = urllib.urlopen(WEBUPDATES)
+        f = urllib.request.urlopen(WEBUPDATES)
         for x in f:
             act = x.strip()
             if not act.startswith("#"):  # Comentarios
@@ -93,7 +93,7 @@ def update(current_version, main_window):
 def test_update(current_version, procesador):
     nresp = 0
     try:
-        f = urllib.urlopen(WEBUPDATES)
+        f = urllib.request.urlopen(WEBUPDATES)
         for x in f:
             act = x.strip()
             if not act.startswith("#"):  # Comentarios

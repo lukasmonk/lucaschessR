@@ -1526,10 +1526,10 @@ class Manager:
                     False,
                 )
                 if resp:
-                    self.board.salvaEnImagen(resp, "png")
+                    self.board.save_as_img(resp, "png")
 
             else:
-                self.board.salvaEnImagen()
+                self.board.save_as_img()
 
         elif resp == "lcsbfichero":
             self.save_lcsb()
