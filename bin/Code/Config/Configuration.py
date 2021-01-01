@@ -173,7 +173,7 @@ class Configuration:
         self.user = user
         self.set_folders()
 
-        self.is_main = user == ""
+        self.is_main = user == "" or user is None
 
         self.version = ""
 

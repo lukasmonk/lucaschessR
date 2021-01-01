@@ -153,7 +153,7 @@ class Procesador:
         self.entrenamientos = Trainings.Entrenamientos(self)
 
         if self.configuration.x_check_for_update:
-            Update.test_update(self.version, self)
+            Update.test_update(self)
 
         if len(sys.argv) > 1:
             comando = sys.argv[1]
@@ -1074,7 +1074,7 @@ class Procesador:
         w.exec_()
 
     def actualiza(self):
-        if Update.update(self.version, self.main_window):
+        if Update.update(self.main_window):
             self.reiniciar()
 
     def unMomento(self, mensaje=None):

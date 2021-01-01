@@ -2,6 +2,7 @@ import shutil
 import urllib.request
 import zipfile
 
+import Code
 from Code.QT import QTUtil2
 from Code import Util
 
@@ -51,29 +52,27 @@ def update_file(titulo, urlfichero, tam):
     return True
 
 
-def update(current_version, main_window):
-    num_act = 0
+def update(main_window):
+    # version = "R 1.01 -> R01.01 -> 01.01 -> 0101 -> bytes
+    current_version = Code.VERSION.replace(" ", "0").replace(".", "")[1:].encode()
+    base_version = Code.BASE_VERSION.encode()
     mens_error = None
+    done_update = False
 
     try:
         f = urllib.request.urlopen(WEBUPDATES)
-        for x in f:
-            act = x.strip()
-            if not act.startswith("#"):  # Comentarios
-                li = act.split(" ")
-                # version urlfichero tama_o
-                if len(li) == 3 and li[2].isdigit():
-                    version, urlfichero, tam = li
-                    current_major = current_version.split(".")[0]
-                    version_major = version.split(".")[0]
-                    if current_major == version_major:
+        for blinea in f:
+            act = blinea.strip()
+            if act and not act.startswith(b"#"):  # Comentarios
+                li = act.split(b" ")
+                if len(li) == 4 and li[3].isdigit():
+                    base, version, urlfichero, tam = li
+                    if base == base_version:
                         if current_version < version:
-                            if update_file(_X(_("version %1"), version), urlfichero, int(tam)):
-                                current_version = version
-                            else:
+                            if not update_file(_X(_("version %1"), version.decode()), urlfichero.decode(), int(tam)):
                                 mens_error = _X(_("An error has occurred during the upgrade to version %1"), version)
-                                break
-                            num_act += 1
+                            else:
+                                done_update = True
 
         f.close()
     except:
@@ -83,27 +82,26 @@ def update(current_version, main_window):
         QTUtil2.message_error(main_window, mens_error)
         return False
 
-    if num_act == 0:
+    if not done_update:
         QTUtil2.message_bold(main_window, _("There are no pending updates"))
         return False
 
     return True
 
 
-def test_update(current_version, procesador):
+def test_update(procesador):
+    current_version = Code.VERSION.replace(" ", "0").replace(".", "")[1:].encode()
+    base_version = Code.BASE_VERSION.encode()
     nresp = 0
     try:
         f = urllib.request.urlopen(WEBUPDATES)
-        for x in f:
-            act = x.strip()
-            if not act.startswith("#"):  # Comentarios
-                li = act.split(" ")
-                # version urlfichero tama_o
-                if len(li) == 3 and li[2].isdigit():
-                    version, urlfichero, tam = li
-                    current_major = current_version.split(".")[0]
-                    version_major = version.split(".")[0]
-                    if current_major == version_major:
+        for blinea in f:
+            act = blinea.strip()
+            if act and not act.startswith(b"#"):  # Comentarios
+                li = act.split(b" ")
+                if len(li) == 4 and li[3].isdigit():
+                    base, version, urlfichero, tam = li
+                    if base == base_version:
                         if current_version < version:
                             nresp = QTUtil2.preguntaCancelar123(
                                 procesador.main_window,
