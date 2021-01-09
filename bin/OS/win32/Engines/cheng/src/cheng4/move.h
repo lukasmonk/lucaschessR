@@ -184,8 +184,8 @@ struct MovePack
 	}
 
 	// convert to UCI move (doesn't add null terminator)
-	static char *toUCI( char *dst, Move m, bool frc = 0 );
-	static std::string toUCI( Move m, bool frc = 0 );
+	static char *toUCI( char *dst, Move m );
+	static std::string toUCI( Move m );
 	// from UCI move
 	static Move fromUCI( const std::string &str );
 	static Move fromUCI( const char *&ptr );

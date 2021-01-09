@@ -116,7 +116,7 @@ class WKibLinea(QtWidgets.QDialog):
                     game = Game.Game(ini_posicion=self.game.last_position)
                     game.read_pv(rm.pv)
                     if len(game):
-                        self.em.ponHtml(game.pgnBaseRAW())
+                        self.em.ponHtml("[%02d] %s | %s" % (rm.depth, rm.abrTexto(), game.pgnBaseRAW()))
 
                 QTUtil.refresh_gui()
 

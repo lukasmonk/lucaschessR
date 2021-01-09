@@ -77,7 +77,8 @@ bool TransTable::resize( size_t sizeBytes )
 		dummyAlloc();
 		return 1;
 	}
-	if ( !roundPow2( sizeEntries ) )
+	// new: always round down, this fixes CECP memory command problems
+	if ( !roundPow2( sizeEntries, 1 ) )
 		return 0;					// bad size
 	if ( size == sizeEntries )
 		return 1;
@@ -99,7 +100,7 @@ bool TransTable::resize( size_t sizeBytes )
 Score TransTable::probe( Signature sig, Ply ply, Depth depth, Score alpha, Score beta, Move &mv, TransEntry &lte ) const
 {
 	mv = mcNone;
-	size_t ei = ((size_t)sig & (size-1) & ~(buckets-1));
+	size_t ei = ((size_t)sig & (size-1) & ~(size_t)(buckets-1));
 	const TransEntry *te = entries + ei;
 	for ( uint i=0; i<buckets; i++, te++)
 	{
@@ -162,7 +163,7 @@ void TransTable::store( Signature sig, Age age, Move move, Score score, HashBoun
 	assert( ScorePack::isValid(score) );
 	assert( score != -scInfinity );
 
-	size_t ei = ((size_t)sig & (size-1) & ~(buckets-1));
+	size_t ei = ((size_t)sig & (size-1) & ~(size_t)(buckets-1));
 	TransEntry *te = entries + ei;
 	TransEntry *be = 0;				// best entry
 	i32 beScore = -0x7fffffff;
@@ -184,7 +185,7 @@ void TransTable::store( Signature sig, Age age, Move move, Score score, HashBoun
 		}
 		// replace based on depth and age
 		// FIXME: better?
-		i32 escore = ((i32)depth-lte.u.s.depth)*2 + ((Age)(lte.u.s.bound & 0xfc) != age) * 256 -
+		i32 escore = (-lte.u.s.depth)*2 + ((Age)(lte.u.s.bound & 0xfc) != age) * 256 -
 			((lte.u.s.bound & 3) == btExact);
 		if ( escore > beScore )
 		{

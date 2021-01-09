@@ -34,18 +34,12 @@ namespace cheng4
 bool isPow2( size_t sz )
 {
 	size_t tmp = sz;
-	while ( tmp < sz )
-	{
-		size_t otmp = tmp;
-		tmp <<= 1;
-		if ( tmp < otmp )
-			return 0;			// overflow
-	}
+	roundPow2(tmp);
 	return tmp == sz;
 }
 
 // round size to nearest power of two
-bool roundPow2( size_t &sz )
+bool roundPow2( size_t &sz, bool down )
 {
 	size_t tmp = 1;
 	while ( tmp < sz )
@@ -55,6 +49,8 @@ bool roundPow2( size_t &sz )
 		if ( tmp < otmp )
 			return 0;			// overflow
 	}
+	if ( down && tmp > sz )
+		tmp >>= 1;
 	sz = tmp;
 	return 1;
 }

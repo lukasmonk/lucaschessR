@@ -27,7 +27,7 @@ class ManagerChallenge101:
 
         fmt = Code.path_resource("IntFiles", "tactic0.bm")
 
-        with open(fmt) as f:
+        with open(fmt, "rt", encoding="utf-8", errors="ignore") as f:
             self.li_lineas_posicion = [linea for linea in f if linea.strip()]
 
         self.siguiente_posicion()

@@ -18,7 +18,7 @@ class SingularMoves:
         self.db_keys = self.db.keys(si_ordenados=True, si_reverse=True)
 
     def lee(self, fichero_tactic):
-        with open(fichero_tactic) as f:
+        with open(fichero_tactic, "rt", encoding="utf-8", errors="ignore") as f:
             dic = {}
             for xdif in "12345":
                 dic[xdif] = []

@@ -101,6 +101,11 @@ bool FilterPgn::parse(const char *fname)
 				parseRes = 0;
 				break;
 			}
+
+			// parse FEN if provided, necessary for chess960
+			if (key == "FEN" && !game.board.fromFEN(value.c_str()))
+				fprintf(stderr, "invalid FEN: %s\n", value.c_str());
+
 			// we're only interested in result so far
 			if (key == "Result")
 			{
@@ -148,7 +153,12 @@ bool FilterPgn::parse(const char *fname)
 		// so we assume a move goes here
 		Move m = game.board.fromSAN(ls.ptr);
 		if (m == mcNone)
+		{
+			// illegal move
+			fprintf(stderr, "!");
+			getChar();
 			continue;
+		}
 		// we got a legal move here...
 		bool ischeck = game.board.isCheck(m, game.board.discovered());
 		UndoInfo ui;

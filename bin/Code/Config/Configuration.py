@@ -37,8 +37,8 @@ def toolbutton_int(qt_tbi):
 
 def active_folder():
     if os.path.isfile(LCFILEFOLDER):
-        with open(LCFILEFOLDER, "wt") as f:
-            x = f.read().strip()
+        with open(LCFILEFOLDER, "rt") as f:
+            x = f.read()
             if os.path.isdir(x):
                 return x
     return LCBASEFOLDER

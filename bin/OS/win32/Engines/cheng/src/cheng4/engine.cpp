@@ -84,6 +84,7 @@ void Engine::init( int npar, const char **par )
 	KPK::init();
 	Eval::init();
 	Search::init();
+	extractFeatures();
 #ifdef USE_TUNING
 	// pass parameters:
 	for (int i=0; i<npar; i+=2)
@@ -482,6 +483,12 @@ void Engine::setLimit( bool limit )
 void Engine::setElo( u32 elo )
 {
 	mainThread->search.setMaxElo( elo );
+}
+
+// set contempt
+void Engine::setContempt( Score contempt )
+{
+	mainThread->search.setContempt( contempt );
 }
 
 // get opening book

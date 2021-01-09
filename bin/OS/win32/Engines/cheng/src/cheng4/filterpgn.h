@@ -67,11 +67,11 @@ private:
 
 	inline int getChar()
 	{
-		return ls.ptr < ls.top ? *ls.ptr++ : -1;
+		return ls.ptr < ls.top ? (*ls.ptr++ & 255) : -1;
 	}
 	inline int peekChar() const
 	{
-		return ls.ptr < ls.top ? *ls.ptr : -1;
+		return ls.ptr < ls.top ? (*ls.ptr & 255) : -1;
 	}
 };
 

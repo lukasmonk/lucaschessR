@@ -69,10 +69,11 @@ const u8 Tables::seeValue[] = { 0, 1, 3, 3, 5, 9, 99 };
 const u8 Tables::npValue[] = { 0, 0, 3, 3, 5, 9, 0 };
 const int Tables::sign[ctMax] = {1, -1};
 // at least nonzero for king - safeguard
-const u8 Tables::mvvValue[ ptMax ] = { 1, 1, 2, 2, 3, 4, 1 };
-const u8 Tables::lvaValue[ ptMax ] = {0, 1, 2, 2, 3, 4, 0 };
-const Score Tables::gainPromo[ ptMax ] = { 0, 0, 225, 225, 400, 875, 0 };	// promotion score gain table
-const Score Tables::gainCap[ ptMax ] = { 100, 100, 325, 325, 500, 975, 0};	// capture score gain table
+const u8 Tables::mvvValue[ ptMax ] = { 1*8, 1*8, 2*8, 2*8, 3*8, 4*8, 1*8 };
+// lva reversed, added to mvvValue to get final sorting key
+const u8 Tables::lvaValue[ ptMax ] = {0, 5, 4, 4, 3, 2, 1 };
+Score Tables::gainPromo[ ptMax ] = { 0, 0, 225, 225, 400, 875, 0 };		// promotion score gain table
+Score Tables::gainCap[ ptMax ] = { 100, 100, 325, 325, 500, 975, 0};	// capture score gain table
 
 void Tables::init()
 {
@@ -88,13 +89,19 @@ void Tables::init()
 		if ( i < 256 )
 			popCount8[ i ] = (u8)bc;
 
+		lsBit16[i] = msBit16[i] = 255;
 		for (uint j=0; j<16; j++)
-		{
 			if ( i & (1<<j) )
+			{
 				lsBit16[i] = (u8)j;
+				break;
+			}
+		for (uint j=0; j<16; j++)
 			if ( i & (1<<(15-j)) )
+			{
 				msBit16[i] = (u8)(15-j);
-		}
+				break;
+			}
 	}
 
 	memset( noneShlTab, 255, sizeof(noneShlTab) );

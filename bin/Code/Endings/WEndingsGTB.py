@@ -392,7 +392,7 @@ class WEndingsGTB(QTVarios.WDialogo):
                 if not go_next:
                     QTUtil2.message_accept(self, _("Done"), explanation=mensaje)
             else:
-                QTUtil2.message_error(self, _("Failed attempt"))
+                QTUtil2.message_error(self, _("Failed attempt") + "\n\n" + self.game.label_termination())
 
             self.bt_movs.show()
             self.pos_game = len(self.game) - 1

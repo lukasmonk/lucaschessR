@@ -150,7 +150,7 @@ class ManagerGame(Manager.Manager):
             if self.ask_for_save_game():
                 self.with_previous_next("save", self.game)
             game1 = self.with_previous_next("previous" if key == TB_PREVIOUS else "next", self.game)
-            self.start(game1, self.is_complete, self.only_consult, self.with_previous_next)
+            self.start(game1, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
 
         else:
             Manager.Manager.rutinaAccionDef(self, key)

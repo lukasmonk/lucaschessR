@@ -833,6 +833,9 @@ class Game:
 
         return mensaje, beep, beep in (BEEP_WIN_PLAYER_TIME, BEEP_WIN_PLAYER)
 
+    def label_termination(self):
+        return DIC_LABELS_TERMINATION.get(self.termination, "")
+
     def shrink(self, until_move: int):
         self.li_moves = self.li_moves[:until_move+1]
 

@@ -44,20 +44,17 @@ static Square parseSquare( const char *&ptr )
 
 // MovePack
 
-std::string MovePack::toUCI( Move m, bool frc )
+std::string MovePack::toUCI( Move m )
 {
 	char buf[16];
-	*toUCI(buf, m, frc) = 0;
+	*toUCI(buf, m) = 0;
 	return buf;
 }
 
-char *MovePack::toUCI( char *dst, Move m, bool frc )
+char *MovePack::toUCI( char *dst, Move m )
 {
 	if ( m == mcNull || m == mcNone )
 		return scpy(dst, "0000");
-
-	if ( frc && isCastling(m) )
-		return SquarePack::file( MovePack::to(m) ) >= EFILE ? scpy(dst, "O-O") : scpy(dst, "O-O-O");
 
 	Square from = MovePack::from( m );
 	Square to = MovePack::to( m );

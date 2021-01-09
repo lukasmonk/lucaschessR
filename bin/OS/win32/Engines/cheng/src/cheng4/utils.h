@@ -33,7 +33,7 @@ namespace cheng4
 // returns true if input is power of two
 bool isPow2( size_t sz );
 // round size to nearest power of two
-bool roundPow2( size_t &sz );
+bool roundPow2( size_t &sz, bool down = 0 );
 // align pointer
 void *alignPtr( void *ptr, size_t align );
 // simple unsafe string copy (doesn't copy null terminator!)
@@ -42,5 +42,11 @@ char *scpy( char *dst, const char *src );
 void skipSpaces( const char *&ptr );
 // skip until EOL (and skip it too)
 void skipUntilEOL( const char *&ptr );
+
+template<typename T>
+inline T clamp(T val, T minv, T maxv)
+{
+	return val < minv ? minv : val > maxv ? maxv : val;
+}
 
 }

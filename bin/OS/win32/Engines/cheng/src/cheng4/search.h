@@ -48,6 +48,8 @@ struct SearchMode
 	bool fixedTime;							// fixed time per move
 
 	void reset();
+	// analyzing?
+	bool analyzing() const;
 };
 
 // extra search flags
@@ -114,8 +116,7 @@ struct Search
 	{
 		Move current;				// current move
 		Killer killers;				// killers
-		FracDepth reduction;		// reducing
-		u32 pad[2];					// pad structure to 32 bytes
+		u32 pad[3];					// pad structure to 32 bytes
 	};
 
 	Board board;					// board
@@ -157,6 +158,7 @@ struct Search
 									// defaults to 63
 	volatile bool eloLimit;			// elo limit master flag
 	volatile u32 maxElo;			// 2500 = full
+	volatile Score contemptFactor;	// contempt factor
 
 	Depth minQsDepth;				// min qsearch depth (limits qs explosions)
 
@@ -346,6 +348,9 @@ struct Search
 	// set maximum elo limit (2500 = full)
 	void setMaxElo( u32 elo );
 
+	// set contempt
+	void setContempt( Score contempt );
+
 	// enable timeout flag
 	void enableTimeOut( bool enable );
 
@@ -368,6 +373,8 @@ struct Search
 protected:
 	Search *master;							// SMP master
 	i32 initIteration();
+
+	static inline FracDepth lmrFormula(Depth depth, size_t lmrCount);
 };
 
 class LazySMPThread : public Thread

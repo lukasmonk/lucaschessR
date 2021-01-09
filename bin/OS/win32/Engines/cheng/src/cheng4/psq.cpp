@@ -22,8 +22,10 @@ or as public domain (where applicable)
 */
 
 #include "psq.h"
+#include "tables.h"
 #include <memory.h>
 #include <stdlib.h>
+#include <algorithm>
 
 namespace cheng4
 {
@@ -220,6 +222,16 @@ void PSq::init( u8 phase, Color color, Piece piece, const i16 * const material, 
 
 void PSq::init()
 {
+	// use values to initialize move gain tables (used by delta pruning in qs)
+	for (Piece p = ptPawn; p<=ptQueen; p++)
+		Tables::gainCap[p] = std::max(materialTables[phOpening][p], materialTables[phEndgame][p]);
+
+	// index 0 used by ep capture
+	Tables::gainCap[0] = Tables::gainCap[ptPawn];
+
+	for (Piece p = ptKnight; p<=ptQueen; p++)
+		Tables::gainPromo[p] = Tables::gainCap[p] - Tables::gainCap[ptPawn];
+
 	memset( tables, 0, sizeof(tables) );
 	for (Phase ph = phOpening; ph <= phEndgame; ph++ )
 		for (Color c = ctWhite; c <= ctBlack; c++)

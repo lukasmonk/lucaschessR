@@ -284,7 +284,7 @@ class Washing:
     def create_tactics_sm(self, db):
         file = Code.path_resource("IntFiles", "tactic0.bm")
         li = []
-        with open(file) as f:
+        with open(file, "rt", encoding="utf-8", errors="ignore") as f:
             for linea in f:
                 linea = linea.strip()
                 if linea:

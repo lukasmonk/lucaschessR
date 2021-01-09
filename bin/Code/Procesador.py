@@ -562,6 +562,9 @@ class Procesador:
     def lanzaAtajosALT(self, key):
         BasicMenus.atajosALT(self, key)
 
+    def atajos_edit(self):
+        BasicMenus.atajos_edit(self)
+
     def options(self):
         menu = QTVarios.LCMenu(self.main_window)
 
@@ -572,6 +575,9 @@ class Procesador:
         menu1.opcion(self.editColoresBoard, _("Main board"), Iconos.EditarColores())
         menu1.separador()
         menu1.opcion(self.cambiaColores, _("General"), Iconos.Vista())
+        menu.separador()
+
+        menu.opcion(self.atajos_edit,  _("Shortcuts"), Iconos.Atajos())
         menu.separador()
 
         menu.opcion(self.sonidos, _("Custom sounds"), Iconos.SoundTool())

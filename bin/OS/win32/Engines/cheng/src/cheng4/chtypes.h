@@ -130,7 +130,7 @@ enum Limits
 	maxPV		=	maxStack,
 	// triangular PV table limit
 	maxTriPV	=	(maxStack*(maxStack+1)/2)+4,
-	repHashMax	=	256,				// repetition limit
+	repHashMax	=	512,				// repetition limit
 
 	maxStrength =	2500,				// maximum elo strength for elo limit
 	minStrength =	800					// minimum elo strength for elo limit
@@ -628,5 +628,17 @@ static const MaterialKey matKRkrp =
 	(U64C(1) << MATSHIFT( ctBlack, ptPawn )) |
 	(U64C(1) << MATSHIFT( ctBlack, ptRook )) |
 	(U64C(1) << MATSHIFT( ctWhite, ptRook ));
+static const MaterialKey matKPkq =
+	(U64C(1) << MATSHIFT( ctWhite, ptPawn )) |
+	(U64C(1) << MATSHIFT( ctBlack, ptQueen ));
+static const MaterialKey matKQkp =
+	(U64C(1) << MATSHIFT( ctBlack, ptPawn )) |
+	(U64C(1) << MATSHIFT( ctWhite, ptQueen ));
+static const MaterialKey matKQkq =
+	(U64C(1) << MATSHIFT( ctWhite, ptQueen )) |
+	(U64C(1) << MATSHIFT( ctBlack, ptQueen ));
+static const MaterialKey matKRkr =
+	(U64C(1) << MATSHIFT( ctWhite, ptRook )) |
+	(U64C(1) << MATSHIFT( ctBlack, ptRook ));
 
 }

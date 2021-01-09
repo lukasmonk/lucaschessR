@@ -121,7 +121,7 @@ class DBendings:
                 label = _("Moves")
             if moves_previo:
                 xdif = moves - moves_previo
-                dif = " (%d)" % (xdif,) if xdif > 0 else " (=)"
+                dif = " (%d)" % (xdif,) if xdif < 0 else " (=)"
             else:
                 dif = ""
             mensaje += "%s: %d%s\n" % (label, moves, dif)

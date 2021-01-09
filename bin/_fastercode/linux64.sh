@@ -15,5 +15,5 @@ export LD_LIBRARY_PATH=$x
 export PATH=$x:$PATH
 python3 ./setup_linux.py build_ext --inplace --verbose
 
-cp ./FasterCode.cpython-37m-x86_64-linux-gnu.so ../../OS/linux
+cp ./FasterCode.cpython-38-x86_64-linux-gnu.so ../../OS/linux
 cp ./irina.so ../../OS/linux

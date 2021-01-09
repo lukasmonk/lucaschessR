@@ -83,7 +83,7 @@ def read_engines(folder_engines):
     cm.ordenUCI("Hash", "32")
     cm.ponMultiPV(1, 4)
 
-    cm = mas("cheng", "Martin Sedlák", "4 0.39", "http://www.vlasak.biz/cheng", "cheng4.exe", 2750)
+    cm = mas("cheng", "Martin Sedlák", "4.40", "http://www.vlasak.biz/cheng", "cheng4.exe", 2750)
     cm.ponMultiPV(20, 256)
 
     cm = mas("glaurung", "Tord RomsTad", "2.2 JA", "http://www.glaurungchess.com/", "windows/glaurung-w32.exe", 2765)

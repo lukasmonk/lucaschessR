@@ -626,8 +626,18 @@ void Protocol::sendPV( const SearchInfo &si, uint index, Score score, enum Bound
 		else if ( bound == btUpper )
 			sendStr << " upperbound ";
 		sendStr << " multipv " << (1+index) << " score " << uciScore( score ) << " pv";
-		for (size_t i=0; i<pvCount; i++)
-			sendStr << " " << engine.board().toUCI( pv[i] );
+
+		if (pvCount)
+		{
+			Board b( engine.board() );
+
+			for (size_t i=0; i<pvCount; i++)
+			{
+				sendStr << " " << b.toUCI( pv[i] );
+				UndoInfo ui;
+				b.doMove( pv[i], ui, b.isCheck( pv[i], b.discovered() ) );
+			}
+		}
 		break;
 	case ptCECP:
 		if ( !post )
@@ -685,8 +695,16 @@ void Protocol::sendBest( Move best, Move ponder )
 	{
 	case ptUCI:
 		sendStr << "bestmove " << engine.board().toUCI( best );
+
 		if ( ponder != mcNone )
-			sendStr << " ponder " << engine.board().toUCI( ponder );
+		{
+			Board b( engine.board() );
+
+			UndoInfo ui;
+			b.doMove( best, ui, b.isCheck( best, b.discovered() ) );
+
+			sendStr << " ponder " << b.toUCI( ponder );
+		}
 		break;
 	case ptCECP:
 		if ( !analyze )
@@ -1054,7 +1072,7 @@ bool Protocol::parseUCI( const std::string &line )
 		sendStart( sifRaw );
 		sendRaw( "id name "); sendRaw( Version::version() ); sendEOL();
 		sendRaw( "id author "); sendRaw( Version::author() ); sendEOL();
-		sendRaw( "option name Hash type spin min 1 max " maxHash " default 4" ); sendEOL();
+		sendRaw( "option name Hash type spin min 1 max " maxHash " default 32" ); sendEOL();
 		sendRaw( "option name Clear Hash type button" ); sendEOL();
 		sendRaw( "option name Ponder type check default false" ); sendEOL();
 		sendRaw( "option name OwnBook type check default true" ); sendEOL();
@@ -1064,6 +1082,7 @@ bool Protocol::parseUCI( const std::string &line )
 		sendRaw( "option name UCI_LimitStrength type check default false" ); sendEOL();
 		sendRaw( "option name UCI_Elo type spin min 800 max 2500 default 2500" ); sendEOL();
 		sendRaw( "option name NullMove type check default true" ); sendEOL();
+		sendRaw( "option name Contempt type spin min -100 max 100 default 0" ); sendEOL();
 #ifdef USE_TUNING
 		for ( size_t i=0; i<TunableParams::paramCount(); i++ )
 		{
@@ -1172,6 +1191,14 @@ bool Protocol::parseUCIOptions( const std::string &line, size_t &pos )
 		elo = std::max( 800L, elo );
 		elo = std::min( 2500L, elo );
 		engine.setElo( (u32)elo );
+		return 1;
+	}
+	if ( key == "Contempt")
+	{
+		long contempt = strtol( value.c_str(), 0, 10 );
+		contempt = std::max( -100L, contempt );
+		contempt = std::min( 100L, contempt );
+		engine.setContempt( (Score)contempt );
 		return 1;
 	}
 	if ( key == "NullMove")
@@ -1587,9 +1614,9 @@ bool Protocol::parseCECPInternal( const std::string &line )
 		sendRaw(
 			"feature name=0 san=0 usermove=0 time=1 sigint=0 sigterm=0 pause=0 reuse=1 analyze=1 colors=0 setboard=1 "
 			"nps=1 smp=1 debug=0 draw=0 playother=1 variants=\"normal,fischerandom\" ics=0 memory=1 ping=0 "
-			"option=\"Clear Hash -button\" option=\"Hash -spin 4 1 " maxHash "\" option=\"Threads -spin 1 1 64\" "
+			"option=\"Clear Hash -button\" option=\"Hash -spin 32 1 " maxHash "\" option=\"Threads -spin 1 1 64\" "
 			"option=\"OwnBook -check 1\" option=\"LimitStrength -check 0\" option=\"Elo -spin 2500 800 2500\" "
-			"option=\"MultiPV -spin 1 1 256\" option=\"NullMove -check 1\" myname=\""
+			"option=\"MultiPV -spin 1 1 256\" option=\"NullMove -check 1\" option=\"Contempt -spin 0 -100 100\" myname=\""
 		);
 		sendRaw( Version::version() );
 		sendRaw( "\" "
@@ -1715,6 +1742,14 @@ bool Protocol::parseCECPInternal( const std::string &line )
 		{
 			long elo = strtol( line.c_str() + pos, 0, 10 );
 			engine.setElo( (u32)std::max( 2500l, std::min( 800l, elo ) ) );
+			return 1;
+		}
+		if ( token == "Contempt")
+		{
+			long contempt = strtol( line.c_str() + pos, 0, 10 );
+			contempt = std::max( -100L, contempt );
+			contempt = std::min( 100L, contempt );
+			engine.setContempt( (Score)contempt );
 			return 1;
 		}
 		error( "uknown option", line );

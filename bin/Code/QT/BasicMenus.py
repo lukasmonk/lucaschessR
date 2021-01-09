@@ -235,6 +235,7 @@ class WAtajos(QTVarios.WDialogo):
 
         # Lista
         o_columnas = Columnas.ListaColumnas()
+        o_columnas.nueva("KEY", _("Key"), 80, centered=True)
         o_columnas.nueva("OPCION", _("Option"), 300)
         o_columnas.nueva("LABEL", _("Label"), 300, edicion=Delegados.LineaTextoUTF8(siPassword=False))
 
@@ -271,6 +272,8 @@ class WAtajos(QTVarios.WDialogo):
         return len(self.li_favoritos)
 
     def grid_dato(self, grid, row, o_column):
+        if o_column.key == "KEY":
+            return "%s %d" % (_("Alt"), row+1)
         dic = self.li_favoritos[row]
         opcion = dic["OPCION"]
         if opcion in self.dic_data:
@@ -329,6 +332,12 @@ class WAtajos(QTVarios.WDialogo):
             self.li_favoritos[row], self.li_favoritos[row + 1] = self.li_favoritos[row + 1], self.li_favoritos[row]
             self.graba(row + 1)
 
+    def grid_doble_click(self, grid, fila, col):
+        if fila >= 0:
+            self.save_video()
+            self.accept()
+            atajosALT(self.procesador, fila+1)
+
 
 def atajos(procesador):
     procesador.entrenamientos.check()
@@ -361,6 +370,16 @@ def atajos(procesador):
         launcher(resp)
 
 
+def atajos_edit(procesador):
+    procesador.entrenamientos.check()
+    dic_data = procesador.entrenamientos.dicMenu
+    menuplay_savemenu(procesador, dic_data)
+    menucompete_savemenu(procesador, dic_data)
+    menu_tools_savemenu(procesador, dic_data)
+    w = WAtajos(procesador, dic_data)
+    w.exec_()
+
+
 def atajosALT(procesador, num):
     procesador.entrenamientos.check()
     dic_data = procesador.entrenamientos.dicMenu
@@ -377,7 +396,7 @@ def atajosALT(procesador, num):
             if nx == num:
                 launcher(key)
                 return
-            nx += 1
+        nx += 1
 
 
 def menuInformacion(procesador):

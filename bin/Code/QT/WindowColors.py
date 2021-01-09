@@ -108,15 +108,7 @@ class BotonImagen(Colocacion.H):
             pm = QtGui.QPixmap()
             png = base64.b64decode(png64)
 
-            # import os
-            # n = 0
-            # while os.path.isfile("mira_%d.png"%n):
-            #     n+=1
-            # f = open("mira_%d.png"%n,"wb")
-            # f.write(png)
-            # f.close()
-
-            pm.loadFromData(png)
+            pm.loadFromData(QtCore.QByteArray(png))
             icono = QtGui.QIcon(pm)
             self.btImagen.ponPlano(True)
             self.btImagen.set_text("")
@@ -134,16 +126,15 @@ class BotonImagen(Colocacion.H):
     def cambiar(self):
         configuration = Code.configuration
         dic = configuration.leeVariables("WindowColores")
-        dirSalvados = dic.get("PNGfolder", "")
-        resp = QTUtil2.leeFichero(self.parent, dirSalvados, "%s PNG (*.png)" % _("File"))
+        folder_prev = dic.get("PNGfolder", "")
+        resp = QTUtil2.leeFichero(self.parent, folder_prev, "%s PNG (*.png)" % _("File"))
         if resp:
-            dirSalvados1 = os.path.dirname(resp)
-            if dirSalvados != dirSalvados1:
-                dic["PNGfolder"] = dirSalvados1
+            folder = os.path.dirname(resp)
+            if folder_prev != folder:
+                dic["PNGfolder"] = folder
                 configuration.escVariables("WindowColores", dic)
-            f = open(resp, "rb")
-            self.rut_actual(base64.b64encode(f.read()))
-            f.close()
+            with open(resp, "rb") as f:
+                self.rut_actual(base64.b64encode(f.read()))
             self.ponImagen()
             self.rut_actualiza()
 
@@ -837,6 +828,9 @@ class WColores(QTVarios.WDialogo):
             self.current_theme["o_base"] = self.config_board.grabaBase()
             if not self.current_theme.get("CHANGE_PIECES", False):
                 self.test_if_pieces(self.current_theme)
+            for pos, theme in enumerate(self.li_themes):
+                if theme.get("NOMBRE") == self.current_theme.get("NOMBRE"):
+                    self.li_themes[pos] = self.current_theme
 
             self.save_own_themes()
 
@@ -872,7 +866,7 @@ def ponMenuTemas(menuBase, liTemas, baseResp):
     liRoot = []
     for n, uno in enumerate(liTemas):
         if uno:
-            if "SECCION" in uno:
+            if "SECCION" in uno and uno["SECCION"]:
                 folder = uno["SECCION"]
                 if not (folder in dFolders):
                     dFolders[folder] = []

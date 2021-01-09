@@ -41,7 +41,7 @@ DIR_LOCALE = Code.path_resource("Locale")
 def install(lang=None):
     if lang and os.path.isfile("%s/%s/LC_MESSAGES/%s.mo" % (DIR_LOCALE, lang, DOMAIN)):
         t = gettext.translation(DOMAIN, DIR_LOCALE, languages=[lang])
-        t.install(True)
+        t.install(lang)
     else:
         gettext.install(DOMAIN, DIR_LOCALE)
 

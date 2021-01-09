@@ -472,7 +472,7 @@ class STS:
         return resp
 
     def writeCSV(self, fich):
-        f = open(fich, "wb")
+        f = open(fich, "wt")
 
         licabs = [_("Reference"), _("Time"), _("Depth"), _("Sample"), _("Result"), _("Elo")]
         for x in range(len(self.groups)):
