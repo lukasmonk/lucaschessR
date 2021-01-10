@@ -1257,7 +1257,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         if self.external_folder:
             file = os.path.join(folder, "%s.lcdblink" % name)
-            with open(file, "wt") as q:
+            with open(file, "wt", encoding="utf-8", errors="ignore") as q:
                 q.write(filepath)
         else:
             file = filepath

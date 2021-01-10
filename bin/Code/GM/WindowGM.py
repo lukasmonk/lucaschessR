@@ -657,7 +657,7 @@ def importar_gm(owner_gm):
         QTUtil2.message_error(owner_gm, _("List of Grandmasters currently unavailable; please check Internet connectivity"))
         return False
 
-    with open(fich_tmp, "rt") as f:
+    with open(fich_tmp, "rt", encoding="utf-8", errors="ignore") as f:
         li_gm = []
         for linea in f:
             linea = linea.strip()

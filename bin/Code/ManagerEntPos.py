@@ -449,7 +449,7 @@ class ManagerEntPos(Manager.Manager):
         nregs = len(liBase)
         tmpBP = QTUtil2.BarraProgreso(self.main_window, name_tactic, _("Working..."), nregs)
         tmpBP.mostrar()
-        with open(nom_fns, "wt") as q:
+        with open(nom_fns, "wt", encoding="utf-8", errors="ignore") as q:
             for n in range(nregs):
 
                 if tmpBP.is_canceled():

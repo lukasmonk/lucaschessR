@@ -37,7 +37,7 @@ def toolbutton_int(qt_tbi):
 
 def active_folder():
     if os.path.isfile(LCFILEFOLDER):
-        with open(LCFILEFOLDER, "rt") as f:
+        with open(LCFILEFOLDER, "rt", encoding="utf-8", errors="ignore") as f:
             x = f.read()
             if os.path.isdir(x):
                 return x
@@ -52,7 +52,7 @@ def change_folder(nueva):
     if nueva:
         if os.path.abspath(nueva) == os.path.abspath(LCBASEFOLDER):
             return change_folder(None)
-        with open(LCFILEFOLDER, "wt") as f:
+        with open(LCFILEFOLDER, "wt", encoding="utf-8", errors="ignore") as f:
             f.write(nueva)
     else:
         Util.remove_file(LCFILEFOLDER)

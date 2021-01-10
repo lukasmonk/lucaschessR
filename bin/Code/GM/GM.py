@@ -79,13 +79,12 @@ class GM:
         # (kupad fix) linux is case sensitive and can't find the xgm file because ficheroGM is all lower-case, but all
         # the xgm files have the first letter capitalized (including ones recently downloaded)
         fichero_gm = "%s%s.xgm" % (self.gm[0].upper(), self.gm[1:])
-        f = open(os.path.join(self.carpeta, fichero_gm), "r")
-        li = []
-        for linea in f:
-            linea = linea.strip()
-            if linea:
-                li.append(GMgame(linea))
-        f.close()
+        with open(os.path.join(self.carpeta, fichero_gm), "rt", encoding="utf-8", errors="ignore") as f:
+            li = []
+            for linea in f:
+                linea = linea.strip()
+                if linea:
+                    li.append(GMgame(linea))
         return li
 
     def filter_side(self, is_white):
@@ -195,7 +194,7 @@ class GM:
 
     def write(self):
         fichero_gm = self.gm + ".xgm"
-        with open(os.path.join(self.carpeta, fichero_gm), "wt") as q:
+        with open(os.path.join(self.carpeta, fichero_gm), "wt", encoding="utf-8", errors="ignore") as q:
             for part in self.li_gm_games:
                 q.write(part.toline() + "\n")
 
@@ -208,7 +207,7 @@ def dic_gm():
     dic = {}
     nomfich = "GM/_listaGM.txt"
     nomfich = Code.path_resource(nomfich)
-    with open(nomfich, "rt") as f:
+    with open(nomfich, "rt", encoding="utf-8", errors="ignore") as f:
         for linea in f:
             if linea:
                 li = linea.split("|")
@@ -242,7 +241,7 @@ def lista_gm_personal(carpeta):
             gm = fich[:-4]
 
             si_w = si_b = False
-            with open(os.path.join(carpeta, fich)) as f:
+            with open(os.path.join(carpeta, fich), "rt", encoding="utf-8", errors="ignore") as f:
                 for linea in f:
                     try:
                         gm_game = GMgame(linea.strip())
@@ -277,7 +276,7 @@ class FabGM:
     def check_previous(self):
         st_xpv = set()
         if Util.exist_file(self.training_path):
-            with open(self.training_path, "rt") as f:
+            with open(self.training_path, "rt", encoding="utf-8", errors="ignore") as f:
                 for linea in f:
                     li_sp = linea.split("|")
                     if len(li_sp) > 1:
@@ -286,7 +285,7 @@ class FabGM:
 
     def write(self, txt):
         if self.f is None:
-            self.f = open(self.training_path, "at")
+            self.f = open(self.training_path, "at", encoding="utf-8", errors="ignore")
         self.f.write(txt)
         self.added += 1
 

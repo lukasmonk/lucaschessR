@@ -238,7 +238,7 @@ class Manager:
         return liC
 
     def atajosRaton(self, a1h8):
-        if a1h8 is None or not self.board.siActivasPiezas:
+        if a1h8 is None or not self.board.pieces_are_active:
             self.atajosRatonReset()
             return
 
@@ -1130,12 +1130,12 @@ class Manager:
                     DGT.set_position(self.game)
 
     def dgt(self, quien, a1h8):
-        if self.board.mensajero and self.board.siActivasPiezas:
+        if self.board.mensajero and self.board.pieces_are_active:
             if quien == "whiteMove":
-                if not self.board.siActivasPiezasColor:
+                if not self.board.side_pieces_active:
                     return 0
             elif quien == "blackMove":
-                if self.board.siActivasPiezasColor:
+                if self.board.side_pieces_active:
                     return 0
             elif quien == "scan":
                 QTUtil.ponPortapapeles(a1h8)

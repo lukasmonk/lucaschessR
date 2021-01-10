@@ -2,7 +2,7 @@ import Code
 
 
 def lee_dic_afinidades():
-    with open(Code.path_resource("IntFiles", "afinidades.dic"), "rt") as f:
+    with open(Code.path_resource("IntFiles", "afinidades.dic"), "rt", encoding="utf-8", errors="ignore") as f:
         return eval(f.read())
 
 

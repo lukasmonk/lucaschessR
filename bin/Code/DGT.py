@@ -68,7 +68,7 @@ def quitarDispatch():
 def log(cad):
     import traceback
 
-    with open("dgt.log", "at") as q:
+    with open("dgt.log", "at", encoding="utf-8", errors="ignore") as q:
         q.write("\n[%s] %s\n" % (Util.today(), cad))
         for line in traceback.format_stack():
             q.write("    %s\n" % line.strip())

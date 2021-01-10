@@ -144,9 +144,8 @@ class AnalizaPartida:
         if not file:
             return
 
-        f = open(file, "ab")
-        f.write("%s\r\n" % fen)
-        f.close()
+        with open(file, "at", encoding="utf-8", errors="ignore") as f:
+            f.write("%s\r\n" % fen)
         self.procesador.entrenamientos.menu = None
 
     def graba_tactic(self, game, njg, mrm, pos_act):
@@ -161,7 +160,7 @@ class AnalizaPartida:
             if not os.path.isdir(dtactics):
                 os.mkdir(dtactics)
             os.mkdir(self.tacticblunders)
-            with open(os.path.join(self.tacticblunders, "Config.ini"), "wt") as f:
+            with open(os.path.join(self.tacticblunders, "Config.ini"), "wt", encoding="utf-8", errors="ignore") as f:
                 f.write(
                     """[COMMON]
     ed_reference=20
@@ -188,18 +187,16 @@ class AnalizaPartida:
         p = Game.Game(fen=fen)
         rm = mrm.li_rm[0]
         p.read_pv(rm.pv)
-        f = open(os.path.join(self.tacticblunders, before), "at")
-        f.write("%s||%s|%s%s\n" % (fen, p.pgnBaseRAW(), cab, game.pgnBaseRAWcopy(None, njg - 1)))
-        f.close()
+        with open(os.path.join(self.tacticblunders, before), "at", encoding="utf-8", errors="ignore") as f:
+            f.write("%s||%s|%s%s\n" % (fen, p.pgnBaseRAW(), cab, game.pgnBaseRAWcopy(None, njg - 1)))
 
         fen = move.position.fen()
         p = Game.Game(fen=fen)
         rm = mrm.li_rm[pos_act]
         li = rm.pv.split(" ")
         p.read_pv(" ".join(li[1:]))
-        f = open(os.path.join(self.tacticblunders, after), "at")
-        f.write("%s||%s|%s%s\n" % (fen, p.pgnBaseRAW(), cab, game.pgnBaseRAWcopy(None, njg)))
-        f.close()
+        with open(os.path.join(self.tacticblunders, after), "at", encoding="utf-8", errors="ignore") as f:
+            f.write("%s||%s|%s%s\n" % (fen, p.pgnBaseRAW(), cab, game.pgnBaseRAWcopy(None, njg)))
 
         self.siTacticBlunders = True
         

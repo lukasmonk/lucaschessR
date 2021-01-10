@@ -482,7 +482,7 @@ class Guion:
                 self.board_mensajero = self.board.mensajero
                 self.board.mensajero = self.winDirector.muevePieza
 
-        self.board_activasPiezas = self.board.siActivasPiezas, self.board.siActivasPiezasColor
+        self.board_activasPiezas = self.board.pieces_are_active, self.board.side_pieces_active
 
     def restoreBoard(self):
         self.board.dirvisual = None

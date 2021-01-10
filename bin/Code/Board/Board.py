@@ -187,7 +187,7 @@ class Board(QtWidgets.QGraphicsView):
                 self.cad_buffer = ""
             return
 
-        if self.mensajero and self.siActivasPiezas and not is_alt:
+        if self.mensajero and self.pieces_are_active and not is_alt:
             # Entrada directa
             if 128 > key > 32:
                 self.cad_buffer += chr(key)
@@ -294,8 +294,8 @@ class Board(QtWidgets.QGraphicsView):
         self.exePulsadoNum = None
         self.exePulsadaLetra = None
         self.atajosRaton = None
-        self.siActivasPiezas = False  # Control adicional, para responder a eventos del raton
-        self.siActivasPiezasColor = None
+        self.pieces_are_active = False  # Control adicional, para responder a eventos del raton
+        self.side_pieces_active = None
 
         self.siPosibleRotarBoard = True
 
@@ -361,7 +361,7 @@ class Board(QtWidgets.QGraphicsView):
                     posA1H8 = chr(c + 96) + str(f)
                     li_pz.append((cpieza, posA1H8))
 
-            ap, apc = self.siActivasPiezas, self.siActivasPiezasColor
+            ap, apc = self.pieces_are_active, self.side_pieces_active
             siFlecha = self.flechaSC is not None
 
             self.rehaz()
@@ -655,7 +655,7 @@ class Board(QtWidgets.QGraphicsView):
                 _("Copy board as image to a file") + " (%s)" % _("without coordinates"),
             ),
         ]
-        if self.siActivasPiezas:
+        if self.pieces_are_active:
             liKeys.append((None, None))
             liKeys.append(("a1 ... h8", _("To indicate origin and destination of a move")))
 
@@ -804,7 +804,7 @@ class Board(QtWidgets.QGraphicsView):
     def cambiaPiezas(self, cual):
         self.config_board.cambiaPiezas(cual)
         self.config_board.guardaEnDisco()
-        ap, apc = self.siActivasPiezas, self.siActivasPiezasColor
+        ap, apc = self.pieces_are_active, self.side_pieces_active
         siFlecha = self.flechaSC is not None
 
         self.crea()
@@ -837,7 +837,11 @@ class Board(QtWidgets.QGraphicsView):
                 self.config_board.leeBase(tema["o_base"])
 
             self.config_board.guardaEnDisco()
+            pac = self.pieces_are_active
+            pac_sie = self.side_pieces_active
             self.crea()
+            if pac and pac_sie is not None:
+                self.activate_side(pac_sie)
 
     def reset(self, config_board):
         self.config_board = config_board
@@ -1065,9 +1069,8 @@ class Board(QtWidgets.QGraphicsView):
         if not hasattr(self, "dicXML"):
 
             def lee(fich):
-                f = open(Code.path_resource("IntFiles/Svg", "%s.svg" % fich))
-                resp = f.read()
-                f.close()
+                with open(Code.path_resource("IntFiles/Svg", "%s.svg" % fich), "rt", encoding="utf-8", errors="ignore") as f:
+                    resp = f.read()
                 return resp
 
             self.dicXML = {}
@@ -1250,7 +1253,7 @@ class Board(QtWidgets.QGraphicsView):
 
         self.variation_history = variation_history
 
-        self.siActivasPiezas = False
+        self.pieces_are_active = False
         self.removePieces()
 
         squares = position.squares
@@ -1351,7 +1354,7 @@ class Board(QtWidgets.QGraphicsView):
         self.blindfoldModoPosicion = modoPosicion if self.blindfold else False
 
     def blindfoldReset(self):
-        ap, apc = self.siActivasPiezas, self.siActivasPiezasColor
+        ap, apc = self.pieces_are_active, self.side_pieces_active
         siFlecha = self.flechaSC is not None
 
         is_white_bottom = self.is_white_bottom
@@ -1473,8 +1476,8 @@ class Board(QtWidgets.QGraphicsView):
         return self.creaPieza(nueva, posA1H8)
 
     def activate_side(self, is_white):
-        self.siActivasPiezas = True
-        self.siActivasPiezasColor = is_white
+        self.pieces_are_active = True
+        self.side_pieces_active = is_white
         for pieza, piezaSC, is_active in self.liPiezas:
             if is_active:
                 if is_white is None:
@@ -1493,7 +1496,7 @@ class Board(QtWidgets.QGraphicsView):
                 piezaSC.setDispatchMove(rutina)
 
     def enable_all(self):
-        self.siActivasPiezas = True
+        self.pieces_are_active = True
         for num, una in enumerate(self.liPiezas):
             pieza, piezaSC, is_active = una
             if is_active:
@@ -1501,8 +1504,8 @@ class Board(QtWidgets.QGraphicsView):
         self.init_kb_buffer()
 
     def disable_all(self):
-        self.siActivasPiezas = False
-        self.siActivasPiezasColor = None
+        self.pieces_are_active = False
+        self.side_pieces_active = None
         for num, una in enumerate(self.liPiezas):
             pieza, piezaSC, is_active = una
             if is_active:

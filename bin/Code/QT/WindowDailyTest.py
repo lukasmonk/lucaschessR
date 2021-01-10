@@ -3,7 +3,7 @@ import random
 import time
 
 from Code.Analysis import Analysis
-from Code.Base import Move, Position
+from Code.Base import Move, Position, Game
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -121,39 +121,39 @@ class WDailyTestBase(QTVarios.WDialogo):
 
     def configurar(self):
         # Datos
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         # # Motor
         mt = self.configuration.tutor_inicial if self.engine is None else self.engine
 
-        liCombo = [mt]
+        li_combo = [mt]
         for name, key in self.configuration.comboMotoresMultiPV10():
-            liCombo.append((key, name))
+            li_combo.append((key, name))
 
-        liGen.append((_("Engine") + ":", liCombo))
+        li_gen.append((_("Engine") + ":", li_combo))
 
         # # Segundos a pensar el tutor
         config = FormLayout.Spinbox(_("Duration of engine analysis (secs)"), 1, 99, 50)
-        liGen.append((config, self.segundos))
+        li_gen.append((config, self.segundos))
 
         # Pruebas
         config = FormLayout.Spinbox(_("N. of tests"), 1, 40, 40)
-        liGen.append((config, self.pruebas))
+        li_gen.append((config, self.pruebas))
 
         # Fichero
         config = FormLayout.Fichero(
             _("File"), "%s (*.fns);;%s PGN (*.pgn)" % (_("List of FENs"), _("File")), False, anchoMinimo=280
         )
-        liGen.append((config, self.fns))
+        li_gen.append((config, self.fns))
 
         # Editamos
-        resultado = FormLayout.fedit(liGen, title=_("Configuration"), parent=self, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title=_("Configuration"), parent=self, icon=Iconos.Opciones())
         if resultado:
-            accion, liResp = resultado
-            self.engine = liResp[0]
-            self.segundos = liResp[1]
-            self.pruebas = liResp[2]
-            self.fns = liResp[3]
+            accion, li_resp = resultado
+            self.engine = li_resp[0]
+            self.segundos = li_resp[1]
+            self.pruebas = li_resp[2]
+            self.fns = li_resp[3]
 
             param = UtilSQL.DictSQL(self.configuration.ficheroDailyTest, tabla="parametros")
             param["MOTOR"] = self.engine
@@ -408,7 +408,8 @@ class WDailyTest(QTVarios.WDialogo):
         if promotion:
             movimiento += promotion
 
-        ok, mens, self.move = Move.get_game_move(self.game, self.position, from_sq, to_sq, promotion)
+        game = Game.Game(ini_posicion=self.position)
+        ok, mens, self.move = Move.get_game_move(game, self.position, from_sq, to_sq, promotion)
         if ok:
             self.board.set_position(self.move.position)
             self.board.put_arrow_sc(from_sq, to_sq)

@@ -36,7 +36,7 @@ class DBgames:
     def __init__(self, nom_fichero):
         self.link_file = nom_fichero
         if nom_fichero.endswith(".lcdblink"):
-            with open(nom_fichero, "rt") as f:
+            with open(nom_fichero, "rt", encoding="utf-8", errors="ignore") as f:
                 nom_fichero = f.read().strip()
             self.external_folder = os.path.dirname(nom_fichero)
         else:
