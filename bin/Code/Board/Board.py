@@ -848,7 +848,11 @@ class Board(QtWidgets.QGraphicsView):
         for item in self.escena.items():
             self.xremoveItem(item)
             del item
+        pac = self.pieces_are_active
+        pac_sie = self.side_pieces_active
         self.crea()
+        if pac and pac_sie is not None:
+            self.activate_side(pac_sie)
 
     def key_current_graphlive(self, event):
         m = int(event.modifiers())
