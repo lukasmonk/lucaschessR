@@ -62,7 +62,7 @@ class ManagerWashingReplay(Manager.Manager):
         self.book = Opening.OpeningPol(999, elo=engine.elo)
 
         is_white = self.engine.color
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
         self.set_position(self.game.last_position)
         self.put_pieces_bottom(is_white)
@@ -76,7 +76,7 @@ class ManagerWashingReplay(Manager.Manager):
 
         player = self.configuration.nom_player()
         other = self.engine.name
-        w, b = (player, other) if self.is_human_side_white else (other, player)
+        w, b = (player, other) if self.human_side else (other, player)
         self.game.add_tag("White", w)
         self.game.add_tag("Black", b)
         QTUtil.refresh_gui()
@@ -276,7 +276,7 @@ class ManagerWashingTactics(Manager.Manager):
         self.game.set_position(cp)
 
         is_white = cp.is_white
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
         self.set_position(self.game.last_position)
         self.put_pieces_bottom(is_white)
@@ -451,7 +451,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.state = ST_PLAYING
 
         is_white = self.engine.color
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
         self.is_competitive = True
 
@@ -499,7 +499,7 @@ class ManagerWashingCreate(Manager.Manager):
         else:
             player = self.configuration.nom_player()
             other = self.xrival.name
-            w, b = (player, other) if self.is_human_side_white else (other, player)
+            w, b = (player, other) if self.human_side else (other, player)
             self.game.add_tag("White", w)
             self.game.add_tag("Black", b)
 
@@ -752,7 +752,7 @@ class ManagerWashingCreate(Manager.Manager):
     def atras(self):
         if len(self.game):
             self.analizaTerminar()
-            self.game.anulaUltimoMovimiento(self.is_human_side_white)
+            self.game.anulaUltimoMovimiento(self.human_side)
             self.game.assign_opening()
             self.goto_end()
             self.opening = Opening.OpeningPol(30, self.engine.elo)
@@ -778,7 +778,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.disable_all()
         self.human_is_playing = False
 
-        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
         self.guardarGanados(player_win)

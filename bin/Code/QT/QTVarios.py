@@ -235,12 +235,14 @@ class Tiempo(QtWidgets.QDialog):
 
         tb = QTUtil2.tbAcceptCancel(self)
 
+        f = Controles.TipoLetra(puntos = 11)
+
         # Tiempo
         self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(
-            self, 10, minMinutos, maxMinutos, maxTam=50, etiqueta=_("Total minutes")
+            self, 10, minMinutos, maxMinutos, maxTam=50, etiqueta=_("Total minutes"), fuente=f
         )
         self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(
-            self, 0, minSegundos, maxSegundos, maxTam=50, etiqueta=_("Seconds added per move")
+            self, 0, minSegundos, maxSegundos, maxTam=50, etiqueta=_("Seconds added per move"), fuente=f
         )
 
         # # Tiempo

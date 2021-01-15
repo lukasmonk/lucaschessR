@@ -25,7 +25,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         self.with_summary = dic_var.get("SUMMARY", False)
 
         is_white = dic_var["ISWHITE"]
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         w, b = self.configuration.nom_player(), dic_var["RIVAL"]
@@ -70,7 +70,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
 
         self.xrival.is_white = self.is_engine_side_white
 
-        self.siPrimeraJugadaHecha = False
+        self.made_the_first_move = False
 
         self.siTiempo = dic_var["SITIEMPO"]
         if self.siTiempo:
@@ -103,7 +103,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         self.pgnRefresh(True)
 
         if self.siTiempo:
-            self.siPrimeraJugadaHecha = False
+            self.made_the_first_move = False
             tpBL = self.vtime[True].etiqueta()
             tpNG = self.vtime[False].etiqueta()
             player = self.configuration.x_player

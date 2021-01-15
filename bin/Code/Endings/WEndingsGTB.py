@@ -115,7 +115,7 @@ class WEndingsGTB(QTVarios.WDialogo):
 
         self.restore_video()
 
-        dic = self.configuration.leeVariables("endingsGTB")
+        dic = self.configuration.read_variables("endingsGTB")
 
         self.key = key = dic.get("KEY")
         if (not key) or len(key) > self.configuration.piezas_gaviota():
@@ -202,7 +202,7 @@ class WEndingsGTB(QTVarios.WDialogo):
                 self.grid_cambiado_registro(None, row, None)
 
     def configurar(self):
-        dic_vars = self.configuration.leeVariables("endingsGTB")
+        dic_vars = self.configuration.read_variables("endingsGTB")
 
         form = FormLayout.FormLayout(self, _("Configuration"), Iconos.Finales())
         form.separador()
@@ -233,14 +233,14 @@ class WEndingsGTB(QTVarios.WDialogo):
             dic_vars["ORDER"] = order
             dic_vars["EXAMPLES_AUTO"] = examples_auto
             self.db.examples_auto = examples_auto
-            self.configuration.escVariables("endingsGTB", dic_vars)
+            self.configuration.write_variables("endingsGTB", dic_vars)
 
     def set_key(self, key):
         self.key = self.db.test_tipo(key)
-        dic = self.configuration.leeVariables("endingsGTB")
+        dic = self.configuration.read_variables("endingsGTB")
         order = dic.get("ORDER", "difficulty")
         dic["KEY"] = self.key
-        self.configuration.escVariables("endingsGTB", dic)
+        self.configuration.write_variables("endingsGTB", dic)
         num_positions = self.db.read_key(self.key, order)
         self.grid.refresh()
 

@@ -723,7 +723,7 @@ class WTournament(QTVarios.WDialogo):
             QTUtil2.message_error(self, _("You must create at least two engines"))
             return
 
-        dicValores = self.configuration.leeVariables("crear_torneo")
+        dicValores = self.configuration.read_variables("crear_torneo")
 
         get = dicValores.get
 
@@ -768,7 +768,7 @@ class WTournament(QTVarios.WDialogo):
             if si:
                 liSel.append(en.huella)
 
-        self.configuration.escVariables("crear_torneo", dicValores)
+        self.configuration.write_variables("crear_torneo", dicValores)
 
         nSel = len(liSel)
         if nSel < 2:

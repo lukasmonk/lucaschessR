@@ -31,7 +31,8 @@ ST_PLAYING, ST_ENDGAME, ST_WAITING, ST_PAUSE = range(4)
     GT_WASHING_REPLAY,
     GT_SINGULAR_MOVES,
     GT_NOTE_DOWN,
-) = range(27)
+    GT_BMT
+) = range(28)
 
 OUT_NORMAL, OUT_REINIT = range(2)
 

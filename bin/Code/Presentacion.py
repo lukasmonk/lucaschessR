@@ -71,13 +71,13 @@ class ManagerChallenge101:
         self.iniTime = time.time()
 
     def lee_results(self):
-        dic = self.configuration.leeVariables(self.cod_variables)
+        dic = self.configuration.read_variables(self.cod_variables)
         results = dic.get("RESULTS", [])
         results.sort(key=lambda x: -x[1])
         return results
 
     def guarda_puntos(self):
-        dic = self.configuration.leeVariables(self.cod_variables)
+        dic = self.configuration.read_variables(self.cod_variables)
         results = dic.get("RESULTS", [])
         if len(results) >= 10:
             ok = False
@@ -100,7 +100,7 @@ class ManagerChallenge101:
             if len(results) > 10:
                 results = results[:10]
             dic["RESULTS"] = results
-            self.configuration.escVariables(self.cod_variables, dic)
+            self.configuration.write_variables(self.cod_variables, dic)
 
     def menu(self):
         main_window = self.procesador.main_window

@@ -45,7 +45,7 @@ class ManagerMateMap(Manager.Manager):
         self.state = ST_PLAYING
         self.plays_instead_of_me_option = False
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.rm_rival = None
@@ -191,7 +191,7 @@ class ManagerMateMap(Manager.Manager):
         self.human_is_playing = False
         self.state = ST_ENDGAME
 
-        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.player_win = player_win
 

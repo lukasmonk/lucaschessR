@@ -125,7 +125,7 @@ class FormLayout:
             parent=self.parent,
             anchoMinimo=self.anchoMinimo,
             icon=self.icon,
-            siDefecto=self.with_default,
+            if_default=self.with_default,
             dispatch=self.dispatch,
         )
 
@@ -791,7 +791,7 @@ class FormTabWidget(QtWidgets.QWidget):
 
 
 class FormDialog(QtWidgets.QDialog):
-    def __init__(self, data, title="", comment="", icon=None, parent=None, siDefecto=True, dispatch=None):
+    def __init__(self, data, title="", comment="", icon=None, parent=None, if_default=True, dispatch=None):
         super(FormDialog, self).__init__(parent, QtCore.Qt.Dialog)
         flags = self.windowFlags()
         flags &= ~QtCore.Qt.WindowContextHelpButtonHint
@@ -809,7 +809,7 @@ class FormDialog(QtWidgets.QDialog):
             if dispatch:
                 dispatch(self.formwidget)  # enviamos el form de donde tomar datos cuando hay cambios
 
-        tb = QTUtil2.tbAcceptCancel(self, siDefecto, siReject=False)
+        tb = QTUtil2.tbAcceptCancel(self, if_default, siReject=False)
 
         layout = Colocacion.V()
         layout.control(tb)
@@ -844,7 +844,7 @@ class FormDialog(QtWidgets.QDialog):
         return self.accion, self.data
 
 
-def fedit(data, title="", comment="", icon=None, parent=None, siDefecto=False, anchoMinimo=None, dispatch=None):
+def fedit(data, title="", comment="", icon=None, parent=None, if_default=False, anchoMinimo=None, dispatch=None):
     """
     Create form dialog and return result
     (if Cancel button is pressed, return None)
@@ -867,7 +867,7 @@ def fedit(data, title="", comment="", icon=None, parent=None, siDefecto=False, a
           * the first element will be the selected index (or value)
           * the other elements can be couples (key, value) or only values
     """
-    dialog = FormDialog(data, title, comment, icon, parent, siDefecto, dispatch)
+    dialog = FormDialog(data, title, comment, icon, parent, if_default, dispatch)
     if anchoMinimo:
         dialog.setMinimumWidth(anchoMinimo)
     if dialog.exec_():

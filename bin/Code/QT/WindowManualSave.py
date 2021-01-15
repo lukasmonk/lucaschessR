@@ -179,7 +179,7 @@ class WManualSave(QTVarios.WDialogo):
     def inicializa(self):
         self.restore_video(anchoDefecto=758, altoDefecto=596)
 
-        dic_vars = self.configuration.leeVariables("manual_save")
+        dic_vars = self.configuration.read_variables("manual_save")
         if dic_vars:
             fen = dic_vars.get("FEN", self.position.fen())
             self.position.read_fen(fen)
@@ -226,7 +226,7 @@ class WManualSave(QTVarios.WDialogo):
             "MULTIPV": self.sb_multipv.valor(),
         }
 
-        self.configuration.escVariables("manual_save", dic_vars)
+        self.configuration.write_variables("manual_save", dic_vars)
 
     def process_toolbar(self):
         getattr(self, self.sender().key)()

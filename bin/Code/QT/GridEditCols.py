@@ -77,7 +77,7 @@ class EditCols(QtWidgets.QDialog):
                 col.position = n
 
     def configurations(self):
-        dic_conf = self.configuration.leeVariables(self.work)
+        dic_conf = self.configuration.read_variables(self.work)
         menu = QTVarios.LCMenu(self)
         submenu = menu.submenu(_("Save"), Iconos.ManualSave())
         submenu.opcion("save_name", _("Save with name"), Iconos.Grabar())
@@ -108,12 +108,12 @@ class EditCols(QtWidgets.QDialog):
                 if name:
                     dic_current = self.o_columnas.save_dic(self.grid_owner)
                     dic_conf[name] = dic_current
-                    self.configuration.escVariables(self.work, dic_conf)
+                    self.configuration.write_variables(self.work, dic_conf)
 
         elif resp == "save_default":
             key = "databases_columns_default"
             dic_current = self.o_columnas.save_dic(self.grid_owner)
-            self.configuration.escVariables(key, dic_current)
+            self.configuration.write_variables(key, dic_current)
 
         elif resp == "reinit":
             dic_current = self.o_columnas_base.save_dic(self.grid_owner)
@@ -125,7 +125,7 @@ class EditCols(QtWidgets.QDialog):
             if menu.siDer:
                 if QTUtil2.pregunta(self, _X(_("Delete %1?"), resp)):
                     del dic_conf[resp]
-                    self.configuration.escVariables(self.work, dic_conf)
+                    self.configuration.write_variables(self.work, dic_conf)
             else:
                 dic_current = dic_conf[resp]
                 self.o_columnas.restore_dic(dic_current, self.grid_owner)

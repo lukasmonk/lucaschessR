@@ -166,7 +166,7 @@ class WLines(QTVarios.WDialogo):
                 resp()
 
     def ta_massive(self):
-        dicVar = self.configuration.leeVariables("MASSIVE_OLINES")
+        dicVar = self.configuration.read_variables("MASSIVE_OLINES")
 
         liGen = [FormLayout.separador]
 
@@ -210,7 +210,7 @@ class WLines(QTVarios.WDialogo):
         dicVar["DEPTH"] = depth
         dicVar["MULTIPV"] = multiPV
         dicVar["REDO"] = redo
-        self.configuration.escVariables("MASSIVE_OLINES", dicVar)
+        self.configuration.write_variables("MASSIVE_OLINES", dicVar)
 
         um = QTUtil2.unMomento(self)
         stFensM2 = self.dbop.getAllFen()
@@ -652,7 +652,7 @@ class WLines(QTVarios.WDialogo):
             dicData["ONLYONE"] = onlyone
             dicData["MINMOVES"] = minMoves
             self.dbop.setconfig("IMPORTAR_LEEPARAM", dicData)
-            self.configuration.escVariables("WBG_MOVES", dicData)
+            self.configuration.write_variables("WBG_MOVES", dicData)
             return dicData
         return None
 
@@ -726,7 +726,7 @@ class WLines(QTVarios.WDialogo):
             self.glines.gotop()
 
     def importarPGN(self, game):
-        previo = self.configuration.leeVariables("OPENINGLINES")
+        previo = self.configuration.read_variables("OPENINGLINES")
         carpeta = previo.get("CARPETAPGN", "")
 
         ficheroPGN = QTUtil2.leeFichero(self, carpeta, "%s (*.pgn)" % _("PGN Format"), titulo=_("File to import"))
@@ -758,7 +758,7 @@ class WLines(QTVarios.WDialogo):
             self.dbop.importarPGN(self, game, ficheroPGN, depth, variations)
             self.glines.refresh()
             self.glines.gotop()
-            self.configuration.escVariables("OPENINGLINES", previo)
+            self.configuration.write_variables("OPENINGLINES", previo)
 
     def grid_color_fondo(self, grid, row, o_column):
         col = o_column.key

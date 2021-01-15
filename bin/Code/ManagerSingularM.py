@@ -69,7 +69,7 @@ class ManagerSingularM(Manager.Manager):
         self.linea_bloque = self.singularMoves.linea_bloque(self.pos_bloque)
 
         is_white = " w " in self.linea_bloque.fen
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.main_window.set_activate_tutor(False)

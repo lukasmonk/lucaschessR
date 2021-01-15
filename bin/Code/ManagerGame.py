@@ -25,7 +25,7 @@ class ManagerGame(Manager.Manager):
         self.changed = False
 
         self.human_is_playing = True
-        self.is_human_side_white = True
+        self.human_side = True
 
         self.state = ST_PLAYING
 
@@ -179,7 +179,7 @@ class ManagerGame(Manager.Manager):
         self.put_view()
 
         is_white = self.game.last_position.is_white
-        self.is_human_side_white = is_white  # Compatibilidad, sino no funciona el cambio en pgn
+        self.human_side = is_white  # Compatibilidad, sino no funciona el cambio en pgn
 
         if self.game.is_finished():
             self.muestra_resultado()
@@ -363,7 +363,7 @@ class ManagerGame(Manager.Manager):
         if self.dicRival:
             dicBase = self.dicRival
         else:
-            dicBase = self.configuration.leeVariables("ENG_MANAGERSOLO")
+            dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
         dic = self.dicRival = PlayAgainstEngine.cambioRival(
             self.main_window, self.configuration, dicBase, siManagerSolo=True
@@ -391,7 +391,7 @@ class ManagerGame(Manager.Manager):
             dic["ROTULO1"] = _("Opponent") + ": <b>" + self.xrival.name
             self.set_label1(dic["ROTULO1"])
             self.play_against_engine = True
-            self.configuration.escVariables("ENG_MANAGERSOLO", dic)
+            self.configuration.write_variables("ENG_MANAGERSOLO", dic)
 
     def window_title(self):
         white = ""

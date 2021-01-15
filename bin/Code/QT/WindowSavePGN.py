@@ -87,19 +87,19 @@ class WBaseSave(QtWidgets.QWidget):
         self.wowner.check_toolbar()
 
     def vars_read(self):
-        dicVariables = self.configuration.leeVariables("SAVEPGN")
+        dicVariables = self.configuration.read_variables("SAVEPGN")
         self.history_list = dicVariables.get("LIHISTORICO", [])
         self.codec = dicVariables.get("CODEC", "default")
 
     def vars_save(self):
         if self.file:
-            dicVariables = self.configuration.leeVariables("SAVEPGN")
+            dicVariables = self.configuration.read_variables("SAVEPGN")
             if self.file in self.history_list:
                 del self.history_list[self.history_list.index(self.file)]
             self.history_list.insert(0, self.file)
             dicVariables["LIHISTORICO"] = self.history_list
             dicVariables["CODEC"] = self.cb_codecs.valor()
-            self.configuration.escVariables("SAVEPGN", dicVariables)
+            self.configuration.write_variables("SAVEPGN", dicVariables)
 
     def history(self):
         menu = QTVarios.LCMenu(self, puntos=9)
@@ -304,7 +304,7 @@ class WSave(QTVarios.WDialogo):
             self.chb_overwrite.hide()
 
     def vars_read(self):
-        dicVariables = self.configuration.leeVariables("SAVEPGN")
+        dicVariables = self.configuration.read_variables("SAVEPGN")
         self.history_list = dicVariables.get("LIHISTORICO", [])
         self.codec = dicVariables.get("CODEC", "default")
         self.remove_c_v = dicVariables.get("REMCOMMENTSVAR", False)
@@ -314,7 +314,7 @@ class WSave(QTVarios.WDialogo):
         dicVariables["LIHISTORICO"] = self.history_list
         dicVariables["CODEC"] = self.cb_codecs.valor()
         dicVariables["REMCOMMENTSVAR"] = self.chb_remove_c_v.isChecked()
-        self.configuration.escVariables("SAVEPGN", dicVariables)
+        self.configuration.write_variables("SAVEPGN", dicVariables)
 
     def history(self):
         menu = QTVarios.LCMenu(self, puntos=9)

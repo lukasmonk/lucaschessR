@@ -14,7 +14,7 @@ from Code import Util
 from Code.Base.Constantes import NAG_3
 
 
-class AnalizaPartida:
+class AnalyzeGame:
     def __init__(self, procesador, alm, is_massiv, li_moves=None):
         self.procesador = procesador
         self.alm = alm
@@ -205,7 +205,7 @@ class AnalizaPartida:
 
     def save_pgn(self, file, name, dic_cab, fen, move, rm, mj):
         """
-        Graba una game en un pgn
+        Graba un game en un pgn
 
         @param file: pgn donde grabar
         @param name: name del engine que hace el analysis
@@ -340,6 +340,7 @@ class AnalizaPartida:
             for x in ["BLACK", "WHITE"]:
                 player = game.get_tag(x)
                 if player:
+                    player = player.upper()
                     si = False
                     for uno in self.li_players:
                         si_z = uno.endswith("*")
@@ -946,7 +947,7 @@ def analyse_game(manager):
     procesador = manager.procesador
     main_window = manager.main_window
 
-    alm = WindowAnalysisParam.paramAnalisis(main_window, procesador.configuration, True)
+    alm = WindowAnalysisParam.analysis_parameters(main_window, procesador.configuration, True)
 
     if alm is None:
         return
@@ -973,7 +974,7 @@ def analyse_game(manager):
     num_moves = len(li_moves)
     tmp_bp = QTUtil2.BarraProgreso(main_window, _("Analysis"), mensaje, num_moves).show_top_right()
 
-    ap = AnalizaPartida(procesador, alm, False, li_moves)
+    ap = AnalyzeGame(procesador, alm, False, li_moves)
 
     def dispatch_bp(pos, ntotal, njg):
         tmp_bp.mensaje(mensaje + " %d/%d" % (pos + 1, ntotal))

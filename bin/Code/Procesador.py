@@ -150,6 +150,8 @@ class Procesador:
 
         self.board = self.main_window.board
 
+        self.cpu = CPU.CPU(self.main_window)
+
         self.entrenamientos = Trainings.Entrenamientos(self)
 
         if self.configuration.x_check_for_update:
@@ -220,7 +222,6 @@ class Procesador:
             self.main_window.ponTitulo()
         if self.siPrimeraVez:
             self.siPrimeraVez = False
-            self.cpu = CPU.CPU(self.main_window)
             self.presentacion()
         self.kibitzers_manager.stop()
 
@@ -458,7 +459,7 @@ class Procesador:
         self.manager = ManagerMicElo.ManagerMicElo(self)
         resp = WEngines.select_engine_micelo(self.manager, self.configuration.miceloActivo())
         if resp:
-            respT = QTVarios.vtime(self.main_window, minMinutos=3, minSegundos=0, maxMinutos=999, maxSegundos=999)
+            respT = QTVarios.vtime(self.main_window, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999)
             if respT:
                 minutos, segundos = respT
                 self.manager.start(resp, minutos, segundos)
@@ -531,23 +532,22 @@ class Procesador:
                 Adjournments.Adjournments().remove(key)
                 if tp == GT_AGAINST_ENGINE:
                     self.manager = ManagerPlayAgainstEngine.ManagerPlayAgainstEngine(self)
-                    self.manager.run_adjourn(dic)
                 elif tp == GT_ALBUM:
                     self.manager = ManagerAlbum.ManagerAlbum(self)
-                    self.manager.run_adjourn(dic)
+                elif tp == GT_MICELO:
+                    self.manager = ManagerMicElo.ManagerMicElo(self)
                 elif tp == GT_COMPETITION_WITH_TUTOR:
                     self.manager = ManagerCompeticion.ManagerCompeticion(self)
-                    self.manager.run_adjourn(dic)
                 elif tp == GT_ELO:
                     self.manager = ManagerElo.ManagerElo(self)
-                    self.manager.run_adjourn(dic)
                 elif tp == GT_AGAINST_GM:
                     self.manager = ManagerGM.ManagerGM(self)
-                    self.manager.run_adjourn(dic)
                 elif tp in (GT_FIDE, GT_FICS, GT_LICHESS):
                     self.manager = ManagerFideFics.ManagerFideFics(self)
                     self.manager.selecciona(tp)
-                    self.manager.run_adjourn(dic)
+                else:
+                    return
+                self.manager.run_adjourn(dic)
                 return
 
             else:

@@ -1,13 +1,15 @@
 import datetime
 import random
 
+from Code.Engines import Engines
 from Code.Polyglots import Books
 from Code import DGT
 from Code.Engines import EnginesMicElo, EngineResponse
 from Code import Manager
 from Code.Base import Move
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, QTUtil
 from Code import Util
+from Code import Adjournments
 from Code.SQL import UtilSQL
 import Code
 from Code.Base.Constantes import *
@@ -17,22 +19,22 @@ class DicMicElos:
     def __init__(self):
         self.variable = "DicMicElos"
         self.configuration = Code.configuration
-        self._dic = self.configuration.leeVariables(self.variable)
+        self._dic = self.configuration.read_variables(self.variable)
 
     def dic(self):
         return self._dic
 
     def cambia_elo(self, clave_motor, nuevo_elo):
-        self._dic = self.configuration.leeVariables(self.variable)
+        self._dic = self.configuration.read_variables(self.variable)
         self._dic[clave_motor] = nuevo_elo
-        self.configuration.escVariables(self.variable, self._dic)
+        self.configuration.write_variables(self.variable, self._dic)
 
 
 def lista():
     li = EnginesMicElo.all_engines()
     dic_elos = DicMicElos().dic()
     for mt in li:
-        k = mt.key
+        k = mt.alias
         if k in dic_elos:
             mt.elo = dic_elos[k]
 
@@ -100,30 +102,30 @@ class ManagerMicElo(Manager.Manager):
 
         return li
 
-    def engineAplazado(self, alias, basElo):
-        li = self.list_engines(basElo)
-        for mt in li:
-            if mt.alias == alias:
-                return mt
-        return None
+    def start(self, engine_rival, minutos, segundos):
+        self.base_inicio(engine_rival, minutos, segundos)
+        if not self.human_side:
+            mensaje = _("Press the continue button to start.")
+            self.mensajeEnPGN(mensaje)
+        self.play_next_move()
 
-    def start(self, datosMotor, minutos, segundos, aplazamiento=None):
-
+    def base_inicio(self, engine_rival, minutos, segundos):
         self.game_type = GT_MICELO
+
+        self.engine_rival = engine_rival
+        self.minutos = minutos
+        self.segundos = segundos
 
         self.is_competitive = True
 
         self.resultado = None
         self.human_is_playing = False
         self.state = ST_PLAYING
-        self.puestoResultado = False  # Problema doble asignacion de ptos Thomas
+        self.showed_result = False  # Problema doble asignacion de ptos Thomas
 
-        if aplazamiento:
-            is_white = aplazamiento["ISWHITE"]
-        else:
-            is_white = self.determinaColor(datosMotor)
+        is_white = self.determinaColor(engine_rival)
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.lirm_engine = []
@@ -138,50 +140,29 @@ class ManagerMicElo(Manager.Manager):
         self.maxSegundos = minutos * 60
         self.segundosJugada = segundos
 
-        # -Aplazamiento 1/2--------------------------------------------------
-        if aplazamiento:
-            self.game.restore(aplazamiento["JUGADAS"])
+        self.vtime[True] = Util.Timer(self.maxSegundos)
+        self.vtime[False] = Util.Timer(self.maxSegundos)
 
-            self.datosMotor = self.engineAplazado(aplazamiento["ALIAS"], aplazamiento["BASEELO"])
-
-            self.vtime[True] = Util.Timer(aplazamiento["TIEMPOBLANCAS"])
-            self.vtime[False] = Util.Timer(aplazamiento["TIEMPONEGRAS"])
-
-            self.maxSegundos = aplazamiento["MAXSEGUNDOS"]
-            self.segundosJugada = aplazamiento["SEGUNDOSJUGADA"]
-
-            self.game.assign_opening()
-
-        else:
-            self.datosMotor = datosMotor
-            self.vtime[True] = Util.Timer(self.maxSegundos)
-            self.vtime[False] = Util.Timer(self.maxSegundos)
-
-        cbook = self.datosMotor.book if self.datosMotor.book else Code.tbook
+        cbook = self.engine_rival.book if self.engine_rival.book else Code.tbook
         self.book = Books.Libro("P", cbook, cbook, True)
         self.book.polyglot()
 
-        elo = self.datosMotor.elo
+        elo = self.engine_rival.elo
         self.maxMoveBook = elo / 200 if 0 <= elo <= 1700 else 9999
 
-        eloengine = self.datosMotor.elo
+        eloengine = self.engine_rival.elo
         eloplayer = self.configuration.miceloActivo()
         self.whiteElo = eloplayer if is_white else eloengine
         self.blackElo = eloplayer if not is_white else eloengine
 
-        self.xrival = self.procesador.creaManagerMotor(
-            self.datosMotor, None, None, siMultiPV=self.datosMotor.multiPV > 0
-        )
+        self.xrival = self.procesador.creaManagerMotor(self.engine_rival, None, None, siMultiPV=self.engine_rival.multiPV > 0)
 
         self.pte_tool_resigndraw = False
-        if self.is_human_side_white:
+        if self.human_side:
             self.pte_tool_resigndraw = True
             self.maxPlyRendirse = 1
         else:
             self.maxPlyRendirse = 0
-
-        if aplazamiento and len(self.game) > self.maxPlyRendirse:
-            self.pte_tool_resigndraw = False
 
         self.pon_toolbar()
 
@@ -194,45 +175,29 @@ class ManagerMicElo(Manager.Manager):
 
         nbsp = "&nbsp;" * 3
 
-        txt = "%s:%+d%s%s:%+d%s%s:%+d" % (
-            _("Win"),
-            self.datosMotor.pgana,
-            nbsp,
-            _("Draw"),
-            self.datosMotor.ptablas,
-            nbsp,
-            _("Loss"),
-            self.datosMotor.ppierde,
-        )
+        txt = "%s:%+d%s%s:%+d%s%s:%+d" % (_("Win"), self.engine_rival.pgana, nbsp, _("Draw"), self.engine_rival.ptablas, nbsp, _("Loss"), self.engine_rival.ppierde)
         self.set_label1("<center>%s</center>" % txt)
         self.set_label2("")
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        # -Aplazamiento 2/2--------------------------------------------------
-        if aplazamiento:
-            self.mueveJugada(GO_END)
-            self.siPrimeraJugadaHecha = True
-        else:
-            self.siPrimeraJugadaHecha = False
+        self.made_the_first_move = False
 
         tpBL = self.vtime[True].etiqueta()
         tpNG = self.vtime[False].etiqueta()
-        self.rival = rival = self.datosMotor.alias + " (%d)" % self.datosMotor.elo
+        self.rival = rival = self.engine_rival.alias + " (%d)" % self.engine_rival.elo
         player = self.configuration.x_player + " (%d)" % self.configuration.miceloActivo()
-        bl, ng = player, rival
+        white_player, black_player = player, rival
         if self.is_engine_side_white:
-            bl, ng = ng, bl
-        self.main_window.ponDatosReloj(bl, tpBL, ng, tpNG)
+            white_player, black_player = black_player, white_player
+
+        self.game.add_tag("White", white_player)
+        self.game.add_tag("Black", black_player)
+
+        self.main_window.ponDatosReloj(white_player, tpBL, black_player, tpNG)
         self.refresh()
 
         self.check_boards_setposition()
-
-        if not self.is_human_side_white:
-            mensaje = _("Press the continue button to start.")
-            self.mensajeEnPGN(mensaje)
-
-        self.play_next_move()
 
     def pon_toolbar(self):
         if self.pte_tool_resigndraw:
@@ -260,7 +225,7 @@ class ManagerMicElo(Manager.Manager):
             self.utilidadesElo()
 
         elif key == TB_ADJOURN:
-            self.aplazar()
+            self.adjourn()
 
         elif key in self.procesador.li_opciones_inicio:
             self.procesador.run_action(key)
@@ -268,24 +233,65 @@ class ManagerMicElo(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def aplazar(self):
-        if len(self.game) and QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
-            aplazamiento = {}
-            aplazamiento["TIPOJUEGO"] = self.game_type
-            aplazamiento["ISWHITE"] = self.is_human_side_white
-            aplazamiento["JUGADAS"] = self.game.save()
+    def save_state(self):
+        self.main_window.stop_clock()
 
-            aplazamiento["BASEELO"] = self.datosMotor.baseElo
-            aplazamiento["ALIAS"] = self.datosMotor.alias
+        self.vtime[self.human_side].paraMarcador(0)
 
-            aplazamiento["MAXSEGUNDOS"] = self.maxSegundos
-            aplazamiento["SEGUNDOSJUGADA"] = self.segundosJugada
-            aplazamiento["TIEMPOBLANCAS"] = self.vtime[True].tiempoAplazamiento()
-            aplazamiento["TIEMPONEGRAS"] = self.vtime[False].tiempoAplazamiento()
+        dic = {
+            "engine_rival": self.engine_rival.save(),
+            "minutos": self.minutos,
+            "segundos": self.segundos,
+            "game_save": self.game.save(),
+            "time_white": self.vtime[WHITE].save(),
+            "time_black": self.vtime[BLACK].save(),
+            "pgana": self.engine_rival.pgana,
+            "ptablas": self.engine_rival.ptablas,
+            "ppierde": self.engine_rival.ppierde,
+            "alias": self.engine_rival.alias,
+        }
 
-            self.configuration.graba(aplazamiento)
+        return dic
+
+    def restore_state(self, dic):
+        engine_rival = Engines.Engine()
+        engine_rival.restore(dic["engine_rival"])
+        engine_rival.pgana = dic["pgana"]
+        engine_rival.ptablas = dic["ptablas"]
+        engine_rival.ppierde = dic["ppierde"]
+        engine_rival.alias = dic["alias"]
+
+        minutos = dic["minutos"]
+        segundos = dic["segundos"]
+
+        self.base_inicio(engine_rival, minutos, segundos)
+
+        self.game.restore(dic["game_save"])
+
+        self.vtime[WHITE].restore(dic["time_white"])
+        self.vtime[BLACK].restore(dic["time_black"])
+
+        self.goto_end()
+
+    def adjourn(self):
+        if QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
+            dic = self.save_state()
+
+            # se guarda en una bd Adjournments dic key = fecha y hora y tipo
+            label_menu = _("Tourney-Elo") + ". " + self.engine_rival.name
+
             self.state = ST_ENDGAME
-            self.main_window.accept()
+
+            with Adjournments.Adjournments() as adj:
+                adj.add(self.game_type, dic, label_menu)
+                adj.si_seguimos(self)
+
+    def run_adjourn(self, dic):
+        self.restore_state(dic)
+        self.check_boards_setposition()
+        self.show_clocks()
+        self.made_the_first_move = True
+        self.play_next_move()
 
     def final_x(self):
         return self.rendirse()
@@ -294,10 +300,10 @@ class ManagerMicElo(Manager.Manager):
         if self.state == ST_ENDGAME:
             return True
         if (len(self.game) > 0) and not self.pte_tool_resigndraw:
-            if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?") + " (%d)" % self.datosMotor.ppierde):
+            if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?") + " (%d)" % self.engine_rival.ppierde):
                 return False  # no abandona
-            self.game.resign(self.is_human_side_white)
-            self.put_result(RS_WIN_OPPONENT)
+            self.game.resign(self.human_side)
+            self.show_result()
         else:
             self.procesador.start()
 
@@ -316,24 +322,9 @@ class ManagerMicElo(Manager.Manager):
 
         num_moves = len(self.game)
 
-        if num_moves > 0:
-            jgUltima = self.game.last_jg()
-            if jgUltima:
-                if jgUltima.is_mate:
-                    self.put_result(RS_WIN_OPPONENT if self.is_human_side_white == is_white else RS_WIN_PLAYER)
-                    return
-                if jgUltima.is_draw_stalemate:
-                    self.put_result(RS_DRAW)
-                    return
-                if jgUltima.is_draw_repetition:
-                    self.put_result(RS_DRAW_REPETITION)
-                    return
-                if jgUltima.is_draw_50:
-                    self.put_result(RS_DRAW_50)
-                    return
-                if jgUltima.is_draw_material:
-                    self.put_result(RS_DRAW_MATERIAL)
-                    return
+        if self.game.is_finished():
+            self.show_result()
+            return
 
         siRival = is_white == self.is_engine_side_white
         self.set_side_indicator(is_white)
@@ -375,10 +366,16 @@ class ManagerMicElo(Manager.Manager):
             self.thinking(False)
             if self.play_rival(rm_rival):
                 self.lirm_engine.append(rm_rival)
-                if self.valoraRMrival(rm_rival):
+                if self.valoraRMrival():
                     self.play_next_move()
+                else:
+                    if self.game.is_finished():
+                        self.show_result()
+                        return
             else:
-                self.put_result(RS_WIN_PLAYER)
+                self.game.set_termination(TERMINATION_RESIGN, RS_WIN_PLAYER)
+                self.show_result()
+                return
         else:
             self.reloj_start(True)
 
@@ -399,8 +396,8 @@ class ManagerMicElo(Manager.Manager):
 
     def add_move(self, move, siNuestra):
 
-        if not self.siPrimeraJugadaHecha:
-            self.siPrimeraJugadaHecha = True
+        if not self.made_the_first_move:
+            self.made_the_first_move = True
 
         self.game.li_moves.append(move)
         self.game.check()
@@ -436,68 +433,31 @@ class ManagerMicElo(Manager.Manager):
             self.error = mens
             return False
 
-    def put_result(self, quien):
-        if self.puestoResultado:  # Problema doble asignacion de ptos Thomas
+    def show_result(self):
+        if self.showed_result:  # Problema doble asignacion de ptos Thomas
             return
-
-        self.resultado = quien
+        self.state = ST_ENDGAME
         self.disable_all()
         self.human_is_playing = False
+        self.main_window.stop_clock()
 
-        self.state = ST_ENDGAME
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
-        self.beepResultadoCAMBIAR(quien)
-
-        nombreContrario = self.rival
-
-        mensaje = _("Game ended")
-        if quien == RS_WIN_PLAYER:
-            mensaje = _X(_("Congratulations you have won against %1."), nombreContrario)
-
-        elif quien == RS_WIN_OPPONENT:
-            mensaje = _X(_("Unfortunately you have lost against %1."), nombreContrario)
-
-        elif quien == RS_DRAW:
-            mensaje = _X(_("Draw against %1."), nombreContrario)
-
-        elif quien == RS_DRAW_REPETITION:
-            mensaje = _X(
-                _("Draw due to three times repetition (n. %1) against %2."),
-                self.game.rotuloTablasRepeticion,
-                nombreContrario,
-            )
-            self.resultado = RS_DRAW
-
-        elif quien == RS_DRAW_50:
-            mensaje = _X(_("Draw according to the 50 move rule against %1."), nombreContrario)
-            self.resultado = RS_DRAW
-
-        elif quien == RS_DRAW_MATERIAL:
-            mensaje = _X(_("Draw, not enough material to mate %1."), nombreContrario)
-            self.resultado = RS_DRAW
-
-        elif quien == RS_WIN_PLAYER_TIME:
-            if self.game.last_position.siFaltaMaterialColor(self.is_human_side_white):
-                return self.put_result(RS_DRAW_MATERIAL)
-            mensaje = _X(_("Congratulations, you win against %1 on time."), nombreContrario)
-            self.resultado = RS_WIN_PLAYER
-
-        elif quien == RS_WIN_OPPONENT_TIME:
-            if self.game.last_position.siFaltaMaterialColor(not self.is_human_side_white):
-                return self.put_result(RS_DRAW_MATERIAL)
-            mensaje = _X(_("%1 has won on time."), nombreContrario)
-            self.resultado = RS_WIN_OPPONENT
+        self.beepResultado(beep)
+        self.guardarGanados(player_win)
+        self.autosave()
+        QTUtil.refresh_gui()
 
         elo = self.configuration.miceloActivo()
-        relo = self.datosMotor.elo
-        if self.resultado == RS_WIN_PLAYER:
-            difelo = self.datosMotor.pgana
+        relo = self.engine_rival.elo
+        if player_win:
+            difelo = self.engine_rival.pgana
 
-        elif self.resultado == RS_WIN_OPPONENT:
-            difelo = self.datosMotor.ppierde
+        elif self.game.is_draw():
+            difelo = self.engine_rival.ptablas
 
         else:
-            difelo = self.datosMotor.ptablas
+            difelo = self.engine_rival.ppierde
 
         nelo = elo + difelo
         if nelo < 0:
@@ -508,24 +468,22 @@ class ManagerMicElo(Manager.Manager):
         if rnelo < 100:
             rnelo = 100
         dme = DicMicElos()
-        dme.cambia_elo(self.datosMotor.key, rnelo)
+        dme.cambia_elo(self.engine_rival.alias, rnelo)
         # TODO en el mensaje poner el elo con el que queda el rival, self.rival incluye el elo antiguo, hay que indicar el elo nuevo
 
         self.historial(elo, nelo)
         self.configuration.graba()
 
-        mensaje += "<br><br>%s : %d<br>" % (_("New Tourney-Elo"), nelo)
+        mensaje += "\n\n%s : %d\n" % (_("New Tourney-Elo"), nelo)
 
-        self.guardarGanados(quien == RS_WIN_PLAYER)
-        self.puestoResultado = True
+        self.showed_result = True
         self.mensajeEnPGN(mensaje)
         self.ponFinJuego()
-        self.autosave()
 
     def historial(self, elo, nelo):
         dic = {}
         dic["FECHA"] = datetime.datetime.now()
-        dic["RIVAL"] = self.datosMotor.name
+        dic["RIVAL"] = self.engine_rival.name
         dic["RESULTADO"] = self.resultado
         dic["AELO"] = elo
         dic["NELO"] = nelo
@@ -535,12 +493,12 @@ class ManagerMicElo(Manager.Manager):
         lik.close()
 
         dd = UtilSQL.DictSQL(self.configuration.fichEstadMicElo, tabla="color")
-        key = self.datosMotor.name
-        dd[key] = self.is_human_side_white
+        key = self.engine_rival.name
+        dd[key] = self.human_side
         dd.close()
 
-    def determinaColor(self, datosMotor):
-        key = datosMotor.name
+    def determinaColor(self, engine_rival):
+        key = engine_rival.name
 
         dd = UtilSQL.DictSQL(self.configuration.fichEstadMicElo, tabla="color")
         previo = dd.get(key, random.randint(0, 1) == 0)
@@ -548,8 +506,7 @@ class ManagerMicElo(Manager.Manager):
         return not previo
 
     def set_clock(self):
-
-        if (not self.siPrimeraJugadaHecha) or self.state != ST_PLAYING:
+        if (not self.made_the_first_move) or self.state != ST_PLAYING:
             return
 
         def mira(is_white):
@@ -563,8 +520,8 @@ class ManagerMicElo(Manager.Manager):
                     self.main_window.ponRelojNegras(eti, eti2)
 
             if ot.siAgotado():
-                siJugador = self.is_human_side_white == is_white
-                self.put_result(RS_WIN_OPPONENT_TIME if siJugador else RS_WIN_PLAYER_TIME)
+                self.game.set_termination_time()
+                self.show_result()
                 return False
 
             return True
@@ -573,26 +530,40 @@ class ManagerMicElo(Manager.Manager):
             DGT.writeClocks(self.vtime[True].etiquetaDGT(), self.vtime[False].etiquetaDGT())
 
         if self.human_is_playing:
-            is_white = self.is_human_side_white
+            is_white = self.human_side
         else:
-            is_white = not self.is_human_side_white
-        mira(is_white)
+            is_white = not self.human_side
+        return mira(is_white)
 
     def reloj_start(self, siUsuario):
-        if self.siPrimeraJugadaHecha:
-            self.vtime[siUsuario == self.is_human_side_white].iniciaMarcador()
+        if self.made_the_first_move:
+            self.vtime[siUsuario == self.human_side].iniciaMarcador()
             self.main_window.start_clock(self.set_clock, transicion=200)
 
     def reloj_stop(self, siUsuario):
-        if self.siPrimeraJugadaHecha:
-            self.vtime[siUsuario == self.is_human_side_white].paraMarcador(self.segundosJugada)
+        if self.made_the_first_move:
+            self.vtime[siUsuario == self.human_side].paraMarcador(self.segundosJugada)
             self.set_clock()
             self.main_window.stop_clock()
             self.refresh()
 
+    def show_clocks(self):
+        if Code.dgt:
+            DGT.writeClocks(self.vtime[True].etiquetaDGT(), self.vtime[False].etiquetaDGT())
+
+        for is_white in (WHITE, BLACK):
+            ot = self.vtime[is_white]
+
+            eti, eti2 = ot.etiquetaDif2()
+            if eti:
+                if is_white:
+                    self.main_window.ponRelojBlancas(eti, eti2)
+                else:
+                    self.main_window.ponRelojNegras(eti, eti2)
+
     def atras(self):
         if len(self.game) > 2:
-            self.game.anulaUltimoMovimiento(self.is_human_side_white)
+            self.game.anulaUltimoMovimiento(self.human_side)
             self.game.assign_opening()
             self.goto_end()
             self.refresh()

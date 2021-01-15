@@ -309,7 +309,7 @@ class STS:
 
     def formulaWrite(self):
         dic = {"X": self.X, "K": self.K}
-        Code.configuration.escVariables("STSFORMULA", dic)
+        Code.configuration.write_variables("STSFORMULA", dic)
 
     def formulaChange(self, x, k):
         self.X = x
@@ -317,7 +317,7 @@ class STS:
         self.formulaWrite()
 
     def formulaRead(self):
-        dic = Code.configuration.leeVariables("STSFORMULA")
+        dic = Code.configuration.read_variables("STSFORMULA")
         if dic:
             self.X = dic["X"]
             self.K = dic["K"]

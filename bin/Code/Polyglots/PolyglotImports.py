@@ -267,7 +267,7 @@ class PolyglotImports:
         yield None, None
 
     def import_polyglot(self):
-        dic = self.configuration.leeVariables("POLYGLOT_IMPORT")
+        dic = self.configuration.read_variables("POLYGLOT_IMPORT")
 
         folder = dic.get("FOLDER_BIN", "")
 
@@ -276,7 +276,7 @@ class PolyglotImports:
             return
 
         dic["FOLDER_BIN"] = os.path.dirname(path_bin)
-        self.configuration.escVariables("POLYGLOT_IMPORT", dic)
+        self.configuration.write_variables("POLYGLOT_IMPORT", dic)
 
         g_bin = iter(self.fuente_bin(path_bin))
         g_origen = iter(self.fuente_origen_acum())
@@ -525,7 +525,7 @@ def add_pgn(path_pgn, plies, st_results, st_side, bunknown_convert, ftime, time_
 
 
 def import_polyglot_config(owner, configuration, titulo):
-    dic = configuration.leeVariables("POLYGLOT_IMPORT")
+    dic = configuration.read_variables("POLYGLOT_IMPORT")
 
     form = FormLayout.FormLayout(owner, titulo, Iconos.Import8(), anchoMinimo=440)
     form.separador()
@@ -588,13 +588,13 @@ def import_polyglot_config(owner, configuration, titulo):
     dic["MINSCORE"] = min_score
     dic["CALCWEIGHT"] = calc_weight
     dic["SAVESCORE"] = save_score
-    configuration.escVariables("POLYGLOT_IMPORT", dic)
+    configuration.write_variables("POLYGLOT_IMPORT", dic)
 
     return plies, st_side, st_results, ru, min_games, min_score, calc_weight, save_score
 
 
 def export_polyglot_config(owner, configuration, file_nom_def):
-    dic = configuration.leeVariables("POLYGLOT_EXPORT")
+    dic = configuration.read_variables("POLYGLOT_EXPORT")
     form = FormLayout.FormLayout(owner, _("Export to"), Iconos.Export8(), anchoMinimo=440)
     form.separador()
 
@@ -617,7 +617,7 @@ def export_polyglot_config(owner, configuration, file_nom_def):
     path_bin = os.path.realpath(path_bin)
     dic["FOLDER"] = os.path.dirname(path_bin)
     dic["UNIFORM"] = uniform
-    configuration.escVariables("POLYGLOT_EXPORT", dic)
+    configuration.write_variables("POLYGLOT_EXPORT", dic)
 
     return path_bin, uniform
 

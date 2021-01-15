@@ -91,7 +91,7 @@ class RunEngine:
                         self.set_option("UCI_AnalyseMode", "true")
                         setoptions = True
         if setoptions:
-            self.put_line("isready")
+            self.put_line_base("isready")
             self.wait_mrm("readyok", 1000)
 
         self.ucinewgame()
@@ -183,7 +183,7 @@ class RunEngine:
         os.chdir(self.direxe)  # to fix problems with non ascii folders
 
         self.process = subprocess.Popen(
-            self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo, shell=False
+            self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo
         )
         os.chdir(curdir)
 

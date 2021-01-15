@@ -120,6 +120,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.position = Position.Position()
         self.actualP = 0  # Posicion actual
 
+        self.game_type = GT_BMT
         self.controlPGN = ControlPGN.ControlPGN(self)
 
         self.state = None  # compatibilidad con ControlPGN
@@ -176,7 +177,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         # BT posiciones ---------------------------------------------------------------
         self.liBT = []
-        nSalto = (self.board.ancho + 34) / 26
+        nSalto = (self.board.ancho + 34) // 26
         self.dicIconos = {
             0: Iconos.PuntoBlanco(),
             1: Iconos.PuntoNegro(),
@@ -901,7 +902,7 @@ class WBMT(QTVarios.WDialogo):
 
     def titulo(self):
         fdir, fnam = os.path.split(self.configuration.ficheroBMT)
-        return "%s : %s (%s)" % (_("Find best move"), fnam, fdir)
+        return "%s : %s (%s)" % (_("Find best move"), fnam, Util.relative_path(fdir))
 
     def terminar(self):
         self.bmt.cerrar()
@@ -1552,12 +1553,11 @@ class WBMT(QTVarios.WDialogo):
         # Motor y vtime, cogemos los estandars de analysis
         file = self.configuration.file_param_analysis()
         dic = Util.restore_pickle(file)
+        engine = self.configuration.tutor.key
+        vtime = self.configuration.x_tutor_mstime
         if dic:
-            engine = dic["MOTOR"]
-            vtime = dic["TIME"]
-        else:
-            engine = self.configuration.tutor.key
-            vtime = self.configuration.x_tutor_mstime
+            engine = dic.get("ENGINE", engine)
+            vtime = dic.get("TIME", vtime)
 
         if not vtime:
             vtime = 3.0

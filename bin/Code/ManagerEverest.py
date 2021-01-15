@@ -25,7 +25,7 @@ class ManagerEverest(Manager.Manager):
         self.analysis = None
         self.comment = None
         self.siAnalizando = False
-        self.is_human_side_white = self.expedition.is_white
+        self.human_side = self.expedition.is_white
         self.is_engine_side_white = not self.expedition.is_white
         self.gameObj = self.expedition.game
         self.game.set_tags(self.gameObj.li_tags)
@@ -47,7 +47,7 @@ class ManagerEverest(Manager.Manager):
 
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.show_side_indicator(True)
         self.set_label1(self.expedition.label())
         self.set_label2("")

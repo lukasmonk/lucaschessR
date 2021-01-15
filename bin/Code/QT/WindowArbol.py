@@ -935,7 +935,7 @@ class WindowArbol(QTVarios.WDialogo):
 
     def nuevoAnalisis(self, lm):
         fen = lm.gameBase.last_position.fen()
-        alm = WindowAnalysisParam.paramAnalisis(self, Code.configuration, False, siTodosMotores=True)
+        alm = WindowAnalysisParam.analysis_parameters(self, Code.configuration, False, siTodosMotores=True)
         if alm is None:
             return
         confMotor = Code.configuration.buscaRival(alm.engine)

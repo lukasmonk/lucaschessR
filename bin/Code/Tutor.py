@@ -27,7 +27,7 @@ class Tutor:
         self.to_sq = to_sq
         self.mrmTutor = manager.mrmTutor
         self.rm_rival = manager.rm_rival
-        self.is_white = manager.is_human_side_white
+        self.is_white = manager.human_side
         self.siEntrenando = siEntrenando
         self.list_rm = None  # necesario
 

@@ -23,7 +23,7 @@ class ManagerResistance(Manager.Manager):
         self.human_is_playing = False
         self.state = ST_PLAYING
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.siBoxing = True
@@ -137,7 +137,7 @@ class ManagerResistance(Manager.Manager):
         if self.game.is_finished():
             self.autosave()
             if self.game.is_mate():
-                si_ganado = self.is_human_side_white != is_white
+                si_ganado = self.human_side != is_white
                 if si_ganado:
                     self.movimientos += 2001
                 self.finJuego(True)

@@ -70,7 +70,7 @@ class ManagerGM(Manager.Manager):
         if self.gameElegida is not None:
             self.motorGM.set_game_selected(self.gameElegida)
 
-        self.is_human_side_white = self.is_white
+        self.human_side = self.is_white
         self.is_engine_side_white = not self.is_white
         self.thinking(False)
 
@@ -283,7 +283,7 @@ class ManagerGM(Manager.Manager):
 
         if not isValid:
             self.board.set_position(position)
-            self.board.activate_side(self.is_human_side_white)
+            self.board.activate_side(self.human_side)
             li_moves = self.motorGM.get_moves_txt(position, True)
             desdeGM, hastaGM, promotionGM = WindowGM.select_move(self, li_moves, True)
             siAnalizaJuez = self.with_adjudicator

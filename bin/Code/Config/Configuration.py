@@ -368,15 +368,15 @@ class Configuration:
         return self.create_base_folder("Tournaments/Workers")
 
     def folder_openings(self):
-        dic = self.leeVariables("OPENING_LINES")
+        dic = self.read_variables("OPENING_LINES")
         folder = dic.get("FOLDER", self.folderBaseOpenings)
         return folder if os.path.isdir(folder) else self.folderBaseOpenings
 
     def set_folder_openings(self, new_folder):
         new_folder = Util.relative_path(os.path.realpath(new_folder))
-        dic = self.leeVariables("OPENING_LINES")
+        dic = self.read_variables("OPENING_LINES")
         dic["FOLDER"] = new_folder
-        self.escVariables("OPENING_LINES", dic)
+        self.write_variables("OPENING_LINES", dic)
 
     def file_mate(self, mate):
         return os.path.join(self.carpeta_results, "Mate%d.pk" % mate)
@@ -638,13 +638,13 @@ class Configuration:
         self.x_style = "WindowsVista"
 
     def get_last_database(self):
-        dic = self.leeVariables("DATABASE")
+        dic = self.read_variables("DATABASE")
         return dic.get("LAST_DATABASE", "")
 
     def set_last_database(self, last_database):
-        dic = self.leeVariables("DATABASE")
+        dic = self.read_variables("DATABASE")
         dic["LAST_DATABASE"] = last_database
-        self.escVariables("DATABASE", dic)
+        self.write_variables("DATABASE", dic)
 
     def get_favoritos(self):
         if self.li_favoritos is None:
@@ -762,7 +762,7 @@ class Configuration:
         except:
             pass
 
-    def leeVariables(self, nomVar):
+    def read_variables(self, nomVar):
         db = UtilSQL.DictSQL(self.ficheroVariables)
         resp = db[nomVar]
         db.close()
@@ -789,7 +789,7 @@ class Configuration:
         # "DBSUMMARY":
         # "DATABASE"
 
-    def escVariables(self, nomVar, dicValores):
+    def write_variables(self, nomVar, dicValores):
         db = UtilSQL.DictSQL(self.ficheroVariables)
         db[nomVar] = dicValores
         db.close()

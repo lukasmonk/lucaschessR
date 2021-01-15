@@ -125,14 +125,14 @@ class BotonImagen(Colocacion.H):
 
     def cambiar(self):
         configuration = Code.configuration
-        dic = configuration.leeVariables("WindowColores")
+        dic = configuration.read_variables("WindowColores")
         folder_prev = dic.get("PNGfolder", "")
         resp = QTUtil2.leeFichero(self.parent, folder_prev, "%s PNG (*.png)" % _("File"))
         if resp:
             folder = os.path.dirname(resp)
             if folder_prev != folder:
                 dic["PNGfolder"] = folder
-                configuration.escVariables("WindowColores", dic)
+                configuration.write_variables("WindowColores", dic)
             with open(resp, "rb") as f:
                 self.rut_actual(base64.b64encode(f.read()))
             self.ponImagen()
@@ -352,10 +352,10 @@ class WColores(QTVarios.WDialogo):
         gbTemas.setFlat(True)
 
         # mas options ################################################################################################
-        def xDefecto(siDefecto):
+        def xDefecto(if_default):
             if self.is_base:
-                siDefecto = False
-            chb = Controles.CHB(self, _("Default"), siDefecto).capture_changes(self, self.defectoBoardM)
+                if_default = False
+            chb = Controles.CHB(self, _("Default"), if_default).capture_changes(self, self.defectoBoardM)
             if self.is_base:
                 chb.setVisible(False)
             return chb
@@ -583,28 +583,28 @@ class WColores(QTVarios.WDialogo):
             self.lista_bt_temas[x].pon_tema(None)
 
     def defectoTemas(self):
-        siDefecto = self.chbTemas.valor()
-        self.config_board.ponDefTema(siDefecto)
-        self.btExterior.setDisabled(siDefecto)
+        if_default = self.chbTemas.valor()
+        self.config_board.ponDefTema(if_default)
+        self.btExterior.setDisabled(if_default)
 
-        self.btBlancas.setDisabled(siDefecto)
-        self.btBlancasPNG.setDisabled(siDefecto)
-        self.dialBlancasTrans.dial.setDisabled(siDefecto)
+        self.btBlancas.setDisabled(if_default)
+        self.btBlancasPNG.setDisabled(if_default)
+        self.dialBlancasTrans.dial.setDisabled(if_default)
 
-        self.btNegras.setDisabled(siDefecto)
-        self.btNegrasPNG.setDisabled(siDefecto)
-        self.dialNegrasTrans.dial.setDisabled(siDefecto)
+        self.btNegras.setDisabled(if_default)
+        self.btNegrasPNG.setDisabled(if_default)
+        self.dialNegrasTrans.dial.setDisabled(if_default)
 
-        self.btTexto.setDisabled(siDefecto)
-        self.btFrontera.setDisabled(siDefecto)
+        self.btTexto.setDisabled(if_default)
+        self.btFrontera.setDisabled(if_default)
 
-        self.lyF.setDisabled(siDefecto)
-        self.lyFAlternativa.setDisabled(siDefecto)
-        self.lyFActual.setDisabled(siDefecto)
-        self.lyFRival.setDisabled(siDefecto)
+        self.lyF.setDisabled(if_default)
+        self.lyFAlternativa.setDisabled(if_default)
+        self.lyFActual.setDisabled(if_default)
+        self.lyFRival.setDisabled(if_default)
 
-        self.btFondo.setDisabled(siDefecto)
-        self.btFondoPNG.setDisabled(siDefecto)
+        self.btFondo.setDisabled(if_default)
+        self.btFondoPNG.setDisabled(if_default)
 
         self.actualizaBoard()
 
@@ -620,13 +620,13 @@ class WColores(QTVarios.WDialogo):
         self.reject()
 
     def importar(self):
-        dr = self.configuration.leeVariables("PCOLORES")
+        dr = self.configuration.read_variables("PCOLORES")
         dirBase = dr["DIRBASE"] if dr else ""
 
         fich = QTUtil2.leeFichero(self, dirBase, "lktheme3")
         if fich:
             dr["DIRBASE"] = os.path.dirname(fich)
-            self.configuration.escVariables("PCOLORES", dr)
+            self.configuration.write_variables("PCOLORES", dr)
             obj = Util.restore_pickle(fich)
             if obj:
                 if type(obj) == dict:
@@ -639,12 +639,12 @@ class WColores(QTVarios.WDialogo):
                 self.ponSecciones()
 
     def exportar(self):
-        dr = self.configuration.leeVariables("PCOLORES")
+        dr = self.configuration.read_variables("PCOLORES")
         dirBase = dr["DIRBASE"] if dr else ""
         fich = QTUtil2.salvaFichero(self, _("Colors"), dirBase, "*.lktheme3", True)
         if fich:
             dr["DIRBASE"] = os.path.dirname(fich)
-            self.configuration.escVariables("PCOLORES", dr)
+            self.configuration.write_variables("PCOLORES", dr)
             if not fich.lower().endswith("lktheme3"):
                 fich += ".lktheme3"
             tema = {}

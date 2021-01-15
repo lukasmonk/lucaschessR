@@ -31,7 +31,7 @@ class ManagerCompeticion(Manager.Manager):
 
         self.plays_instead_of_me_option = True
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.rm_rival = None
@@ -76,7 +76,7 @@ class ManagerCompeticion(Manager.Manager):
 
         player = self.configuration.nom_player()
         other = "%s (%s %d)" % (self.xrival.name, _("Level"), self.nivelJugado)
-        w, b = (player, other) if self.is_human_side_white else (other, player)
+        w, b = (player, other) if self.human_side else (other, player)
         self.game.add_tag("White", w)
         self.game.add_tag("Black", b)
 
@@ -130,7 +130,7 @@ class ManagerCompeticion(Manager.Manager):
             label_menu = _("Competition with tutor") + ". " + self.xrival.name
 
             dic = {
-                "ISWHITE": self.is_human_side_white,
+                "ISWHITE": self.human_side,
                 "GAME_SAVE": self.game.save(),
                 "SITUTOR": self.is_tutor_enabled,
                 "AYUDAS": self.hints,
@@ -185,7 +185,7 @@ class ManagerCompeticion(Manager.Manager):
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
             self.resultado = RS_WIN_OPPONENT
-            self.game.resign(self.is_human_side_white)
+            self.game.resign(self.human_side)
             self.guardarGanados(False)
             self.ponFinJuego()
             self.autosave()
@@ -199,7 +199,7 @@ class ManagerCompeticion(Manager.Manager):
             if QTUtil2.pregunta(self.main_window, _("Do you want to go back in the last movement?")):
                 self.hints -= 1
                 self.ponAyudas(self.hints)
-                self.game.anulaUltimoMovimiento(self.is_human_side_white)
+                self.game.anulaUltimoMovimiento(self.human_side)
                 self.in_the_opening = False
                 self.game.assign_opening()
                 self.goto_end()
@@ -267,11 +267,11 @@ class ManagerCompeticion(Manager.Manager):
         self.disable_all()
         self.human_is_playing = False
 
-        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
         if player_win:
-            hecho = "B" if self.is_human_side_white else "N"
+            hecho = "B" if self.human_side else "N"
             if self.categorias.put_result(self.categoria, self.nivelJugado, hecho):
                 mensaje += "<br><br>%s: %d (%s)" % (
                     _("Move to the next level"),

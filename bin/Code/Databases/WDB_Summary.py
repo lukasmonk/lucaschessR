@@ -421,7 +421,7 @@ class WSummary(QtWidgets.QWidget):
         self.lbName.set_text(_("Summary of %s") % name)
 
     def leeConfig(self):
-        dicConfig = self.configuration.leeVariables("DBSUMMARY")
+        dicConfig = self.configuration.read_variables("DBSUMMARY")
         if not dicConfig:
             dicConfig = {"allmoves": False}
         self.allmoves = dicConfig["allmoves"]
@@ -429,7 +429,7 @@ class WSummary(QtWidgets.QWidget):
 
     def grabaConfig(self):
         dicConfig = {"allmoves": self.allmoves}
-        self.configuration.escVariables("DBSUMMARY", dicConfig)
+        self.configuration.write_variables("DBSUMMARY", dicConfig)
         self.configuration.graba()
 
     # def pr int_repertorio(self):

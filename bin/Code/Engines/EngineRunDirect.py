@@ -41,9 +41,6 @@ class DirectEngine(object):
         if args:
             xargs.extend(args)
 
-        if Code.isLinux and Code.isWine and exe.lower().endswith(".exe"):
-            xargs.insert(0, "/usr/bin/wine")
-
         if Code.isWindows:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -52,9 +49,7 @@ class DirectEngine(object):
             startupinfo = None
         curdir = os.path.abspath(os.curdir)
         os.chdir(direxe)
-        self.process = subprocess.Popen(
-            xargs, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo, shell=False
-        )
+        self.process = subprocess.Popen(xargs, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo)
 
         os.chdir(curdir)
 

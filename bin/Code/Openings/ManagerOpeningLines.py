@@ -86,8 +86,8 @@ class ManagerOpeningEngines(Manager.Manager):
         self.plies_pendientes = self.plies_control
         self.lost_points = self.trainingEngines["LOST_POINTS"]
 
-        self.is_human_side_white = self.trainingEngines["COLOR"] == "WHITE"
-        self.is_engine_side_white = not self.is_human_side_white
+        self.human_side = self.trainingEngines["COLOR"] == "WHITE"
+        self.is_engine_side_white = not self.human_side
 
         self.siAprobado = False
 
@@ -121,7 +121,7 @@ class ManagerOpeningEngines(Manager.Manager):
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
         self.remove_hints()
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.pgnRefresh(True)
 
         self.ponCapInfoPorDefecto()
@@ -283,7 +283,7 @@ class ManagerOpeningEngines(Manager.Manager):
         lista = []
         for njg in range(self.game.num_moves()):
             move = self.game.move(njg)
-            if move.is_white() == self.is_human_side_white:
+            if move.is_white() == self.human_side:
                 fenm2 = move.position_before.fenm2()
                 if not (fenm2 in self.dicFENm2):
                     move.njg = njg
@@ -374,7 +374,7 @@ class ManagerOpeningEngines(Manager.Manager):
                 self.dbop.set_cache_engines(name, vtime, fen, mrm)
 
             rm = mrm.mejorMov()
-            if (" w " in fen) == self.is_human_side_white:
+            if (" w " in fen) == self.human_side:
                 return rm.puntos, rm.mate
             else:
                 return -rm.puntos, -rm.mate
@@ -384,7 +384,7 @@ class ManagerOpeningEngines(Manager.Manager):
             self.ponFinJuego()
             move = self.game.move(-1)
             if move.is_mate:
-                if move.is_white() == self.is_human_side_white:
+                if move.is_white() == self.human_side:
                     aprobado()
                 else:
                     suspendido()
@@ -609,8 +609,8 @@ class ManagerOpeningLines(Manager.Manager):
 
         self.hints = 9999  # Para que analice sin problemas
 
-        self.is_human_side_white = self.training["COLOR"] == "WHITE"
-        self.is_engine_side_white = not self.is_human_side_white
+        self.human_side = self.training["COLOR"] == "WHITE"
+        self.is_engine_side_white = not self.human_side
 
         self.main_window.pon_toolbar((TB_CLOSE, TB_HELP, TB_REINIT))
         self.main_window.activaJuego(True, False, siAyudas=False)
@@ -618,7 +618,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.set_position(self.game.last_position)
         self.show_side_indicator(True)
         self.remove_hints()
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.pgnRefresh(True)
 
         self.ponCapInfoPorDefecto()
@@ -914,8 +914,8 @@ class ManagerOpeningLinesPositions(Manager.Manager):
 
         self.hints = 9999  # Para que analice sin problemas
 
-        self.is_human_side_white = self.training["COLOR"] == "WHITE"
-        self.is_engine_side_white = not self.is_human_side_white
+        self.human_side = self.training["COLOR"] == "WHITE"
+        self.is_engine_side_white = not self.human_side
 
         self.main_window.pon_toolbar((TB_CLOSE, TB_HELP, TB_CONFIG))
         self.main_window.activaJuego(True, False, siAyudas=False)
@@ -923,7 +923,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         self.set_position(cp)
         self.show_side_indicator(True)
         self.remove_hints()
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.pgnRefresh(True)
 
         self.ponCapInfoPorDefecto()

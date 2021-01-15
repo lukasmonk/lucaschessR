@@ -630,7 +630,7 @@ class WUnSTS(QTVarios.WDialogo):
                 config = FormLayout.Editbox("K", 100, tipo=float, decimales=4)
                 liGen.append((config, K))
                 resultado = FormLayout.fedit(
-                    liGen, title=_("Formula to calculate elo"), parent=self, icon=Iconos.Elo(), with_default=True
+                    liGen, title=_("Formula to calculate elo"), parent=self, icon=Iconos.Elo(), if_default=True
                 )
                 if resultado:
                     resp, valor = resultado

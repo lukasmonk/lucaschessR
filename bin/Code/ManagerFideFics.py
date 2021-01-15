@@ -24,7 +24,7 @@ class ManagerFideFics(Manager.Manager):
             self._db = Code.path_resource("IntFiles", "FicsElo.db")
             self._activo = self.configuration.ficsActivo
             self._ponActivo = self.configuration.ponFicsActivo
-            self.nombreObj = _("Fics-player")  # self.cabs[ "White" if self.is_human_side_white else "Black" ]
+            self.nombreObj = _("Fics-player")  # self.cabs[ "White" if self.human_side else "Black" ]
             self._fichEstad = self.configuration.fichEstadFicsElo
             self._titulo = _("Fics-Elo")
             self._newTitulo = _("New Fics-Elo")
@@ -34,7 +34,7 @@ class ManagerFideFics(Manager.Manager):
             self._db = Code.path_resource("IntFiles", "FideElo.db")
             self._activo = self.configuration.fideActivo
             self._ponActivo = self.configuration.ponFideActivo
-            self.nombreObj = _("Fide-player")  # self.cabs[ "White" if self.is_human_side_white else "Black" ]
+            self.nombreObj = _("Fide-player")  # self.cabs[ "White" if self.human_side else "Black" ]
             self._fichEstad = self.configuration.fichEstadFideElo
             self._titulo = _("Fide-Elo")
             self._newTitulo = _("New Fide-Elo")
@@ -73,7 +73,7 @@ class ManagerFideFics(Manager.Manager):
         self.nivel = dbf.LEVEL
 
         is_white = dbf.WHITE
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         pv = FasterCode.xpv_pv(dbf.MOVS)
@@ -108,7 +108,7 @@ class ManagerFideFics(Manager.Manager):
         self.read_id(id_game)
         self.id_game = id_game
 
-        self.eloObj = int(self.game.get_tag("WhiteElo" if self.is_human_side_white else "BlackElo"))
+        self.eloObj = int(self.game.get_tag("WhiteElo" if self.human_side else "BlackElo"))
         self.eloUsu = self._activo()
 
         self.pwin = Util.fideELO(self.eloUsu, self.eloObj, +1)
@@ -132,7 +132,7 @@ class ManagerFideFics(Manager.Manager):
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.remove_hints(True, siQuitarAtras=True)
         self.show_side_indicator(True)
         label = "%s: <b>%d</b> | %s: <b>%d</b>" % (self._titulo, self.eloUsu, _("Elo rival"), self.eloObj)
@@ -452,7 +452,7 @@ class ManagerFideFics(Manager.Manager):
 
         dd = UtilSQL.DictSQL(self._fichEstad, tabla="color")
         key = "%s-%d" % (self._TIPO, self.nivel)
-        dd[key] = self.is_human_side_white
+        dd[key] = self.human_side
         dd.close()
 
     def determinaColor(self, nivel):
@@ -466,7 +466,7 @@ class ManagerFideFics(Manager.Manager):
     def atras(self):
         if len(self.game) > 2:
             self.analizaFinal()
-            ndel = self.game.anulaUltimoMovimiento(self.is_human_side_white)
+            ndel = self.game.anulaUltimoMovimiento(self.human_side)
             self.game.assign_opening()
             self.posJugadaObj -= ndel
             self.analysis = None

@@ -853,7 +853,7 @@ class WGames(QtWidgets.QWidget):
         liSeleccionadas = self.grid.recnosSeleccionados()
         nSeleccionadas = len(liSeleccionadas)
 
-        alm = WindowAnalysisParam.paramAnalisisMasivo(self, self.configuration, nSeleccionadas > 1, siDatabase=True)
+        alm = WindowAnalysisParam.massive_analysis_parameters(self, self.configuration, nSeleccionadas > 1, siDatabase=True)
         if alm:
 
             if alm.siVariosSeleccionados:
@@ -867,7 +867,7 @@ class WGames(QtWidgets.QWidget):
             tmpBP.ponRotulo(2, _("Moves"))
             tmpBP.mostrar()
 
-            ap = Analysis.AnalizaPartida(self.procesador, alm, True)
+            ap = Analysis.AnalyzeGame(self.procesador, alm, True)
 
             for n in range(nregs):
 

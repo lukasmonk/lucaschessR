@@ -167,7 +167,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.human_is_playing = False
         self.state = ST_PLAYING
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.main_window.set_activate_tutor(False)
@@ -312,7 +312,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.main_window.pon_toolbar(li_options)
         jgUlt = self.game.last_jg()
 
-        siwin = (jgUlt.is_white() == self.is_human_side_white) and not jgUlt.is_draw
+        siwin = (jgUlt.is_white() == self.human_side) and not jgUlt.is_draw
 
         self.guardarGanados(siwin)
         self.autosave()
@@ -339,7 +339,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         lbe = self.engine.name
 
         white, black = self.configuration.x_player, lbe
-        if not self.is_human_side_white:
+        if not self.human_side:
             white, black = black, white
 
         resp += '[White "%s"]\n' % white
@@ -395,7 +395,7 @@ class ManagerRoutesEndings(ManagerRoutes):
         self.human_is_playing = False
         self.state = ST_PLAYING
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.main_window.set_activate_tutor(False)
@@ -616,7 +616,7 @@ class ManagerRoutesTactics(ManagerRoutes):
         self.human_is_playing = False
         self.state = ST_PLAYING
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.main_window.set_activate_tutor(False)

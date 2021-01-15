@@ -51,8 +51,8 @@ class Game:
 
     def set_termination_time(self):
         self.termination = TERMINATION_WIN_ON_TIME
-        # Pierde el que le toca jugar
-        self.result = RESULT_WIN_WHITE if self.last_position.is_white else RESULT_WIN_BLACK
+        # Pierde el que le toca jugar, que se indica en position resultado del ultimo movimiento
+        self.result = RESULT_WIN_BLACK if self.last_position.is_white else RESULT_WIN_WHITE
 
     def set_termination(self, termination, result):
         self.termination = termination
@@ -272,7 +272,7 @@ class Game:
         return len(self.li_moves)
 
     def last_jg(self):
-        return self.li_moves[-1]
+        return self.li_moves[-1] if self.li_moves else None
 
     def assign_other_game(self, otra):
         txt = otra.save()

@@ -258,7 +258,7 @@ class ManagerElo(Manager.Manager):
 
         is_white = self.determina_side(datos_motor)
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.lirm_engine = []
@@ -328,7 +328,7 @@ class ManagerElo(Manager.Manager):
 
         player = self.configuration.nom_player()
         other = self.datosMotor.name
-        w, b = (player, other) if self.is_human_side_white else (other, player)
+        w, b = (player, other) if self.human_side else (other, player)
         self.game.add_tag("White", w)
         self.game.add_tag("Black", b)
 
@@ -336,7 +336,7 @@ class ManagerElo(Manager.Manager):
         if len(self.game) > 0 and QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
             self.state = ST_ENDGAME
             dic = {
-                "ISWHITE": self.is_human_side_white,
+                "ISWHITE": self.human_side,
                 "GAME_SAVE": self.game.save(),
                 "CLAVE": self.datosMotor.key,
                 "DEPTH": self.datosMotor.depth,
@@ -360,7 +360,7 @@ class ManagerElo(Manager.Manager):
         engine.ppierde = dic["PPIERDE"]
         engine.ptablas = dic["PTABLAS"]
         self.base_inicio(engine)
-        self.is_human_side_white = dic["ISWHITE"]
+        self.human_side = dic["ISWHITE"]
 
         self.game.restore(dic["GAME_SAVE"])
         self.goto_end()
@@ -412,7 +412,7 @@ class ManagerElo(Manager.Manager):
         if not self.pte_tool_resigndraw:
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?") + " (%d)" % self.datosMotor.ppierde):
                 return False  # no abandona
-            self.game.resign(self.is_human_side_white)
+            self.game.resign(self.human_side)
             self.muestra_resultado()
             self.autosave()
         else:
@@ -499,7 +499,7 @@ class ManagerElo(Manager.Manager):
         self.disable_all()
         self.human_is_playing = False
 
-        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
         self.guardarGanados(player_win)
@@ -591,7 +591,7 @@ class ManagerElo(Manager.Manager):
 
         dd = UtilSQL.DictSQL(self.configuration.fichEstadElo, tabla="color")
         key = "%s-%d" % (self.datosMotor.name, self.datosMotor.depth if self.datosMotor.depth else 0)
-        dd[key] = self.is_human_side_white
+        dd[key] = self.human_side
         dd.close()
 
     def determina_side(self, datosMotor):

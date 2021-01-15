@@ -147,13 +147,13 @@ class BlindfoldConfig:
         return Code.path_resource("IntFiles/Svg", "blind_%s.svg" % fich)
 
     def restore(self):
-        self.dicPiezas = Code.configuration.leeVariables("BLINDFOLD")
+        self.dicPiezas = Code.configuration.read_variables("BLINDFOLD")
         if not self.dicPiezas:
             for pieza in "rnbqkpRNBQKP":
                 self.dicPiezas[pieza] = HIDE
 
     def save(self):
-        Code.configuration.escVariables("BLINDFOLD", self.dicPiezas)
+        Code.configuration.write_variables("BLINDFOLD", self.dicPiezas)
 
 
 class Blindfold(ConjuntoPiezas):
@@ -292,7 +292,7 @@ class WBlindfold(QTVarios.WDialogo):
         self.reject()
 
     def configurations(self):
-        dic = Code.configuration.leeVariables("BLINDFOLD")
+        dic = Code.configuration.read_variables("BLINDFOLD")
         dicConf = collections.OrderedDict()
         for k in dic:
             if k.startswith("_"):
@@ -343,10 +343,10 @@ class WBlindfold(QTVarios.WDialogo):
                 if not name:
                     return None
                 dic["_%s" % name] = self.config.dicPiezas
-                Code.configuration.escVariables("BLINDFOLD", dic)
+                Code.configuration.write_variables("BLINDFOLD", dic)
         else:
             del dic["_%s" % cual]
-            Code.configuration.escVariables("BLINDFOLD", dic)
+            Code.configuration.write_variables("BLINDFOLD", dic)
 
     def allWhite(self):
         tp = self.cbAll.valor()

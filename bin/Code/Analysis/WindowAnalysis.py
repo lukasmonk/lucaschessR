@@ -142,11 +142,11 @@ class WAnalisisGraph(QTVarios.WDialogo):
 
     def showLostPointsChanged(self):
         dic = {"SHOWLOSTPOINTS": self.valorShowLostPoints()}
-        self.configuration.escVariables("ANALISIS_GRAPH", dic)
+        self.configuration.write_variables("ANALISIS_GRAPH", dic)
         self.cambiadoShow()
 
     def getShowLostPoints(self):
-        dic = self.configuration.leeVariables("ANALISIS_GRAPH")
+        dic = self.configuration.read_variables("ANALISIS_GRAPH")
         return dic.get("SHOWLOSTPOINTS", True) if dic else True
 
     def cambiadoShow(self):
@@ -642,7 +642,7 @@ class WAnalisis(QTVarios.WDialogo):
             delattr(self, "timer")
 
     def crear(self):
-        alm = WindowAnalysisParam.paramAnalisis(self, Code.configuration, False, siTodosMotores=True)
+        alm = WindowAnalysisParam.analysis_parameters(self, Code.configuration, False, siTodosMotores=True)
         if alm:
             um = self.tb_analysis.create_show(self, alm)
             self.crearMuestra(um)

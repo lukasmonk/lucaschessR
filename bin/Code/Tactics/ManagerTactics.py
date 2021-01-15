@@ -38,7 +38,7 @@ class ManagerTacticas(Manager.Manager):
         is_white = cp.is_white
         if self.pointView:
             is_white = self.pointView == 1
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         if self.game_base:

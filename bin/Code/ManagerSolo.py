@@ -40,7 +40,7 @@ class ManagerSolo(Manager.Manager):
         self.reinicio = dic
 
         self.human_is_playing = True
-        self.is_human_side_white = True
+        self.human_side = True
 
         self.board.setAcceptDropPGNs(self.dropPGN)
 
@@ -184,7 +184,7 @@ class ManagerSolo(Manager.Manager):
         self.put_view()
 
         is_white = self.game.last_position.is_white
-        self.is_human_side_white = is_white  # Compatibilidad, sino no funciona el cambio en pgn
+        self.human_side = is_white  # Compatibilidad, sino no funciona el cambio en pgn
 
         if self.auto_rotate:
             time.sleep(1)
@@ -397,7 +397,7 @@ class ManagerSolo(Manager.Manager):
             self.leeFichero(resp)
 
     def listaHistorico(self):
-        dic = self.configuration.leeVariables("FICH_MANAGERSOLO")
+        dic = self.configuration.read_variables("FICH_MANAGERSOLO")
         if dic:
             li = dic.get("HISTORICO")
             if li:
@@ -405,7 +405,7 @@ class ManagerSolo(Manager.Manager):
         return []
 
     def guardarHistorico(self, path):
-        dic = self.configuration.leeVariables("FICH_MANAGERSOLO")
+        dic = self.configuration.read_variables("FICH_MANAGERSOLO")
         if not dic:
             dic = {}
         lista = dic.get("HISTORICO", [])
@@ -414,7 +414,7 @@ class ManagerSolo(Manager.Manager):
         lista.insert(0, path)
         lista = [Util.relative_path(x) for x in lista]
         dic["HISTORICO"] = Util.unique_list(lista[:20])
-        self.configuration.escVariables("FICH_MANAGERSOLO", dic)
+        self.configuration.write_variables("FICH_MANAGERSOLO", dic)
 
     def informacion(self):
         menu = QTVarios.LCMenu(self.main_window)
@@ -622,7 +622,7 @@ class ManagerSolo(Manager.Manager):
         if self.dicRival:
             dicBase = self.dicRival
         else:
-            dicBase = self.configuration.leeVariables("ENG_MANAGERSOLO")
+            dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
         dic = self.dicRival = PlayAgainstEngine.cambioRival(
             self.main_window, self.configuration, dicBase, siManagerSolo=True
@@ -635,7 +635,7 @@ class ManagerSolo(Manager.Manager):
             dr = dic["RIVAL"]
             rival = dr["CM"]
             if hasattr(rival, "icono"):
-                delattr(rival, "icono")  # problem with configuration.escVariables and saving qt variables
+                delattr(rival, "icono")  # problem with configuration.write_variables and saving qt variables
             r_t = dr["TIME"] * 100  # Se guarda en decimas -> milesimas
             r_p = dr["PROFUNDIDAD"]
             if r_t <= 0:
@@ -652,9 +652,9 @@ class ManagerSolo(Manager.Manager):
             dic["ROTULO1"] = _("Opponent") + ": <b>" + self.xrival.name
             self.set_label1(dic["ROTULO1"])
             self.play_against_engine = True
-            self.configuration.escVariables("ENG_MANAGERSOLO", dic)
-            self.is_human_side_white = dic["ISWHITE"]
-            if self.game.last_position.is_white != self.is_human_side_white and not self.game.siEstaTerminada():
+            self.configuration.write_variables("ENG_MANAGERSOLO", dic)
+            self.human_side = dic["ISWHITE"]
+            if self.game.last_position.is_white != self.human_side and not self.game.siEstaTerminada():
                 self.play_against_engine = False
                 self.disable_all()
                 self.juegaRival()

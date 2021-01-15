@@ -88,7 +88,7 @@ class ManagerTurnOnLights(Manager.Manager):
             self.game.set_position(cp)
 
             is_white = cp.is_white
-            self.is_human_side_white = is_white
+            self.human_side = is_white
             self.is_engine_side_white = not is_white
             self.set_position(self.game.last_position)
             self.put_pieces_bottom(is_white)

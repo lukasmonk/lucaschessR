@@ -526,13 +526,13 @@ def resalta(mens, tipo=4):
     return ("<h%d>%s</h%d>" % (tipo, mens, tipo)).replace("\n", "<br>")
 
 
-def tbAcceptCancel(parent, siDefecto=False, siReject=True):
+def tbAcceptCancel(parent, if_default=False, siReject=True):
     li_acciones = [
         (_("Accept"), Iconos.Aceptar(), parent.aceptar),
         None,
         (_("Cancel"), Iconos.Cancelar(), parent.reject if siReject else parent.cancelar),
     ]
-    if siDefecto:
+    if if_default:
         li_acciones.append(None)
         li_acciones.append((_("Default"), Iconos.Defecto(), parent.defecto))
     li_acciones.append(None)

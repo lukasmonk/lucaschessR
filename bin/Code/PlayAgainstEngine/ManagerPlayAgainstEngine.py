@@ -29,7 +29,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     timekeeper = None
     summary = None
     with_summary = False
-    is_human_side_white = False
+    human_side = False
     is_engine_side_white = False
     conf_engine = None
     lirm_engine = None
@@ -86,7 +86,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.with_summary = dic_var.get("SUMMARY", False)
 
         is_white = dic_var["ISWHITE"]
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.conf_engine = dic_var["RIVAL"].get("CM", None)
@@ -179,7 +179,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         player = self.configuration.nom_player()
         other = self.xrival.name
-        w, b = (player, other) if self.is_human_side_white else (other, player)
+        w, b = (player, other) if self.human_side else (other, player)
         self.game.add_tag("White", w)
         self.game.add_tag("Black", b)
 
@@ -196,14 +196,14 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
             self.vtime = {WHITE: Util.Timer(self.maxSegundos), BLACK: Util.Timer(self.maxSegundos)}
             if self.segExtra:
-                self.vtime[self.is_human_side_white].ponSegExtra(self.segExtra)
+                self.vtime[self.human_side].ponSegExtra(self.segExtra)
 
             time_control = "%d" % int(self.maxSegundos)
             if self.segundosJugada:
                 time_control += "+%d" % self.segundosJugada
             self.game.add_tag("TimeControl", time_control)
             if self.segExtra:
-                self.game.add_tag("TimeExtra" + "White" if self.is_human_side_white else "Black", "%d" % self.segExtra)
+                self.game.add_tag("TimeExtra" + "White" if self.human_side else "Black", "%d" % self.segExtra)
 
         self.pon_toolbar()
 
@@ -303,7 +303,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.set_label1(rotulo1)
 
     def show_time(self, siUsuario):
-        is_white = siUsuario and self.is_human_side_white
+        is_white = siUsuario and self.human_side
         ot = self.vtime[is_white]
         eti, eti2 = ot.etiquetaDif2()
         if eti:
@@ -347,7 +347,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 else:
                     self.main_window.ponRelojNegras(eti, eti2)
 
-            siJugador = self.is_human_side_white == xis_white
+            siJugador = self.human_side == xis_white
             if ot.siAgotado():
                 if siJugador and QTUtil2.pregunta(
                     self.main_window,
@@ -372,19 +372,19 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             DGT.writeClocks(self.vtime[True].etiquetaDGT(), self.vtime[False].etiquetaDGT())
 
         if self.human_is_playing:
-            is_white = self.is_human_side_white
+            is_white = self.human_side
         else:
-            is_white = not self.is_human_side_white
+            is_white = not self.human_side
         mira(is_white)
 
     def reloj_start(self, siUsuario):
         if self.siTiempo:
-            self.vtime[siUsuario == self.is_human_side_white].iniciaMarcador()
-            self.vtime[siUsuario == self.is_human_side_white].setZeitnot(self.zeitnot)
+            self.vtime[siUsuario == self.human_side].iniciaMarcador()
+            self.vtime[siUsuario == self.human_side].setZeitnot(self.zeitnot)
 
     def reloj_stop(self, siUsuario):
         if self.siTiempo:
-            self.vtime[siUsuario == self.is_human_side_white].paraMarcador(self.segundosJugada)
+            self.vtime[siUsuario == self.human_side].paraMarcador(self.segundosJugada)
             self.show_time(siUsuario)
 
     def run_action(self, key):
@@ -532,6 +532,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def run_adjourn(self, dic):
         self.restore_state(dic)
         self.check_boards_setposition()
+        self.show_clocks()
+        self.made_the_first_move = True
         self.play_next_move()
 
     def xpause(self):
@@ -597,7 +599,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if len(self.game) > 0:
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
-            self.game.set_termination(TERMINATION_RESIGN, self.is_human_side_white)
+            self.game.set_termination(TERMINATION_RESIGN, self.human_side)
             self.guardarGanados(False)
             self.saveSummary()
             self.ponFinJuego(self.with_takeback)
@@ -622,7 +624,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.hints -= 1
                 self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
             self.ponAyudasEM()
-            self.game.anulaUltimoMovimiento(self.is_human_side_white)
+            self.game.anulaUltimoMovimiento(self.human_side)
             if not self.fen:
                 self.game.assign_opening()
             self.goto_end()
@@ -825,7 +827,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.rm_rival = None
         self.pon_toolbar()
         if not self.is_tutor_enabled:
-            self.activate_side(self.is_human_side_white)
+            self.activate_side(self.human_side)
 
         fen_ultimo = self.last_fen()
 
@@ -1168,7 +1170,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.siTiempo:
             self.main_window.stop_clock()
 
-        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
         self.saveSummary()
@@ -1228,8 +1230,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.ponRotuloBasico()
 
             self.put_pieces_bottom(is_white)
-            if is_white != self.is_human_side_white:
-                self.is_human_side_white = is_white
+            if is_white != self.human_side:
+                self.human_side = is_white
                 self.is_engine_side_white = not is_white
 
                 self.play_next_move()
@@ -1279,3 +1281,17 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         Analysis.show_analysis(self.procesador, self.xanalyzer, move, self.board.is_white_bottom, max_recursion, pos)
         self.put_view()
+
+    def show_clocks(self):
+        if Code.dgt:
+            DGT.writeClocks(self.vtime[True].etiquetaDGT(), self.vtime[False].etiquetaDGT())
+
+        for is_white in (WHITE, BLACK):
+            ot = self.vtime[is_white]
+
+            eti, eti2 = ot.etiquetaDif2()
+            if eti:
+                if is_white:
+                    self.main_window.ponRelojBlancas(eti, eti2)
+                else:
+                    self.main_window.ponRelojNegras(eti, eti2)

@@ -7,7 +7,7 @@ from Code.Base.Constantes import *
 def paramPelicula(configuration, parent):
 
     nomVar = "PARAMPELICULA"
-    dicVar = configuration.leeVariables(nomVar)
+    dicVar = configuration.read_variables(nomVar)
 
     # Datos
     form = FormLayout.FormLayout(parent, _("Replay game"), Iconos.Pelicula(), anchoMinimo=460)
@@ -35,7 +35,7 @@ def paramPelicula(configuration, parent):
         dicVar["START"] = if_start
         dicVar["PGN"] = if_pgn
         dicVar["BEEP"] = if_beep
-        configuration.escVariables(nomVar, dicVar)
+        configuration.write_variables(nomVar, dicVar)
         return segundos, if_start, if_pgn, if_beep
     else:
         return None

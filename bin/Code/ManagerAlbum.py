@@ -25,7 +25,7 @@ class ManagerAlbum(Manager.Manager):
         self.human_is_playing = False
         self.state = ST_PLAYING
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.is_tutor_enabled = False
@@ -51,7 +51,7 @@ class ManagerAlbum(Manager.Manager):
 
         player = self.configuration.nom_player()
         other = self.cromo.name
-        w, b = (player, other) if self.is_human_side_white else (_F(other), player)
+        w, b = (player, other) if self.human_side else (_F(other), player)
 
         self.game.add_tag("White", w)
         self.game.add_tag("Black", b)
@@ -130,7 +130,7 @@ class ManagerAlbum(Manager.Manager):
         if len(self.game) > 1:
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
-            self.game.resign(self.is_human_side_white)
+            self.game.resign(self.human_side)
             self.guardarGanados(False)
             self.ponFinJuego()
             self.xrival.cerrar()
@@ -222,7 +222,7 @@ class ManagerAlbum(Manager.Manager):
         self.disable_all()
         self.human_is_playing = False
 
-        mensaje, beep, player_win = self.game.label_resultado_player(self.is_human_side_white)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
         self.guardarGanados(player_win)

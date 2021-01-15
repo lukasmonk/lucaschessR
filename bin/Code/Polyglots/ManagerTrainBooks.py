@@ -26,7 +26,7 @@ class ManagerTrainBooks(Manager.Manager):
 
         self.li_reinit = book_player, player_highest, book_rival, resp_rival, is_white
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_book_side_white = not is_white
 
         self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_TAKEBACK, TB_HELP, TB_CONFIG, TB_UTILITIES))
@@ -204,7 +204,7 @@ class ManagerTrainBooks(Manager.Manager):
                     opacity = 1.0 if p == paux else max(p, 0.25)
                 self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
 
-            resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.is_human_side_white, siSelectSiempre=False)
+            resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
             self.board.remove_arrows()
             if resp is None:
                 self.sumar_aciertos = False
@@ -249,7 +249,7 @@ class ManagerTrainBooks(Manager.Manager):
                 opacity = 1.0 if p == paux else max(p, 0.25)
             self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
 
-        resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.is_human_side_white, siSelectSiempre=False)
+        resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
         self.board.quitaFlechas()
         if resp is None:
             self.sumar_aciertos = False
@@ -301,7 +301,7 @@ class ManagerTrainBooks(Manager.Manager):
             self.aciertos -= 1
             if self.aciertos < 0:
                 self.aciertos = 0
-            self.game.anulaUltimoMovimiento(self.is_human_side_white)
+            self.game.anulaUltimoMovimiento(self.human_side)
             self.goto_end()
             self.refresh()
             self.siguienteJugada()

@@ -510,7 +510,7 @@ class ManagerMate(Manager.Manager):
         cp.read_fen(position_mate.fen)
         self.set_position(cp)
         self.activate_side(cp.is_white)
-        self.is_human_side_white = cp.is_white
+        self.human_side = cp.is_white
         self.board.remove_arrows()
         self.board.ponerPiezasAbajo(cp.is_white)
         self.game = Game.Game(cp)
@@ -577,7 +577,7 @@ class ManagerMate(Manager.Manager):
         if self.is_finished():
             self.repiteMate(True, True)
             return
-        self.activate_side(self.is_human_side_white)  # Caso en que hay promotion, sino no se activa la dama
+        self.activate_side(self.human_side)  # Caso en que hay promotion, sino no se activa la dama
 
     def analizaPosicion(self, row, key):
         # Doble click lanza el bloque

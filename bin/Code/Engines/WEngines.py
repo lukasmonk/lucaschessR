@@ -459,14 +459,14 @@ def selectEngine(wowner):
     :return: MotorExterno / None=error
     """
     # Pedimos el ejecutable
-    folderEngines = Code.configuration.leeVariables("FOLDER_ENGINES")
+    folderEngines = Code.configuration.read_variables("FOLDER_ENGINES")
     exeMotor = QTUtil2.leeFichero(
         wowner, folderEngines if folderEngines else ".", "%s EXE (*.exe)" % _("File"), _("Engine")
     )
     if not exeMotor:
         return None
     folderEngines = Util.relative_path(os.path.dirname(exeMotor))
-    Code.configuration.escVariables("FOLDER_ENGINES", folderEngines)
+    Code.configuration.write_variables("FOLDER_ENGINES", folderEngines)
 
     # Leemos el UCI
     um = QTUtil2.unMomento(wowner)
@@ -614,7 +614,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
         if not QTUtil2.pregunta(self, _("Are you sure you want to set the original elo of all engines?")):
             return
 
-        self.manager.configuration.escVariables("DicMicElos", {})
+        self.manager.configuration.write_variables("DicMicElos", {})
         self.cancelar()
 
     def cancelar(self):

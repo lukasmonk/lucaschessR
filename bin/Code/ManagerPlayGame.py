@@ -28,7 +28,7 @@ class ManagerPlayGame(Manager.Manager):
         self.analysis = None
         self.comment = None
         self.siAnalizando = False
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
         self.numJugadasObj = gameObj.num_moves()
         self.gameObj = gameObj
@@ -53,7 +53,7 @@ class ManagerPlayGame(Manager.Manager):
 
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.show_side_indicator(True)
         self.set_label1(label)
         self.set_label2("")
@@ -327,7 +327,7 @@ class ManagerPlayGame(Manager.Manager):
 
         dicIntento = {
             "DATE": Util.today(),
-            "COLOR": "w" if self.is_human_side_white else "b",
+            "COLOR": "w" if self.human_side else "b",
             "POINTS": self.puntos,
             "POINTSMAX": self.puntosMax,
             "TIME": self.vtime,

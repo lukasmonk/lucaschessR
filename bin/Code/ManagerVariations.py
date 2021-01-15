@@ -29,13 +29,13 @@ class ManagerVariations(Manager.Manager):
 
         self.main_window.pon_toolbar((TB_ACCEPT, TB_CANCEL, TB_TAKEBACK, TB_REINIT, TB_CONFIG, TB_UTILITIES))
 
-        self.is_human_side_white = is_white_bottom
+        self.human_side = is_white_bottom
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.remove_hints(True, False)
         self.main_window.set_label1(None)
         self.main_window.set_label2(None)
         self.show_side_indicator(True)
-        self.put_pieces_bottom(self.is_human_side_white)
+        self.put_pieces_bottom(self.human_side)
         self.set_dispatcher(self.player_has_moved)
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
@@ -53,7 +53,7 @@ class ManagerVariations(Manager.Manager):
         self.thinking(False)
 
         is_white = self.game.last_position.is_white
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.human_is_playing = True
 
         if with_engine_active and not is_competitive:
@@ -123,7 +123,7 @@ class ManagerVariations(Manager.Manager):
         self.put_view()
 
         is_white = self.game.last_position.is_white
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.human_is_playing = True
 
         if self.game.is_finished():
@@ -164,7 +164,7 @@ class ManagerVariations(Manager.Manager):
         self.refresh()
 
     def reiniciar(self):
-        self.start(self.fen, self.lineaPGN, self.okMasOpciones, self.is_human_side_white)
+        self.start(self.fen, self.lineaPGN, self.okMasOpciones, self.human_side)
 
     def configurar(self):
 
@@ -200,7 +200,7 @@ class ManagerVariations(Manager.Manager):
             self.thinking(False)
 
     def activeEngine(self):
-        dicBase = self.configuration.leeVariables("ENG_VARIANTES")
+        dicBase = self.configuration.read_variables("ENG_VARIANTES")
         if dicBase:
             self.ponRival(dicBase)
         else:
@@ -211,7 +211,7 @@ class ManagerVariations(Manager.Manager):
         if self.dicRival:
             dicBase = self.dicRival
         else:
-            dicBase = self.configuration.leeVariables("ENG_VARIANTES")
+            dicBase = self.configuration.read_variables("ENG_VARIANTES")
 
         import Code.PlayAgainstEngine.PlayAgainstEngine as WindowEntMaq
 
@@ -241,4 +241,4 @@ class ManagerVariations(Manager.Manager):
         dic["ROTULO1"] = _("Opponent") + ": <b>" + self.xrival.name
         self.set_label1(dic["ROTULO1"])
         self.play_against_engine = True
-        self.configuration.escVariables("ENG_VARIANTES", dic)
+        self.configuration.write_variables("ENG_VARIANTES", dic)

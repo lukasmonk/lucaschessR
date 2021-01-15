@@ -89,7 +89,7 @@ class ControlPGN:
             if is_last:
                 self.manager.set_position(move.position)
                 if self.manager.human_is_playing and self.manager.state == ST_PLAYING:
-                    self.manager.activate_side(self.manager.is_human_side_white)
+                    self.manager.activate_side(self.manager.human_side)
             else:
                 if self.variations_mode:
                     self.manager.set_position(move.position, variation_history=str(pos))
@@ -134,17 +134,17 @@ class ControlPGN:
 
         player = self.manager.configuration.nom_player()
         resultado = self.manager.resultado
-        is_human_side_white = self.manager.is_human_side_white
+        human_side = self.manager.human_side
 
         if resultado == RS_WIN_PLAYER:
-            r = "1-0" if is_human_side_white else "0-1"
+            r = "1-0" if human_side else "0-1"
         elif resultado == RS_WIN_OPPONENT:
-            r = "0-1" if is_human_side_white else "1-0"
+            r = "0-1" if human_side else "1-0"
         elif resultado == RS_DRAW:
             r = "1/2-1/2"
         else:
             r = "*"
-        if is_human_side_white:
+        if human_side:
             blancas = player
             negras = rival
         else:

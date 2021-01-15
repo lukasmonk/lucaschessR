@@ -83,7 +83,7 @@ class ManagerEntPos(Manager.Manager):
         self.state = ST_PLAYING
         self.plays_instead_of_me_option = True
 
-        self.is_human_side_white = is_white
+        self.human_side = is_white
         self.is_engine_side_white = not is_white
 
         self.rm_rival = None
@@ -232,7 +232,7 @@ class ManagerEntPos(Manager.Manager):
         if self.is_rival_thinking:
             return
         if len(self.game):
-            self.game.anulaUltimoMovimiento(self.is_human_side_white)
+            self.game.anulaUltimoMovimiento(self.human_side)
             self.goto_end()
             self.is_analyzed_by_tutor = False
             self.state = ST_PLAYING

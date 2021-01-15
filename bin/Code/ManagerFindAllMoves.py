@@ -174,7 +174,7 @@ class ManagerFindAllMoves(Manager.Manager):
         self.number = number
         cp = Position.Position()
         cp.read_fen(fen)
-        self.is_human_side_white = self.is_white = cp.is_white
+        self.human_side = self.is_white = cp.is_white
         if self.is_white:
             siP = self.siJugador
         else:

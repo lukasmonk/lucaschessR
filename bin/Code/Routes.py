@@ -225,7 +225,7 @@ class Transsiberian:
             self._dpos_endings = dic.get("DPOS_ENDINGS", self._dpos_endings)
 
     def read_with_level(self, nlevel):
-        dic = self.configuration.leeVariables("TRANSSIBERIAN%s" % nlevel)
+        dic = self.configuration.read_variables("TRANSSIBERIAN%s" % nlevel)
         if dic:
             self.read_dic(dic)
         else:
@@ -237,7 +237,7 @@ class Transsiberian:
         # self._level = 5
         # self._is_miles = True
         # self.write_current()
-        dic = self.configuration.leeVariables("TRANSSIBERIAN")
+        dic = self.configuration.read_variables("TRANSSIBERIAN")
         self.read_dic(dic)
 
     def write_dic(self):
@@ -258,10 +258,10 @@ class Transsiberian:
         return dic
 
     def write_current(self):
-        self.configuration.escVariables("TRANSSIBERIAN", self.write_dic())
+        self.configuration.write_variables("TRANSSIBERIAN", self.write_dic())
 
     def write_with_level(self):
-        self.configuration.escVariables("TRANSSIBERIAN%s" % self._level, self.write_dic())
+        self.configuration.write_variables("TRANSSIBERIAN%s" % self._level, self.write_dic())
 
     def get_line(self):
         km = self._km

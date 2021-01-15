@@ -87,7 +87,7 @@ class WBDatabase(QTVarios.WDialogo):
         dic_grid = self.dbGames.recuperaConfig("dic_grid")
         if not dic_grid:
             key = "databases_columns_default"
-            dic_grid = self.configuration.leeVariables(key)
+            dic_grid = self.configuration.read_variables(key)
         if dic_grid:
             self.wgames.grid.restore_video(dic_grid)
             self.wgames.grid.releerColumnas()

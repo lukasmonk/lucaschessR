@@ -27,6 +27,7 @@ class Engine:
         self.max_time = 0
         self.id_name = key
         self.id_author = autor
+        self.book = None
 
         self.__li_uci_options = None
 

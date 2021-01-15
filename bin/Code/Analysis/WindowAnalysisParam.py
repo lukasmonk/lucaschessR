@@ -124,7 +124,7 @@ def form_variations(alm):
     return li_var
 
 
-def paramAnalisis(parent, configuration, siModoAmpliado, siTodosMotores=False):
+def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=False):
     alm = leeDicParametros(configuration)
 
     # Datos
@@ -310,7 +310,7 @@ def paramAnalisis(parent, configuration, siModoAmpliado, siTodosMotores=False):
         return None
 
 
-def paramAnalisisMasivo(parent, configuration, siVariosSeleccionados, siDatabase=False):
+def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, siDatabase=False):
     alm = leeDicParametros(configuration)
 
     # Datos
