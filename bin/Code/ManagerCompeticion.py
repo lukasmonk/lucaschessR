@@ -63,7 +63,7 @@ class ManagerCompeticion(Manager.Manager):
         self.put_pieces_bottom(is_white)
         self.ponAyudas(self.hints)
         self.show_side_indicator(True)
-        label = "%s: <b>%s</b><br>%s %s %d" % (_("Opponent"), self.xrival.name, categoria.name(), _("Level"), nivel)
+        label = "%s: %s\n%s %s %d" % (_("Opponent"), self.xrival.name, categoria.name(), _("Level"), nivel)
         if self.puntos:
             label += " (+%d %s)" % (self.puntos, _("points"))
         self.set_label1(label)
@@ -273,7 +273,7 @@ class ManagerCompeticion(Manager.Manager):
         if player_win:
             hecho = "B" if self.human_side else "N"
             if self.categorias.put_result(self.categoria, self.nivelJugado, hecho):
-                mensaje += "<br><br>%s: %d (%s)" % (
+                mensaje += "\n\n%s: %d (%s)" % (
                     _("Move to the next level"),
                     self.categoria.level_done + 1,
                     self.categoria.name(),
@@ -281,7 +281,7 @@ class ManagerCompeticion(Manager.Manager):
             self.dbm.set_categorias_rival(self.rival_conf.key, self.categorias)
             if self.puntos:
                 puntuacion = self.dbm.puntuacion()
-                mensaje += "<br><br>%s: %d+%d = %d %s" % (
+                mensaje += "\n\n%s: %d+%d = %d %s" % (
                     _("Total score"),
                     puntuacion - self.puntos,
                     self.puntos,

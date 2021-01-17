@@ -968,3 +968,5 @@ def change_interval(owner, configuration):
     if vtime > 0.01:
         configuration.x_interval_replay = int(vtime * 1000)
         configuration.graba()
+
+

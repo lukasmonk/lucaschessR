@@ -469,7 +469,7 @@ class DBgames:
         p.resultado()
         return p
 
-    def read_pgn_recno(self, recno, sp):
+    def read_pgn_recno(self, recno):
         raw = self.read_complete_recno(recno)
         litags = []
         result = "*"
@@ -494,12 +494,10 @@ class DBgames:
             return p.pgn(), p.resultado()
 
         pgn = xpv_pgn(raw["XPV"])
-        if sp == "\r\n":
-            pgn = pgn.replace("\n", "\r\n")
         tags = []
         for t, v in litags:
             tags.append('[%s "%s"]' % (t, v))
-        pgn = sp.join(tags) + sp + sp + pgn
+        pgn = "\n".join(tags) + "\n" + "\n" + pgn
         return pgn, result
 
     def blank_game(self):

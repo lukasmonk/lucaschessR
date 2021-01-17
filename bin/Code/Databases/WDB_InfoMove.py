@@ -1,10 +1,12 @@
+import re
 from PySide2 import QtWidgets, QtCore
 from PySide2.QtCore import Qt
 
 from Code.Base import Position
 from Code.QT import Colocacion
 from Code.QT import Controles
-from Code.QT import QTVarios
+from Code.QT import QTVarios, QTUtil
+from Code.QT import Iconos
 from Code.Board import Board
 import Code
 
@@ -18,7 +20,22 @@ class BoardKey(Board.Board):
 class LBKey(Controles.LB):
     def keyPressEvent(self, event):
         k = event.key()
-        self.parentWidget().tecla_pulsada(k)
+        self.wowner.tecla_pulsada(k)
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            if not self.game:
+                return
+            event.ignore()
+            menu = QTVarios.LCMenu(self)
+            menu.opcion("copy", _("Copy"), Iconos.Clipboard())
+            menu.opcion("copy_sel", _("Copy to selected position"), Iconos.Clipboard())
+            resp = menu.lanza()
+            if resp == "copy":
+                QTUtil.ponPortapapeles(self.game.pgn())
+            elif resp == "copy_sel":
+                g = self.game.copia(self.pos_move)
+                QTUtil.ponPortapapeles(g.pgn())
 
 
 class WInfomove(QtWidgets.QWidget):
@@ -44,7 +61,7 @@ class WInfomove(QtWidgets.QWidget):
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
         self.lbPGN = LBKey(self).anchoFijo(self.board.ancho).set_wrap()
-        self.lbPGN.colocate = self.colocatePartida
+        self.lbPGN.wowner = self
         self.lbPGN.ponTipoLetra(puntos=configuration.x_pgn_fontpoints + 2)
         self.lbPGN.setStyleSheet(
             "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 2px 16px 6px 2px;}"
@@ -152,9 +169,12 @@ class WInfomove(QtWidgets.QWidget):
             li.append(xp)
         pgn = " ".join(li)
         self.lbPGN.set_text(pgn)
+        self.lbPGN.game = self.game
+        self.lbPGN.pos_move = self.pos_move
 
     def colocatePartida(self, pos):
         if not len(self.game):
+            self.lbPGN.game = None
             self.lbPGN.set_text("")
             self.board.set_position(self.game.first_position)
             return
@@ -190,6 +210,8 @@ class WInfomove(QtWidgets.QWidget):
             pgn += '<a href="%d" style="text-decoration:none;">%s</a> ' % (n, xp)
 
         self.lbPGN.set_text(pgn)
+        self.lbPGN.game = self.game
+        self.lbPGN.pos_move = pos
 
         self.pos_move = pos
 

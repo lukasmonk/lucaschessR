@@ -701,7 +701,7 @@ class Manager:
             try:
                 with open(conf.x_save_pgn, "at", encoding="utf-8", errors="ignore") as q:
                     dato = self.pgn.actual() + "\n\n"
-                    q.write(dato.replace("\n", "\r\n"))
+                    q.write(dato)
             except:
                 QTUtil.ponPortapapeles(self.pgn.actual())
                 QTUtil2.message_error(

@@ -973,7 +973,6 @@ class WGames(QtWidgets.QWidget):
         if w.exec_():
             ws = WindowSavePGN.FileSavePGN(self, w.dic_result)
             if ws.open():
-                sp = "\r\n" if ws.crlf else "\n"
                 pb = QTUtil2.BarraProgreso1(self, _("Saving..."), formato1="%p%")
                 pb.mostrar()
                 if only_selected:
@@ -983,15 +982,15 @@ class WGames(QtWidgets.QWidget):
                 pb.ponTotal(len(li_sel))
                 for n, recno in enumerate(li_sel):
                     pb.pon(n)
-                    pgn, result = self.dbGames.read_pgn_recno(recno, sp)
+                    pgn, result = self.dbGames.read_pgn_recno(recno)
                     if pb.is_canceled():
                         break
                     if n > 0 or not ws.is_new:
-                        ws.write(sp + sp)
+                        ws.write("\n\n")
                     if result in ("*", "1-0", "0-1", "1/2-1/2"):
                         if not pgn.endswith(result):
                             pgn += " " + result
-                    ws.write(pgn + sp)
+                    ws.write(pgn + "\n")
 
                 pb.close()
                 ws.close()

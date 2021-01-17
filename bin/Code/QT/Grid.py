@@ -349,6 +349,8 @@ class Grid(QtWidgets.QTableView):
         if hasattr(self.w_parent, "grid_tecla_control"):
             self.w_parent.grid_tecla_control(self, k, is_shift, is_control, is_alt)
 
+        QtWidgets.QTableView.keyPressEvent(self, event)
+
     def selectionChanged(self, uno, dos):
         if self.starting:
             return

@@ -7,6 +7,7 @@ from Code import TrListas
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
+from Code.QT import QTUtil
 from Code.QT import QTVarios
 from Code.Board import Board
 from Code.QT import WindowColors
@@ -23,6 +24,24 @@ V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_
     18,
     19,
 )
+
+class LBKey(Controles.LB):
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            if not self.game:
+                return
+            event.ignore()
+            menu = QTVarios.LCMenu(self)
+            menu.opcion("copy", _("Copy"), Iconos.Clipboard())
+            menu.opcion("copy_sel", _("Copy to selected position"), Iconos.Clipboard())
+            resp = menu.lanza()
+            if resp == "copy":
+                QTUtil.ponPortapapeles(self.game.pgn())
+            elif resp == "copy_sel":
+                g = self.game.copia(self.pos_move)
+                QTUtil.ponPortapapeles(g.pgn())
+
 
 
 class BoardLines(QtWidgets.QWidget):
@@ -58,8 +77,7 @@ class BoardLines(QtWidgets.QWidget):
 
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
-        self.lbPGN = Controles.LB(self).set_wrap()
-        self.lbPGN.colocate = self.colocatePartida
+        self.lbPGN = LBKey(self).set_wrap()
         self.lbPGN.setStyleSheet(
             "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}"
         )
@@ -199,7 +217,7 @@ class BoardLines(QtWidgets.QWidget):
         self.fenm2 = None
         num_jugadas = len(self.game)
         if num_jugadas == 0:
-            self.pos_move = -1
+            self.lbPGN.game = None
             self.lbPGN.set_text("")
             self.board.set_position(self.game.first_position)
             self.resetValues()
@@ -234,6 +252,9 @@ class BoardLines(QtWidgets.QWidget):
             pgn += '<a href="%d" style="text-decoration:none;">%s</a> ' % (n, xp)
 
         self.lbPGN.set_text(pgn)
+        self.lbPGN.game = self.game
+        self.lbPGN.pos_move = pos
+
 
         self.pos_move = pos
 
@@ -259,11 +280,6 @@ class BoardLines(QtWidgets.QWidget):
             self.board.put_arrow_sc(move.from_sq, move.to_sq)
             position_before = move.position_before
             fenM2_base = position_before.fenm2()
-            # dicP = self.dbop.getfenvalue(fenM2_base)
-            # if "ANALISIS" in dicP:
-            #     mrm = dicP["ANALISIS"]
-            #     rm = mrm.mejorMov()
-            #     self.board.creaFlechaMulti(rm.movimiento(), False)
 
         if self.siReloj:
             self.board.disable_all()

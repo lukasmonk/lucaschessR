@@ -145,7 +145,7 @@ class AnalyzeGame:
             return
 
         with open(file, "at", encoding="utf-8", errors="ignore") as f:
-            f.write("%s\r\n" % fen)
+            f.write("%s\n" % fen)
         self.procesador.entrenamientos.menu = None
 
     def graba_tactic(self, game, njg, mrm, pos_act):

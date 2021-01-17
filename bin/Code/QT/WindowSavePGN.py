@@ -4,7 +4,6 @@ import os
 import chardet.universaldetector
 from PySide2 import QtWidgets
 
-import Code
 from Code.Base import Game
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -385,8 +384,6 @@ class WSave(QTVarios.WDialogo):
         pgn += "\n%s\n" % self.em_body.texto().strip()
         if "\r\n" in pgn:
             pgn = pgn.replace("\r\n", "\n")
-        if Code.isWindows:
-            pgn = pgn.replace("\n", "\r\n")
 
         if self.chb_remove_c_v.isChecked():
             ok, p = Game.pgn_game(pgn)
@@ -405,7 +402,7 @@ class WSave(QTVarios.WDialogo):
         if os.path.isfile(self.file):
             if not self.chb_overwrite.isChecked():
                 modo = "a"
-                pgn = ("\r\n\r\n") + pgn
+                pgn = ("\n\n") + pgn
 
         codec = self.cb_codecs.valor()
 
@@ -426,7 +423,7 @@ class WSave(QTVarios.WDialogo):
         try:
             with open(self.file, modo, encoding=codec, errors="ignore") as q:
                 if modo == "a":
-                    q.write("\r\n\r\n" if Code.isWindows else "\n\n")
+                    q.write("\n\n")
                 q.write(pgn)
             if self.file in self.history_list:
                 self.history_list.remove(self.file)
@@ -487,14 +484,14 @@ class WSave(QTVarios.WDialogo):
 
     def grid_dato(self, grid, row, o_column):
         if o_column.key == "ETIQUETA":
-            lb = self.li_labels[row][0]
+            lb, value = self.li_labels[row]
             ctra = lb.upper()
             trad = TrListas.pgnLabel(lb)
             if trad != ctra:
                 key = trad
             else:
                 if lb:
-                    key = lb  # [0].upper()+lb[1:].lower()
+                    key = lb
                 else:
                     key = ""
             return key
@@ -562,21 +559,14 @@ class FileSavePGN:
                     u.close()
                     self.codec = u.result.get("encoding", "utf-8")
         self.xum = None
-        self.crlf = False
 
     def open(self):
         # try:
         modo = "wt" if self.overwrite else "at"
         self.is_new = self.overwrite or not os.path.isfile(self.file)
-        if not self.is_new:
-            with open(self.file, "rt") as f:
-                self.crlf = "\r\n" in f.read(1000)
 
         self.f = open(self.file, modo, encoding=self.codec, errors="ignore")
         return True
-        # except:
-        #     QTUtil2.message_error(self.owner, "%s : %s\n" % (_("Unable to save"), self.file))
-        #     return False
 
     def write(self, pgn):
         self.f.write(pgn)

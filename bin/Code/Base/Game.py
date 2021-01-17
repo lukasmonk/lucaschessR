@@ -472,6 +472,7 @@ class Game:
 
     def is_finished(self):
         if self.termination != TERMINATION_UNKNOWN or self.result != RESULT_UNKNOWN:
+            self.test_tag_result()
             return True
         if self.li_moves:
             move = self.li_moves[-1]
@@ -482,8 +483,13 @@ class Game:
                 else:
                     self.result = RESULT_DRAW
                     self.termination = TERMINATION_DRAW_STALEMATE
+                self.test_tag_result()
                 return True
         return False
+
+    def test_tag_result(self):
+        if not self.get_tag("RESULT"):
+            self.add_tag("Result", self.result)
 
     def resultado(self):
         if self.result == RESULT_UNKNOWN:
@@ -582,6 +588,7 @@ class Game:
 
     def resign(self, is_white):
         self.set_termination(TERMINATION_RESIGN, RESULT_WIN_BLACK if is_white else RESULT_WIN_WHITE)
+        self.test_tag_result()
 
     def borraCV(self):
         self.first_comment = ""
