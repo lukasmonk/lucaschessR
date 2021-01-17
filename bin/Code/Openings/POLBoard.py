@@ -217,6 +217,7 @@ class BoardLines(QtWidgets.QWidget):
         self.fenm2 = None
         num_jugadas = len(self.game)
         if num_jugadas == 0:
+            self.pos_move = -1
             self.lbPGN.game = None
             self.lbPGN.set_text("")
             self.board.set_position(self.game.first_position)
@@ -293,7 +294,7 @@ class BoardLines(QtWidgets.QWidget):
         if not self.siReloj and self.pos_move >= self.num_jg_inicial - 1:
             if self.pos_move >= 0:
                 move = self.game.move(self.pos_move)
-                color = not move.is_white()
+                color = not move.is_white() if move else True
             else:
                 color = True
             self.board.activate_side(color)
