@@ -109,9 +109,6 @@ char * pgn_fen(int num);
 int pgn_numfens(void);
 
 // polyglot.c
-Bitmap hash_polyglot(board_polyglot *board);
-void pboard_init(board_polyglot *board);
-int pboard_from_fen(board_polyglot *board, char *fen);
 Bitmap hash_from_fen(char *fen);
 void open_poly_w(char * name);
 void close_poly();

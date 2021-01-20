@@ -2,7 +2,7 @@ from Code.Base import Game, Position
 from Code import Manager
 from Code.QT import Controles
 from Code.QT import Iconos
-from Code.PlayAgainstEngine import PlayAgainstEngine
+from Code.PlayAgainstEngine import WPlayAgainstEngine
 from Code.QT import WindowSolo
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
@@ -365,7 +365,7 @@ class ManagerGame(Manager.Manager):
         else:
             dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
-        dic = self.dicRival = PlayAgainstEngine.cambioRival(
+        dic = self.dicRival = WPlayAgainstEngine.cambioRival(
             self.main_window, self.configuration, dicBase, siManagerSolo=True
         )
 

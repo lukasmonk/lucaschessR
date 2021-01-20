@@ -213,7 +213,7 @@ class ManagerVariations(Manager.Manager):
         else:
             dicBase = self.configuration.read_variables("ENG_VARIANTES")
 
-        import Code.PlayAgainstEngine.PlayAgainstEngine as WindowEntMaq
+        import Code.PlayAgainstEngine.WPlayAgainstEngine as WindowEntMaq
 
         dic = self.dicRival = WindowEntMaq.cambioRival(
             self.main_window, self.configuration, dicBase, siManagerSolo=True

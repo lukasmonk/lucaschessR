@@ -3,7 +3,7 @@ import random
 
 from Code.Engines import Engines
 
-from Code.Base import Game
+from Code.Base import Game, Position
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
@@ -196,7 +196,10 @@ class Tournament:
         return self.config("last_change", None, None)
 
     def fen(self, valor=None):
-        return self.config("fen", valor, "")
+        v = self.config("fen", valor, "")
+        if isinstance(v, Position.Position):
+            v = v.fen()
+        return v
 
     def norman(self, valor=None):
         return self.config("norman", valor, False)

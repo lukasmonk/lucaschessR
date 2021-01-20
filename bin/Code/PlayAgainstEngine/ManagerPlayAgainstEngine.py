@@ -17,7 +17,7 @@ from Code import Tutor
 from Code import Util
 from Code import Adjournments
 from Code.Engines import EngineResponse, SelectEngines
-from Code.PlayAgainstEngine import PlayAgainstEngine
+from Code.PlayAgainstEngine import WPlayAgainstEngine
 
 from Code.Base.Constantes import *
 
@@ -353,7 +353,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     self.main_window,
                     _X(_("%1 has won on time."), self.xrival.name) + "\n\n" + _("Add time and keep playing?"),
                 ):
-                    minX = PlayAgainstEngine.dameMinutosExtra(self.main_window)
+                    minX = WPlayAgainstEngine.dameMinutosExtra(self.main_window)
                     if minX:
                         ot.ponSegExtra(minX * 60)
                         return
@@ -1186,7 +1186,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.ponAyudas(self.hints, siQuitarAtras=False)
 
     def cambioRival(self):
-        dic = PlayAgainstEngine.cambioRival(self.main_window, self.configuration, self.reinicio)
+        dic = WPlayAgainstEngine.cambioRival(self.main_window, self.configuration, self.reinicio)
 
         if dic:
             dr = dic["RIVAL"]

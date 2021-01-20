@@ -175,7 +175,6 @@ def read_engines(folder_engines):
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 218)
 
-
     if is64:
         mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
 

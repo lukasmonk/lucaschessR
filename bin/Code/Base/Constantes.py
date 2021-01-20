@@ -226,6 +226,17 @@ dicHTMLnags = {
     245: "⊥",
 }
 
+dicHTMLnagsTxt = {
+    NAG_1: "!",
+    NAG_2: "?",
+    NAG_3: "!!",
+    NAG_4: "??",
+    NAG_5: "!?",
+    NAG_6: "?!",
+}
+
+
+
 
 OPENING, MIDDLEGAME, ENDGAME, ALLGAME = range(4)
 

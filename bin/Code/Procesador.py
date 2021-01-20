@@ -8,7 +8,7 @@ from Code import Util
 from Code import Routes
 from Code import Update
 from Code.Engines import EngineManager, WEngines
-from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, PlayAgainstEngine
+from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine
 from Code.Base.Constantes import *
 from Code import Albums
 from Code import CPU
@@ -820,7 +820,7 @@ class Procesador:
         WindowSTS.sts(self, self.main_window)
 
     def libre(self):
-        dic = PlayAgainstEngine.play_against_engine(self, _("Play against an engine"))
+        dic = WPlayAgainstEngine.play_against_engine(self, _("Play against an engine"))
         if dic:
             self.entrenaMaquina(dic)
 
@@ -961,7 +961,7 @@ class Procesador:
 
     def juegaExterno(self, fich_tmp):
         dic_sended = Util.restore_pickle(fich_tmp)
-        dic = PlayAgainstEngine.play_position(self, _("Play a position"), dic_sended["ISWHITE"])
+        dic = WPlayAgainstEngine.play_position(self, _("Play a position"), dic_sended["ISWHITE"])
         if dic is None:
             self.run_action(TB_QUIT)
         else:

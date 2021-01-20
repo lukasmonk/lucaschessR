@@ -237,10 +237,10 @@ class PGNreader:
                     linea = readline()
                     if not linea:
                         raise StopIteration
-                    linea = linea.strip()
-                    if linea[:1] == b"[" and linea[-1:] == b"]":
-                        add_label(linea)
-                    elif len(linea) > 0:
+                    linea1 = linea.strip()
+                    if linea1[:1] == b"[" and linea1[-1:] == b"]":
+                        add_label(linea1)
+                    elif len(linea1) > 0:
                         body = linea
                         break
                 break

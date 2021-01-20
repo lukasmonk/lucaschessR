@@ -362,7 +362,7 @@ class WTournament(QTVarios.WDialogo):
         cp.read_fen(self.fen)
         resp = Voyager.voyager_position(self, cp)
         if resp is not None:
-            self.fen = resp
+            self.fen = resp.fen()
             self.muestraPosicion()
 
     def posicionQuitar(self):

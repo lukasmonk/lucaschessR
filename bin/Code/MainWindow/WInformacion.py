@@ -274,7 +274,7 @@ class InformacionPGN(QtWidgets.QWidget):
     def more_nags(self):
         for cb in self.li_nags:
             if not cb.isVisible():
-                cb.ponValor("-")
+                cb.ponValor(None)
                 cb.show()
                 return
 
@@ -322,12 +322,12 @@ class InformacionPGN(QtWidgets.QWidget):
             n += 1
         if n == 0:
             cb = self.li_nags[0]
-            cb.ponValor("-")
+            cb.ponValor(None)
             cb.show()
         else:
             for x in range(n, self.max_nags):
                 cb = self.li_nags[x]
-                cb.ponValor("-")
+                cb.ponValor(None)
                 cb.hide()
 
     def keyPressEvent(self, event):

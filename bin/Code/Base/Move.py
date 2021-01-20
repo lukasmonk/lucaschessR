@@ -19,6 +19,8 @@ dicHTMLFigs = creaDicHTML()
 def html_nag(nag):
     return dicHTMLnags.get(nag, "$%d" % nag)
 
+def html_nag_txt(nag):
+    return dicHTMLnagsTxt.get(nag, "$%d" % nag)
 
 class Move:
     def __init__(self, game, position_before=None, position=None, from_sq=None, to_sq=None, promotion=""):
@@ -186,7 +188,7 @@ class Move:
     def resto(self, with_variations=True):
         resp = ""
         if self.li_nags:
-            resp += " ".join([html_nag(nag) for nag in self.li_nags])
+            resp += " ".join([html_nag_txt(nag) for nag in self.li_nags])
 
         if self.comment:
             resp += " "

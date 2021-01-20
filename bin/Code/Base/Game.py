@@ -372,7 +372,9 @@ class Game:
                 numJugada += 1
             resp += move.pgnEN() + " "
 
-        resp = resp.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").replace("  ", " ").strip()
+        resp = resp.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").strip()
+        while "  " in resp:
+            resp = resp.replace("  ", " ")
 
         return resp
 
@@ -887,7 +889,7 @@ def pgn_game(pgn):
     game = Game()
     last_posicion = game.first_position
     jg_activa = None
-    if type(pgn) is bytes:
+    if type(pgn) == bytes:
         pgn = pgn.decode("utf-8", errors="ignore")
     li = FasterCode.xparse_pgn(pgn)
     if li is None:
