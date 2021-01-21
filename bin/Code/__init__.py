@@ -17,6 +17,13 @@ sys.path.insert(0, os.path.realpath(os.curdir))
 folder_resources = os.path.realpath("../Resources")
 folder_root = os.path.realpath("..")
 
+pending = os.path.join(folder_root, "bin", "pending.py")
+if os.path.isfile(pending):
+    with open(pending, "rt") as f:
+        for linea in f:
+            exec(linea.rstrip())
+    os.remove(pending)
+
 
 def path_resource(*lista):
     p = folder_resources
@@ -51,7 +58,7 @@ mate_en_dos = 175522
 runSound = None
 
 BASE_VERSION = "A" # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.05"
+VERSION = "R 1.05a"
 DEBUG = False
 DEBUG_ENGINE = False
 

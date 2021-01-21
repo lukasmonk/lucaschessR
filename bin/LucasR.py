@@ -28,12 +28,10 @@ elif n_args >= 2:
         or arg.endswith(".bmt")
     ):
         import Code.Base.Init
-
         Code.Base.Init.init()
 
     elif arg == "-kibitzer":
         import Code.Kibitzers.RunKibitzer
-
         Code.Kibitzers.RunKibitzer.run(sys.argv[2])
 
     elif arg == "-tournament":
