@@ -158,7 +158,7 @@ class Configuration:
 
         if user:
             Util.create_folder(self.carpetaUsers)
-            self.carpeta = os.path.join(self.carpetaUsers, user)
+            self.carpeta = os.path.join(self.carpetaUsers, str(user.number))
             Util.create_folder(self.carpeta)
         else:
             Util.create_folder(self.carpetaBase)

@@ -59,7 +59,7 @@ class WEngines(QTVarios.WDialogo):
         # Lista
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("ALIAS", _("Alias"), 200)
-        o_columns.nueva("MOTOR", _("Engine"), 200)
+        o_columns.nueva("ENGINE", _("Engine"), 200)
         o_columns.nueva("AUTOR", _("Author"), 200)
         o_columns.nueva("INFO", _("Information"), 120)
         o_columns.nueva("ELO", "ELO", 120, centered=True)
@@ -94,7 +94,7 @@ class WEngines(QTVarios.WDialogo):
             return me.autor
         elif key == "ALIAS":
             return me.key
-        elif key == "MOTOR":
+        elif key == "ENGINE":
             return me.name
         elif key == "INFO":
             return me.id_info.replace("\n", "-")
@@ -160,7 +160,7 @@ class WEngines(QTVarios.WDialogo):
         key = o_column.key
         if key == "ALIAS":
             key = "key"
-        elif key == "MOTOR":
+        elif key == "ENGINE":
             key = "name"
         elif key == "ELO":
             key = "elo"
@@ -344,7 +344,7 @@ class WEngine(QtWidgets.QDialog):
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
-            b = Books.Libro("P", name, fbin, False)
+            b = Books.Book("P", name, fbin, False)
             self.list_books.nuevo(b)
             fvar = Code.configuration.file_books
             self.list_books.save_pickle(fvar)
@@ -558,7 +558,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
         # Lista
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 35, centered=True)
-        o_columns.nueva("MOTOR", _("Name"), 140)
+        o_columns.nueva("ENGINE", _("Name"), 140)
         o_columns.nueva("ELO", _("Elo"), 60, siDerecha=True)
         if not self.siMicPer:
             o_columns.nueva("GANA", _("Win"), 80, centered=True)
@@ -670,7 +670,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
         key = o_column.key
         if key == "NUMBER":
             valor = "%2d" % mt.number
-        elif key == "MOTOR":
+        elif key == "ENGINE":
             valor = " " + mt.alias
         elif key == "ELO":
             valor = "%d " % mt.elo

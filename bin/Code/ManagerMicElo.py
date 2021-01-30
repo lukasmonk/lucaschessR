@@ -144,7 +144,7 @@ class ManagerMicElo(Manager.Manager):
         self.vtime[False] = Util.Timer(self.maxSegundos)
 
         cbook = self.engine_rival.book if self.engine_rival.book else Code.tbook
-        self.book = Books.Libro("P", cbook, cbook, True)
+        self.book = Books.Book("P", cbook, cbook, True)
         self.book.polyglot()
 
         elo = self.engine_rival.elo

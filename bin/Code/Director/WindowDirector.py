@@ -63,7 +63,7 @@ class WPanelDirector(QTVarios.WDialogo):
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 20, centered=True)
         o_columns.nueva("MARCADO", "", 20, centered=True, siChecked=True)
-        o_columns.nueva("TIPO", _("Type"), 50, centered=True)
+        o_columns.nueva("TYPE", _("Type"), 50, centered=True)
         o_columns.nueva("NOMBRE", _("Name"), 100, centered=True, edicion=Delegados.LineaTextoUTF8())
         o_columns.nueva("INFO", _("Information"), 100, centered=True)
         self.g_guion = Grid.Grid(self, o_columns, siCabeceraMovible=False, siEditable=True, siSeleccionMultiple=True)
@@ -178,7 +178,7 @@ class WPanelDirector(QTVarios.WDialogo):
             return "%d" % (row + 1,)
         if key == "MARCADO":
             return self.guion.marcado(row)
-        elif key == "TIPO":
+        elif key == "TYPE":
             return self.guion.txt_tipo(row)
         elif key == "NOMBRE":
             return self.guion.name(row)

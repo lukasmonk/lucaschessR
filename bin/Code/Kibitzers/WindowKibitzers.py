@@ -57,7 +57,7 @@ class WKibitzers(QTVarios.WDialogo):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva(
-            "TIPO", "", 30, centered=True, edicion=Delegados.PmIconosBMT(self, dicIconos=self.tipos.dicDelegado())
+            "TYPE", "", 30, centered=True, edicion=Delegados.PmIconosBMT(self, dicIconos=self.tipos.dicDelegado())
         )
         o_columns.nueva("NOMBRE", _("Kibitzer"), 209)
         self.grid_kibitzers = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid="kib")
@@ -188,7 +188,7 @@ class WKibitzers(QTVarios.WDialogo):
         menu.opcion(("engine", None), _("Engine"), Iconos.Motor())
         menu.separador()
 
-        submenu = menu.submenu(_("Book polyglot"), Iconos.Book())
+        submenu = menu.submenu(_("Polyglot book"), Iconos.Book())
         list_books = Books.ListBooks()
         list_books.restore_pickle(self.configuration.file_books)
         list_books.check()
@@ -235,7 +235,7 @@ class WKibitzers(QTVarios.WDialogo):
         if fbin:
             list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
-            book = Books.Libro("P", name, fbin, True)
+            book = Books.Book("P", name, fbin, True)
             list_books.nuevo(book)
             list_books.save_pickle(self.configuration.file_books)
             num = self.kibitzers.nuevo_polyglot(book)
@@ -335,7 +335,7 @@ class WKibitzers(QTVarios.WDialogo):
         me = self.kibitzers.kibitzer(row)
         if column == "NOMBRE":
             return me.name
-        elif column == "TIPO":
+        elif column == "TYPE":
             return me.tipo
 
     def gridDatoValores(self, row, column):

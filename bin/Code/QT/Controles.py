@@ -18,7 +18,6 @@ class ED(QtWidgets.QLineEdit):
             QtWidgets.QLineEdit.__init__(self, parent)
         self.parent = parent
 
-        self.siMayusculas = False
         self.decimales = 1
 
         self.menu = None

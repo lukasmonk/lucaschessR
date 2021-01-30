@@ -125,8 +125,9 @@ class EngineManager:
             self.engine = EngineRunDirect.DirectEngine(
                 self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args
             )
+        elif self.name.lower().startswith("maia"):
+            self.engine = EngineRun.MaiaEngine(self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args)
         else:
-            # self.engine = RunEngine.RunEngine(self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args)
             self.engine = EngineRun.RunEngine(self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args)
 
         if self.confMotor.siDebug:

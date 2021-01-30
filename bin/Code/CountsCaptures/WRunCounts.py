@@ -173,7 +173,7 @@ class WRunCounts(QTVarios.WDialogo):
                     self.count.current_posmove = 0
                 self.count.current_depth = 0
                 self.lb_result.set_text(
-                    "%s (%d)" % (_("Wrong, you advance to the last position solved"), self.count.current_posmove + 1)
+                    "%s (%d)" % (_("Wrong, return to the last position solved"), self.count.current_posmove + 1)
                 )
                 self.lb_result.set_foreground("red")
             else:

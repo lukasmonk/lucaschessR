@@ -990,7 +990,7 @@ class WBMT(QTVarios.WDialogo):
         file = self.configuration.file_param_analysis()
         dic = Util.restore_pickle(file)
         if dic:
-            engine = dic["MOTOR"]
+            engine = dic["ENGINE"]
             vtime = dic["TIME"]
         else:
             engine = self.configuration.tutor.key
@@ -1026,7 +1026,7 @@ class WBMT(QTVarios.WDialogo):
         if not vtime or not name:
             return
 
-        dic = {"MOTOR": engine, "TIME": vtime}
+        dic = {"ENGINE": engine, "TIME": vtime}
         Util.save_pickle(file, dic)
 
         # Analizamos todos, creamos las games, y lo salvamos
@@ -1595,7 +1595,7 @@ class WBMT(QTVarios.WDialogo):
                 if not vtime or not name:
                     return
 
-                dic = {"MOTOR": engine, "TIME": vtime}
+                dic = {"ENGINE": engine, "TIME": vtime}
                 Util.save_pickle(file, dic)
 
                 from_sq = liGen[3]

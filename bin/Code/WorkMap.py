@@ -417,7 +417,7 @@ class DBWorkMap(SQLBase.DBBase):
                 "DCREATION": DCREATION[: DCREATION.rindex(":")],
                 "DEND": DEND[: DEND.rindex(":")] if DEND else "",
                 "DONE": DONE,
-                "TIPO": "%s - %s" % (self.trDic[TIPO], self.trDic.get(MODEL, MODEL)),
+                "TYPE": "%s - %s" % (self.trDic[TIPO], self.trDic.get(MODEL, MODEL)),
                 "XTIPO": TIPO,
                 "RESULT": INFO if INFO else "",
             }
@@ -485,7 +485,7 @@ class DBWorkMap(SQLBase.DBBase):
     def getTipo(self):
         for d in self.listaRaws:
             if d["ACTIVE"] == "X":
-                return d["TIPO"]
+                return d["TYPE"]
         return ""
 
 
@@ -611,7 +611,7 @@ class WorkMap:
         return len(self.listaGrid)
 
     def dato(self, row, column):
-        if column == "TIPO":
+        if column == "TYPE":
             return "5" if self.listaGrid[row].donePV else "1"  # 5 = Azul 1 = Gris
         else:
             return self.listaGrid[row].name

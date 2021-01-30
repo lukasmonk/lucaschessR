@@ -376,7 +376,7 @@ class ManagerGame(Manager.Manager):
             dr = dic["RIVAL"]
             rival = dr["CM"]
             r_t = dr["TIME"] * 100  # Se guarda en decimas -> milesimas
-            r_p = dr["PROFUNDIDAD"]
+            r_p = dr["DEPTH"]
             if r_t <= 0:
                 r_t = None
             if r_p <= 0:
@@ -384,7 +384,7 @@ class ManagerGame(Manager.Manager):
             if r_t is None and r_p is None and not dic["SITIEMPO"]:
                 r_t = 1000
 
-            nAjustarFuerza = dic["AJUSTAR"]
+            nAjustarFuerza = dic["ADJUST"]
             self.xrival = self.procesador.creaManagerMotor(rival, r_t, r_p, nAjustarFuerza != ADJUST_BETTER)
             self.xrival.nAjustarFuerza = nAjustarFuerza
 

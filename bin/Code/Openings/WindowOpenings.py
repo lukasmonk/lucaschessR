@@ -60,7 +60,7 @@ class WOpenings(QTVarios.WDialogo):
         # Lista Openings
         o_columns = Columnas.ListaColumnas()
         dicTipos = {"b": Iconos.pmSun(), "n": Iconos.pmPuntoAzul(), "l": Iconos.pmNaranja()}
-        o_columns.nueva("TIPO", "", 24, edicion=Delegados.PmIconosBMT(dicIconos=dicTipos))
+        o_columns.nueva("TYPE", "", 24, edicion=Delegados.PmIconosBMT(dicIconos=dicTipos))
         o_columns.nueva("OPENING", _("Possible continuation"), 480)
 
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, altoFila=32)
@@ -115,7 +115,7 @@ class WOpenings(QTVarios.WDialogo):
     def grid_dato(self, grid, row, o_column):
         key = o_column.key
         ap = self.liActivas[row]
-        if key == "TIPO":
+        if key == "TYPE":
             return "b" if ap.siBasic else "n"
         else:
             return ap.name + "\n" + ap.pgn

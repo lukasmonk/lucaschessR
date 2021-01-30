@@ -86,14 +86,7 @@ def dict_engines_fixed_elo(folder_engines):
     d = read_engines(folder_engines)
     dic = {}
     for nm, xfrom, xto in (
-        ("amyan", 1000, 2400),
-        ("rhetoric", 1300, 2600),
-        ("cheng", 800, 2500),
-        ("greko", 1600, 2400),
-        ("hamsters", 1000, 2000),
-        ("rybka", 1200, 2400),
-        ("ufim", 700, 2000),
-        ("delfi", 1000, 1000),
+        ("stockfish", 1350, 2850),
     ):
         for elo in range(xfrom, xto + 100, 100):
             cm = d[nm].clona()

@@ -27,7 +27,7 @@ class ListBooks:
         if dic_booklist:
             self.lista = []
             for dic_book in dic_booklist["lista"]:
-                b = Libro("P", "", "", False)
+                b = Book("P", "", "", False)
                 b.from_dic(dic_book)
                 self.lista.append(b)
             self.path = dic_booklist["path"]
@@ -41,7 +41,7 @@ class ListBooks:
     def alMenosUno(self):
         if len(self.lista) == 0:
             bookdef = Code.tbook
-            b = Libro("P", os.path.basename(bookdef)[:-4], bookdef, True)
+            b = Book("P", os.path.basename(bookdef)[:-4], bookdef, True)
             self.lista.append(b)
 
     def modoAnalisis(self, apli):
@@ -173,7 +173,7 @@ class ListBooks:
         return liResp
 
 
-class Libro:
+class Book:
     def __init__(self, tipo, name, path, pordefecto, extras=None):
         self.tipo = tipo
         self.name = name
@@ -1330,10 +1330,10 @@ class Polyglot:
         # return listaJugadas
 
 
-class BookGame(Libro):
+class BookGame(Book):
     def __init__(self, path):
         name = os.path.basename(path)[:-4]
-        Libro.__init__(self, "P", name, path, True)
+        Book.__init__(self, "P", name, path, True)
         self.polyglot()
         self.activo = True
 

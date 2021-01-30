@@ -30,7 +30,7 @@ class WMap(QTVarios.WDialogo):
         self.playCurrent = None
 
         o_columns = Columnas.ListaColumnas()
-        o_columns.nueva("TIPO", "", 24, edicion=Delegados.PmIconosBMT(), centered=True)
+        o_columns.nueva("TYPE", "", 24, edicion=Delegados.PmIconosBMT(), centered=True)
         o_columns.nueva("SELECT", _("Select one to play"), 150)
 
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, xid="W")
@@ -63,7 +63,7 @@ class WMap(QTVarios.WDialogo):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("ACTIVE", _("Active"), 80, centered=True)
-        o_columns.nueva("TIPO", _("Type"), 110, centered=True)
+        o_columns.nueva("TYPE", _("Type"), 110, centered=True)
         o_columns.nueva("DCREATION", _("Creation date"), 110, centered=True)
         o_columns.nueva("DONE", _("Done"), 110, centered=True)
         o_columns.nueva("DEND", _("Ending date"), 110, centered=True)

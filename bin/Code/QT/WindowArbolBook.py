@@ -266,13 +266,13 @@ class WMoves(QtWidgets.QWidget):
 
 
 class InfoMove(QtWidgets.QWidget):
-    def __init__(self, fenActivo):
+    def __init__(self, is_white_bottom, fenActivo):
         QtWidgets.QWidget.__init__(self)
 
         config_board = Code.configuration.config_board("INFOMOVE", 32)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.ponerPiezasAbajo(" w " in fenActivo)
+        self.board.ponerPiezasAbajo(is_white_bottom)
 
         self.cpDefecto = Position.Position()
         self.cpDefecto.read_fen(fenActivo)
@@ -368,7 +368,7 @@ class WindowArbolBook(QTVarios.WDialogo):
 
         self.listaMoves = ListaMoves(None, self.book, fenActivo)
 
-        self.infoMove = InfoMove(fenActivo)
+        self.infoMove = InfoMove(manager.board.is_white_bottom, fenActivo)
 
         self.wmoves = WMoves(self, self.siEnviar)
 
@@ -467,7 +467,7 @@ class WindowArbolBook(QTVarios.WDialogo):
                 if fbin:
                     self.list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
-                    book = Books.Libro("P", name, fbin, True)
+                    book = Books.Book("P", name, fbin, True)
                     self.list_books.nuevo(book)
                     self.cambiaLibro(book)
             elif orden == "b":

@@ -595,7 +595,8 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         self.gb_thinks.setVisible(not hide_time_depth)
 
-        self.cbAjustarRival.ponValor(ADJUST_BETTER)
+        if not si_multi:
+            self.cbAjustarRival.ponValor(ADJUST_BETTER)
         self.btAjustarRival.setVisible(si_multi)
         self.cbAjustarRival.setEnabled(si_multi)
 
@@ -878,7 +879,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             self.edDepthBookP.ponInt(dic.get("BOOKPDEPTH", 0))
 
         # Avanzado
-        self.cbAjustarRival.ponValor(dic.get("AJUSTAR", ADJUST_BETTER))
+        self.cbAjustarRival.ponValor(dic.get("ADJUST", ADJUST_BETTER))
         self.cbResign.ponValor(dr.get("RESIGN", -800))
 
         self.muestraOpening()
@@ -912,7 +913,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
-            b = Books.Libro("P", name, fbin, False)
+            b = Books.Book("P", name, fbin, False)
             self.list_books.nuevo(b)
             fvar = self.configuration.file_books
             self.list_books.save_pickle(fvar)
@@ -1080,13 +1081,13 @@ class WCambioRival(QtWidgets.QDialog):
         dic["ISWHITE"] = self.rb_white.isChecked()
 
         dr = dic["RIVAL"] = {}
-        dr["MOTOR"] = self.rival.key
+        dr["ENGINE"] = self.rival.key
         dr["TIME"] = int(self.edRtiempo.textoFloat() * 10)
-        dr["PROFUNDIDAD"] = self.cbRdepth.valor()
+        dr["DEPTH"] = self.cbRdepth.valor()
         dr["CM"] = self.rival
-        dr["TIPO"] = self.rivalTipo
+        dr["TYPE"] = self.rivalTipo
 
-        dic["AJUSTAR"] = self.cbAjustarRival.valor()
+        dic["ADJUST"] = self.cbAjustarRival.valor()
 
         self.accept()
 
@@ -1103,14 +1104,14 @@ class WCambioRival(QtWidgets.QDialog):
         self.rb_black.activa(not is_white)
 
         dr = dic.get("RIVAL", {})
-        engine = dr.get("MOTOR", self.configuration.tutor.key)
-        tipo = dr.get("TIPO", SelectEngines.INTERNO)
+        engine = dr.get("ENGINE", self.configuration.tutor.key)
+        tipo = dr.get("TYPE", SelectEngines.INTERNO)
         self.rivalTipo, self.rival = self.motores.busca(tipo, engine)
         self.ponRival()
 
         self.edRtiempo.ponFloat(float(dr.get("TIME", self.configuration.x_tutor_mstime / 100)) / 10.0)
-        self.cbRdepth.ponValor(dr.get("PROFUNDIDAD", 0))
-        self.cbAjustarRival.ponValor(dic.get("AJUSTAR", ADJUST_BETTER))
+        self.cbRdepth.ponValor(dr.get("DEPTH", 0))
+        self.cbAjustarRival.ponValor(dic.get("ADJUST", ADJUST_BETTER))
 
     def cambiaPersonalidades(self):
         siRehacer = self.personalidades.lanzaMenu()

@@ -620,7 +620,7 @@ class TabsAnalisis(QtWidgets.QWidget):
                 if fbin:
                     list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
-                    book = Books.Libro("P", name, fbin, True)
+                    book = Books.Book("P", name, fbin, True)
                     list_books.nuevo(book)
                     list_books.save_pickle(self.configuration.file_books)
         else:

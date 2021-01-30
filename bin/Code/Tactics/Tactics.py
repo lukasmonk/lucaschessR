@@ -105,7 +105,7 @@ class Reinforcement:
 
     def label(self):
         if self.is_working():
-            return _("REINFORCEMENT"), ""
+            return _("Reinforcement"), ""
         elif self.enabled():
             if len(self.li_num_fens) > 0:
                 return (

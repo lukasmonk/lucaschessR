@@ -72,7 +72,7 @@ class WBooksTrain(QTVarios.WDialogo):
         ly_select = Colocacion.H().relleno().control(self.chb_highest).relleno()
 
         ly = Colocacion.V().otro(lybook).espacio(10).otro(ly_select)
-        gb_player = Controles.GB(self, _("Player book"), ly).ponFuente(flb)
+        gb_player = Controles.GB(self, _("Player's book"), ly).ponFuente(flb)
 
         # Rival
         book_rival = book_player
@@ -129,7 +129,7 @@ class WBooksTrain(QTVarios.WDialogo):
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             nombre = os.path.basename(fbin)[:-4]
-            b = Books.Libro("P", nombre, fbin, False)
+            b = Books.Book("P", nombre, fbin, False)
             self.list_books.nuevo(b)
             self.rehacer_cb(b)
 

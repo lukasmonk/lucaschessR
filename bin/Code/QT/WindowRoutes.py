@@ -199,8 +199,8 @@ class WTranssiberian(QTVarios.WDialogo):
         smenu = menu.submenu(_("Tactics"), Iconos.Tacticas())
         dkey = {True: None, False: "g"}
         go_fast = self.route.go_fast
-        smenu.opcion(dkey[not go_fast], _("Stop after solve"), dico[not go_fast], is_disabled=not go_fast)
-        smenu.opcion(dkey[go_fast], _("Jump to the next after solve"), dico[go_fast], is_disabled=go_fast)
+        smenu.opcion(dkey[not go_fast], _("Stop after solving"), dico[not go_fast], is_disabled=not go_fast)
+        smenu.opcion(dkey[go_fast], _("Jump to the next after solving"), dico[go_fast], is_disabled=go_fast)
 
         if self.route.km:
             menu.separador()

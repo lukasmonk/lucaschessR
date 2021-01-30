@@ -88,7 +88,7 @@ class Personalities:
         liMJ = [(None, None)]
 
         # # Ajustar
-        liMJ.append((FormLayout.Combobox(_("Strength"), self.listaAjustes(False)), una.get("AJUSTAR", ADJUST_BETTER)))
+        liMJ.append((FormLayout.Combobox(_("Strength"), self.listaAjustes(False)), una.get("ADJUST", ADJUST_BETTER)))
 
         # Movimiento siguiente
         liMJ.append((None, _("In the next move")))
@@ -157,7 +157,7 @@ class Personalities:
                 una["BOOK"] = liAR[0]
 
                 # Medio
-                una["AJUSTAR"] = liMJR[0]
+                una["ADJUST"] = liMJR[0]
 
                 for num, opcion in enumerate(listaSG):
                     una[opcion] = liMJR[num + 1]

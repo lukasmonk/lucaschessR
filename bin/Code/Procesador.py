@@ -795,7 +795,7 @@ class Procesador:
         if accion == "D":
             resp = QTVarios.select_db(self.main_window, self.configuration, True, False)
             if resp:
-                if QTUtil2.pregunta(self.main_window, "%s\n%s" % (_("Do you want to remove ?"), resp)):
+                if QTUtil2.pregunta(self.main_window, "%s\n%s" % (_("Do you want to remove?"), resp)):
                     Util.remove_file(resp)
                     Util.remove_file(resp + ".st1")
             return
@@ -955,7 +955,7 @@ class Procesador:
                 if fbin:
                     list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
-                    book = Books.Libro("P", name, fbin, True)
+                    book = Books.Book("P", name, fbin, True)
                     list_books.nuevo(book)
                     list_books.save_pickle(self.configuration.file_books)
 

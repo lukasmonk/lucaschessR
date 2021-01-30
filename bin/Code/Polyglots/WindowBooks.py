@@ -138,7 +138,7 @@ class WBooksCrear(QtWidgets.QDialog):
         Util.remove_file(fichTemporal)
 
         name = os.path.basename(self.file)[:-4]
-        b = Books.Libro("P", name, self.file, False)
+        b = Books.Book("P", name, self.file, False)
         self.list_books.nuevo(b)
         fvar = self.configuration.file_books
         self.list_books.save_pickle(fvar)

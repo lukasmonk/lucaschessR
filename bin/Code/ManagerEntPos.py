@@ -502,7 +502,7 @@ class ManagerEntPos(Manager.Manager):
 
         QTUtil2.message(
             self.main_window,
-            _X(_("Tactic training %1 created."), nom_dir),
+            _("Tactic training %s created.") % nom_dir,
             explanation=_X(_("You can access this training from menu Train - Learn tactics by repetition - %1"), name),
         )
 

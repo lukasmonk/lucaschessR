@@ -316,7 +316,7 @@ def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo):
 
     liGen.append(FormLayout.separador)
 
-    liGen.append((_("Jump to the next after solve") + ":", salta))
+    liGen.append((_("Jump to the next after solving") + ":", salta))
 
     resultado = FormLayout.fedit(liGen, title=titulo, parent=w_parent, anchoMinimo=200, icon=Iconos.Entrenamiento())
     if resultado:

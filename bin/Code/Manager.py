@@ -872,9 +872,10 @@ class Manager:
         move = self.game.move(pos)
         return move, is_white, siUltimo, tam_lj, pos
 
-    def ayudaMover(self, max_recursion):
+    def ayudaMover(self):
         if not self.is_finished():
             move = Move.Move(self.game, position_before=self.game.last_position.copia())
+            max_recursion = 999
             Analysis.show_analysis(
                 self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, 0, must_save=False
             )

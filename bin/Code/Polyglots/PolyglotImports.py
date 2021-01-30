@@ -196,7 +196,7 @@ class PolyglotImports:
                             ext_int, ext_str = li_externas[pos_externas]
                             if ext_int < current_key:
                                 for entry_ext in self.db_entries[ext_str].values():
-                                    yield entry_ext
+                                    dic_entries[entry_ext.move] = entry_ext
                                 pos_externas += 1
                             else:
                                 break
@@ -212,7 +212,7 @@ class PolyglotImports:
 
                         # se envian
                         for entry_dic in dic_entries.values():
-                            yield entry_dic
+                            yield entry_dic.key, entry_dic
 
                     current_key = entry.key
                     dic_entries = {}
@@ -222,7 +222,7 @@ class PolyglotImports:
         while pos_externas < max_externas:
             ext_int, ext_str = li_externas[pos_externas]
             for entry_ext in self.db_entries[ext_str].values():
-                yield entry_ext
+                yield entry_ext.key, entry_ext
             pos_externas += 1
 
         yield None, None

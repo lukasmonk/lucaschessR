@@ -92,7 +92,7 @@ class PotenciaHistorico:
         tb.nuevoCampo("FECHA", "VARCHAR", notNull=True, primaryKey=True)
         tb.nuevoCampo("REF", "INTEGER")
         tb.nuevoCampo("SCORE", "INTEGER")
-        tb.nuevoCampo("MOTOR", "VARCHAR")
+        tb.nuevoCampo("ENGINE", "VARCHAR")
         tb.nuevoCampo("SEGUNDOS", "INTEGER")
         tb.nuevoCampo("MIN_MIN", "INTEGER")
         tb.nuevoCampo("MIN_MAX", "INTEGER")
@@ -387,7 +387,7 @@ class WPotenciaBase(QTVarios.WDialogo):
         o_columns.nueva("REF", _("N."), 35, centered=True)
         o_columns.nueva("FECHA", _("Date"), 120, centered=True)
         o_columns.nueva("SCORE", _("Score"), 100, centered=True)
-        o_columns.nueva("MOTOR", _("Engine"), 120, centered=True)
+        o_columns.nueva("ENGINE", _("Engine"), 120, centered=True)
         o_columns.nueva("SEGUNDOS", _("Second(s)"), 80, centered=True)
         o_columns.nueva("MIN_MIN", _("Minimum minutes"), 90, centered=True)
         o_columns.nueva("MIN_MAX", _("Maximum minutes"), 90, centered=True)
@@ -445,7 +445,7 @@ class WPotenciaBase(QTVarios.WDialogo):
 
     def leeParametros(self):
         param = UtilSQL.DictSQL(self.configuration.ficheroPotencia, tabla="parametros")
-        engine = param.get("MOTOR", "stockfish")
+        engine = param.get("ENGINE", "stockfish")
         segundos = param.get("SEGUNDOS", 5)
         min_min = param.get("MIN_MIN", 1)
         min_max = param.get("MIN_MAX", 5)
@@ -463,7 +463,7 @@ class WPotenciaBase(QTVarios.WDialogo):
             return Util.localDateT(reg.FECHA)
         elif col == "SCORE":
             return str(reg.SCORE)
-        elif col == "MOTOR":
+        elif col == "ENGINE":
             return reg.MOTOR
         elif col == "SEGUNDOS":
             return str(reg.SEGUNDOS)
@@ -521,7 +521,7 @@ class WPotenciaBase(QTVarios.WDialogo):
             self.min_max = liResp[3]
 
             param = UtilSQL.DictSQL(self.configuration.ficheroPotencia, tabla="parametros")
-            param["MOTOR"] = self.engine
+            param["ENGINE"] = self.engine
             param["SEGUNDOS"] = self.segundos
             param["MIN_MIN"] = self.min_min
             param["MIN_MAX"] = self.min_max

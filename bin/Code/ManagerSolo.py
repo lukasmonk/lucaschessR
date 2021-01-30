@@ -146,7 +146,7 @@ class ManagerSolo(Manager.Manager):
             self.grabarComo()
 
         elif key == TB_HELP_TO_MOVE:
-            self.ayudaMover(999)
+            self.ayudaMover()
 
         else:
             Manager.Manager.rutinaAccionDef(self, key)
@@ -637,7 +637,7 @@ class ManagerSolo(Manager.Manager):
             if hasattr(rival, "icono"):
                 delattr(rival, "icono")  # problem with configuration.write_variables and saving qt variables
             r_t = dr["TIME"] * 100  # Se guarda en decimas -> milesimas
-            r_p = dr["PROFUNDIDAD"]
+            r_p = dr["DEPTH"]
             if r_t <= 0:
                 r_t = None
             if r_p <= 0:
@@ -645,7 +645,7 @@ class ManagerSolo(Manager.Manager):
             if r_t is None and r_p is None and not dic["SITIEMPO"]:
                 r_t = 1000
 
-            nAjustarFuerza = dic["AJUSTAR"]
+            nAjustarFuerza = dic["ADJUST"]
             self.xrival = self.procesador.creaManagerMotor(rival, r_t, r_p, nAjustarFuerza != ADJUST_BETTER)
             self.xrival.nAjustarFuerza = nAjustarFuerza
 

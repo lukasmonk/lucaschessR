@@ -36,7 +36,7 @@ class WDailyTestBase(QTVarios.WDialogo):
         o_columns.nueva("FECHA", _("Date"), 120, centered=True)
         o_columns.nueva("MPUNTOS", _("Points lost"), 100, centered=True)
         o_columns.nueva("MTIEMPOS", _("Time"), 80, centered=True)
-        o_columns.nueva("MOTOR", _("Engine"), 120, centered=True)
+        o_columns.nueva("ENGINE", _("Engine"), 120, centered=True)
         o_columns.nueva("SEGUNDOS", _("Second(s)"), 80, centered=True)
         o_columns.nueva("PRUEBAS", _("N. of tests"), 80, centered=True)
         o_columns.nueva("FNS", _("File"), 150, centered=True)
@@ -66,7 +66,7 @@ class WDailyTestBase(QTVarios.WDialogo):
 
     def leeParametros(self):
         param = UtilSQL.DictSQL(self.configuration.ficheroDailyTest, tabla="parametros")
-        engine = param.get("MOTOR", self.configuration.tutor_inicial)
+        engine = param.get("ENGINE", self.configuration.tutor_inicial)
         segundos = param.get("SEGUNDOS", 7)
         pruebas = param.get("PRUEBAS", 5)
         fns = param.get("FNS", "")
@@ -90,8 +90,8 @@ class WDailyTestBase(QTVarios.WDialogo):
         elif col == "MTIEMPOS":
             mtiempos = reg["MTIEMPOS"]
             return "%0.2f" % mtiempos
-        elif col == "MOTOR":
-            return reg["MOTOR"]
+        elif col == "ENGINE":
+            return reg["ENGINE"]
         elif col == "SEGUNDOS":
             vtime = int(reg["TIEMPOJUGADA"] / 1000)
             return "%d" % vtime
@@ -156,7 +156,7 @@ class WDailyTestBase(QTVarios.WDialogo):
             self.fns = li_resp[3]
 
             param = UtilSQL.DictSQL(self.configuration.ficheroDailyTest, tabla="parametros")
-            param["MOTOR"] = self.engine
+            param["ENGINE"] = self.engine
             param["SEGUNDOS"] = self.segundos
             param["PRUEBAS"] = self.pruebas
             param["FNS"] = self.fns
@@ -369,7 +369,7 @@ class WDailyTest(QTVarios.WDialogo):
         fecha = "%d%02d%02d" % (hoy.year, hoy.month, hoy.day)
         datos = {}
         datos["FECHA"] = hoy
-        datos["MOTOR"] = self.xtutor.key
+        datos["ENGINE"] = self.xtutor.key
         datos["TIEMPOJUGADA"] = self.xtutor.motorTiempoJugada
         datos["LIFENS"] = self.liFens
         datos["LIPV"] = self.li_pv

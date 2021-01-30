@@ -34,7 +34,7 @@ class ManagerMotorAlbum:
         if self.opening:
             bookdef = Code.tbookPTZ
             name = os.path.basename(bookdef)[:-4]
-            self.book = Books.Libro("P", name, bookdef, True)
+            self.book = Books.Book("P", name, bookdef, True)
             self.book.polyglot()
 
         # De compatibilidad

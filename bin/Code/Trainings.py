@@ -189,7 +189,7 @@ class Entrenamientos:
         menu_games = menu.submenu(_("Games"), Iconos.Training_Games())
 
         #   GM ---------------------------------------------------------------------------------------------------
-        xopcion(menu_games, "gm", _("Play like a GrandMaster"), Iconos.GranMaestro())
+        xopcion(menu_games, "gm", _("Play like a Grandmaster"), Iconos.GranMaestro())
         menu.separador()
 
         menu_games.separador()
@@ -450,7 +450,7 @@ class Entrenamientos:
                         else:
                             posUltimo = data["POSULTIMO"]
                             jump = data["SALTA"]
-                            tipo = data["TIPO"]
+                            tipo = data["TYPE"]
                         resp = WCompetitionWithTutor.numPosicion(
                             self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo
                         )
@@ -458,7 +458,7 @@ class Entrenamientos:
                             db.close()
                             return
                         pos, tipo, jump = resp
-                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TIPO": tipo}
+                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TYPE": tipo}
                         db.close()
                         if tipo.startswith("r"):
                             if tipo == "rk":

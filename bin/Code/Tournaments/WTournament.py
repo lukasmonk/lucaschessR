@@ -57,12 +57,12 @@ class WTournament(QTVarios.WDialogo):
         w = QtWidgets.QWidget()
 
         # Adjudicator
-        lb_resign = Controles.LB(self, "%s (%s): " % (_("Minimum centipawns to assign winner"), _("0=disable")))
+        lb_resign = Controles.LB(self, "%s (%s): " % (_("Minimum centipawns to assign winner"), "0=%s" %_("Disable")))
         self.ed_resign = Controles.ED(self).tipoInt(torneo.resign()).anchoFijo(30)
         bt_resign = Controles.PB(self, "", rutina=self.borra_resign).ponIcono(Iconos.Reciclar())
 
         # Draw-plys
-        lbDrawMinPly = Controles.LB(self, "%s (%s): " % (_("Minimum moves to assign draw"), _("0=disable")))
+        lbDrawMinPly = Controles.LB(self, "%s (%s): " % (_("Minimum moves to assign draw"), "0=%s" %_("Disable")))
         self.sbDrawMinPly = Controles.SB(self, torneo.drawMinPly(), 20, 1000)
         # Draw-puntos
         lb_draw_range = Controles.LB(self, _("Maximum centipawns to assign draw") + ": ")
@@ -387,7 +387,7 @@ class WTournament(QTVarios.WDialogo):
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
-            b = Books.Libro("P", name, fbin, False)
+            b = Books.Book("P", name, fbin, False)
             self.list_books.nuevo(b)
             fvar = self.configuration.file_books
             self.list_books.save_pickle(fvar)
@@ -516,13 +516,13 @@ class WTournament(QTVarios.WDialogo):
         self.liEnActual.append((_("Maximum depth"), me.depth))
         self.liEnActual.append((_("Maximum seconds to think"), me.time))
         pbook = me.book
-        if pbook == "-":
+        if pbook in ("-", None):
             pbook = "* " + _("Engine book")
         else:
             if pbook == "*":
                 pbook = "* " + _("Default")
             dic = {"au": _("Uniform random"), "ap": _("Proportional random"), "mp": _("Always the highest percentage")}
-            pbook += "   (%s)" % dic[me.bookRR]
+            pbook += "   (%s)" % dic.get(me.bookRR, "mp")
 
         self.liEnActual.append((_("Opening book"), pbook))
 

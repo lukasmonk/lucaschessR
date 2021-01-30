@@ -57,7 +57,7 @@ class WPolyglot(QtWidgets.QDialog):
         self.board.set_dispatcher(self.mensajero)
         Delegados.generaPM(self.board.piezas)
 
-        self.book = Books.Libro("P", cpu.kibitzer.name, cpu.kibitzer.path_exe, True)
+        self.book = Books.Book("P", cpu.kibitzer.name, cpu.kibitzer.path_exe, True)
         self.book.polyglot()
 
         self.with_figurines = cpu.configuration.x_pgn_withfigurines
@@ -262,8 +262,8 @@ class WPolyglot(QtWidgets.QDialog):
 
     def orden_game(self, game):
         self.game = game
-
         if self.siPlay:
+
             position = game.last_position
             self.siW = position.is_white
             self.board.set_position(position)

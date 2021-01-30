@@ -818,7 +818,7 @@ class MultiEngineResponse:
             fdbg.close()
 
         return (
-            una.get("AJUSTARFINAL" if tipo == "F" else "AJUSTAR", ADJUST_BETTER),
+            una.get("AJUSTARFINAL" if tipo == "F" else "ADJUST", ADJUST_BETTER),
             mindifpuntos,
             maxmate,
             dbg,

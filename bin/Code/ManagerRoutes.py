@@ -157,7 +157,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.liPVopening = opening.pv.split(" ")
         self.posOpening = 0
         self.is_opening = len(opening.pv) > 0
-        self.book = Books.Libro("P", Code.tbookI, Code.tbookI, True)
+        self.book = Books.Book("P", Code.tbookI, Code.tbookI, True)
         self.book.polyglot()
 
         self.engine = GR_Engine(self.procesador, line.engine)

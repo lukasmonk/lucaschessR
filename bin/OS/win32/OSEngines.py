@@ -185,6 +185,13 @@ def read_engines(folder_engines):
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 500)
 
+    for level in range(1100, 2000, 100):
+        cm = mas("maia-%d" % level, "Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang + LcZero team", "%d"%level, "https://maiachess.com/",
+                 "lc0.exe", level)
+        cm.ordenUCI("WeightsFile", "maia-%d.pb.gz" % level)
+        cm.path_exe = os.path.join(folder_engines, "maia", "lc0.exe")
+        cm.name = "Maia-%d" % level
+
     return dic_engines
 
 

@@ -51,7 +51,7 @@ class WPolyglot(QTVarios.WDialogo):
         delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.configuration.x_pgn_withfigurines else None
         o_columnas.nueva("move", _("Move"), 80, centered=True, edicion=delegado, siEditable=False)
         o_columnas.nueva("%", "%", 60, siDerecha=True, siEditable=False)
-        o_columnas.nueva("weight", _("weight"), 60, siDerecha=True, edicion=Delegados.LineaTexto(siEntero=True))
+        o_columnas.nueva("weight", _("Weight"), 60, siDerecha=True, edicion=Delegados.LineaTexto(siEntero=True))
         o_columnas.nueva("score", _("Score"), 60, siDerecha=True, edicion=Delegados.LineaTexto(siEntero=True))
         o_columnas.nueva("depth", _("Depth"), 60, siDerecha=True, edicion=Delegados.LineaTexto(siEntero=True))
         o_columnas.nueva("learn", _("Learn"), 60, siDerecha=True, edicion=Delegados.LineaTexto(siEntero=True))

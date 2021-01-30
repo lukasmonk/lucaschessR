@@ -284,7 +284,7 @@ class WTournamentRun(QtWidgets.QWidget):
             if bk == "-":  # Puede que el torneo tenga "-"
                 bk = None
             if bk:
-                self.book[side] = Books.Libro("P", bk, bk, True)
+                self.book[side] = Books.Book("P", bk, bk, True)
                 self.book[side].polyglot()
             else:
                 self.book[side] = None

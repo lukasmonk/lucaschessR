@@ -16,11 +16,10 @@ from Code.Polyglots import WPolyglot
 
 class WFactoryPolyglots(QTVarios.WDialogo):
     def __init__(self, procesador):
-
         self.procesador = procesador
         self.configuration = procesador.configuration
         self.resultado = None
-        self.lista_names, self.dict_data = self.lee_lista()
+        self.list_names, self.dict_data = self.lee_lista()
 
         QTVarios.WDialogo.__init__(
             self, procesador.main_window, "Polyglot book factory", Iconos.FactoryPolyglot(), "factorypolyglots"
@@ -78,7 +77,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
     def edit(self):
         recno = self.glista.recno()
         if recno >= 0:
-            self.run_edit(self.dict_data[self.lista_names[recno]][0].path)
+            self.run_edit(self.dict_data[self.list_names[recno]][0].path)
 
     def grid_doble_click(self, grid, row, o_columna):
         self.edit()
@@ -113,9 +112,9 @@ class WFactoryPolyglots(QTVarios.WDialogo):
     def copy(self):
         recno = self.glista.recno()
         if recno >= 0:
-            path = self.get_new_path(self.lista_names[recno].name)
+            path = self.get_new_path(self.list_names[recno].name)
             if path:
-                shutil.copy(self.lista_names[recno].path, path)
+                shutil.copy(self.list_names[recno].path, path)
                 self.glista.refresh()
 
     def renombrar(self):
@@ -133,24 +132,24 @@ class WFactoryPolyglots(QTVarios.WDialogo):
             mens = _("Do you want to delete all selected records?")
             mens += "\n"
             for num, row in enumerate(li, 1):
-                mens += "\n%d. %s" % (num, self.lista_names[row])
+                mens += "\n%d. %s" % (num, self.list_names[row])
             if QTUtil2.pregunta(self, mens):
                 li.sort(reverse=True)
                 for row in li:
-                    name = self.lista_names[row]
+                    name = self.list_names[row]
                     entry_dbbin, entry_mkbin, ms = self.dict_data[name]
                     Util.remove_file(entry_dbbin.path)
                     if entry_mkbin:
                         Util.remove_file(entry_mkbin.path)
-                    del self.lista_names[row]
+                    del self.list_names[row]
                 self.glista.refresh()
 
     def grid_num_datos(self, grid):
-        return len(self.lista_names)
+        return len(self.list_names)
 
     def grid_dato(self, grid, row, o_columna):
         col = o_columna.key
-        name = self.lista_names[row]
+        name = self.list_names[row]
         entry_dbbin, entry_mkbin, ms = self.dict_data[name]
         if col == "NAME":
             return name

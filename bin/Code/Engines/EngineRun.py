@@ -6,12 +6,14 @@ import time
 import subprocess
 import threading
 import psutil
+import random
 
 from PySide2 import QtCore
 
 import Code
 from Code.Engines import Priorities
 from Code.Engines import EngineResponse
+from Code.Polyglots import Books
 from Code import Util
 from Code.QT import QTUtil2
 
@@ -605,3 +607,122 @@ class RunEngine:
         self.play_with_return(play_return, game, env, max_time, max_depth)
 
 
+class MaiaEngine(RunEngine):
+    def __init__(self, name, exe, liOpcionesUCI=None, nMultiPV=0, priority=None, args=None):
+        RunEngine.__init__(self, name, exe, liOpcionesUCI, nMultiPV, priority, args)
+        self.stopping = False
+
+        level = int(name[5:])
+        book_name = "1100-1500.bin" if level <= 1500 else "1600-1900.bin"
+        book_path = os.path.join(os.path.dirname(exe), book_name)
+        self.book = Books.Book("P", book_name, book_path, True)
+        self.book.polyglot()
+        self.book_select = []
+        mp = (level-1100)//10
+        ap = 40 - 20*(level-1100)//800
+        au = 100 - mp - ap
+        self.book_select.extend(["mp"]*mp)
+        self.book_select.extend(["ap"]*ap)
+        self.book_select.extend(["au"]*au)
+        # random.shuffle(self.book_select)
+
+        # for lv in range(1100, 2000, 100):
+        #     self.book_select = {}
+        #     self.book_select["mp"] = (lv - 1100) // 10
+        #     self.book_select["ap"] = 40 - 20 * (lv - 1100) // 800
+        #     self.book_select["au"] = 100 - self.book_select["mp"] - self.book_select["ap"]
+        #     prin t(lv, self.book_select)
+        #
+    def simulate_time(self, ms_time):
+        tini = time.time()
+        while not (self.stopping or (time.time()-tini)*1000 > ms_time):
+            QtCore.QCoreApplication.processEvents()
+            time.sleep(0.1)
+        self.stopping = False
+
+    def seek_bestmove(self, max_time, max_depth, is_savelines):
+        tini = time.time()
+        self.stopping = False
+        env = "go nodes 1"
+        ms_time = 10000
+        if max_time:
+            ms_time = max_time + 3000
+        elif max_depth:
+            ms_time = int(max_depth * ms_time / 3.0)
+
+        self.reset()
+        if is_savelines:
+            self.mrm.save_lines()
+        self.mrm.setTimeDepth(max_time, max_depth)
+
+        self.work_bestmove(env, ms_time)
+        if max_time:
+            self.simulate_time(max_time-(time.time()-tini)*1000)
+
+        self.mrm.ordena()
+
+        return self.mrm
+
+    def seek_bestmove_time(self, time_white, time_black, inc_time_move):
+        tini = time.time()
+        self.stopping = False
+        env = "go nodes 1"
+        max_time = time_white if self.is_white else time_black
+
+        self.reset()
+        self.mrm.setTimeDepth(max_time, None)
+
+        self.work_bestmove(env, max_time)
+
+        if time_white > 60000 and time_black > 60000:
+            self.simulate_time(min(time_white/40, random.randint(1000, 15000))-(time.time()-tini)*1000)
+
+        self.mrm.ordena()
+        return self.mrm
+
+    def play_bestmove_time(self, play_return, game, time_white, time_black, inc_time_move):
+        self.stopping = False
+        env = "go nodes 1"
+        max_time = time_white if self.is_white else time_black
+        if time_white > 60000 and time_black > 60000:
+            time_simulate = min(time_white/40, random.randint(1000, 15000))
+        else:
+            time_simulate = 0
+        self.play_with_return_maia(play_return, game, env, max_time, None, time_simulate)
+
+    def play_bestmove_game(self, play_return, game, max_time, max_depth):
+        self.stopping = False
+        env = "go nodes 1"
+        time_simulate = max_time
+        self.play_with_return_maia(play_return, game, env, max_time, max_depth, time_simulate)
+
+    def play_with_return_maia(self, play_return, game, line, max_time, max_depth, time_simulate):
+        self.reset()
+        if self.test_book(game):
+            time_simulate /= 3
+        else:
+            self.mrm.setTimeDepth(max_time, max_depth)
+            self.set_game_position(game)
+            self.work_bestmove(line, 5000)
+            self.mrm.ordena()
+        self.simulate_time(time_simulate)
+        play_return(self.mrm)
+
+    def put_line_debug(self, line: str):
+        if line == "stop":
+            self.stopping = True
+        RunEngine.put_line_debug(self, line)
+
+    def put_line_base(self, line: str):
+        if line == "stop":
+            self.stopping = True
+        RunEngine.put_line_base(self, line)
+
+    def test_book(self, game):
+        if len(game) < 30:
+            pv = self.book.eligeJugadaTipo(game.last_position.fen(), random.choice(self.book_select))
+            if pv:
+                self.mrm.dispatch("bestmove %s" %pv)
+                self.mrm.ordena()
+                return True
+        return False

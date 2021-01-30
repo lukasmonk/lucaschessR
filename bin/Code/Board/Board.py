@@ -193,15 +193,29 @@ class Board(QtWidgets.QGraphicsView):
                 self.cad_buffer += chr(key)
             if self.cad_buffer:
                 FasterCode.set_fen(self.last_position.fen())
-                li = FasterCode.get_moves()
+                li = FasterCode.get_exmoves()
                 ok_ini = False
                 busca = self.cad_buffer.lower()
-                for p_a1h8 in li:
-                    a1h8 = p_a1h8[1:]
+
+                exmove_ok = None
+
+                for exmove in li:
+                    a1h8 = exmove.move()
                     if busca.endswith(a1h8):
-                        self.init_kb_buffer()
-                        self.mensajero(a1h8[:2], a1h8[2:4], a1h8[4:])
-                        return
+                        exmove_ok = exmove
+                        break
+                if exmove_ok is None:
+                    for exmove in li:
+                        san = exmove.san()
+                        if busca.endswith(san.lower()) or (san == "O-O-O" and busca.endswith("o3")) or (san == "O-O" and busca.endswith("o2")):
+                            exmove_ok = exmove
+                            break
+
+                if exmove_ok:
+                    self.init_kb_buffer()
+                    self.mensajero(exmove_ok.xfrom(), exmove_ok.xto(), exmove_ok.promotion())
+
+
 
     def sizeHint(self):
         return QtCore.QSize(self.ancho + 6, self.ancho + 6)
