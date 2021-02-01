@@ -37,7 +37,7 @@ class DirectEngine(object):
 
         self.exe = exe = os.path.abspath(exe)
         direxe = os.path.dirname(exe)
-        xargs = [os.path.basename(exe)]
+        xargs = ["./%s" % os.path.basename(exe)]
         if args:
             xargs.extend(args)
 

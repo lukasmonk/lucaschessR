@@ -98,6 +98,8 @@ def menu_tools_savemenu(procesador, dic_data=None):
     menu1.opcion("kibitzers", _("Kibitzers"), Iconos.Kibitzer())
     savemenu.separador()
 
+    # savemenu.opcion("bridge", _("Data conversion from version 11"), Iconos.Bridge())
+
     return savemenu
 
 
@@ -411,7 +413,7 @@ def menuInformacion(procesador):
     menu.opcion("mail", _("Contact") + " (%s)" % "lukasmonk@gmail.com", Iconos.Mail())
     menu.separador()
     if procesador.configuration.is_main:
-        menu.opcion("actualiza", _("Search for updates"), Iconos.Actualiza())
+        menu.opcion("actualiza", _("Check for updates"), Iconos.Actualiza())
         menu.separador()
 
     menu.opcion("acercade", _("About"), Iconos.Aplicacion64())

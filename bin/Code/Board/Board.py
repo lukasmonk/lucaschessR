@@ -191,7 +191,7 @@ class Board(QtWidgets.QGraphicsView):
             # Entrada directa
             if 128 > key > 32:
                 self.cad_buffer += chr(key)
-            if self.cad_buffer:
+            if len(self.cad_buffer) >= 2:
                 FasterCode.set_fen(self.last_position.fen())
                 li = FasterCode.get_exmoves()
                 ok_ini = False
@@ -206,10 +206,15 @@ class Board(QtWidgets.QGraphicsView):
                         break
                 if exmove_ok is None:
                     for exmove in li:
-                        san = exmove.san()
-                        if busca.endswith(san.lower()) or (san == "O-O-O" and busca.endswith("o3")) or (san == "O-O" and busca.endswith("o2")):
-                            exmove_ok = exmove
-                            break
+                        san = exmove.san().replace("+", "").replace("#", "")
+                        if busca.endswith(san.lower()) \
+                                or busca.endswith(san.lower().replace("=", "")) \
+                                or (san == "O-O-O" and busca.endswith("o3")) or (san == "O-O" and busca.endswith("o2")):
+                            if exmove_ok:
+                                if len(san) > len(exmove_ok.san()):
+                                    exmove_ok = exmove
+                            else:
+                                exmove_ok = exmove
 
                 if exmove_ok:
                     self.init_kb_buffer()

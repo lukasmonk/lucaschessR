@@ -15,9 +15,9 @@ def pixmap(name):
     return eval("pm%s()"%name)
 
 
-def PM(xfrom, xto):
+def PM(desde, hasta):
     pm = QtGui.QPixmap()
-    pm.loadFromData(binIconos[xfrom:xto])
+    pm.loadFromData(binIconos[desde:hasta])
     return pm
 
 def pmLM():
@@ -3554,5 +3554,21 @@ def pmTraining_Endings():
 
 def Training_Endings():
     return QtGui.QIcon(pmTraining_Endings())
+
+
+def pmMaia():
+    return PM(937859,938643)
+
+
+def Maia():
+    return QtGui.QIcon(pmMaia())
+
+
+def pmBridge():
+    return PM(938643,939661)
+
+
+def Bridge():
+    return QtGui.QIcon(pmBridge())
 
 

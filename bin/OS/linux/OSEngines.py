@@ -95,6 +95,6 @@ def dict_engines_fixed_elo(folder_engines):
             cm.ordenUCI("UCI_Elo", str(elo))
             cm.ordenUCI("UCI_LimitStrength", "true")
             cm.name += " (%d)" % elo
-            cm.clave += " (%d)" % elo
+            cm.key += " (%d)" % elo
             dic[elo].append(cm)
     return dic

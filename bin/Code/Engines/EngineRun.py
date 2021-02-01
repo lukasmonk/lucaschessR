@@ -55,7 +55,7 @@ class RunEngine:
         self.working = True
         self.liBuffer = []
         self.starting = True
-        self.args = [os.path.basename(self.exe)]
+        self.args = ["./%s" % os.path.basename(self.exe)]
         if args:
             self.args.extend(args)
 
@@ -178,9 +178,12 @@ class RunEngine:
             stdout.close()
 
     def start_engine(self):
-        startupinfo = subprocess.STARTUPINFO()
-        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        startupinfo.wShowWindow = subprocess.SW_HIDE
+        if Code.isWindows:
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+        else:
+            startupinfo = None
         curdir = os.path.abspath(os.curdir)  # problem with "." as curdir
         os.chdir(self.direxe)  # to fix problems with non ascii folders
 

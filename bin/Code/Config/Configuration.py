@@ -255,7 +255,7 @@ class Configuration:
         self.tutor_inicial = "stockfish"
         self.x_tutor_clave = self.tutor_inicial
         self.x_tutor_multipv = 10  # 0: maximo
-        self.x_tutor_difpoints = 0
+        self.x_tutor_difpoints = 10
         self.x_tutor_difporc = 0
         self.x_tutor_mstime = 3000
         self.x_tutor_depth = 0
