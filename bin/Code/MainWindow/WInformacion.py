@@ -260,6 +260,7 @@ class InformacionPGN(QtWidgets.QWidget):
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         splitter.addWidget(self.gb_comments)
         splitter.addWidget(self.variantes)
+        splitter.setSizes([1, 1])
 
         layout = Colocacion.V()
         layout.control(self.lb_opening)

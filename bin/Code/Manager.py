@@ -1828,26 +1828,25 @@ class Manager:
         )
         self.procesador.entrenamientos.menu = None
 
-    def jugarPosicionActual(self):
+    def play_current_position(self):
         row, column = self.main_window.pgnPosActual()
         num_moves, nj, row, is_white = self.jugadaActual()
-        if num_moves:
-            self.game.is_finished()
+        self.game.is_finished()
+        if row == 0 and column.key == "NUMBER" or nj == -1:
+            gm = self.game.copia(0)
+            gm.li_moves = []
+            gm.is_finished()
+        else:
             gm = self.game.copia(nj)
-            gm.set_unknown()
-            if row == 0 and column.key == "NUMBER":
-                position = self.game.first_position
-            else:
-                move = self.game.move(nj)
-                position = move.position
-            dic = {
-                "GAME": gm.save(),
-                "ISWHITE": position.is_white
-            }
-            fich = Util.relative_path(self.configuration.ficheroTemporal(".pkd"))
-            Util.save_pickle(fich, dic)
+        gm.set_unknown()
+        dic = {
+            "GAME": gm.save(),
+            "ISWHITE": gm.last_position.is_white
+        }
+        fich = Util.relative_path(self.configuration.ficheroTemporal(".pkd"))
+        Util.save_pickle(fich, dic)
 
-            XRun.run_lucas("-play", fich)
+        XRun.run_lucas("-play", fich)
 
     def showPV(self, pv, nArrows):
         if not pv:

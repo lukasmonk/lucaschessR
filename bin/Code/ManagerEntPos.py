@@ -158,7 +158,7 @@ class ManagerEntPos(Manager.Manager):
             if resp == "tactics":
                 self.create_tactics()
             elif resp == "play":
-                self.jugarPosicionActual()
+                self.play_current_position()
 
         elif key == TB_PGN_LABELS:
             self.pgnInformacionMenu()

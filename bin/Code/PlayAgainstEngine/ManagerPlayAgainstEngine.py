@@ -436,7 +436,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     from_sq, to_sq, promotion = liMovs[-1]
                     self.player_has_moved(from_sq, to_sq, promotion)
             elif resp == "play":
-                self.jugarPosicionActual()
+                self.play_current_position()
 
         elif key == TB_ADJOURN:
             self.adjourn()
