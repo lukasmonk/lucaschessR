@@ -325,6 +325,9 @@ class Book:
         return liResp
 
 
+class Libro(Book):  # Cambio de denominación, error en restore wplayagainst engine
+    pass
+
 class Entry:
     key = 0
     move = 0

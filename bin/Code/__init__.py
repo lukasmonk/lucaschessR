@@ -58,7 +58,7 @@ mate_en_dos = 175522
 runSound = None
 
 BASE_VERSION = "A" # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.06c"
+VERSION = "R 1.07"
 DEBUG = False
 DEBUG_ENGINE = False
 
