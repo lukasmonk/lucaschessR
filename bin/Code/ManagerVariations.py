@@ -229,8 +229,8 @@ class ManagerVariations(Manager.Manager):
     def ponRival(self, dic):
         dr = dic["RIVAL"]
         rival = dr["CM"]
-        r_t = dr["TIME"] * 100  # Se guarda en decimas -> milesimas
-        r_p = dr["DEPTH"]
+        r_t = dr.get("TIME", 0) * 100  # Se guarda en decimas -> milesimas
+        r_p = dr.get("DEPTH", 0)
         if r_t <= 0:
             r_t = None
         if r_p <= 0:

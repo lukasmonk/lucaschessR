@@ -63,7 +63,7 @@ class WPolyglot(QTVarios.WDialogo):
             None,
             (_("Takeback"), Iconos.Atras(), self.takeback),
             None,
-            (_("Voyager"), Iconos.Voyager(), self.voyager),
+            (_("Voyager"), Iconos.Voyager32(), self.voyager),
             None,
             (_("Import"), Iconos.Import8(), self.pol_imports.importar),
             None,

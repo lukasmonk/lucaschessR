@@ -937,10 +937,9 @@ class Procesador:
         list_books.restore_pickle(self.configuration.file_books)
         list_books.check()
         menu = QTVarios.LCMenu(self.main_window)
-        rondo = QTVarios.rondoPuntos()
         for book in list_books.lista:
             if not Util.same_path(book.path, Code.tbook):
-                menu.opcion(("x", book), book.name, rondo.otro())
+                menu.opcion(("x", book), book.name, Iconos.Delete())
                 menu.separador()
         menu.opcion(("n", None), _("Install new book"), Iconos.Nuevo())
         resp = menu.lanza()

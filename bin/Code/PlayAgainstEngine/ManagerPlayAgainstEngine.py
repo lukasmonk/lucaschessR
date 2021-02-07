@@ -531,7 +531,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def run_adjourn(self, dic):
         self.restore_state(dic)
         self.check_boards_setposition()
-        self.show_clocks()
+        if self.siTiempo:
+            self.show_clocks()
         self.made_the_first_move = True
         self.play_next_move()
 

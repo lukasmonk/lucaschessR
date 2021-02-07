@@ -839,7 +839,7 @@ class Board(QtWidgets.QGraphicsView):
 
         if self.config_board.is_base:
             nomPiezasOri = self.config_board.nomPiezas()
-            Code.todasPiezas.saveAllPNG(nomPiezasOri, 20)  # reset IntFiles/Figs
+            Code.todasPiezas.saveAllPNG(nomPiezasOri, 30)  # reset IntFiles/Figs
             Delegados.generaPM(self.piezas)
 
     def ponColores(self, liTemas, resp):

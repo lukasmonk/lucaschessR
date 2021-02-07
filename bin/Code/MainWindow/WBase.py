@@ -193,7 +193,7 @@ class WBase(QtWidgets.QWidget):
         self.lb_player_black.setStyleSheet(style % ("black", "white"))
 
         # # Capturas
-        n_alto_fijo = 2*(configuration.x_sizefont_infolabels + 2)
+        n_alto_fijo = 3*(configuration.x_sizefont_infolabels + 2)
         self.lb_capt_white = Controles.LB(self).anchoFijo(nAnchoLabels).set_wrap().altoFijo(n_alto_fijo)
         style = "QWidget { border-style: groove; border-width: 1px; border-color: LightGray; padding: 2px 0px 2px 0px;}"
         self.lb_capt_white.setStyleSheet(style)
@@ -532,17 +532,20 @@ class WBase(QtWidgets.QWidget):
             for x in range(num):
                 d[pz.isupper()].append(pz)
 
+        value = {"q":1, "r":2, "b":3, "n":4, "p":5}
+
         def xshow(max_num, tp, li, lb):
             html = ""
-            for n, pz in enumerate(reversed(li)):
-                if n >= max_num:
-                    html += "···"
-                    break
+            li.sort(key=lambda x:value[x.lower()])
+            for n, pz in enumerate(li):
+                # if n >= max_num: # la situación en la que sobran
+                #     html += "+++"
+                #     break
                 # html += '<img src="../Resources/IntFiles/Figs/%s%s.png">' % (tp, pz.lower())
-                html += '<img src="../Resources/IntFiles/Figs/%s%s.png" width="20" height="20">' % (tp, pz.lower())
+                html += '<img src="../Resources/IntFiles/Figs/%s%s.png" width="30" height="30">' % (tp, pz.lower())
             lb.set_text(html)
 
-        max_num = self.lb_capt_white.width()//23
+        max_num = self.lb_capt_white.width()//27
         xshow(max_num, "b", d[True], self.lb_capt_white)
         xshow(max_num, "w", d[False], self.lb_capt_black)
         self.lb_capt_white.show()

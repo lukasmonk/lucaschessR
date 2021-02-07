@@ -249,7 +249,7 @@ class PolyglotImports:
     def fuente_origen_acum(self):
         key = None
         dic = None
-        for entry in self.fuente_origen():
+        for key, entry in self.fuente_origen():
             if key is None:
                 if entry is None:
                     yield None, None
@@ -279,7 +279,7 @@ class PolyglotImports:
         self.configuration.write_variables("POLYGLOT_IMPORT", dic)
 
         g_bin = iter(self.fuente_bin(path_bin))
-        g_origen = iter(self.fuente_origen_acum())
+        g_origen = iter(self.fuente_origen())
 
         n_key, n_data = next(g_bin)
         o_key, o_data = next(g_origen)

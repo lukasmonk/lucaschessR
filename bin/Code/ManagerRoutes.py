@@ -57,7 +57,7 @@ class GR_Engine:
             mrm = self.manager.analiza(fen)
             return mrm.rmBest().movimiento()
         else:
-            return FasterCode.runFen(fen, 1, 0, 2)
+            return FasterCode.run_fen(fen, 1, 0, 2)
 
     def elos(self):
         x = """stockfish 1284 1377 1377 1496
@@ -705,8 +705,8 @@ class ManagerRoutesTactics(ManagerRoutes):
 
         jgObj = self.jugadaObjetivo()
         if jgObj.movimiento() != jgSel.movimiento():
-            for pvar in jgObj.pvariantes:
-                jgObjV = pvar.move(0)
+            for variation in jgObj.variations.li_variations:
+                jgObjV = variation.move(0)
                 if jgObjV.movimiento() == jgSel.movimiento():
 
                     QTUtil2.mensajeTemporal(
@@ -741,8 +741,8 @@ class ManagerRoutesTactics(ManagerRoutes):
     def ayuda(self, siQuitarPuntos=True):
         jgObj = self.jugadaObjetivo()
         liMovs = [(jgObj.from_sq, jgObj.to_sq, True)]
-        for pvar in jgObj.pvariantes:
-            jg0 = pvar.move(0)
+        for variation in jgObj.variations.li_variations:
+            jg0 = variation.move(0)
             liMovs.append((jg0.from_sq, jg0.to_sq, False))
         self.board.ponFlechasTmp(liMovs)
         if siQuitarPuntos:
