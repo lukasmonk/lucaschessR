@@ -1451,6 +1451,9 @@ class Manager:
             menuKibitzers.separador()
             menuKibitzers.opcion("kibitzer_edit", _("Edition"), Iconos.ModificarP())
 
+            menu.separador()
+            menu.opcion("play", _("Play current position"), Iconos.MoverJugar())
+
         # Juega por mi
         if (
             self.plays_instead_of_me_option
@@ -1509,6 +1512,9 @@ class Manager:
 
         elif resp == "replay":
             self.replay()
+
+        elif resp == "play":
+            self.play_current_position()
 
         elif resp.startswith("kibitzer_"):
             self.kibitzers(resp[9:])
@@ -1749,10 +1755,10 @@ class Manager:
     def valoraRMrival(self):
         if len(self.game) < 50 or len(self.lirm_engine) <= 5:
             return True
+        self.resign_limit = -100
         if self.next_test_resign:
             self.next_test_resign -= 1
             return True
-
         b = random.random() ** 0.33
 
         # Resign
@@ -1765,7 +1771,6 @@ class Manager:
             resp = QTUtil2.pregunta(self.main_window, _X(_("%1 wants to resign, do you accept it?"), self.xrival.name))
             if resp:
                 self.game.resign(self.is_engine_side_white)
-                self.game.set_termination(TERMINATION_RESIGN, RESULT_WIN_BLACK if self.is_engine_side_white else RESULT_WIN_WHITE)
                 return False
             else:
                 self.next_test_resign = 9

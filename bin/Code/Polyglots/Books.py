@@ -29,7 +29,8 @@ class ListBooks:
             for dic_book in dic_booklist["lista"]:
                 b = Book("P", "", "", False)
                 b.from_dic(dic_book)
-                self.lista.append(b)
+                if os.path.isfile(b.path):
+                    self.lista.append(b)
             self.path = dic_booklist["path"]
             self._modoAnalisis = dic_booklist["_modoAnalisis"]
             self.alMenosUno()

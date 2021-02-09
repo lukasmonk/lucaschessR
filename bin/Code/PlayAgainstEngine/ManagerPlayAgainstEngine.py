@@ -425,8 +425,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             liMasOpciones = []
             if self.human_is_playing or self.is_finished():
                 liMasOpciones.append(("books", _("Consult a book"), Iconos.Libros()))
-                liMasOpciones.append((None, None, None))
-                liMasOpciones.append(("play", _("Play current position"), Iconos.MoverJugar()))
 
             resp = self.utilidades(liMasOpciones)
             if resp == "books":

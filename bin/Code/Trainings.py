@@ -574,7 +574,7 @@ class Entrenamientos:
                 um.final()
             self.procesador.game_type = GT_TACTICS
             self.procesador.state = ST_PLAYING
-            self.procesador.manager = ManagerTactics.ManagerTacticas(self.procesador)
+            self.procesador.manager = ManagerTactics.ManagerTactics(self.procesador)
             self.procesador.manager.start(tactica)
 
     def entrenaGM(self):

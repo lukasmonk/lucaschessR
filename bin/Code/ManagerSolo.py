@@ -122,8 +122,6 @@ class ManagerSolo(Manager.Manager):
         elif key == TB_UTILITIES:
             liMasOpciones = (
                 ("books", _("Consult a book"), Iconos.Libros()),
-                (None, None, None),
-                ("play", _("Play current position"), Iconos.MoverJugar()),
             )
 
             resp = self.utilidades(liMasOpciones)
@@ -133,8 +131,6 @@ class ManagerSolo(Manager.Manager):
                     for x in range(len(liMovs) - 1, -1, -1):
                         from_sq, to_sq, promotion = liMovs[x]
                         self.player_has_moved(from_sq, to_sq, promotion)
-            elif resp == "play":
-                self.play_current_position()
 
         elif key == TB_PGN_LABELS:
             self.informacion()

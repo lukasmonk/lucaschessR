@@ -11,7 +11,7 @@ from Code.QT import QTUtil2
 from Code.Base.Constantes import *
 
 
-class ManagerTacticas(Manager.Manager):
+class ManagerTactics(Manager.Manager):
     def start(self, tactic: Tactics.Tactic):
         self.reiniciando = False
         self.tactic = tactic

@@ -201,7 +201,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         ManagerRoutes.end_game(self)
 
     def run_action(self, key):
-        if key == TB_CLOSE:
+        if key in (TB_CLOSE, TB_NEXT):
             self.end_game()
             self.procesador.showRoute()
 
@@ -308,11 +308,14 @@ class ManagerRoutesPlay(ManagerRoutes):
         self.human_is_playing = False
         self.state = ST_ENDGAME
         self.refresh()
-        li_options = [TB_CLOSE, TB_UTILITIES]
+        li_options = [TB_CLOSE, TB_UTILITIES, TB_NEXT]
         self.main_window.pon_toolbar(li_options)
         jgUlt = self.game.last_jg()
 
         siwin = (jgUlt.is_white() == self.human_side) and not jgUlt.is_draw
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
+
+        self.beepResultado(beep)
 
         self.guardarGanados(siwin)
         self.autosave()
@@ -329,6 +332,7 @@ class ManagerRoutesPlay(ManagerRoutes):
                 li_options = [TB_CLOSE, TB_CONFIG, TB_UTILITIES, TB_REINIT]
                 self.main_window.pon_toolbar(li_options)
             else:
+                QTUtil2.message(self.main_window, mensaje)
                 self.route.end_playing()
 
     def current_pgn(self):
@@ -432,7 +436,7 @@ class ManagerRoutesEndings(ManagerRoutes):
             self.set_label2(_("You must repeat the puzzle."))
 
     def run_action(self, key):
-        if key == TB_CLOSE:
+        if key in (TB_CLOSE, TB_NEXT):
             self.end_game()
             self.procesador.showRoute()
 
@@ -575,7 +579,7 @@ class ManagerRoutesEndings(ManagerRoutes):
             self.mensajeEnPGN(mensaje)
             self.start(self.route)
         elif self.warnings <= self.max_warnings:
-            self.main_window.pon_toolbar([TB_CLOSE, TB_UTILITIES])
+            self.main_window.pon_toolbar([TB_CLOSE, TB_UTILITIES, TB_NEXT])
             self.mensajeEnPGN(_("Done"))
             self.route.end_ending()
         else:

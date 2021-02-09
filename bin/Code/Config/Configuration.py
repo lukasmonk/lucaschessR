@@ -456,6 +456,7 @@ class Configuration:
         self.file_train_books = "%s/booksTrain.lkv" % self.carpeta_results
         self.file_memory = "%s/memo.pk" % self.carpeta_results
         self.ficheroEntMaquina = "%s/entmaquina.pke" % self.carpeta_results
+        self.ficheroEntMaquinaPlay = "%s/entmaquinaplay.pke" % self.carpeta_results
         self.ficheroEntMaquinaConf = "%s/entmaquinaconf.pkd" % self.carpeta_config
         self.ficheroGMhisto = "%s/gmh.db" % self.carpeta_results
         self.ficheroPuntuacion = "%s/punt.pke" % self.carpeta_results

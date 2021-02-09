@@ -152,13 +152,10 @@ class ManagerEntPos(Manager.Manager):
                 liMasOpciones = []
             else:
                 liMasOpciones = [("tactics", _("Create tactics training"), Iconos.Tacticas()), (None, None, None)]
-            liMasOpciones.append(("play", _("Play current position"), Iconos.MoverJugar()))
 
             resp = self.utilidades(liMasOpciones)
             if resp == "tactics":
                 self.create_tactics()
-            elif resp == "play":
-                self.play_current_position()
 
         elif key == TB_PGN_LABELS:
             self.pgnInformacionMenu()

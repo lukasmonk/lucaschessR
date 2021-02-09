@@ -26,13 +26,13 @@ from Code.Base.Constantes import *
 
 
 class WPlayAgainstEngine(QTVarios.WDialogo):
-    def __init__(self, procesador, titulo, save_at_end):
+    def __init__(self, procesador, titulo, direct_option):
 
         QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, Iconos.Libre(), "entMaquina")
 
         font = Controles.TipoLetra(puntos=procesador.configuration.x_menu_points)
 
-        self.save_at_end = save_at_end
+        self.direct_option = direct_option
 
         self.setFont(font)
 
@@ -415,7 +415,10 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         self.li_preferred_openings = []
         self.btOpeningsFavoritas.hide()
 
-        dic = Util.restore_pickle(self.configuration.ficheroEntMaquina)
+        file = self.configuration.ficheroEntMaquina if self.direct_option else self.configuration.ficheroEntMaquinaPlay
+        if not os.path.isfile(file):
+            file = self.configuration.ficheroEntMaquina
+        dic = Util.restore_pickle(file)
         if not dic:
             dic = {}
         self.restore_dic(dic)
@@ -887,8 +890,8 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
     def aceptar(self):
         self.dic = self.save_dic()
-        if self.save_at_end:
-            Util.save_pickle(self.configuration.ficheroEntMaquina, self.dic)
+        file = self.configuration.ficheroEntMaquina if self.direct_option else self.configuration.ficheroEntMaquinaPlay
+        Util.save_pickle(file, self.dic)
 
         # Info para el manager, después de grabar, para que no haga falta salvar esto
         dr = self.dic["RIVAL"]
@@ -918,7 +921,12 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             fvar = self.configuration.file_books
             self.list_books.save_pickle(fvar)
             li = [(x.name, x) for x in self.list_books.lista]
-            self.cbBooks.rehacer(li, b)
+            if self.sender() == self.btNuevoBookR:
+                self.cbBooksR.rehacer(li, b)
+                self.cbBooksP.rehacer(li, self.cbBooksP.valor())
+            else:
+                self.cbBooksP.rehacer(li, b)
+                self.cbBooksR.rehacer(li, self.cbBooksR.valor())
 
     def aperturasQuitar(self):
         self.opening_block = None

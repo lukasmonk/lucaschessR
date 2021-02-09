@@ -262,7 +262,7 @@ class ManagerElo(Manager.Manager):
         self.is_engine_side_white = not is_white
 
         self.lirm_engine = []
-        self.next_test_resign = False
+        self.next_test_resign = 5
         self.resign_limit = -1000
 
         self.is_tutor_enabled = False
@@ -488,7 +488,10 @@ class ManagerElo(Manager.Manager):
                 self.lirm_engine.append(rm_rival)
                 if self.valoraRMrival():
                     self.play_next_move()
-
+                else:
+                    self.muestra_resultado()
+                    self.autosave()
+                    return
         else:
 
             self.human_is_playing = True

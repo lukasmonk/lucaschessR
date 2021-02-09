@@ -20,7 +20,7 @@ def read_engines(folder_engines):
         return engine
 
     mas("acqua", "Giovanni Di Maria", "2.0", "http://www.elektrosoft.it/scacchi/acqua/acqua.asp", "acqua.exe", 844)
-    mas("acquad", "Giovanni Di Maria", "3.9.1 LDC", "http://www.elektrosoft.it/scacchi/acquad/acquad.asp", "acquad.exe", 1105)
+    # mas("acquad", "Giovanni Di Maria", "3.9.1 LDC", "http://www.elektrosoft.it/scacchi/acquad/acquad.asp", "acquad.exe", 1105)
 
     mas("tarrasch", "Bill Forster", "ToyEngine Beta V0.905", "http://www.triplehappy.com/", "TarraschToyEngine.exe", 1481)
 
