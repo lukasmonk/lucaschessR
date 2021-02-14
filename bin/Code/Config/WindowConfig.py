@@ -51,7 +51,7 @@ def options(parent, configuration):
     form.checkbox(_("Results"), configuration.x_sound_results)
     form.checkbox(_("Rival moves"), configuration.x_sound_move)
     form.separador()
-    form.checkbox(_("Activate sounds with our moves") + ":", configuration.x_sound_our)
+    form.checkbox(_("Activate sounds with our moves"), configuration.x_sound_our)
 
     form.add_tab(_("Sounds"))
 
@@ -84,7 +84,7 @@ def options(parent, configuration):
     form.separador()
     form.checkbox(_("Work in the background, when possible"), not configuration.x_engine_notbackground)
     form.separador()
-    form.checkbox("%s -> %s:" % (_("Save engines log"), "UserData/EngineLogs"), configuration.x_log_engines)
+    form.checkbox("%s -> %s" % (_("Save engines log"), "UserData/EngineLogs"), configuration.x_log_engines)
     form.separador()
     form.folder(_("Gaviota Tablebases"), configuration.x_carpeta_gaviota, configuration.carpeta_gaviota_defecto())
     form.separador()

@@ -390,8 +390,11 @@ class Configuration:
     def file_kibitzers(self):
         return os.path.join(self.carpeta_config, "kibitzers.pk")
 
-    def file_Adjournments(self):
+    def file_adjournments(self):
         return os.path.join(self.carpeta_config, "Adjournments.ddb")
+
+    def file_index_polyglots(self):
+        return os.path.join(self.carpeta_config, "index_polyglots.pk")
 
     def file_pers_openings(self):
         return os.path.join(self.carpeta_config, "persaperturas.pkd")

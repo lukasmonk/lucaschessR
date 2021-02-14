@@ -6,7 +6,7 @@ from Code.QT import QTUtil2
 
 class Adjournments:
     def __init__(self):
-        self.file = Code.configuration.file_Adjournments()
+        self.file = Code.configuration.file_adjournments()
 
     def open(self):
         return UtilSQL.DictSQL(self.file)

@@ -55,7 +55,7 @@ class WOpeningLines(QTVarios.WDialogo):
             None,
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
-            (_("Reinit"), Iconos.Reiniciar(), self.reiniciar),
+            (_("Update"), Iconos.Reiniciar(), self.reiniciar),
             None,
             (_("Folder"), Iconos.File(), self.changeFolder),
             None,

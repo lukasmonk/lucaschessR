@@ -1,5 +1,7 @@
 import os
 
+from PySide2 import QtCore
+
 import FasterCode
 
 from Code.Base import Position
@@ -14,32 +16,26 @@ from Code.Board import Board
 from Code.QT import Delegados
 from Code.QT import Voyager
 from Code.QT import QTVarios
-from Code.Polyglots import PolyglotImports
+from Code.Polyglots import PolyglotImportExports, DBPolyglot
 
 
 class WPolyglot(QTVarios.WDialogo):
-    def __init__(self, wowner, configuration, path_dbbin):
-        title = os.path.basename(path_dbbin)[:-6]
-        QTVarios.WDialogo.__init__(self, wowner, title, Iconos.Book(), "polyglot")
+    def __init__(self, wowner, configuration, path_lcbin):
+        self.title = os.path.basename(path_lcbin)[:-6]
+        QTVarios.WDialogo.__init__(self, wowner, self.title, Iconos.Book(), "polyglot")
 
         self.configuration = configuration
-        self.path_dbbin = path_dbbin
-        self.path_mkbin = self.path_dbbin[:-6] + ".mkbin"
+        self.path_lcbin = path_lcbin
 
         self.owner = wowner
-        self.key = None
-        self.key_str10 = None
 
-        self.db_entries = UtilSQL.DictSQL(self.path_dbbin)
-        if Util.filesize(self.path_mkbin) < 0:
-            f = open(self.path_mkbin, "wb")
-            f.close()
-        self.pol_mkbin = FasterCode.Polyglot(self.path_mkbin)
+        self.db_entries = DBPolyglot.DBPolyglot(path_lcbin)
+
+        self.pol_import = PolyglotImportExports.PolyglotImport(self)
+        self.pol_export = PolyglotImportExports.PolyglotExport(self)
 
         self.li_moves = []
         self.history = []
-
-        self.pol_imports = PolyglotImports.PolyglotImports(self)
 
         conf_board = configuration.config_board("WPOLYGLOT", 48)
         self.board = Board.Board(self, conf_board)
@@ -65,9 +61,9 @@ class WPolyglot(QTVarios.WDialogo):
             None,
             (_("Voyager"), Iconos.Voyager32(), self.voyager),
             None,
-            (_("Import"), Iconos.Import8(), self.pol_imports.importar),
+            (_("Import"), Iconos.Import8(), self.pol_import.importar),
             None,
-            (_("Export"), Iconos.Export8(), self.pol_imports.exportar),
+            (_("Create book"), Iconos.BinBook(), self.pol_export.exportar),
             None,
         )
         self.tb = Controles.TBrutina(self, li_acciones)
@@ -90,30 +86,28 @@ class WPolyglot(QTVarios.WDialogo):
 
         self.li_moves = [FasterCode.BinMove(info_move) for info_move in self.position.get_exmoves()]
 
-        self.key, str_key, d_entries = self.pol_mkbin.dict_entries(position.fen())
-        self.key_str10 = "%10s" % str_key
+        li = self.db_entries.get_entries(position.fen())
+        d_entries = {entry.move:entry for entry in li}
+
         for binmove in self.li_moves:
             mv = binmove.imove()
             if mv in d_entries:
                 binmove.set_entry(d_entries[mv])
-
-        dic_db = self.db_entries[self.key_str10]
-        if dic_db is not None:
-            for binmove in self.li_moves:
-                mv = binmove.imove()
-                if mv in dic_db:
-                    binmove.set_entry(dic_db[mv])
+                binmove.rowid = d_entries[mv].rowid
+            else:
+                binmove.rowid = 0
 
         tt = sum(binmove.weight() for binmove in self.li_moves)
         for binmove in self.li_moves:
             binmove.porc = binmove.weight() * 100.0 / tt if tt > 0 else 0
 
         self.li_moves.sort(key=lambda x: x.weight(), reverse=True)
-        self.grid_moves.refresh()
         self.board.set_position(position)
         self.board.activate_side(position.is_white)
         if save_history:
             self.history.append(self.position.fen())
+        self.grid_moves.refresh()
+        self.grid_moves.gotop()
 
     def grid_doble_click(self, grid, row, col):
         if col.key == "move":
@@ -127,10 +121,6 @@ class WPolyglot(QTVarios.WDialogo):
         if -1 < row < len(self.li_moves):
             bin_move = self.li_moves[row]
             self.board.put_arrow_sc(bin_move.info_move.xfrom(), bin_move.info_move.xto())
-
-    def terminar(self):
-        self.finalizar()
-        self.accept()
 
     def grid_num_datos(self, grid):
         return len(self.li_moves)
@@ -154,33 +144,55 @@ class WPolyglot(QTVarios.WDialogo):
     def grid_setvalue(self, grid, row, column, valor):
         binmove = self.li_moves[row]
         field = column.key
-        if valor == "":
-            valor = 0
-
-        valor = int(valor)
+        valor = int(valor) if valor else 0
+        hash_key = FasterCode.hash_polyglot8(self.position.fen())
 
         binmove.set_field(field, valor)
-        dic = self.db_entries.get(self.key_str10, {})
         entry = binmove.get_entry()
         if entry.key == 0:
-            entry.key = self.key
-        if entry.move == 0:
+            entry.key = hash_key
             entry.move = binmove.imove()
-        dic[entry.move] = entry
-        self.db_entries[self.key_str10] = dic
+
+        rowid = self.db_entries.save_entry(binmove.rowid, entry)
+        binmove.rowid = entry.rowid = rowid
+        if rowid  == 0:
+            for field in ("score", "depth", "learn"):
+                binmove.set_field(field, 0)
 
         if field == "weight":
             tt = sum(binmove.weight() for binmove in self.li_moves)
             for binmove in self.li_moves:
-                binmove.porc = binmove.weight() * 100.0 / tt
+                binmove.porc = binmove.weight() * 100.0 / tt if tt else 0.0
+            grid.refresh()
 
-    def closeEvent(self, event):
-        self.finalizar()
+    def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
+        if k in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):
+            row, o_col = grid.current_position()
+            field = o_col.key
 
-    def finalizar(self):
-        self.pol_mkbin.close()
-        self.db_entries.close()
-        self.save_video()
+            binmove = self.li_moves[row]
+
+            if field in ("move", "%", "weight"):
+                binmove.set_field("weight", 0)
+                for xfield in ("score", "depth", "learn"):
+                    binmove.set_field(xfield, 0)
+            else:
+                binmove.set_field(field, 0)
+
+            entry = binmove.get_entry()
+            if entry.key == 0:
+                entry.key = FasterCode.hash_polyglot8(self.position.fen())
+                entry.move = binmove.imove()
+
+            self.db_entries.save_entry(binmove.rowid, entry)
+            if entry.weight == 0:
+                binmove.rowid = entry.rowid = 0  # borrados
+
+                tt = sum(binmove.weight() for binmove in self.li_moves)
+                for binmove in self.li_moves:
+                    binmove.porc = binmove.weight() * 100.0 / tt if tt else 0.0
+
+            grid.refresh()
 
     def mensajero(self, from_sq, to_sq, promocion=""):
         FasterCode.set_fen(self.position.fen())
@@ -188,6 +200,17 @@ class WPolyglot(QTVarios.WDialogo):
             fen = FasterCode.get_fen()
             self.position.read_fen(fen)
             self.set_position(self.position, True)
+
+    def terminar(self):
+        self.finalizar()
+        self.accept()
+
+    def closeEvent(self, event):
+        self.finalizar()
+
+    def finalizar(self):
+        self.db_entries.close()
+        self.save_video()
 
     def takeback(self):
         if len(self.history) > 1:

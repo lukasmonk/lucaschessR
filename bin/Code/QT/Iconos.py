@@ -3564,19 +3564,27 @@ def Training_Endings():
     return QtGui.QIcon(pmTraining_Endings())
 
 
+def pmBridge():
+    return PM(939747,940765)
+
+
+def Bridge():
+    return QtGui.QIcon(pmBridge())
+
+
 def pmMaia():
-    return PM(939747,940531)
+    return PM(940765,941549)
 
 
 def Maia():
     return QtGui.QIcon(pmMaia())
 
 
-def pmBridge():
-    return PM(940531,941549)
+def pmBinBook():
+    return PM(941549,942298)
 
 
-def Bridge():
-    return QtGui.QIcon(pmBridge())
+def BinBook():
+    return QtGui.QIcon(pmBinBook())
 
 

@@ -54,9 +54,7 @@ class ManagerCompeticion(Manager.Manager):
         self.rival_conf = self.dbm.get_current_rival()
         self.xrival = self.procesador.creaManagerMotor(self.rival_conf, None, nivel)
 
-        self.main_window.pon_toolbar(
-            (TB_CANCEL, TB_RESIGN, TB_TAKEBACK, TB_REINIT, TB_ADJOURN, TB_CONFIG, TB_UTILITIES)
-        )
+        self.main_window.pon_toolbar((TB_CANCEL, TB_RESIGN, TB_TAKEBACK, TB_REINIT, TB_ADJOURN, TB_CONFIG, TB_UTILITIES))
         self.main_window.activaJuego(True, False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
@@ -87,10 +85,7 @@ class ManagerCompeticion(Manager.Manager):
         self.game.tag_timestart()
 
     def xrotulo2(self):
-        self.set_label2(
-            "%s: <b>%s</b><br>%s: %d %s"
-            % (_("Tutor"), self.xtutor.name, _("Total score"), self.dbm.puntuacion(), _("pts"))
-        )
+        self.set_label2("%s: <b>%s</b><br>%s: %d %s" % (_("Tutor"), self.xtutor.name, _("Total score"), self.dbm.puntuacion(), _("pts")))
 
     def run_action(self, key):
 
@@ -133,7 +128,7 @@ class ManagerCompeticion(Manager.Manager):
                 "ISWHITE": self.human_side,
                 "GAME_SAVE": self.game.save(),
                 "SITUTOR": self.is_tutor_enabled,
-                "AYUDAS": self.hints,
+                "HINTS": self.hints,
                 "CATEGORIA": self.categoria.key,
                 "LEVEL": self.nivelJugado,
                 "PUNTOS": self.puntos,
@@ -152,9 +147,9 @@ class ManagerCompeticion(Manager.Manager):
         categorias = dbm.get_categorias_rival(dic["RIVAL_KEY"])
         categoria = categorias.segun_clave(dic["CATEGORIA"])
         self.base_inicio(categorias, categoria, nivel, is_white, puntos)
+        self.hints = dic["HINTS"]
         self.game.restore(dic["GAME_SAVE"])
         self.goto_end()
-
 
         self.play_next_move()
 
@@ -273,21 +268,11 @@ class ManagerCompeticion(Manager.Manager):
         if player_win:
             hecho = "B" if self.human_side else "N"
             if self.categorias.put_result(self.categoria, self.nivelJugado, hecho):
-                mensaje += "\n\n%s: %d (%s)" % (
-                    _("Move to the next level"),
-                    self.categoria.level_done + 1,
-                    self.categoria.name(),
-                )
+                mensaje += "\n\n%s: %d (%s)" % (_("Move to the next level"), self.categoria.level_done + 1, self.categoria.name())
             self.dbm.set_categorias_rival(self.rival_conf.key, self.categorias)
             if self.puntos:
                 puntuacion = self.dbm.puntuacion()
-                mensaje += "\n\n%s: %d+%d = %d %s" % (
-                    _("Total score"),
-                    puntuacion - self.puntos,
-                    self.puntos,
-                    puntuacion,
-                    _("pts"),
-                )
+                mensaje += "\n\n%s: %d+%d = %d %s" % (_("Total score"), puntuacion - self.puntos, self.puntos, puntuacion, _("pts"))
                 self.xrotulo2()
 
         self.guardarGanados(player_win)
@@ -356,9 +341,7 @@ class ManagerCompeticion(Manager.Manager):
                                 from_sq = tutor.from_sq
                                 to_sq = tutor.to_sq
                                 promotion = tutor.promotion
-                                ok, mens, jgTutor = Move.get_game_move(
-                                    self.game, self.game.last_position, from_sq, to_sq, promotion
-                                )
+                                ok, mens, jgTutor = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
                                 if ok:
                                     move = jgTutor
                         elif self.configuration.x_save_tutor_variations:

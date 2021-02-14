@@ -175,12 +175,12 @@ def save_pickle(fich: str, obj) -> bool:
     return True
 
 
-def restore_pickle(fich: str):
+def restore_pickle(fich: str, default=None):
     if exist_file(fich):
         with open(fich, "rb") as f:
             return pickle.loads(f.read())
     else:
-        return None
+        return default
 
 
 def urlretrieve(url: str, fich: str) -> bool:

@@ -18,7 +18,7 @@ from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.Polyglots import PolyglotImports
+from Code.Polyglots import PolyglotImportExports
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import WindowSavePGN
@@ -121,9 +121,14 @@ class WGames(QtWidgets.QWidget):
     def tw_train(self):
         menu = QTVarios.LCMenu(self)
         menu.opcion(self.tw_play_against, _("Play against a game"), Iconos.Law())
+        menu.separador()
         if self.dbGames.has_positions():
-            menu.separador()
             menu.opcion(self.tw_uti_tactic, _("Create tactics training"), Iconos.Tacticas())
+            menu.separador()
+        eti = _("Play like a Grandmaster")
+        menu.opcion(self.tw_gm, _X(_("Create training to %1"), eti), Iconos.GranMaestro())
+        menu.separador()
+
         resp = menu.lanza()
         if resp:
             resp()
@@ -726,9 +731,6 @@ class WGames(QtWidgets.QWidget):
             menu.separador()
             menu.opcion(self.tw_polyglot, _("Create a polyglot book"), Iconos.Book())
             menu.separador()
-            eti = _("Play like a Grandmaster")
-            menu.opcion(self.tw_gm, _X(_("Create training to %1"), eti), Iconos.GranMaestro())
-            menu.separador()
         menu.opcion(self.tw_pack, _("Pack database"), Iconos.Pack())
 
         resp = menu.lanza()
@@ -925,11 +927,11 @@ class WGames(QtWidgets.QWidget):
 
     def tw_polyglot(self):
         titulo = self.dbGames.get_name() + ".bin"
-        resp = PolyglotImports.export_polyglot_config(self, self.configuration, titulo)
+        resp = PolyglotImportExports.export_polyglot_config(self, self.configuration, titulo)
         if resp is None:
             return
         path_bin, uniform = resp
-        resp = PolyglotImports.import_polyglot_config(self, self.configuration, os.path.basename(path_bin))
+        resp = PolyglotImportExports.import_polyglot_config(self, self.configuration, os.path.basename(path_bin), False)
         if resp is None:
             return
         plies, st_side, st_results, ru, min_games, min_score, calc_weight, save_score = resp
@@ -941,14 +943,14 @@ class WGames(QtWidgets.QWidget):
             pts += pt
             db[keymove] = num, pts
 
-        dltmp = PolyglotImports.ImportarPGNDB(self, titulo)
+        dltmp = PolyglotImportExports.ImportarPGNDB(self, titulo)
         dltmp.show()
 
-        ok = PolyglotImports.add_db(self.dbGames, plies, st_results, st_side, ru, time.time, 1.2, dltmp.dispatch, fsum)
+        ok = PolyglotImportExports.add_db(self.dbGames, plies, st_results, st_side, ru, time.time, 1.2, dltmp.dispatch, fsum)
         dltmp.close()
 
         if ok:
-            PolyglotImports.create_bin_from_dbbig(self, path_bin, db, min_games, min_score, calc_weight, save_score)
+            PolyglotImportExports.create_bin_from_dbbig(self, path_bin, db, min_games, min_score, calc_weight, save_score)
 
     def tw_exportar_db(self, lista):
         dbpath = QTVarios.select_db(self, self.configuration, False, True)

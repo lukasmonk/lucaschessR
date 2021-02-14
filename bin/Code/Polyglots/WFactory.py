@@ -3,6 +3,7 @@ import os.path
 import datetime
 import shutil
 
+import Code
 from Code import Util
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -11,7 +12,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import FormLayout
-from Code.Polyglots import WPolyglot
+from Code.Polyglots import DBPolyglot, WPolyglot
 
 
 class WFactoryPolyglots(QTVarios.WDialogo):
@@ -19,7 +20,10 @@ class WFactoryPolyglots(QTVarios.WDialogo):
         self.procesador = procesador
         self.configuration = procesador.configuration
         self.resultado = None
-        self.list_names, self.dict_data = self.lee_lista()
+
+        self.index_polyglots = DBPolyglot.IndexPolyglot()
+
+        self.list_db = self.index_polyglots.list()
 
         QTVarios.WDialogo.__init__(
             self, procesador.main_window, "Polyglot book factory", Iconos.FactoryPolyglot(), "factorypolyglots"
@@ -28,7 +32,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("NAME", _("Name"), 240)
         o_columnas.nueva("MTIME", _("Last modification"), 100, centered=True)
-        o_columnas.nueva("SIZE", _("Size"), 100, siDerecha=True)
+        o_columnas.nueva("SIZE", _("Moves"), 100, siDerecha=True)
         self.glista = Grid.Grid(self, o_columnas, siSelecFilas=True, siSeleccionMultiple=True)
 
         li_acciones = (
@@ -44,6 +48,8 @@ class WFactoryPolyglots(QTVarios.WDialogo):
             None,
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
+            (_("Update"), Iconos.Reiniciar(), self.update),
+            None,
         )
         tb = QTVarios.LCTB(self, li_acciones)
 
@@ -55,35 +61,16 @@ class WFactoryPolyglots(QTVarios.WDialogo):
 
         self.glista.gotop()
 
-    def lee_lista(self):
-        d = {}
-        with os.scandir(self.configuration.folder_polyglots_factory()) as it:
-            for entry in it:
-                if entry.is_file():
-                    name = entry.name
-                    name_base = entry.name[:-6]
-                    ns = entry.stat().st_mtime
-                    if name.endswith(".dbbin") or name.endswith(".mkbin"):
-                        if not (name_base in d):
-                            d[name_base] = [None, None, ns]
-                        d[name_base][0 if name.endswith(".dbbin") else 1] = entry
-                        if d[name_base][2] < ns:
-                            d[name_base][2] = ns
-        li = list(d.keys())
-        li.sort(key=lambda x: d[x][2], reverse=True)
-
-        return li, d
-
     def edit(self):
         recno = self.glista.recno()
         if recno >= 0:
-            self.run_edit(self.dict_data[self.list_names[recno]][0].path)
+            self.run_edit(self.list_db[recno]["FILENAME"])
 
     def grid_doble_click(self, grid, row, o_columna):
         self.edit()
 
-    def run_edit(self, path):
-        self.resultado = path
+    def run_edit(self, filename):
+        self.resultado = os.path.join(Code.configuration.folder_polyglots_factory(), filename)
         self.save_video()
         self.accept()
 
@@ -96,9 +83,9 @@ class WFactoryPolyglots(QTVarios.WDialogo):
             resp = form.run()
             if resp:
                 name = resp[1][0]
-                path = os.path.join(self.configuration.folder_polyglots_factory(), name + ".dbbin")
+                path = os.path.join(self.configuration.folder_polyglots_factory(), name + ".lcbin")
                 if os.path.isfile(path):
-                    QTUtil2.message_error(self, "%s/n%s" % (_("This file already exists"), path))
+                    QTUtil2.message_error(self, "%s\n%s" % (_("This file already exists"), path))
                 else:
                     return os.path.realpath(path)
             else:
@@ -107,23 +94,32 @@ class WFactoryPolyglots(QTVarios.WDialogo):
     def new(self):
         path = self.get_new_path("")
         if path:
+            with DBPolyglot.DBPolyglot(path) as db:  # To create the file
+                pass
+            self.update(soft=True)
             self.run_edit(path)
+
+    def path_db(self, filename):
+        return os.path.join(Code.configuration.folder_polyglots_factory(), filename)
 
     def copy(self):
         recno = self.glista.recno()
         if recno >= 0:
-            path = self.get_new_path(self.list_names[recno].name)
+            path = self.get_new_path(self.list_db[recno]["FILENAME"][:-6])
             if path:
-                shutil.copy(self.list_names[recno].path, path)
+                folder = Code.configuration.folder_polyglots_factory()
+                shutil.copy(self.path_db(self.list_db[recno]["FILENAME"]), os.path.join(folder, path))
+                self.update()
                 self.glista.refresh()
 
     def renombrar(self):
-        row = self.glista.recno()
-        if row >= 0:
-            op = self.listaOpenings[row]
-            name = self.get_nombre(op["title"])
-            if name:
-                self.listaOpenings.change_title(row, name)
+        recno = self.glista.recno()
+        if recno >= 0:
+            reg = self.list_db[recno]
+            path = self.get_new_path(reg["FILENAME"][:-6])
+            if path:
+                os.rename(self.path_db(reg["FILENAME"]), path)
+                self.update()
                 self.glista.refresh()
 
     def borrar(self):
@@ -132,32 +128,35 @@ class WFactoryPolyglots(QTVarios.WDialogo):
             mens = _("Do you want to delete all selected records?")
             mens += "\n"
             for num, row in enumerate(li, 1):
-                mens += "\n%d. %s" % (num, self.list_names[row])
+                mens += "\n%d. %s" % (num, self.list_db[row]["FILENAME"][:-6])
             if QTUtil2.pregunta(self, mens):
                 li.sort(reverse=True)
                 for row in li:
-                    name = self.list_names[row]
-                    entry_dbbin, entry_mkbin, ms = self.dict_data[name]
-                    Util.remove_file(entry_dbbin.path)
-                    if entry_mkbin:
-                        Util.remove_file(entry_mkbin.path)
-                    del self.list_names[row]
+                    Util.remove_file(self.path_db(self.list_db[row]["FILENAME"]))
+                self.update(soft=True)
                 self.glista.refresh()
 
     def grid_num_datos(self, grid):
-        return len(self.list_names)
+        return len(self.list_db)
 
     def grid_dato(self, grid, row, o_columna):
         col = o_columna.key
-        name = self.list_names[row]
-        entry_dbbin, entry_mkbin, ms = self.dict_data[name]
-        if col == "NAME":
-            return name
-        elif col == "MTIME":
-            return Util.localDateT(datetime.datetime.fromtimestamp(ms))
+
+        reg = self.list_db[row]
+        if col == "MTIME":
+            return Util.localDateT(datetime.datetime.fromtimestamp(reg["MTIME"]))
+        elif col == "NAME":
+            return reg["FILENAME"][:-6]
         elif col == "SIZE":
-            sz_mk = entry_mkbin.stat().st_size if entry_mkbin else 0
-            return "{:,}".format(sz_mk // 16).replace(",", ".")
+            return "{:,}".format(reg["SIZE"]).replace(",", ".")
+
+    def update(self, soft=False):
+        if soft:
+            self.list_db = self.index_polyglots.update_soft()
+        else:
+            self.list_db = self.index_polyglots.update_hard(self)
+        self.glista.refresh()
+        self.glista.gotop()
 
     def closeEvent(self, event):  # Cierre con X
         self.save_video()
