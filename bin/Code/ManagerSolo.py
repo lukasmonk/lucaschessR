@@ -7,7 +7,7 @@ from Code.QT import Controles
 from Code.QT import Iconos
 from Code.Openings import WindowOpenings
 from Code.PlayAgainstEngine import WPlayAgainstEngine
-from Code.QT import WindowSolo
+from Code.QT import WindowPgnTags
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -256,7 +256,7 @@ class ManagerSolo(Manager.Manager):
         self.start(dic)
 
     def editEtiquetasPGN(self):
-        resp = WindowSolo.editEtiquetasPGN(self.procesador, self.game.li_tags)
+        resp = WindowPgnTags.editTagsPGN(self.procesador, self.game.li_tags)
         if resp:
             self.game.set_tags(resp)
             self.pon_rotulo()

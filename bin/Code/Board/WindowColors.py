@@ -285,20 +285,18 @@ class WColores(QTVarios.WDialogo):
         lbFondo = crea_lb(_("Background"))
         self.btFondo = BotonColor(self, self.config_board.colorFondo, self.actualizaBoard)
         self.btFondoPNG = BotonImagen(self, self.config_board.png64Fondo, self.actualizaBoard, self.btFondo)
-        self.chbExtended = Controles.CHB(
-            self, _("Extended to outer border"), self.config_board.extendedColor()
-        ).capture_changes(self, self.extendedColor)
+        self.chbExtended = Controles.CHB(self, _("Extended to outer border"), self.config_board.extendedColor()).capture_changes(self, self.extendedColor)
 
         # Actual
-        self.chbTemas = Controles.CHB(self, _("Default"), self.config_board.siDefTema()).capture_changes(
-            self, self.defectoTemas
-        )
+        self.chbTemas = Controles.CHB(self, _("Default"), self.config_board.siDefTema()).capture_changes(self, self.defectoTemas)
         if self.is_base:
             self.chbTemas.ponValor(False)
             self.chbTemas.setVisible(False)
         # Exterior
         lbExterior = crea_lb(_("Outer Border"))
         self.btExterior = BotonColor(self, self.config_board.colorExterior, self.actualizaBoard)
+        self.btExteriorPNG = BotonImagen(self, self.config_board.png64Exterior, self.actualizaBoard, self.btExterior)
+
         # Texto
         lbTexto = crea_lb(_("Coordinates"))
         self.btTexto = BotonColor(self, self.config_board.colorTexto, self.actualizaBoard)
@@ -308,35 +306,21 @@ class WColores(QTVarios.WDialogo):
 
         # Flechas
         lbFlecha = crea_lb(_("Move indicator"))
-        self.lyF = BotonFlecha(
-            self, self.config_board.fTransicion, self.config_board.flechaDefecto, self.actualizaBoard
-        )
+        self.lyF = BotonFlecha(self, self.config_board.fTransicion, self.config_board.flechaDefecto, self.actualizaBoard)
         lbFlechaAlternativa = crea_lb(_("Arrow alternative"))
-        self.lyFAlternativa = BotonFlecha(
-            self, self.config_board.fAlternativa, self.config_board.flechaAlternativaDefecto, self.actualizaBoard
-        )
+        self.lyFAlternativa = BotonFlecha(self, self.config_board.fAlternativa, self.config_board.flechaAlternativaDefecto, self.actualizaBoard)
         lbFlechaActivo = crea_lb(_("Active moves"))
-        self.lyFActual = BotonFlecha(
-            self, self.config_board.fActivo, self.config_board.flechaActivoDefecto, self.actualizaBoard
-        )
+        self.lyFActual = BotonFlecha(self, self.config_board.fActivo, self.config_board.flechaActivoDefecto, self.actualizaBoard)
         lbFlechaRival = crea_lb(_("Opponent moves"))
-        self.lyFRival = BotonFlecha(
-            self, self.config_board.fRival, self.config_board.flechaRivalDefecto, self.actualizaBoard
-        )
+        self.lyFRival = BotonFlecha(self, self.config_board.fRival, self.config_board.flechaRivalDefecto, self.actualizaBoard)
 
         lyActual = Colocacion.G()
         lyActual.control(self.chbTemas, 0, 0)
         lyActual.controlc(lbPNG, 0, 2).controlc(lbTrans, 0, 3)
-        lyActual.controld(lbBlancas, 1, 0).control(self.btBlancas, 1, 1).otroc(self.btBlancasPNG, 1, 2).otroc(
-            self.dialBlancasTrans, 1, 3
-        )
-        lyActual.controld(lbNegras, 2, 0).control(self.btNegras, 2, 1).otroc(self.btNegrasPNG, 2, 2).otroc(
-            self.dialNegrasTrans, 2, 3
-        )
-        lyActual.controld(lbFondo, 3, 0).control(self.btFondo, 3, 1).otroc(self.btFondoPNG, 3, 2).control(
-            self.chbExtended, 3, 3
-        )
-        lyActual.controld(lbExterior, 4, 0).control(self.btExterior, 4, 1)
+        lyActual.controld(lbBlancas, 1, 0).control(self.btBlancas, 1, 1).otroc(self.btBlancasPNG, 1, 2).otroc(self.dialBlancasTrans, 1, 3)
+        lyActual.controld(lbNegras, 2, 0).control(self.btNegras, 2, 1).otroc(self.btNegrasPNG, 2, 2).otroc(self.dialNegrasTrans, 2, 3)
+        lyActual.controld(lbFondo, 3, 0).control(self.btFondo, 3, 1).otroc(self.btFondoPNG, 3, 2).control(self.chbExtended, 3, 3)
+        lyActual.controld(lbExterior, 4, 0).control(self.btExterior, 4, 1).otroc(self.btExteriorPNG, 4, 2)
         lyActual.controld(lbTexto, 5, 0).control(self.btTexto, 5, 1)
         lyActual.controld(lbFrontera, 6, 0).control(self.btFrontera, 6, 1)
         lyActual.controld(lbFlecha, 7, 0).otro(self.lyF, 7, 1, 1, 4)
@@ -372,9 +356,7 @@ class WColores(QTVarios.WDialogo):
         # _nCoordenadas
         lbCoordenadas = crea_lb(_("Number"))
         li_options = [("0", 0), ("4", 4), ("2a", 2), ("2b", 3), ("2c", 5), ("2d", 6)]
-        self.cbCoordenadas = Controles.CB(self, li_options, self.config_board.nCoordenadas()).capture_changes(
-            self.actualizaBoardM
-        )
+        self.cbCoordenadas = Controles.CB(self, li_options, self.config_board.nCoordenadas()).capture_changes(self.actualizaBoardM)
         self.chbDefCoordenadas = xDefecto(self.config_board.siDefCoordenadas())
         l2mas1(lyG, 0, lbCoordenadas, self.cbCoordenadas, self.chbDefCoordenadas)
 
@@ -389,29 +371,19 @@ class WColores(QTVarios.WDialogo):
         l2mas1(lyG, 1, lbTipoLetra, self.cbTipoLetra, self.chbDefTipoLetra)
 
         # _cBold
-        self.chbBold = Controles.CHB(self, _("Bold"), self.config_board.siBold()).capture_changes(
-            self, self.actualizaBoardM
-        )
+        self.chbBold = Controles.CHB(self, _("Bold"), self.config_board.siBold()).capture_changes(self, self.actualizaBoardM)
         self.chbDefBold = xDefecto(self.config_board.siDefBold())
         l2mas1(lyG, 2, None, self.chbBold, self.chbDefBold)
 
         # _tamLetra
         lbTamLetra = crea_lb(_("Size") + " %")
-        self.sbTamLetra = (
-            Controles.SB(self, self.config_board.tamLetra(), 1, 200)
-            .tamMaximo(50)
-            .capture_changes(self.actualizaBoardM)
-        )
+        self.sbTamLetra = Controles.SB(self, self.config_board.tamLetra(), 1, 200).tamMaximo(50).capture_changes(self.actualizaBoardM)
         self.chbDefTamLetra = xDefecto(self.config_board.siDefTamLetra())
         l2mas1(lyG, 3, lbTamLetra, self.sbTamLetra, self.chbDefTamLetra)
 
         # _sepLetras
         lbSepLetras = crea_lb(_("Separation") + " %")
-        self.sbSepLetras = (
-            Controles.SB(self, self.config_board.sepLetras(), -1000, 1000)
-            .tamMaximo(50)
-            .capture_changes(self.actualizaBoardM)
-        )
+        self.sbSepLetras = Controles.SB(self, self.config_board.sepLetras(), -1000, 1000).tamMaximo(50).capture_changes(self.actualizaBoardM)
         self.chbDefSepLetras = xDefecto(self.config_board.siDefSepLetras())
         l2mas1(lyG, 4, lbSepLetras, self.sbSepLetras, self.chbDefSepLetras)
 
@@ -431,21 +403,13 @@ class WColores(QTVarios.WDialogo):
 
         # _tamRecuadro
         lbTamRecuadro = crea_lb(_("Outer Border Size") + " %")
-        self.sbTamRecuadro = (
-            Controles.SB(self, self.config_board.tamRecuadro(), 0, 10000)
-            .tamMaximo(50)
-            .capture_changes(self.actualizaBoardM)
-        )
+        self.sbTamRecuadro = Controles.SB(self, self.config_board.tamRecuadro(), 0, 10000).tamMaximo(50).capture_changes(self.actualizaBoardM)
         self.chbDefTamRecuadro = xDefecto(self.config_board.siDefTamRecuadro())
         l2mas1(ly_otros, 1, lbTamRecuadro, self.sbTamRecuadro, self.chbDefTamRecuadro)
 
         # _tamFrontera
         lbTamFrontera = crea_lb(_("Inner Border Size") + " %")
-        self.sbTamFrontera = (
-            Controles.SB(self, self.config_board.tamFrontera(), 0, 10000)
-            .tamMaximo(50)
-            .capture_changes(self.actualizaBoardM)
-        )
+        self.sbTamFrontera = Controles.SB(self, self.config_board.tamFrontera(), 0, 10000).tamMaximo(50).capture_changes(self.actualizaBoardM)
         self.chbDefTamFrontera = xDefecto(self.config_board.siDefTamFrontera())
         l2mas1(ly_otros, 2, lbTamFrontera, self.sbTamFrontera, self.chbDefTamFrontera)
 
@@ -455,9 +419,7 @@ class WColores(QTVarios.WDialogo):
         gbOtros.setFlat(True)
 
         # Board #####################################################################################################
-        cp = Position.Position().read_fen(
-            "2kr1b1r/2p1pppp/p7/3pPb2/1q3P2/2N1P3/PPP3PP/R1BQK2R w KQ - 0 1"
-        )
+        cp = Position.Position().read_fen("2kr1b1r/2p1pppp/p7/3pPb2/1q3P2/2N1P3/PPP3PP/R1BQK2R w KQ - 0 1")
         self.board = Board.Board(self, self.config_board, siMenuVisual=False)
         self.board.crea()
         self.board.set_position(cp)
@@ -481,15 +443,7 @@ class WColores(QTVarios.WDialogo):
         self.lbTamBoard = Controles.LB(self, "%d px" % self.board.width())
 
         # Juntamos
-        lyT = (
-            Colocacion.V()
-            .control(tb)
-            .espacio(15)
-            .control(self.board)
-            .controli(self.lbTamBoard)
-            .relleno(1)
-            .margen(3)
-        )
+        lyT = Colocacion.V().control(tb).espacio(15).control(self.board).controli(self.lbTamBoard).relleno(1).margen(3)
 
         self.tab = Controles.Tab()
         self.tab.nuevaTab(gbTemas, _("Themes"))
@@ -501,13 +455,7 @@ class WColores(QTVarios.WDialogo):
         self.elegido = None
 
         self.li_themes = self.read_own_themes()
-        self.current_theme = {
-            "NOMBRE": "",
-            "SECCION": "",
-            "CHANGE_PIECES": True,
-            "o_tema": self.config_board.grabaTema(),
-            "o_base": self.config_board.grabaBase(),
-        }
+        self.current_theme = {"NOMBRE": "", "SECCION": "", "CHANGE_PIECES": True, "o_tema": self.config_board.grabaTema(), "o_base": self.config_board.grabaBase()}
         self.own_theme_selected = False
         self.cambiadoTema()
         self.defectoTemas()
@@ -606,6 +554,9 @@ class WColores(QTVarios.WDialogo):
         self.btFondo.setDisabled(if_default)
         self.btFondoPNG.setDisabled(if_default)
 
+        self.btExterior.setDisabled(if_default)
+        self.btExteriorPNG.setDisabled(if_default)
+
         self.actualizaBoard()
 
     def aceptar(self):
@@ -702,6 +653,7 @@ class WColores(QTVarios.WDialogo):
         self.btBlancasPNG.ponImagen()
         self.btNegrasPNG.ponImagen()
         self.btFondoPNG.ponImagen()
+        self.btExteriorPNG.ponImagen()
 
         self.lyF.ponImagen()
         self.lyFAlternativa.ponImagen()
@@ -1393,21 +1345,12 @@ class WNameTheme(QtWidgets.QDialog):
 
         lb_section = Controles.LB2P(self, _("Section"))
         self.ed_section = Controles.ED(self, theme.get("SECCION", ""))
-        bt_section = (
-            Controles.PB(self, "", self.mira_section).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Section lists"))
-        )
-        ly_section = (
-            Colocacion.H().control(lb_section).control(self.ed_section).espacio(-10).control(bt_section).relleno(1)
-        )
+        bt_section = Controles.PB(self, "", self.mira_section).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Section lists"))
+        ly_section = Colocacion.H().control(lb_section).control(self.ed_section).espacio(-10).control(bt_section).relleno(1)
 
         self.chb_pieces_set = Controles.CHB(self, _("Change piece set"), theme.get("CHANGE_PIECES", True))
 
-        li_acciones = [
-            (_("Save"), Iconos.Aceptar(), self.aceptar),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.reject),
-            None,
-        ]
+        li_acciones = [(_("Save"), Iconos.Aceptar(), self.aceptar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None]
         self.tb = QTVarios.LCTB(self, li_acciones)
 
         layout = Colocacion.V().control(self.tb).espacio(16)

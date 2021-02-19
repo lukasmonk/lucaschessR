@@ -43,6 +43,7 @@ class ConfigTabTema(JS):
         self.x_transNegras = 0
         self.x_colorFondo = self.x_colorBlancas
         self.x_png64Fondo = ""
+        self.x_png64Exterior = ""
         self.o_fActivo = self.flechaActivoDefecto()
         self.o_fRival = self.flechaRivalDefecto()
         self.x_png64Thumb = ""
@@ -265,6 +266,7 @@ class ConfigBoard(JS):
         return self.o_tema.save_dic()
 
     def leeTema(self, dic: dict):
+        self.o_tema = ConfigTabTema()  # al poner campos nuevos que no permanezcan
         self.o_tema.restore_dic(dic)
 
     def grabaBase(self):
@@ -320,6 +322,11 @@ class ConfigBoard(JS):
         if png64 is not None:
             self.o_tema.x_png64Fondo = png64
         return self.confPadre().png64Fondo() if self.o_tema.x_siTemaDefecto else self.o_tema.x_png64Fondo
+
+    def png64Exterior(self, png64=None):
+        if png64 is not None:
+            self.o_tema.x_png64Exterior = png64
+        return self.confPadre().png64Exterior() if self.o_tema.x_siTemaDefecto else self.o_tema.x_png64Exterior
 
     def png64Thumb(self, png64=None):
         if png64 is not None:

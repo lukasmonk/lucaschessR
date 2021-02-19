@@ -3,7 +3,7 @@ from Code import Manager
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.PlayAgainstEngine import WPlayAgainstEngine
-from Code.QT import WindowSolo
+from Code.QT import WindowPgnTags
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -219,7 +219,7 @@ class ManagerGame(Manager.Manager):
         self.check_boards_setposition()
 
     def editEtiquetasPGN(self):
-        resp = WindowSolo.editEtiquetasPGN(self.procesador, self.game.li_tags)
+        resp = WindowPgnTags.editTagsPGN(self.procesador, self.game.li_tags)
         if resp:
             self.game.li_tags = resp
             self.put_information()

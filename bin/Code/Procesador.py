@@ -43,7 +43,7 @@ from Code.QT import WindowAlbumes
 from Code.QT import WindowAnotar
 from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd, ManagerOpeningLines
 from Code.QT import WindowBMT
-from Code.QT import WindowColors
+from Code.Board import WindowColors
 from Code.QT import WindowEverest
 from Code.QT import WindowRoutes
 from Code.QT import WindowSTS

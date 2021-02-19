@@ -10,7 +10,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
 from Code.Board import Board
-from Code.QT import WindowColors
+from Code.Board import WindowColors
 
 from Code.Base.Constantes import *
 

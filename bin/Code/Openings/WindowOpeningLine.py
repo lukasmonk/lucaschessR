@@ -155,7 +155,7 @@ class WLines(QTVarios.WDialogo):
         resp = menu.lanza()
         if resp:
             if isinstance(resp, str):
-                if QTUtil2.pregunta(self, _("Are you sure you want to restore backup %s ?" % ("\n%s" % resp))):
+                if QTUtil2.pregunta(self, _("Are you sure you want to restore backup %s ?") % ("\n%s" % resp)):
                     um = QTUtil2.unMomento(self, _("Working..."))
                     self.dbop.rechistory(resp)
                     self.glines.refresh()

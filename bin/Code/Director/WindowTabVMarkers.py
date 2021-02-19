@@ -170,7 +170,7 @@ class WTV_Markers(QTVarios.WDialogo):
         ly = Colocacion.V().control(tb).control(self.grid)
 
         # Board
-        config_board = owner.board.config_board
+        config_board = self.configuration.config_board("EDIT_GRAPHICS", 48)
         self.board = Board.Board(self, config_board, siDirector=False)
         self.board.crea()
         self.board.copiaPosicionDe(owner.board)

@@ -349,12 +349,7 @@ class ManagerRoutesPlay(ManagerRoutes):
         resp += '[White "%s"]\n' % white
         resp += '[Black "%s"]\n' % black
 
-        last_jg = self.game.last_jg()
-        result = last_jg.resultado()
-        if last_jg.is_draw:
-            result = "1/2-1/2"
-        else:
-            result = "1-0" if last_jg.is_white() else "0-1"
+        result = self.game.resultado()
 
         resp += '[Result "%s"]\n' % result
 
@@ -431,7 +426,7 @@ class ManagerRoutesEndings(ManagerRoutes):
 
     def ponWarnings(self):
         if self.warnings <= self.max_warnings:
-            self.set_label2(_("Warnings: %d/%d" % (self.warnings, self.max_warnings)))
+            self.set_label2(_("Warnings: %d/%d")% (self.warnings, self.max_warnings))
         else:
             self.set_label2(_("You must repeat the puzzle."))
 

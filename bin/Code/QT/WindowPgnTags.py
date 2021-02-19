@@ -4,11 +4,11 @@ from Code.QT import Columnas
 from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import QTVarios
+from Code.QT import QTVarios, QTUtil
 from Code.Base.Constantes import STANDARD_TAGS
 
 
-class WEtiquetasPGN(QTVarios.WDialogo):
+class WTagsPGN(QTVarios.WDialogo):
     def __init__(self, procesador, liPGN):
         titulo = _("Edit PGN labels")
         icono = Iconos.PGN()
@@ -60,23 +60,6 @@ class WEtiquetasPGN(QTVarios.WDialogo):
         self.liPGN = li
 
     def aceptar(self):
-        dic_rev = {}
-        for eti in self.listandard:
-            dic_rev[TrListas.pgnLabel(eti.upper())] = eti
-
-        for n, (eti, val) in enumerate(self.liPGN):
-            if eti in dic_rev:
-                self.liPGN[n][0] = dic_rev[eti]
-
-        li = []
-        st = set()
-        for n, (eti, val) in enumerate(self.liPGN):
-            val = val.strip()
-            if not (eti in st) and val:
-                st.add(eti)
-                li.append((eti, val))
-        self.liPGN = li
-
         self.save_video()
         self.accept()
 
@@ -92,10 +75,8 @@ class WEtiquetasPGN(QTVarios.WDialogo):
 
     def grid_setvalue(self, grid, row, o_column, valor):
         col = 0 if o_column.key == "ETIQUETA" else 1
-        try:
-            self.liPGN[row][col] = valor
-        except:
-            pass
+        if row < len(self.liPGN):
+            self.liPGN[row][col] = valor.strip()
 
     def grid_dato(self, grid, row, o_column):
         if o_column.key == "ETIQUETA":
@@ -110,7 +91,8 @@ class WEtiquetasPGN(QTVarios.WDialogo):
                 else:
                     key = ""
             return key
-        return self.liPGN[row][1]
+        if row < len(self.liPGN):
+            return self.liPGN[row][1]
 
     def arriba(self):
         recno = self.grid.recno()
@@ -128,13 +110,19 @@ class WEtiquetasPGN(QTVarios.WDialogo):
             self.grid.refresh()
 
 
-def editEtiquetasPGN(procesador, liPGN):
-    w = WEtiquetasPGN(procesador, liPGN)
+def editTagsPGN(procesador, liPGN):
+    w = WTagsPGN(procesador, liPGN)
     if w.exec_():
         li = []
+        st_eti = set()
         for eti, valor in w.liPGN:
-            if (len(eti.strip()) > 0) and (len(valor.strip()) > 0):
+            eti = eti.strip()
+            valor = valor.strip()
+            if eti in st_eti:
+                continue
+            if (len(eti) > 0) and (len(valor) > 0):
                 li.append([eti, valor])
+                st_eti.add(eti)
         return li
     else:
         return None

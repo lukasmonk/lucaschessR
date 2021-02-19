@@ -32,6 +32,7 @@ class WTV_Marco(QtWidgets.QDialog):
         tb = Controles.TB(self, li_acciones)
 
         # Board
+        config_board = Code.configuration.config_board("EDIT_GRAPHICS", 32)
         config_board = owner.board.config_board
         self.board = Board.Board(self, config_board, siDirector=False)
         self.board.crea()
@@ -70,7 +71,7 @@ class WTV_Marco(QtWidgets.QDialog):
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        liGen.append((config, regMarco.position.orden))
+        liGen.append((config, regMarco.physical_pos.orden))
 
         self.form = FormLayout.FormWidget(liGen, dispatch=self.cambios)
 
@@ -105,9 +106,9 @@ class WTV_Marco(QtWidgets.QDialog):
                 regMarco.opacity = (100.0 - float(li[4])) / 100.0
                 regMarco.grosor = li[5]
                 regMarco.redEsquina = li[6]
-                regMarco.position.orden = li[7]
+                regMarco.physical_pos.orden = li[7]
                 box.setOpacity(regMarco.opacity)
-                box.setZValue(regMarco.position.orden)
+                box.setZValue(regMarco.physical_pos.orden)
                 box.update()
             self.board.escena.update()
             QTUtil.refresh_gui()
@@ -176,7 +177,7 @@ class WTV_Marcos(QTVarios.WDialogo):
         ly = Colocacion.V().control(tb).control(self.grid)
 
         # Board
-        config_board = owner.board.config_board
+        config_board = Code.configuration.config_board("EDIT_GRAPHICS", 48)
         self.board = Board.Board(self, config_board, siDirector=False)
         self.board.crea()
         self.board.copiaPosicionDe(owner.board)

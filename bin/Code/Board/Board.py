@@ -22,7 +22,7 @@ from Code.Director import TabVisual, WindowDirector
 from Code import Util
 import Code
 from Code.Base.Constantes import *
-import Code.QT.WindowColors as WindowColores
+import Code.Board.WindowColors as WindowColores
 
 
 class RegKB:
@@ -35,9 +35,7 @@ class Board(QtWidgets.QGraphicsView):
     def __init__(self, parent, config_board, siMenuVisual=True, siDirector=True):
         super(Board, self).__init__(None)
 
-        self.setRenderHints(
-            QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform
-        )
+        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setDragMode(self.NoDrag)
@@ -132,7 +130,7 @@ class Board(QtWidgets.QGraphicsView):
 
             if is_ctrl and (key in (Qt.Key_Plus, Qt.Key_Minus)):
                 ap = self.config_board.anchoPieza()
-                ap += 2 *(1 if key == Qt.Key_Plus else -1)
+                ap += 2 * (1 if key == Qt.Key_Plus else -1)
                 if ap >= 10:
                     self.config_board.anchoPieza(ap)
                     self.config_board.guardaEnDisco()
@@ -150,9 +148,7 @@ class Board(QtWidgets.QGraphicsView):
 
             # ALT-J Save image to file (CTRL->no border)
             elif key == Qt.Key_J:
-                path = QTUtil2.salvaFichero(
-                    self, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
-                )
+                path = QTUtil2.salvaFichero(self, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
                 if path:
                     self.save_as_img(path, "png", is_ctrl=is_ctrl, is_alt=is_alt)
                     self.configuration.x_save_folder = os.path.dirname(path)
@@ -162,11 +158,7 @@ class Board(QtWidgets.QGraphicsView):
             elif key == Qt.Key_K:
                 self.showKeys()
 
-            elif (
-                hasattr(self.main_window, "manager")
-                and self.main_window.manager
-                and key in (Qt.Key_P, Qt.Key_N, Qt.Key_C)
-            ):
+            elif hasattr(self.main_window, "manager") and self.main_window.manager and key in (Qt.Key_P, Qt.Key_N, Qt.Key_C):
                 # P -> show information
                 if key == Qt.Key_P and hasattr(self.main_window.manager, "pgnInformacion"):
                     self.main_window.manager.pgnInformacion()
@@ -207,9 +199,12 @@ class Board(QtWidgets.QGraphicsView):
                 if exmove_ok is None:
                     for exmove in li:
                         san = exmove.san().replace("+", "").replace("#", "")
-                        if busca.endswith(san.lower()) \
-                                or busca.endswith(san.lower().replace("=", "")) \
-                                or (san == "O-O-O" and busca.endswith("o3")) or (san == "O-O" and busca.endswith("o2")):
+                        if (
+                            busca.endswith(san.lower())
+                            or busca.endswith(san.lower().replace("=", ""))
+                            or (san == "O-O-O" and busca.endswith("o3"))
+                            or (san == "O-O" and busca.endswith("o2"))
+                        ):
                             if exmove_ok:
                                 if len(san) > len(exmove_ok.san()):
                                     exmove_ok = exmove
@@ -219,8 +214,6 @@ class Board(QtWidgets.QGraphicsView):
                 if exmove_ok:
                     self.init_kb_buffer()
                     self.mensajero(exmove_ok.xfrom(), exmove_ok.xto(), exmove_ok.promotion())
-
-
 
     def sizeHint(self):
         return QtCore.QSize(self.ancho + 6, self.ancho + 6)
@@ -296,15 +289,17 @@ class Board(QtWidgets.QGraphicsView):
         self.png64Blancas = self.config_board.png64Blancas()
         self.png64Negras = self.config_board.png64Negras()
         self.png64Fondo = self.config_board.png64Fondo()
+        self.png64Exterior = self.config_board.png64Exterior()
         self.transBlancas = self.config_board.transBlancas()
         self.transNegras = self.config_board.transNegras()
 
-        if self.config_board.extendedColor():
+        self.extended_fondo = self.config_board.extendedColor()
+        if self.extended_fondo:
             self.colorExterior = self.colorFondo
-            self.png64FondoExt = self.png64Fondo
+            self.png64Exterior = self.png64Fondo
         else:
             self.colorExterior = self.config_board.colorExterior()
-            self.png64FondoExt = None
+            self.png64Exterior = self.png64Exterior
 
         self.colorTexto = self.config_board.colorTexto()
 
@@ -351,22 +346,24 @@ class Board(QtWidgets.QGraphicsView):
                     mx = mt
                     kt = k
             pt, mc = dTam[kt]
-            self.puntos = pt * ap / kt
-            self.margenCentro = mc * ap / kt
+            self.puntos = pt * ap // kt
+            self.margenCentro = mc * ap // kt
 
         self.anchoPieza = ap
 
         self.width_square = ap + self.margenPieza * 2
-        self.tamFrontera = self.margenCentro * 3.0 / 46.0
+        self.tamFrontera = self.margenCentro * 3.0 // 46.0
 
-        self.margenCentro = self.margenCentro * self.config_board.tamRecuadro() / 100
+        self.margenCentro = self.margenCentro * self.config_board.tamRecuadro() // 100
 
         fx = self.config_board.tamFrontera()
-        self.tamFrontera = int(self.tamFrontera * fx / 100)
+        self.tamFrontera = int(self.tamFrontera * fx // 100)
         if fx > 0 and self.tamFrontera == 0:
             self.tamFrontera = 1
+        if self.tamFrontera == 1:
+            self.tamFrontera = 2
 
-        self.puntos = self.puntos * self.config_board.tamLetra() * 12 / 1000
+        self.puntos = self.puntos * self.config_board.tamLetra() * 12 // 1000
 
         # Guardamos las piezas
 
@@ -414,48 +411,40 @@ class Board(QtWidgets.QGraphicsView):
 
         self.is_white_bottom = True
 
-        # base
-        if self.png64FondoExt:
-            cajon = BoardTypes.Imagen()
-            cajon.pixmap = self.png64FondoExt
+        # Completo
+        is_png = False
+        if self.extended_fondo:
+            if self.png64Fondo:
+                cajon = BoardTypes.Imagen()
+                cajon.pixmap = self.png64Fondo
+                is_png = True
+            else:
+                cajon = BoardTypes.Caja()
+                cajon.colorRelleno = self.colorFondo
         else:
-            cajon = BoardTypes.Caja()
-            cajon.colorRelleno = self.colorExterior
-        self.ancho = ancho = cajon.physical_pos.alto = cajon.physical_pos.ancho = (
-            self.width_square * 8 + self.margenCentro * 2 + 4
-        )
+            if self.png64Exterior:
+                cajon = BoardTypes.Imagen()
+                cajon.pixmap = self.png64Exterior
+                is_png = True
+            else:
+                cajon = BoardTypes.Caja()
+                cajon.colorRelleno = self.colorExterior
+        self.ancho = ancho = cajon.physical_pos.alto = cajon.physical_pos.ancho = self.width_square * 8 + self.margenCentro * 2 + 4
         cajon.physical_pos.orden = 1
-        cajon.colorRelleno = self.colorExterior
         cajon.tipo = QtCore.Qt.NoPen
         self.setFixedSize(ancho + 4, ancho + 4)
-        if self.png64FondoExt:
+        if is_png:
             self.cajonSC = BoardElements.PixmapSC(self.escena, cajon)
         else:
             self.cajonSC = BoardElements.CajaSC(self.escena, cajon)
 
-        # Frontera
-        base_casillas_f = BoardTypes.Caja()
-        base_casillas_f.grosor = self.tamFrontera
-        base_casillas_f.physical_pos.x = base_casillas_f.physical_pos.y = self.margenCentro - self.tamFrontera + 1
-        base_casillas_f.physical_pos.alto = base_casillas_f.physical_pos.ancho = (
-            self.width_square * 8 + 4 + (self.tamFrontera - 1) * 2
-        )
-        base_casillas_f.physical_pos.orden = 2
-        base_casillas_f.colorRelleno = self.colorFrontera
-        base_casillas_f.redEsquina = self.tamFrontera
-        base_casillas_f.tipo = 0
-
-        if base_casillas_f.grosor > 0:
-            self.baseCasillasFSC = BoardElements.CajaSC(self.escena, base_casillas_f)
-
-        # exterior squares
+        # Fondo squares
         if self.png64Fondo:
             baseCasillas = BoardTypes.Imagen()
             baseCasillas.pixmap = self.png64Fondo
         else:
             baseCasillas = BoardTypes.Caja()
-            if not self.png64FondoExt:
-                baseCasillas.colorRelleno = self.colorFondo
+            baseCasillas.colorRelleno = self.colorFondo
         baseCasillas.physical_pos.x = baseCasillas.physical_pos.y = self.margenCentro + 2
         baseCasillas.physical_pos.alto = baseCasillas.physical_pos.ancho = self.width_square * 8
         baseCasillas.physical_pos.orden = 2
@@ -464,6 +453,22 @@ class Board(QtWidgets.QGraphicsView):
             self.baseCasillasSC = BoardElements.PixmapSC(self.escena, baseCasillas)
         else:
             self.baseCasillasSC = BoardElements.CajaSC(self.escena, baseCasillas)
+        if self.extended_fondo:
+            self.baseCasillasSC.hide()
+
+        # Frontera
+        base_casillas_f = BoardTypes.Caja()
+        base_casillas_f.grosor = self.tamFrontera
+        base_casillas_f.physical_pos.x = base_casillas_f.physical_pos.y = self.margenCentro + 1
+        base_casillas_f.physical_pos.alto = base_casillas_f.physical_pos.ancho = self.width_square * 8 + self.tamFrontera
+        base_casillas_f.physical_pos.orden = 3
+        base_casillas_f.colorRelleno = -1
+        base_casillas_f.color = self.colorFrontera
+        base_casillas_f.redEsquina = 0#self.tamFrontera
+        base_casillas_f.tipo = 1
+
+        if base_casillas_f.grosor > 0:
+            self.baseCasillasFSC = BoardElements.CajaSC(self.escena, base_casillas_f)
 
         # squares
         def hazCasillas(tipo, png64, color, transparencia):
@@ -517,9 +522,7 @@ class Board(QtWidgets.QGraphicsView):
             pCasillas = baseCasillas.physical_pos
             pFrontera = base_casillas_f.physical_pos
             gapCasilla = (self.width_square - anchoTexto) / 2
-            sep = (
-                self.margenCentro * self.config_board.sepLetras() * 38 / 50000
-            )  # ancho = 38 -> sep = 5 -> sepLetras = 100
+            sep = self.margenCentro * self.config_board.sepLetras() * 38 / 50000  # ancho = 38 -> sep = 5 -> sepLetras = 100
 
             def norm(x):
                 if x < 0:
@@ -615,9 +618,7 @@ class Board(QtWidgets.QGraphicsView):
             indicador_menu.tipo = 1
             indicador_menu.sur = indicador.physical_pos.y
             indicador_menu.norte = gap / 2
-            self.indicadorSC_menu = BoardElements.PixmapSC(
-                self.escena, indicador_menu, pixmap=Iconos.pmSettings(), rutina=self.lanzaMenuVisual
-            )
+            self.indicadorSC_menu = BoardElements.PixmapSC(self.escena, indicador_menu, pixmap=Iconos.pmSettings(), rutina=self.lanzaMenuVisual)
             self.indicadorSC_menu.setOpacity(0.50 if self.configuration.x_opacity_tool_board == 10 else 0.01)
 
             if self.siDirectorIcon:
@@ -635,9 +636,7 @@ class Board(QtWidgets.QGraphicsView):
                 script.tipo = 1
                 script.sur = indicador.physical_pos.y
                 script.norte = gap / 2
-                self.scriptSC_menu = BoardElements.PixmapSC(
-                    self.escena, script, pixmap=Iconos.pmLampara(), rutina=self.lanzaGuion
-                )
+                self.scriptSC_menu = BoardElements.PixmapSC(self.escena, script, pixmap=Iconos.pmLampara(), rutina=self.lanzaGuion)
                 self.scriptSC_menu.hide()
                 self.scriptSC_menu.setOpacity(0.70)
 
@@ -663,16 +662,10 @@ class Board(QtWidgets.QGraphicsView):
             (_("CTRL") + " C", _("Copy FEN to clipboard")),
             (_("ALT") + " I", _("Copy board as image to clipboard")),
             (_("CTRL") + " I", _("Copy board as image to clipboard") + " (%s)" % _("without border")),
-            (
-                _("CTRL") + "+" + _("ALT") + " I",
-                _("Copy board as image to clipboard") + " (%s)" % _("without coordinates"),
-            ),
+            (_("CTRL") + "+" + _("ALT") + " I", _("Copy board as image to clipboard") + " (%s)" % _("without coordinates")),
             (_("ALT") + " J", _("Copy board as image to a file")),
             (_("CTRL") + " J", _("Copy board as image to a file") + " (%s)" % _("without border")),
-            (
-                _("CTRL") + "+" + _("ALT") + " J",
-                _("Copy board as image to a file") + " (%s)" % _("without coordinates"),
-            ),
+            (_("CTRL") + "+" + _("ALT") + " J", _("Copy board as image to a file") + " (%s)" % _("without coordinates")),
         ]
         if self.pieces_are_active:
             liKeys.append((None, None))
@@ -783,9 +776,7 @@ class Board(QtWidgets.QGraphicsView):
 
         elif resp.startswith("def_"):
             if resp.endswith("todo"):
-                self.config_board = self.configuration.resetConfBoard(
-                    self.config_board.id(), self.config_board.anchoPieza()
-                )
+                self.config_board = self.configuration.resetConfBoard(self.config_board.id(), self.config_board.anchoPieza())
                 self.reset(self.config_board)
 
     def lanzaDirector(self):
@@ -917,17 +908,7 @@ class Board(QtWidgets.QGraphicsView):
         self.current_graphlive.update()
 
     def readGraphLive(self):
-        rel = {
-            0: "MR",
-            1: "ALTMR",
-            2: "SHIFTMR",
-            3: "CTRLMR",
-            4: "CTRLALTMR",
-            5: "CTRLSHIFTMR",
-            6: "MR1",
-            7: "ALTMR1",
-            8: "SHIFTMR1",
-        }
+        rel = {0: "MR", 1: "ALTMR", 2: "SHIFTMR", 3: "CTRLMR", 4: "CTRLALTMR", 5: "CTRLSHIFTMR", 6: "MR1", 7: "ALTMR1", 8: "SHIFTMR1"}
         dic = {}
         db = self.dbVisual
         li = self.dbVisual.dbConfig["SELECTBANDA"]
@@ -1823,17 +1804,13 @@ class Board(QtWidgets.QGraphicsView):
         QTUtil.refresh_gui()
 
     def pulsadoNum(self, siIzq, siActivar, number):
-        if (
-            not siIzq
-        ):  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
+        if not siIzq:  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
             return
         if self.exePulsadoNum:
             self.exePulsadoNum(siActivar, int(number))
 
     def pulsadaLetra(self, siIzq, siActivar, letra):
-        if (
-            not siIzq
-        ):  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
+        if not siIzq:  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
             return
         if self.exePulsadaLetra:
             self.exePulsadaLetra(siActivar, letra)
@@ -2383,7 +2360,7 @@ class BoardEstaticoMensaje(BoardEstatico):
         self.mens2.colorTexto = self.color_mens
         self.mens2.valor = ""
         self.mens2.alineacion = "c"
-        self.mens2.physical_pos.x = self.mens.physical_pos.x + self.width_square*2
+        self.mens2.physical_pos.x = self.mens.physical_pos.x + self.width_square * 2
         self.mens2.physical_pos.y = self.mens.physical_pos.y
         self.mensSC2 = BoardElements.TextoSC(self.escena, self.mens2)
 
@@ -2405,4 +2382,3 @@ class BoardEstaticoMensaje(BoardEstatico):
     def remove_pieces(self, st):
         for a1h8 in st:
             self.borraPieza(a1h8)
-

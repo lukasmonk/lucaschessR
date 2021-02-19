@@ -1829,7 +1829,7 @@ class Manager:
         with open(self.configuration.ficheroSelectedPositions, "at", encoding="utf-8", errors="ignore") as q:
             q.write(lineaTraining + "\n")
         QTUtil2.mensajeTemporal(
-            self.main_window, _('Position saved in "%s" file.' % self.configuration.ficheroSelectedPositions), 2
+            self.main_window, _('Position saved in "%s" file.') % self.configuration.ficheroSelectedPositions, 2
         )
         self.procesador.entrenamientos.menu = None
 
