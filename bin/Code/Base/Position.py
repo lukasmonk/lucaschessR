@@ -52,6 +52,16 @@ class Position:
         else:
             self.en_passant = "-"
 
+    def is_valid_fen(self, fen):
+        fen = fen.strip()
+        if fen.count("/") != 7:
+            return False
+        try:
+            self.read_fen(fen)
+            return True
+        except:
+            return False
+
     def read_fen(self, fen):
         fen = fen.strip()
         if fen.count("/") != 7:

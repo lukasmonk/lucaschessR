@@ -77,6 +77,7 @@ cdef extern from "irina.h":
     ctypedef struct MoveBin:
         pass
 
+    int is_bmi2()
     void init_board()
     void fen_board(char *fen)
     char *board_fen(char *fen)
@@ -114,6 +115,9 @@ cdef extern from "irina.h":
     void close_poly()
     void set_ext_fen_body(char * ext_fen, char * ext_body, char * pv )
 
+
+def bmi2():
+    return is_bmi2()
 
 class PGNreader:
     def __init__(self, path_file, depth):

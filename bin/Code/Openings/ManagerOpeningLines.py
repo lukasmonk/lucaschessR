@@ -600,7 +600,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.liMensBasic = []
         if self.modo != "sequential":
             self.liMensBasic.append("%d/%d" % (self.num_linea + 1, len(self.liGames)))
-        self.liMensBasic.append("%s: %s" % (_("Lines"), mensLines))
+        self.liMensBasic.append("%s: %s" % (_("Lines") if len(li) > 1 else _("Line"), mensLines))
 
         self.siAyuda = False
         self.board.dbvisual_set_show_allways(False)
@@ -704,18 +704,20 @@ class ManagerOpeningLines(Manager.Manager):
                 self.game_info["NOERROR"] += 1
                 noError = self.game_info["NOERROR"]
                 if self.modo == "sequential":
-                    salto = 2 ** (noError + 1)
-                    numGames = len(self.liGames)
-                    for x in range(salto, numGames):
-                        game_info = self.liGames[x]
-                        if game_info["NOERROR"] != noError:
-                            salto = x
-                            break
-
-                    liNuevo = self.liGames[1:salto]
+                    # salto = 2 ** (noError + 1)
+                    # numGames = len(self.liGames)
+                    # for x in range(salto, numGames):
+                    #     game_info = self.liGames[x]
+                    #     if game_info["NOERROR"] != noError:
+                    #         salto = x
+                    #         break
+                    #
+                    # liNuevo = self.liGames[1:salto]
+                    # liNuevo.append(self.game_info)
+                    # if numGames > salto:
+                    #     liNuevo.extend(self.liGames[salto:])
+                    liNuevo = self.liGames[1:]
                     liNuevo.append(self.game_info)
-                    if numGames > salto:
-                        liNuevo.extend(self.liGames[salto:])
                     self.training["LIGAMES_SEQUENTIAL"] = liNuevo
                     self.main_window.pon_toolbar((TB_CLOSE, TB_NEXT))
                 else:
@@ -831,7 +833,7 @@ class ManagerOpeningLines(Manager.Manager):
 
         if pvSel != pvObj:
             fenm2 = move.position_before.fenm2()
-            li = self.dicFENm2.get(fenm2, [])
+            li = self.dicFENm2.get(fenm2, set())
             if pvSel in li:
                 mens = _("You have selected a correct move, but this line uses another one.")
                 QTUtil2.mensajeTemporal(self.main_window, mens, 2, physical_pos="tb", background="#C3D6E8")

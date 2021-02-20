@@ -298,7 +298,6 @@ class Opening:
         maxmoves = reg["MAXMOVES"]
         is_white = reg["COLOR"] == "WHITE"
         siRandom = reg["RANDOM"]
-        siRepetir = False
 
         lilipv = [FasterCode.xpv_pv(xpv).split(" ") for xpv in self.li_xpv]
 
@@ -316,24 +315,27 @@ class Opening:
         dicpv = {}
         for lipv in lilipv:
             pvmirar = "".join(lipv)
-            if pvmirar in dicpv:
-                continue
+            dicpv[pvmirar] = lipv
 
+        lilipv = []
+        set_correct = set()
+        for pvmirar in dicpv:
             siesta = False
             for pvotro in dicpv:
-                if pvotro.startswith(pvmirar):
+                if pvotro != pvmirar and pvotro.startswith(pvmirar):
                     siesta = True
                     break
             if not siesta:
-                dicpv[pvmirar] = lipv
-        li = list(dicpv.keys())
-        li.sort()
-        lilipv = [value for key, value in dicpv.items()]
+                set_correct.add(pvmirar)
+
+        lilipv = [value for key, value in dicpv.items() if key in set_correct]
 
         ligamesST = []
         ligamesSQ = []
         dicFENm2 = {}
         cp = Position.Position()
+
+        busca = " w " if is_white else " b "
 
         for lipv in lilipv:
             game = {}
@@ -344,58 +346,22 @@ class Opening:
             ligamesST.append(game)
             game = dict(game)
             ligamesSQ.append(game)
+
             FasterCode.set_init_fen()
             for pv in lipv:
                 fen = FasterCode.get_fen()
                 cp.read_fen(fen)
-                fenm2 = cp.fenm2()
-                if not (fenm2 in dicFENm2):
-                    dicFENm2[fenm2] = set()
-                dicFENm2[fenm2].add(pv)
-                FasterCode.make_move(pv)
-
-        if not siRepetir:
-            stBorrar = set()
-            xanalyzer = procesador.XAnalyzer()
-            busca = " w " if is_white else " b "
-            for stpv, fenm2 in dicFENm2.items():
-                if len(stpv) > 1:
-                    if busca in fenm2:
-                        dic = self.getfenvalue(fenm2)
-                        if not ("ANALISIS" in dic):
-                            dic["ANALISIS"] = xanalyzer.analiza(fen)
-                            self.setfenvalue(fenm2, dic)
-                        mrm = dic["ANALISIS"]
-                        pvsel = stpv[0]  # el primero que encuentre por defecto
-                        for rm in mrm.li_rm():
-                            pv0 = rm.movimiento()
-                            if pv0 in stpv:
-                                pvsel = pv0
-                                stpv.remove(pvsel)
-                                break
-                        dicFENm2[fenm2] = {pvsel}
-                        for pv in stpv:
-                            stBorrar.add("%s|%s" % (fenm2, pv))
-            liBorrar = []
-            for n, game in enumerate(ligamesSQ):
-                FasterCode.set_init_fen()
-                for pv in game["LIPV"]:
-                    fen = FasterCode.get_fen()
-                    cp.read_fen(fen)
+                if busca in fen:
                     fenm2 = cp.fenm2()
-                    key = "%s|%s" % (fenm2, pv)
-                    if key in stBorrar:
-                        liBorrar.append(n)
-                        break
-                    FasterCode.make_move(pv)
-            liBorrar.sort(reverse=True)
-            for n in liBorrar:
-                del ligamesSQ[n]
-                del ligamesST[n]
+                    if not (fenm2 in dicFENm2):
+                        dicFENm2[fenm2] = set()
+                    dicFENm2[fenm2].add(pv)
+                FasterCode.make_move(pv)
 
         if siRandom:
             random.shuffle(ligamesSQ)
             random.shuffle(ligamesST)
+
         reg["LIGAMES_STATIC"] = ligamesST
         reg["LIGAMES_SEQUENTIAL"] = ligamesSQ
         reg["DICFENM2"] = dicFENm2
@@ -403,13 +369,12 @@ class Opening:
         bcolor = " w " if is_white else " b "
         liTrainPositions = []
         for fenm2 in dicFENm2:
-            if bcolor in fenm2:
-                data = {}
-                data["FENM2"] = fenm2
-                data["MOVES"] = dicFENm2[fenm2]
-                data["NOERROR"] = 0
-                data["TRIES"] = []
-                liTrainPositions.append(data)
+            data = {}
+            data["FENM2"] = fenm2
+            data["MOVES"] = dicFENm2[fenm2]
+            data["NOERROR"] = 0
+            data["TRIES"] = []
+            liTrainPositions.append(data)
         random.shuffle(liTrainPositions)
         reg["LITRAINPOSITIONS"] = liTrainPositions
 

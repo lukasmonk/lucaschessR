@@ -11,7 +11,6 @@ import Code.Translate as Translate
 
 Translate.install()
 
-
 n_args = len(sys.argv)
 
 if n_args == 1:

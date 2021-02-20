@@ -11,6 +11,7 @@ int ah_pos(char *ah);
 Bitmap get_ms(void);
 bool bioskey(void);
 char *move2str(MoveBin move, char *str_dest);
+int is_bmi2(void);
 
 // test.c
 void test(void);

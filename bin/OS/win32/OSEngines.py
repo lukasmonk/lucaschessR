@@ -2,6 +2,7 @@ import os
 import platform
 
 import Code
+import FasterCode
 
 from Code.Engines import Engines
 
@@ -169,8 +170,11 @@ def read_engines(folder_engines):
 
     is64 = platform.machine().endswith("64")
     t32_64 = "64" if is64 else "32"
+    if is64:
+        if FasterCode.bmi2() == 1:
+            t32_64 = "64-bmi2"
 
-    cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"12.1.1 {t32_64}bit", "http://komodochess.com/", f"komodo-12.1.1-{t32_64}bit.exe", 3300)
+    cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"12.1.1 {t32_64}", "https://komodochess.com/", f"komodo-12.1.1-{t32_64}.exe", 3300)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 218)
@@ -178,10 +182,10 @@ def read_engines(folder_engines):
     if is64:
         mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
 
-    cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"12 {t32_64}bits", "http://stockfishchess.org/",
-             f"Stockfish-12R1_x{t32_64}.exe", 3400)
+    cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"13 {t32_64}", "https://stockfishchess.org/",
+             f"Stockfish-13_x{t32_64}.exe", 3500)
     cm.ordenUCI("Ponder", "false")
-    cm.ordenUCI("Threads", "1")
+    cm.ordenUCI("Threads", "2" if is64 else "1")
     cm.ordenUCI("Hash", "64")
     cm.ponMultiPV(20, 500)
 

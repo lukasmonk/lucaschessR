@@ -1,6 +1,8 @@
 import os
 import time
 
+import FasterCode
+
 from Code.Base import Game, Move, Position
 from Code import Manager
 from Code.QT import Controles
@@ -256,9 +258,26 @@ class ManagerSolo(Manager.Manager):
         self.start(dic)
 
     def editEtiquetasPGN(self):
-        resp = WindowPgnTags.editTagsPGN(self.procesador, self.game.li_tags)
+        fen_antes = self.game.get_tag("FEN")
+        resp = WindowPgnTags.editTagsPGN(self.procesador, self.game.li_tags, True)
         if resp:
             self.game.set_tags(resp)
+            fen_despues = self.game.get_tag("FEN")
+            if fen_antes != fen_despues:
+                fen_antes_fenm2 = FasterCode.fen_fenm2(fen_antes)
+                fen_despues_fenm2 = FasterCode.fen_fenm2(fen_despues)
+                if fen_antes_fenm2 != fen_despues_fenm2:
+                    cp = Position.Position()
+                    cp.read_fen(fen_despues_fenm2)
+                    self.xfichero = None
+                    self.xpgn = None
+                    self.xjugadaInicial = None
+                    self.new_game()
+                    self.game.set_position(first_position=cp)
+                    self.state = ST_ENDGAME if self.game.is_finished() else ST_PLAYING
+                    self.opening_block = None
+                    self.reiniciar()
+
             self.pon_rotulo()
 
     def guardaDir(self, resp):

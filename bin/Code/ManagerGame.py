@@ -1,3 +1,5 @@
+import FasterCode
+
 from Code.Base import Game, Position
 from Code import Manager
 from Code.QT import Controles
@@ -102,7 +104,8 @@ class ManagerGame(Manager.Manager):
         p.restore(self.reinicio)
         p.recno = getattr(self.game, "recno", None)
 
-        self.start(p, self.is_complete, self.only_consult, self.with_previous_next)
+        self.start(p, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+
 
     def run_action(self, key):
         if key == TB_REINIT:
@@ -219,9 +222,20 @@ class ManagerGame(Manager.Manager):
         self.check_boards_setposition()
 
     def editEtiquetasPGN(self):
-        resp = WindowPgnTags.editTagsPGN(self.procesador, self.game.li_tags)
+        fen_antes = self.game.get_tag("FEN")
+        resp = WindowPgnTags.editTagsPGN(self.procesador, self.game.li_tags, not self.is_complete)
         if resp:
             self.game.li_tags = resp
+            fen_despues = self.game.get_tag("FEN")
+            if fen_antes != fen_despues:
+                fen_antes_fenm2 = FasterCode.fen_fenm2(fen_antes)
+                fen_despues_fenm2 = FasterCode.fen_fenm2(fen_despues)
+                if fen_antes_fenm2 != fen_despues_fenm2:
+                    cp = Position.Position()
+                    cp.read_fen(fen_despues)
+                    self.game.set_position(cp)
+                    self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+
             self.put_information()
             if not self.changed:
                 if self.is_changed():
@@ -294,7 +308,8 @@ class ManagerGame(Manager.Manager):
             new_position = Voyager.voyager_position(self.main_window, ini_position)
             if new_position and new_position != ini_position:
                 self.game.set_position(new_position)
-                self.start(self.game, self.is_complete, self.with_previous_next)
+                self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+
 
         elif resp == "pasteposicion":
             texto = QTUtil.traePortapapeles()
@@ -305,7 +320,8 @@ class ManagerGame(Manager.Manager):
                     ini_position = self.game.first_position
                     if new_position and new_position != ini_position:
                         self.game.set_position(new_position)
-                        self.start(self.game, self.is_complete, self.with_previous_next)
+                        self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+
                 except:
                     pass
 
@@ -328,7 +344,8 @@ class ManagerGame(Manager.Manager):
         p = Game.Game()
         p.assign_other_game(game)
         p.recno = getattr(self.game, "recno", None)
-        self.start(p, self.is_complete, self.only_consult, self.with_previous_next)
+        self.start(p, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+
         self.changed = True
         self.put_toolbar()
 

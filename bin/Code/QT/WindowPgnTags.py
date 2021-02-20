@@ -1,19 +1,22 @@
 from Code import TrListas
+from Code.Base import Position
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import QTVarios, QTUtil
+from Code.QT import QTVarios, QTUtil2
 from Code.Base.Constantes import STANDARD_TAGS
 
 
 class WTagsPGN(QTVarios.WDialogo):
-    def __init__(self, procesador, liPGN):
+    def __init__(self, procesador, liPGN, is_fen_possible):
         titulo = _("Edit PGN labels")
         icono = Iconos.PGN()
         extparam = "editlabels"
         self.listandard = STANDARD_TAGS
+        self.is_fen_possible = is_fen_possible
+
 
         QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
         self.procesador = procesador
@@ -76,7 +79,27 @@ class WTagsPGN(QTVarios.WDialogo):
     def grid_setvalue(self, grid, row, o_column, valor):
         col = 0 if o_column.key == "ETIQUETA" else 1
         if row < len(self.liPGN):
-            self.liPGN[row][col] = valor.strip()
+            valor = valor.strip()
+
+            if col == 0 and valor.upper() == "FEN":
+                if self.is_fen_possible:
+                    valor = "FEN"
+                else:
+                    return
+
+            self.liPGN[row][col] = valor
+
+            if self.liPGN[row][0] == "FEN":
+                fen = self.liPGN[row][1]
+                if fen:
+                    cp = Position.Position()
+                    if not cp.is_valid_fen(fen):
+                        QTUtil2.message_error(self, _("This FEN is invalid"))
+                        self.liPGN[row][1] = ""
+                    else:
+                        cp.read_fen(fen)
+                        if cp.is_initial():
+                            self.liPGN[row][1] = ""
 
     def grid_dato(self, grid, row, o_column):
         if o_column.key == "ETIQUETA":
@@ -110,8 +133,8 @@ class WTagsPGN(QTVarios.WDialogo):
             self.grid.refresh()
 
 
-def editTagsPGN(procesador, liPGN):
-    w = WTagsPGN(procesador, liPGN)
+def editTagsPGN(procesador, liPGN, is_fen_possible):
+    w = WTagsPGN(procesador, liPGN, is_fen_possible)
     if w.exec_():
         li = []
         st_eti = set()

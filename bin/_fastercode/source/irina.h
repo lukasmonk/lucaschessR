@@ -13,6 +13,7 @@ typedef struct
    unsigned is_castle : 2;
 } MoveBin;
 
+int is_bmi2();
 void init_board();
 void fen_board(char *fen);
 int movegen(void);
