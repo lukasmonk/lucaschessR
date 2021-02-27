@@ -92,7 +92,7 @@ class PotenciaHistorico:
         tb.nuevoCampo("FECHA", "VARCHAR", notNull=True, primaryKey=True)
         tb.nuevoCampo("REF", "INTEGER")
         tb.nuevoCampo("SCORE", "INTEGER")
-        tb.nuevoCampo("ENGINE", "VARCHAR")
+        tb.nuevoCampo("MOTOR", "VARCHAR")
         tb.nuevoCampo("SEGUNDOS", "INTEGER")
         tb.nuevoCampo("MIN_MIN", "INTEGER")
         tb.nuevoCampo("MIN_MAX", "INTEGER")

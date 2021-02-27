@@ -250,7 +250,7 @@ class Configuration:
         self.x_save_csv = ""
         self.x_save_pgn = ""
 
-        self.x_rival_inicial = "rocinante" if Code.isLinux else "irina"
+        self.x_rival_inicial = "rocinante" if Code.is_linux else "irina"
 
         self.tutor_inicial = "stockfish"
         self.x_tutor_clave = self.tutor_inicial
@@ -613,6 +613,7 @@ class Configuration:
             if x.startswith("x_"):
                 dic[x] = getattr(self, x)
         dic["PERFOMANCE"] = self.perfomance.save()
+        dic["PALETTE"] = self.palette
         Util.save_pickle(self.file, dic)
 
     def lee(self):
@@ -625,7 +626,9 @@ class Configuration:
             xperf = dic.get("PERFOMANCE")
             if xperf:
                 self.perfomance.restore(xperf)
-
+            palette = dic.get("PALETTE")
+            if palette:
+                self.palette = palette
 
         for x in os.listdir("../.."):
             if x.endswith(".pon"):

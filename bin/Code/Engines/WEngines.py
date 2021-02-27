@@ -105,7 +105,7 @@ class WEngines(QTVarios.WDialogo):
         separador = FormLayout.separador
         liGen = [separador]
         liGen.append(separador)
-        config = FormLayout.Fichero(_("File"), "exe" if Code.isWindows else "*", False)
+        config = FormLayout.Fichero(_("File"), "exe" if Code.is_windows else "*", False)
         liGen.append((config, ""))
 
         for num in range(1, 11):

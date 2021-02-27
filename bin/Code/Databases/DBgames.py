@@ -493,7 +493,14 @@ class DBgames:
             p.set_tags(litags)
             return p.pgn(), p.resultado()
 
-        pgn = xpv_pgn(raw["XPV"])
+        xpv = raw["XPV"]
+        if xpv.startswith("|"):
+            nada, fen, xpv = xpv.split("|")
+            pv = xpv_pv(xpv) if xpv else ""
+            game = Game.pv_game(fen, pv)
+            pgn = game.pgnBase()
+        else:
+            pgn = xpv_pgn(raw["XPV"])
         tags = []
         for t, v in litags:
             tags.append('[%s "%s"]' % (t, v))

@@ -175,7 +175,7 @@ class WKibEngine(QtWidgets.QDialog):
             xprioridad = w.result_xprioridad
             if xprioridad is not None:
                 pid = self.engine.pid()
-                if Code.isWindows:
+                if Code.is_windows:
                     hp, ht, pid, dt = struct.unpack("PPII", pid.asstring(16))
                 p = psutil.Process(pid)
                 p.nice(xprioridad)

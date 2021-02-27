@@ -138,7 +138,7 @@ class WOpeningLines(QTVarios.WDialogo):
             menu.opcion(x, x, rondo.otro())
         menu.separador()
         menu.opcion(":n", nof, Iconos.Nuevo())
-        if Code.isWindows:
+        if Code.is_windows:
             menu.separador()
             menu.opcion(":m", _("Direct maintenance"), Iconos.Configurar())
 

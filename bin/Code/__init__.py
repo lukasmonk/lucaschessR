@@ -31,9 +31,11 @@ def path_resource(*lista):
         p = os.path.join(p, x)
     return os.path.realpath(p)
 
-isLinux = sys.platform == "linux"
-isWindows = not isLinux
-if isLinux:
+
+is_linux = sys.platform.startswith("linux")
+
+is_windows = not is_linux
+if is_linux:
     startfile = os.system
 else:
     startfile = os.startfile
@@ -57,8 +59,8 @@ mate_en_dos = 175522
 
 runSound = None
 
-BASE_VERSION = "A" # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.12"
+BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
+VERSION = "R 1.13"
 DEBUG = False
 DEBUG_ENGINE = False
 
@@ -68,13 +70,12 @@ if DEBUG:
     def prlk(*x):
         import sys
 
-        lx = len(x)-1
+        lx = len(x) - 1
 
         for n, l in enumerate(x):
             sys.stdout.write(str(l))
             if n < lx:
                 sys.stdout.write(" ")
-
 
     def stack(si_previo=False):
         import traceback
@@ -85,7 +86,6 @@ if DEBUG:
             prlk("\n" + "-" * 80 + "\n")
         for line in traceback.format_stack()[:-1]:
             prlk(line.strip() + "\n")
-
 
     builtins.__dict__["stack"] = stack
     builtins.__dict__["prlk"] = prlk
@@ -103,7 +103,6 @@ if DEBUG:
         prlk("%0.02f %s %s" % (t - tdbg[0], name, line))
         tdbg[0] = t
         return True
-
 
     if DEBUG_ENGINE:
         tdbg = [time.time()]

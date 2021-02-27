@@ -959,7 +959,10 @@ def cambiaColores(parent, configuration):
         else:
             palette = {}
             for n, tipo in enumerate(liPalette):
-                palette[tipo] = liColor[n + 1]
+                color = liColor[n + 1]
+                if type(color) != str:
+                    color = color.name()
+                palette[tipo] = color
         configuration.palette = palette
 
         if liPGN[0]:

@@ -178,7 +178,7 @@ class RunEngine:
             stdout.close()
 
     def start_engine(self):
-        if Code.isWindows:
+        if Code.is_windows:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE
@@ -226,7 +226,7 @@ class RunEngine:
                     self.process.kill()
                     self.process.terminate()
             except:
-                if Code.isWindows:
+                if Code.is_windows:
                     subprocess.call(['taskkill', '/F', '/T', '/PID', str(self.pid)])
                 else:
                     os.kill(self.pid, signal.SIGTERM)

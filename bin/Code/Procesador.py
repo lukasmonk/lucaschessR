@@ -782,7 +782,7 @@ class Procesador:
 
     def database(self, accion, dbpath, temporary=False):
         if accion == "M":
-            if Code.isWindows:
+            if Code.is_windows:
                 os.startfile(self.configuration.folder_databases())
             return
 
@@ -837,7 +837,7 @@ class Procesador:
         cfecha_pgn = str(os.path.getmtime(fichero_pgn))
         cdir = self.configuration.folder_databases_pgn()
 
-        file_db = os.path.join(cdir, os.path.basename(fichero_pgn)[:-4] + ".lcdb")
+        file_db = os.path.join(cdir, os.path.basename(fichero_pgn)[:-4] + "lcdb")
 
         if Util.exist_file(file_db):
             create = False
@@ -907,9 +907,12 @@ class Procesador:
         return None
 
     def pgn_paste(self):
-        path = self.configuration.ficheroTemporal("lcdb")
+        path = self.configuration.ficheroTemporal("pgn")
         texto = QTUtil.traePortapapeles()
         if texto:
+            texto = texto.strip()
+            if not texto.startswith("["):
+                texto = '[Event "%s"]\n\n %s' % (_("Paste PGN"), texto)
             with open(path, "wt") as q:
                 q.write(texto)
             self.read_pgn(path)

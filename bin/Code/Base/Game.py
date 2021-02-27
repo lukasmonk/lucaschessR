@@ -870,6 +870,12 @@ def pv_pgn(fen, pv):
     return p.pgn_translated()
 
 
+def pv_game(fen, pv):
+    p = Game(fen=fen)
+    p.read_pv(pv)
+    return p
+
+
 def lipv_lipgn(lipv):
     FasterCode.set_init_fen()
     li_pgn = []

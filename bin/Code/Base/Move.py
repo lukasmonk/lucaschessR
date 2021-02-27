@@ -300,7 +300,7 @@ class Move:
         if a1h8 == self.movimiento():
             return True, False
         for variation in self.variations.li_variations:
-            if variation.movimiento() == a1h8:
+            if variation.move(0) == a1h8:
                 return False, True
         return False, False
 

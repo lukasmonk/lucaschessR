@@ -614,6 +614,7 @@ def get_pgn_b(bfrom_a1h8, bto_a1h8, bpromotion):
 
 def xpv_pgn(xpv):
     cdef char san[10]
+
     set_init_fen()
     is_white = True
     num = 1

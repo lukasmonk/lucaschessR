@@ -208,7 +208,7 @@ class ManagerTactics(Manager.Manager):
         is_variation = False
         if not is_main:
             if len(move_obj.variations) > 0:
-                li_a1h8 = self.game_obj.variations.list_movimientos()
+                li_a1h8 = move_obj.variations.list_movimientos()
                 is_variation = a1h8 in li_a1h8
                 if is_variation:
                     li_flechas = [(x[:2], x[2:4], False) for x in li_a1h8]

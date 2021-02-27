@@ -202,10 +202,11 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         lbThoughtTt = Controles.LB(self, _("It is showed") + ":").ponFuente(font)
         self.cbThoughtTt = Controles.CB(self, liThinks, -1).ponFuente(font)
 
-        self.chbContinueTt = Controles.CHB(self, _("The tutor thinks while you think"), True).ponFuente(font)
-
-        lbBoxHeight = Controles.LB2P(self, _("Box height")).ponFuente(font)
+        self.lbBoxHeight = Controles.LB2P(self, _("Box height")).ponFuente(font)
         self.sbBoxHeight = Controles.SB(self, 7, 0, 999).tamMaximo(50).ponFuente(font)
+
+
+        self.chbContinueTt = Controles.CHB(self, _("The tutor thinks while you think"), True).ponFuente(font)
 
         lbArrows = Controles.LB2P(self, _("Arrows with the best moves")).ponFuente(font)
         self.sbArrowsTt = Controles.SB(self, 3, 0, 999).tamMaximo(50).ponFuente(font)
@@ -213,7 +214,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         lyT1 = Colocacion.H().control(lbAyudas).control(self.cbAyudas).relleno()
         lyT1.control(self.chbChance).relleno().control(btTutorChange)
         lyT2 = Colocacion.H().control(self.chbContinueTt).relleno()
-        lyT2.control(lbBoxHeight).control(self.sbBoxHeight).relleno()
+        lyT2.control(self.lbBoxHeight).control(self.sbBoxHeight).relleno()
         lyT3 = Colocacion.H().control(lbThoughtTt).control(self.cbThoughtTt).relleno()
         lyT3.control(lbArrows).control(self.sbArrowsTt)
 

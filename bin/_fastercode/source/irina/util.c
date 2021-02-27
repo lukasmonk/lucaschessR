@@ -7,13 +7,14 @@
 #include "globals.h"
 
 
+#ifdef WIN32
 int is_bmi2()
 {
     int info[4];
     __cpuidex(info, 0x00000007, 0);
     return (info[1] & ((int)1 <<  8)) != 0;
 }
-
+#endif
 
 unsigned int bit_count(Bitmap bitmap) {
     // MIT HAKMEM algorithm, see http://graphics.stanford.edu/~seander/bithacks.html

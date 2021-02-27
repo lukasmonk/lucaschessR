@@ -27,5 +27,5 @@ def init():
         if sys.argv[0].endswith(".py"):
             exe = os.path.abspath(sys.argv[0])
         else:
-            exe = "LucasR.exe" if Code.isWindows else "LucasR"
+            exe = "LucasR.exe" if Code.is_windows else "LucasR"
         Code.startfile(exe)

@@ -62,7 +62,7 @@ def menu_tools_savemenu(procesador, dic_data=None):
     submenu_database.opcion("dbase_N", _("Create new database"), Iconos.DatabaseMas())
     submenu_database.separador()
     submenu_database.opcion("dbase_D", _("Delete a database"), Iconos.DatabaseDelete())
-    if Code.isWindows:
+    if Code.is_windows:
         submenu_database.separador()
         submenu_database.opcion("dbase_M", _("Direct maintenance"), Iconos.Configurar())
     savemenu.separador()

@@ -41,7 +41,7 @@ class DirectEngine(object):
         if args:
             xargs.extend(args)
 
-        if Code.isWindows:
+        if Code.is_windows:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE

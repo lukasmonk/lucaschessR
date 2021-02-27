@@ -35,7 +35,7 @@ def _lfTituloFiltro(extension, titulo):
         filtro = extension
     else:
         pathext = "*.%s" % extension
-        if extension == "*" and Code.isLinux:
+        if extension == "*" and Code.is_linux:
             pathext = "*"
         filtro = _("File") + " %s (%s)" % (extension, pathext)
     return titulo, filtro

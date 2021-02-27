@@ -104,8 +104,11 @@ def run_gui(procesador):
     app.setStyle(QtWidgets.QStyleFactory.create(configuration.x_style))
 
     if configuration.palette:
-        qpalette = QtGui.QPalette(QtGui.QPalette.Dark)
+        qpalette = QtGui.QPalette()
         palette = configuration.palette
+        # palette_dark = {'Window': '#353535', 'WindowText': '#b4b4b4', 'Base': '#2a2a2a', 'Text': '#b4b4b4', 'AlternateBase': '#424242',
+        #  'ToolTipBase': '#353535', 'ToolTipText': '#b4b4b4', 'Button': '#353535', 'ButtonText': '#b4b4b4', 'BrightText': '#b4b4b4',
+        #  'Link': '#38fcc4'}
 
         for key, tp in (
             (QtGui.QPalette.Window, "Window"),

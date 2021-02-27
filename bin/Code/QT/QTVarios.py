@@ -866,12 +866,12 @@ def lista_db(configuration, siAll):
     if not siAll:
         lista.remove(configuration.get_last_database())
     lista.remove_empties()
-    return None if lista.is_empty() else lista
+    return lista
 
 
 def select_db(owner, configuration, siAll, siNew):
     lista = lista_db(configuration, siAll)
-    if lista is None and not siNew:
+    if lista.is_empty() and not siNew:
         return None
 
     menu = LCMenu(owner)
@@ -886,7 +886,7 @@ def select_db(owner, configuration, siAll, siNew):
 
 def menuDB(submenu, configuration, siAll, indicador_previo=None):
     lista = lista_db(configuration, siAll)
-    if lista is None:
+    if lista.is_empty():
         return None
 
     rp = rondoPuntos()

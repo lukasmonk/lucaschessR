@@ -250,7 +250,7 @@ class ManagerTrainBooks(Manager.Manager):
             self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
 
         resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
-        self.board.quitaFlechas()
+        self.board.remove_arrows()
         if resp is None:
             self.sumar_aciertos = False
             self.sigueHumano()
