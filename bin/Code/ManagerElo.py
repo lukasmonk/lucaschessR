@@ -324,13 +324,13 @@ class ManagerElo(Manager.Manager):
 
         self.check_boards_setposition()
 
-        self.game.add_tag("Event", _("Lucas-Elo"))
+        self.game.set_tag("Event", _("Lucas-Elo"))
 
         player = self.configuration.nom_player()
         other = self.datosMotor.name
         w, b = (player, other) if self.human_side else (other, player)
-        self.game.add_tag("White", w)
-        self.game.add_tag("Black", b)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
 
     def adjourn(self):
         if len(self.game) > 0 and QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):

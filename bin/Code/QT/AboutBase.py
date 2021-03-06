@@ -26,7 +26,7 @@ class ThanksTo:
 
     @staticmethod
     def list_engines(bloque):
-        li = Code.configuration.list_engines(si_externos=False)
+        li = Code.configuration.list_engines_show()
         li.sort(key=lambda xt: xt[0])
         for n, x in enumerate(li, 1):
             x[0] = "%d. %s" % (n, x[0])
@@ -101,7 +101,7 @@ class ThanksTo:
             return mtxt
 
         # Version R
-        li_base = ["Alfonso Solbes", "Alan Lee", '<a href="https://goneill.co.nz/index.php">Graham O\'Neill</a>']
+        li_base = ["Alfonso Solbes", "Alan Lee", '<a href="https://goneill.co.nz/index.php">Graham O\'Neill</a>', "Eric", "Laudecir Daniel", "Nambi"]
         li_resto = []
         txt += version("R0", li_base, li_resto, False)
 
@@ -228,6 +228,7 @@ class ThanksTo:
         txt += self.dl_end()
         txt += "</td></tr>"
         txt += self.table_end()
+        txt += '<br><big><bold><center>%s: <a href="https://poeditor.com">https://poeditor.com</a></center>' % _("Web")
         return txt
 
     def images(self):

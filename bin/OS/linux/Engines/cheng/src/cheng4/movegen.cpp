@@ -108,14 +108,14 @@ static const uint phaseEvas[] = {
 };
 
 static const uint phaseQCapsNoCastling[] = {
-	mpHash,
+	mpQHash,
 	mpQCap,
 	mpQCapBuffer,
 	mpDone
 };
 
 static const uint phaseQCaps[] = {
-	mpHash,
+	mpQHash,
 	mpQCap,
 	mpQCapBuffer,
 	mpCastling,
@@ -124,7 +124,7 @@ static const uint phaseQCaps[] = {
 };
 
 static const uint phaseQCapsChecks[] = {
-	mpHash,
+	mpQHash,
 	mpQCap,
 	mpQCapBuffer,
 	mpQChecks,
@@ -133,7 +133,13 @@ static const uint phaseQCapsChecks[] = {
 };
 
 // legal only version
-MoveGen::MoveGen( const Board &b_ ) : mode( mmLegal ), board(b_), killer(0), history(0), genMoveCount(0)
+MoveGen::MoveGen( const Board &b_ )
+	: mode( mmLegal )
+	, board(b_)
+	, killer(0)
+	, history(0)
+	, genMoveCount(0)
+	, nextMove(mcNone)
 {
 	dcMask = board.discovered();
 	pin = board.pins();
@@ -141,7 +147,12 @@ MoveGen::MoveGen( const Board &b_ ) : mode( mmLegal ), board(b_), killer(0), his
 }
 
 MoveGen::MoveGen(const Board &b_, const Killer &killer_, const History &history_, uint mode_)
-	: mode(mode_), board(b_), killer(&killer_), history(&history_), genMoveCount(0)
+	: mode(mode_)
+	, board(b_)
+	, killer(&killer_)
+	, history(&history_)
+	, genMoveCount(0)
+	, nextMove(mcNone)
 {
 	dcMask = board.discovered();
 	pin = board.pins();
@@ -177,9 +188,25 @@ bool MoveGen::alreadyGenerated( Move m )
 	return 0;
 }
 
+Move MoveGen::peek()
+{
+	if (nextMove != mcNone)
+		return nextMove;
+
+	return (nextMove = next());
+}
+
 Move MoveGen::next()
 {
 	Move res;
+
+	if (nextMove != mcNone)
+	{
+		res = nextMove;
+		nextMove = mcNone;
+		return res;
+	}
+
 loop:
 	switch( *phPtr )
 	{
@@ -224,6 +251,14 @@ loop:
 		index = 0;
 		phPtr++;
 		goto loop;
+		break;
+	case mpQHash:
+		res = killer->hashMove;
+		phPtr++;
+		if ( !res || !(board.inCheck() ? board.isLegal<1,0>( res, pins() ) : board.see<1>(res) >= 0 && board.isLegal<0,0>( res, pins() ) ) )
+			goto loop;
+
+		genMoves[ genMoveCount++ ] = res;
 		break;
 	case mpQCap:
 		count = generateCaptures( board, moveBuf, 0 );
@@ -398,7 +433,7 @@ checksloop:
 			if ( MovePack::isCastling(res) )
 				break;
 			if ( board.see<1>( res ) < 0 )
-				continue;						// skip bad see checks
+				goto checksloop;						// skip bad see checks
 		} while ( !board.pseudoIsLegal<0>( res, pin ) );
 		assert( board.isCheck( res, dcMask ) );
 		break;
@@ -436,10 +471,10 @@ void MoveGen::scoreCaptures()
 			continue;
 		}
 		// apply MVV/LVA
-		Piece mvv = Tables::mvvValue[ PiecePack::type( board.piece( MovePack::to( *mp ) ) ) ];
-		Piece lva = Tables::lvaValue[ PiecePack::type( board.piece( MovePack::from( *mp ) ) ) ];
-		assert( mvv );
-		*mp += ( (((mvv << 3) - lva)<<3) + MovePack::promo( *mp ) ) << msScore;
+		Piece mvv_lva = Tables::mvvValue[ PiecePack::type( board.piece( MovePack::to( *mp ) ) ) ] +
+						Tables::lvaValue[ PiecePack::type( board.piece( MovePack::from( *mp ) ) ) ];
+		assert( mvv_lva );
+		*mp += ( (mvv_lva<<3) + MovePack::promo( *mp ) ) << msScore;
 	}
 	isort( moveBuf, count );
 }
@@ -451,14 +486,14 @@ void MoveGen::scoreEvasions()
 	for ( ;mp < me; mp++ )
 	{
 		assert( !(*mp & mmScore) );
-		if ( board.see<0>(*mp) >= 0 )
+		if ( board.see<1>(*mp) >= 0 )
 		{
 			if ( MovePack::isCapture(*mp) )
 			{
 				// captures by MVV/LVA
-				Piece mvv = Tables::mvvValue[ PiecePack::type( board.piece( MovePack::to( *mp ) ) ) ];
-				Piece lva = Tables::lvaValue[ PiecePack::type( board.piece( MovePack::from( *mp ) ) ) ];
-				*mp += ( ((mvv << 3) - lva) + 1 + 2*History::historyMax ) << msScore;
+				Piece mvv_lva = Tables::mvvValue[ PiecePack::type( board.piece( MovePack::to( *mp ) ) ) ] +
+								Tables::lvaValue[ PiecePack::type( board.piece( MovePack::from( *mp ) ) ) ];
+				*mp += ( mvv_lva + 1 + 2*History::historyMax ) << msScore;
 			}
 			else
 				// history

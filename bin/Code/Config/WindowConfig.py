@@ -189,7 +189,7 @@ def options(parent, configuration):
         return " (%s %d)" % (_("default"), num)
 
     form.separador()
-    form.apart(_("Bad moves: lost points to consider a move as bad"))
+    form.apart(_("Bad moves: lost centipawns to consider a move as bad"))
     form.spinbox(_("Bad move") + d(90), 20, 1000, 60, perf.bad_lostp)
     form.spinbox(_("Very bad move") + d(200), 50, 1000, 60, perf.very_bad_lostp)
     form.separador()

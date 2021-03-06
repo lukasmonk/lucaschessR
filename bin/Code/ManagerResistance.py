@@ -95,7 +95,7 @@ class ManagerResistance(Manager.Manager):
             self.finJuego(False)
 
         elif key == TB_CLOSE:
-            self.procesador.pararMotores()
+            self.procesador.stop_engines()
             self.procesador.start()
             self.procesador.entrenamientos.resistance(self.resistance.tipo)
 
@@ -250,7 +250,7 @@ class ManagerResistance(Manager.Manager):
 
         self.disable_all()
         self.state = ST_ENDGAME
-        self.procesador.pararMotores()
+        self.procesador.stop_engines()
         self.xarbitro.terminar()
         self.main_window.ajustaTam()
         self.main_window.resize(0, 0)

@@ -86,7 +86,7 @@ class ManagerFideFics(Manager.Manager):
         for x in li:
             if x:
                 key, valor = x.split("=")
-                self.game.add_tag(key, valor)
+                self.game.set_tag(key, valor)
 
         dbf.cerrar()
         db.cerrar()

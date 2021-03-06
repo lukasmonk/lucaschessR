@@ -35,9 +35,7 @@ class ManagerEntPos(Manager.Manager):
         db[self.entreno] = data
         db.close()
 
-    def start(
-        self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False
-    ):
+    def start(self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False):
         if hasattr(self, "reiniciando"):
             if self.reiniciando:
                 return
@@ -116,11 +114,16 @@ class ManagerEntPos(Manager.Manager):
         QTUtil.refresh_gui()
 
         if self.xrival is None:
-            self.xrival = self.procesador.creaManagerMotor(
-                self.configuration.tutor, self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth
-            )
+            self.xrival = self.procesador.creaManagerMotor(self.configuration.tutor, self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth)
+
+        player = self.configuration.nom_player()
+        other = self.xrival.name
+        w, b = (player, other) if self.human_side else (other, player)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
 
         self.is_analyzed_by_tutor = False
+        self.continueTt = not self.configuration.x_engine_notbackground
 
         self.check_boards_setposition()
 
@@ -174,15 +177,10 @@ class ManagerEntPos(Manager.Manager):
 
     def reiniciar(self):
         if self.is_rival_thinking:
-            return
-        self.start(
-            self.pos_training,
-            self.num_trainings,
-            self.title_training,
-            self.li_trainings,
-            self.is_tutor_enabled,
-            self.is_automatic_jump,
-        )
+            self.xrival.stop()
+        if self.is_analyzing:
+            self.xtutor.stop()
+        self.start(self.pos_training, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump)
 
     def ent_siguiente(self, tipo):
         if not (self.human_is_playing or self.state == ST_ENDGAME):
@@ -192,14 +190,7 @@ class ManagerEntPos(Manager.Manager):
             pos = 1
         elif pos == 0:
             pos = self.num_trainings
-        self.start(
-            pos,
-            self.num_trainings,
-            self.title_training,
-            self.li_trainings,
-            self.is_tutor_enabled,
-            self.is_automatic_jump,
-        )
+        self.start(pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump)
 
     def control_teclado(self, nkey):
         if nkey in (Qt.Key_Plus, Qt.Key_PageDown):
@@ -212,11 +203,7 @@ class ManagerEntPos(Manager.Manager):
             self.saveSelectedPosition("|".join(li))
 
     def listHelpTeclado(self):
-        return [
-            ("+/%s" % _("Page Down"), _("Next position")),
-            ("-/%s" % _("Page Up"), _("Previous position")),
-            ("T", _("Save position in 'Selected positions' file")),
-        ]
+        return [("+/%s" % _("Page Down"), _("Next position")), ("-/%s" % _("Page Up"), _("Previous position")), ("T", _("Save position in 'Selected positions' file"))]
 
     def end_game(self):
         self.procesador.start()
@@ -241,8 +228,6 @@ class ManagerEntPos(Manager.Manager):
             if self.game_obj and self.is_automatic_jump:
                 self.ent_siguiente(TB_NEXT)
             return
-
-        # self.compruebaComentarios()
 
         self.state = ST_PLAYING
 
@@ -275,6 +260,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.human_is_playing = True
         self.activate_side(is_white)
+        self.analizaInicio()
 
     def piensa_rival(self):
         self.human_is_playing = False
@@ -300,10 +286,6 @@ class ManagerEntPos(Manager.Manager):
         ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.is_analyzed_by_tutor = False
         is_obj = self.is_playing_gameobj()
-        if self.is_tutor_enabled:
-            if not is_obj:
-                self.analizaTutor()  # Que analice antes de activar humano, para que no tenga que esperar
-                self.is_analyzed_by_tutor = True
 
         self.move_the_pieces(move.liMovs, True)
         self.add_move(move, False)
@@ -311,6 +293,45 @@ class ManagerEntPos(Manager.Manager):
         if is_obj:
             self.lineaTerminadaOpciones()
         self.play_next_move()
+
+    def analizaInicio(self):
+        if not self.is_tutor_enabled:
+            return
+
+        self.is_analyzing = False
+        self.is_analyzed_by_tutor = False
+        if self.continueTt:
+            if not self.is_finished():
+                self.xtutor.ac_inicio(self.game)
+                self.is_analyzing = True
+        else:
+            mrm = self.analizaTutor()
+            self.is_analyzed_by_tutor = True
+
+    def analizaFinal(self, is_mate=False):
+        if not self.is_tutor_enabled:
+            if self.is_analyzing:
+                self.xtutor.stop()
+            return
+        if is_mate:
+            if self.is_analyzing:
+                self.xtutor.stop()
+            return
+        if not self.is_tutor_enabled:
+            if self.is_analyzing:
+                self.xtutor.stop()
+            return
+        estado = self.is_analyzing
+        self.is_analyzing = False
+        if self.is_analyzed_by_tutor:
+            return
+        if self.continueTt and estado:
+            self.main_window.pensando_tutor(True)
+            self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+            self.main_window.pensando_tutor(False)
+        else:
+            self.mrmTutor = self.analizaTutor()
+        self.is_analyzed_by_tutor = True
 
     def sigue(self):
         self.state = ST_PLAYING
@@ -333,7 +354,7 @@ class ManagerEntPos(Manager.Manager):
             return False
 
     def is_playing_gameobj(self):
-        if self.is_tutor_enabled and self.game_obj:
+        if self.game_obj:
             move = self.game_obj.move(self.pos_obj)
             return move.position_before == self.game.last_position
         return False
@@ -366,21 +387,21 @@ class ManagerEntPos(Manager.Manager):
                 return False
 
         if not ok:
+            is_mate = move.is_mate
+            self.analizaFinal(is_mate)  # tiene que acabar siempre
             if self.is_tutor_enabled:
                 if not self.is_analyzed_by_tutor:
-                    self.analizaTutor()
+                    self.analizaTutor(True)
                 if self.mrmTutor.mejorMovQue(a1h8):
                     if not move.is_mate:
-                        tutor = Tutor.Tutor(self, self, move, from_sq, to_sq, False)
+                        tutor = Tutor.Tutor(self, move, from_sq, to_sq, False)
 
                         if tutor.elegir(True):
                             self.set_piece_again(from_sq)
                             from_sq = tutor.from_sq
                             to_sq = tutor.to_sq
                             promotion = tutor.promotion
-                            si_bien, mens, move_tutor = Move.get_game_move(
-                                self.game, self.game.last_position, from_sq, to_sq, promotion
-                            )
+                            si_bien, mens, move_tutor = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
                             if si_bien:
                                 move = move_tutor
 
@@ -408,6 +429,11 @@ class ManagerEntPos(Manager.Manager):
         self.check_boards_setposition()
 
     def pon_resultado(self):
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
+
+        QTUtil.refresh_gui()
+        QTUtil2.message(self.main_window, mensaje)
+
         self.state = ST_ENDGAME
         self.disable_all()
         self.human_is_playing = False
@@ -415,9 +441,7 @@ class ManagerEntPos(Manager.Manager):
         self.refresh()
 
     def ent_otro(self):
-        pos = WCompetitionWithTutor.edit_training_position(
-            self.main_window, self.title_training, self.num_trainings, pos=self.pos_training
-        )
+        pos = WCompetitionWithTutor.edit_training_position(self.main_window, self.title_training, self.num_trainings, pos=self.pos_training)
         if pos is not None:
             self.pos_training = pos
             self.reiniciar()
@@ -498,9 +522,7 @@ class ManagerEntPos(Manager.Manager):
         name = os.path.basename(nom_dir)
 
         QTUtil2.message(
-            self.main_window,
-            _("Tactic training %s created.") % nom_dir,
-            explanation=_X(_("You can access this training from menu Train - Learn tactics by repetition - %1"), name),
+            self.main_window, _("Tactic training %s created.") % nom_dir, explanation=_X(_("You can access this training from menu Train - Learn tactics by repetition - %1"), name)
         )
 
         self.procesador.entrenamientos.rehaz()

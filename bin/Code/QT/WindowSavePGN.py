@@ -338,10 +338,11 @@ class WSave(QTVarios.WDialogo):
         menu.setToolTip(_("To choose: <b>left button</b> <br>To erase: <b>right button</b>"))
 
         icoTras = Iconos.BoxRoom()
-        liTras = self.configuration.liBoxRooms
-        for ntras, uno in enumerate(liTras):
-            carpeta, boxroom = uno
-            menu.opcion((0, ntras), "%s  (%s)" % (boxroom, carpeta), icoTras)
+        boxrooms = self.configuration.boxrooms()
+        li_tras = boxrooms.lista()
+        for ntras, uno in enumerate(li_tras):
+            folder, boxroom = uno
+            menu.opcion((0, ntras), "%s  (%s)" % (boxroom, folder), icoTras)
         menu.separador()
         menu.opcion((1, 0), _("New boxroom"), Iconos.NewBoxRoom())
 
@@ -351,32 +352,24 @@ class WSave(QTVarios.WDialogo):
             op, ntras = resp
             if op == 0:
                 if menu.siIzq:
-                    carpeta, boxroom = liTras[ntras]
-                    self.file = os.path.join(carpeta, boxroom)
+                    folder, boxroom = li_tras[ntras]
+                    self.file = os.path.join(folder, boxroom)
                     self.show_file()
                 elif menu.siDer:
-                    del self.configuration.liBoxRooms[ntras]
-                    self.configuration.graba()
+                    boxrooms.delete(ntras)
 
             elif op == 1:
                 resp = QTUtil2.salvaFichero(
-                    self, _("Boxrooms PGN"), self.configuration.x_save_folder, _("File") + " pgn (*.pgn)", False
+                    self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", _("File") + " pgn (*.pgn)", False
                 )
                 if resp:
-                    carpeta, boxroom = os.path.split(resp)
-                    if carpeta != self.configuration.x_save_folder:
-                        self.configuration.x_save_folder = carpeta
+                    resp = os.path.realpath(resp)
+                    folder, boxroom = os.path.split(resp)
+                    if folder != self.configuration.x_save_folder:
+                        self.configuration.x_save_folder = folder
                         self.configuration.graba()
 
-                    orden = None
-                    for n, (carpeta1, trastero1) in enumerate(self.configuration.liBoxRooms):
-                        if carpeta1.lower() == carpeta.lower() and trastero1.lower() == boxroom.lower():
-                            orden = len(self.configuration.liBoxRooms) - 1
-                            break
-
-                    if orden is None:
-                        self.configuration.liBoxRooms.append((carpeta, boxroom))
-                        self.configuration.graba()
+                    boxrooms.append(folder, boxroom)
 
     def current_pgn(self):
         pgn = ""

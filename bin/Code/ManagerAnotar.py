@@ -3,7 +3,6 @@ import time
 from Code import Util
 from Code.SQL import UtilSQL
 from Code import Manager
-from Code.Base import Game
 from Code.QT import QTVarios
 from Code.Base.Constantes import *
 
@@ -21,8 +20,6 @@ class ManagerAnotar(Manager.Manager):
     informacion_activable = False
 
     def start(self, game_objetivo, si_blancas_abajo):
-
-        self.game = Game.Game()
         self.game_type = GT_NOTE_DOWN
         self.game_objetivo = game_objetivo
         self.jugada_actual = -1
@@ -39,7 +36,7 @@ class ManagerAnotar(Manager.Manager):
         self.show_side_indicator(True)
         self.si_terminar = False
         self.main_window.pon_toolbar((TB_CLOSE,))
-        self.main_window.enable_option_toolbar(TB_CLOSE, False)
+        self.main_window.show_option_toolbar(TB_CLOSE, False)
         self.informacion_activable = False
         self.main_window.activaInformacionPGN(False)
         self.main_window.activaJuego(False, False, siAyudas=False)
@@ -168,11 +165,12 @@ class ManagerAnotar(Manager.Manager):
                 f = Util.today()
                 key = "%04d-%02d-%02d %02d:%02d:%02d" % (f.year, f.month, f.day, f.hour, f.minute, f.second)
                 db[key] = {
-                    "PC": self.game_objetivo,
+                    "PC": self.game_objetivo.save(),
                     "MOVES": numjug,
                     "TIME": self.vtime / numjug,
                     "HINTS": self.ayudas_recibidas,
                     "ERRORS": self.errores,
                     "COLOR": self.si_blancas_abajo,
+                    "TOTAL_MOVES": len(self.game_objetivo)
                 }
                 db.close()

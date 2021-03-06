@@ -128,9 +128,11 @@ typedef void (*RecogFunc)( const Board &b, FineScore *fscore );
 
 struct MaterialHashEntry
 {
-	MaterialKey sig;		// signature
-	RecogFunc recog;		// recognizer function (can be 0)
+	MaterialKey sig;			// signature
+	RecogFunc recog;			// recognizer function (can be 0)
 	FineScore fscore[phMax];
+	// tricky padding to make it power of 2
+	u8 pad[12-int(sizeof(RecogFunc))];
 	union u
 	{
 		u8 div[phMax];			// scale dividers
@@ -157,6 +159,9 @@ struct Eval
 	// static initializer (sort recognizers)
 	static void init();
 
+	// set contempt
+	void setContempt( Score contempt );
+
 	// returns final centipawn evaluation from stm's point of view
 	Score eval( const Board &b, Score alpha = -scInfinity, Score beta = +scInfinity );
 
@@ -177,11 +182,14 @@ struct Eval
 	void clear();
 
 private:
+	Score contemptFactor[ctMax];
 	// scores for game phases
 	FineScore fscore[phMax];
 	// precomputed values for evaluation
 	Bitboard occ;				// occupied
 	Bitboard safetyMask[ctMax];	// safety masks for each king
+	u32 checkPotential[ctMax];	// king checking potential
+	u32 kingOpenFiles[ctMax];	// open files around the king
 	u32 attackers[ctMax];		// attackers for each stm
 	Bitboard pinMask[ctMax];
 
@@ -189,9 +197,12 @@ private:
 
 	// attack mask [color][piece]
 	Bitboard attm[ctMax][ptMax];
+	// full rook vertical attack mask [color]
+	Bitboard rookVertAttacks[ctMax];
 
 	EvalCache ecache;
 	PawnHash phash;
+	// note: not used (yet); I never actually finished this
 	MaterialHash mhash;
 
 	template< PopCountMode pcm > Score ieval( const Board &b, Score alpha = -scInfinity, Score beta = +scInfinity );
@@ -216,6 +227,63 @@ private:
 
 	// evaluate blind bishop scaling
 	template< Color c > void evalBlindBishop( const Board &b );
+
+	// returns scale, fpn:8
+	static uint evalProgress(const Board &b);
 };
+
+// feature export
+
+extern i16 kingCheckPotential[];
+extern i16 kingOpenFile[];
+extern i16 kingOpenFileEg[];
+extern i16 safetyScale[];
+extern i16 safetyScaleEg[];
+extern i16 shelterFront1;
+extern i16 shelterFront2;
+extern i16 bishopPairOpening;
+extern i16 bishopPairEndgame;
+extern i16 trappedBishopOpening;
+extern i16 trappedBishopEndgame;
+extern i16 unstoppablePasser;
+extern i16 doubledPawnOpening;
+extern i16 doubledPawnEndgame;
+extern i16 isolatedPawnOpening;
+extern i16 isolatedPawnEndgame;
+extern i16 knightHangingOpening;
+extern i16 knightHangingEndgame;
+extern i16 bishopHangingOpening;
+extern i16 bishopHangingEndgame;
+extern i16 rookHangingOpening;
+extern i16 rookHangingEndgame;
+extern i16 rookOnOpenOpening;
+extern i16 rookOnOpenEndgame;
+extern i16 rookBehindPasserOpening;
+extern i16 rookBehindPasserEndgame;
+extern i16 queenHangingOpening;
+extern i16 queenHangingEndgame;
+extern i16 kingPasserSupportBase;
+extern i16 kingPasserSupportScale;
+extern i16 outpostBonusFile[];
+extern i16 outpostBonusRank[];
+extern i16 pawnRaceAdvantageEndgame;
+extern i16 passerScaleImbalance[];
+extern i16 passerScaleBlocked[];
+extern i16 candPasserOpening[];
+extern i16 candPasserEndgame[];
+extern i16 passerOpening[];
+extern i16 passerEndgame[];
+extern i16 connectedPasserOpening[];
+extern i16 connectedPasserEndgame[];
+extern i16 knightMobility[phMax][9];
+extern i16 bishopMobility[phMax][14];
+extern i16 rookMobility[phMax][15];
+extern i16 queenMobility[phMax][28];
+extern i16 goodBishopOpening[17];
+extern i16 goodBishopEndgame[17];
+extern i16 disconnectedPawn;
+extern i16 disconnectedPawnEg;
+extern i16 progressBasePly;
+extern i16 progressScale;
 
 }

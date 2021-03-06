@@ -52,6 +52,8 @@ int main( int argc, char **argv )
 	{
 		std::string line;
 		std::getline( std::cin, line );
+		if ( !std::cin.good() )
+			line = "quit";
 		proto->parse( line );
 	}
 

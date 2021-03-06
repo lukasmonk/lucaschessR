@@ -72,8 +72,7 @@ class DictSQL(object):
             obj = pickle.loads(row[0])
             self.add_cache(key, obj)
             return obj
-        else:
-            return None
+        return None
 
     def __delitem__(self, key):
         if key in self.li_keys:

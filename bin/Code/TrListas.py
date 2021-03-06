@@ -11068,8 +11068,8 @@ def dic_nags():
 def dicTraining():
     d = {
         "Checkmates by Eduardo Sadier": _("Checkmates by Eduardo Sadier"),
-        "%d positions of mate in two"
-        % Code.mate_en_dos: _("50000 positions of mate in two").replace("50000", "%d" % Code.mate_en_dos),
+        "%d positions of mate in two" % Code.mate_en_dos: _("50000 positions of mate in two").replace("50000", "%d" % Code.mate_en_dos),
+        "Mate in one (derived from mate in two)": _("Mate in one (derived from mate in two)"),
         "Checkmates from FICS database": _("Checkmates from FICS database"),
         "Attacking the king in the castle M1": _("Attacking the king in the castle M1"),
         "Attacking the king in the castle M2-7": _("Attacking the king in the castle M2-7"),

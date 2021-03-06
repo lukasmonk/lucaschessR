@@ -113,9 +113,9 @@ class Manager:
 
     def new_game(self):
         self.game = Game.Game()
-        self.game.add_tag("Site", Code.lucas_chess)
+        self.game.set_tag("Site", Code.lucas_chess)
         hoy = Util.today()
-        self.game.add_tag("Date", "%d-%02d-%02d" % (hoy.year, hoy.month, hoy.day))
+        self.game.set_tag("Date", "%d-%02d-%02d" % (hoy.year, hoy.month, hoy.day))
 
     def ponFinJuego(self, with_takeback=False):
         self.runSound.close()
@@ -467,7 +467,8 @@ class Manager:
         self.main_window.ponAyudas(hints, siQuitarAtras)
 
     def thinking(self, siPensando):
-        self.main_window.thinking(siPensando)
+        if self.configuration.x_cursor_thinking:
+            self.main_window.thinking(siPensando)
 
     def set_activate_tutor(self, siActivar):
         self.main_window.set_activate_tutor(siActivar)
@@ -833,14 +834,18 @@ class Manager:
         else:
             return self.game.first_position.fen()
 
-    def analizaTutor(self):
-        self.thinking(True)
+    def analizaTutor(self, with_cursor=False):
+        if with_cursor:
+            self.main_window.pensando_tutor(True)
+        # self.thinking(True)
         fen = self.game.last_position.fen()
         if not self.is_finished():
             self.mrmTutor = self.xtutor.analiza(fen)
         else:
             self.mrmTutor = None
-        self.thinking(False)
+        # self.thinking(False)
+        if with_cursor:
+            self.main_window.pensando_tutor(False)
         return self.mrmTutor
 
     def cambioTutor(self):
@@ -1247,14 +1252,8 @@ class Manager:
         smenu = menu.submenu(_("Save engines log"), Iconos.Grabar())
         if len(listaGMotores) > 0:
             for pos, gmotor in enumerate(listaGMotores):
-                ico = Iconos.Cancelar() if gmotor.ficheroLog else Iconos.PuntoVerde()
+                ico = Iconos.Aceptar() if gmotor.ficheroLog else None
                 smenu.opcion("log_%d" % pos, gmotor.name, ico)
-
-        smenu.separador()
-        if self.configuration.x_log_engines:
-            smenu.opcion("log_noall", _("Always deactivated for all engines"), Iconos.Cancelar())
-        else:
-            smenu.opcion("log_yesall", _("Always activated for all engines"), Iconos.Aceptar())
 
         menu.separador()
 
@@ -1334,18 +1333,6 @@ class Manager:
                 engine.log_close()
             else:
                 engine.log_open()
-        else:
-            listaGMotores = Code.list_engine_managers.listaActivos()
-            if resp == "yesall":
-                self.configuration.x_log_engines = True
-            else:
-                self.configuration.x_log_engines = False
-            for gmotor in listaGMotores:
-                if resp == "yesall":
-                    gmotor.log_open()
-                else:
-                    gmotor.log_close()
-            self.configuration.graba()
 
     def config_sonido(self):
         separador = FormLayout.separador

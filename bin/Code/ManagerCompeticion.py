@@ -70,13 +70,13 @@ class ManagerCompeticion(Manager.Manager):
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        self.game.add_tag("Event", _("Competition with tutor"))
+        self.game.set_tag("Event", _("Competition with tutor"))
 
         player = self.configuration.nom_player()
         other = "%s (%s %d)" % (self.xrival.name, _("Level"), self.nivelJugado)
         w, b = (player, other) if self.human_side else (other, player)
-        self.game.add_tag("White", w)
-        self.game.add_tag("Black", b)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
 
         self.is_analyzed_by_tutor = False
 
@@ -327,7 +327,7 @@ class ManagerCompeticion(Manager.Manager):
                 if self.mrmTutor.mejorMovQue(movimiento):
                     self.refresh()
                     if not move.is_mate:
-                        tutor = Tutor.Tutor(self, self, move, from_sq, to_sq, False)
+                        tutor = Tutor.Tutor(self, move, from_sq, to_sq, False)
 
                         if self.in_the_opening:
                             liApPosibles = self.listaOpeningsStd.list_possible_openings(self.game)

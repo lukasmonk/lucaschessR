@@ -275,11 +275,11 @@ class Board(QtWidgets.QGraphicsView):
         return self.config_board.anchoPieza() == 1000
 
     def crea(self):
-        nomPiezasOri = self.config_board.nomPiezas()
+        nom_pieces_ori = self.config_board.nomPiezas()
         if self.blindfold:
-            self.piezas = Piezas.Blindfold(nomPiezasOri, self.blindfold)
+            self.piezas = Piezas.Blindfold(nom_pieces_ori, self.blindfold)
         else:
-            self.piezas = Code.todasPiezas.selecciona(nomPiezasOri)
+            self.piezas = Code.todasPiezas.selecciona(nom_pieces_ori)
         self.anchoPieza = self.config_board.anchoPieza()
         self.margenPieza = 2
 
@@ -777,6 +777,10 @@ class Board(QtWidgets.QGraphicsView):
         elif resp.startswith("def_"):
             if resp.endswith("todo"):
                 self.config_board = self.configuration.resetConfBoard(self.config_board.id(), self.config_board.anchoPieza())
+                if self.config_board.is_base:
+                    nom_pieces_ori = self.config_board.nomPiezas()
+                    Code.todasPiezas.saveAllPNG(nom_pieces_ori, 30)  # reset IntFiles/Figs
+                    Delegados.generaPM(self.piezas)
                 self.reset(self.config_board)
 
     def lanzaDirector(self):
@@ -829,8 +833,8 @@ class Board(QtWidgets.QGraphicsView):
         self.init_kb_buffer()
 
         if self.config_board.is_base:
-            nomPiezasOri = self.config_board.nomPiezas()
-            Code.todasPiezas.saveAllPNG(nomPiezasOri, 30)  # reset IntFiles/Figs
+            nom_pieces_ori = self.config_board.nomPiezas()
+            Code.todasPiezas.saveAllPNG(nom_pieces_ori, 30)  # reset IntFiles/Figs
             Delegados.generaPM(self.piezas)
 
     def ponColores(self, liTemas, resp):
@@ -1396,8 +1400,8 @@ class Board(QtWidgets.QGraphicsView):
                 self.blindfoldReset()
 
     def blindfoldConfig(self):
-        nomPiezasOri = self.config_board.nomPiezas()
-        w = Piezas.WBlindfold(self, nomPiezasOri)
+        nom_pieces_ori = self.config_board.nomPiezas()
+        w = Piezas.WBlindfold(self, nom_pieces_ori)
         if w.exec_():
             self.blindfold = BLINDFOLD_CONFIG
             self.blindfoldReset()

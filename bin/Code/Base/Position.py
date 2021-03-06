@@ -14,6 +14,11 @@ class Position:
     def is_initial(self):
         return self.fen() == FEN_INITIAL
 
+    def logo(self):
+        #  self.leeFen( "8/4q1k1/1R2bpn1/1N2n1b1/1B2r1r1/1Q6/1PKNBR2/8 w - - 0 1" )
+        self.read_fen("8/4Q1K1/1r2BPN1/1n2N1B1/1b2R1R1/1q6/1pknbr2/8 w - - 0 1")
+        return self
+
     def copia(self):
         p = Position()
         p.squares = self.squares.copy()
@@ -29,12 +34,7 @@ class Position:
 
     def legal(self):
         if self.castles != "-":
-            dic = {
-                "K": ("K", "R", "e1", "h1"),
-                "k": ("k", "r", "e8", "h8"),
-                "Q": ("K", "R", "e1", "a1"),
-                "q": ("k", "r", "e8", "a8"),
-            }
+            dic = {"K": ("K", "R", "e1", "h1"), "k": ("k", "r", "e8", "h8"), "Q": ("K", "R", "e1", "a1"), "q": ("k", "r", "e8", "a8")}
             enr = ""
             for tipo in self.castles:
                 king, rook, pos_king, pos_rook = dic[tipo]
@@ -71,7 +71,7 @@ class Position:
         nli = len(li)
         if nli < 6:
             lid = ["w", "-", "-", "0", "1"]
-            li.extend(lid[nli - 1:])
+            li.extend(lid[nli - 1 :])
         position, color, self.castles, self.en_passant, mp, move = li
 
         self.is_white = color == "w"
@@ -208,7 +208,7 @@ class Position:
                 dic[pieza] += 1
         dif = {}
         for pieza in "PRNBQK":
-            d = dic[pieza]-dic[pieza.lower()]
+            d = dic[pieza] - dic[pieza.lower()]
             if d < 0:
                 dif[pieza.lower()] = -d
             elif d > 0:
@@ -325,7 +325,7 @@ class Position:
     def pgn_translated(self, from_sq, to_sq, promotion=""):
         d_conv = TrListas.dConv()
         li = []
-        cpgn =  self.pgn(from_sq, to_sq, promotion)
+        cpgn = self.pgn(from_sq, to_sq, promotion)
         if not cpgn:
             return ""
         for c in cpgn:
@@ -557,7 +557,7 @@ class Position:
         lipos = [k for k, v in self.squares.items() if v]
         d = 0
         for n, a in enumerate(lipos[:-1]):
-            for b in lipos[n + 1:]:
+            for b in lipos[n + 1 :]:
                 d += distancia(a, b)
         return d
 

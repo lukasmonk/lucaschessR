@@ -191,8 +191,8 @@ class ManagerMicElo(Manager.Manager):
         if self.is_engine_side_white:
             white_player, black_player = black_player, white_player
 
-        self.game.add_tag("White", white_player)
-        self.game.add_tag("Black", black_player)
+        self.game.set_tag("White", white_player)
+        self.game.set_tag("Black", black_player)
 
         self.main_window.ponDatosReloj(white_player, tpBL, black_player, tpNG)
         self.refresh()

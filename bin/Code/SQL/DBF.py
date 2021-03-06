@@ -75,6 +75,28 @@ class DBF:
         self.select = select.upper()
         self.li_fields = [campo.strip() for campo in self.select.split(",")]
 
+    def existe_column(self, column):
+        sql = "pragma table_info(%s)" % self.ctabla
+        cursor = self.conexion.execute(sql)
+        lirows = cursor.fetchall()
+        column = column.upper()
+        for row in lirows:
+            nom = row[1].upper()
+            if nom == column:
+                return True
+        return False
+
+    def add_column_varchar(self, column: str):
+        sql = "ALTER TABLE %s ADD COLUMN %s VARCHAR;" % (self.ctabla, column)
+        self.conexion.execute(sql)
+        self.conexion.commit()
+        self.li_fields.append(column)
+
+    def copy_column(self, column_ori, column_dest):
+        sql = "UPDATE %s SET %s = %s;" % (self.ctabla, column_dest, column_ori)
+        self.conexion.execute(sql)
+        self.conexion.commit()
+
     def put_order(self, orden):
         """
         Cambia el orden de lectura, previo a una lectura completa.

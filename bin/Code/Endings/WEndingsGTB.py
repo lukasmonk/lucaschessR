@@ -330,7 +330,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.save_video()
         self.db.close()
         self.t4.close()
-        self.procesador.pararMotores()
+        self.procesador.stop_engines()
         self.accept()
 
     def closeEvent(self, event):

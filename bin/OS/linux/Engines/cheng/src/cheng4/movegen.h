@@ -50,6 +50,7 @@ enum MoveGenPhase
 	mpHash,				// hashmove
 	mpCap,				// captures and promotions (note that only good/winning captures belong here)
 	mpCapBuffer,		// buffer phases: picks sorted moves from buffer
+	mpQHash,			// hashmove in qsearch
 	mpQCap,				// quiescence captures and promotions (ignores underpromotions)
 	mpQCapBuffer,
 	mpQChecks,			// qchecks
@@ -636,6 +637,8 @@ protected:
 	Move genMoves[ 4 ];				// already generated moves (hash, killers) (FIXME: use constant, rename)
 	MoveCount genMoveCount;			// number of already generated moves
 
+	Move nextMove;					// used by peek
+
 	// score and sort specific moves
 	void scoreCaptures();
 	void scoreEvasions();
@@ -651,6 +654,9 @@ public:
 
 	// generate next move, if mcNone is returned => no more moves available
 	Move next();
+
+	// peek next move, returns mcNone if no more moves available
+	Move peek();
 
 	// returns discovered checkers mask (always)
 	inline Bitboard discovered() const

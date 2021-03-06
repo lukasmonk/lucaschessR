@@ -884,7 +884,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         # Avanzado
         self.cbAjustarRival.ponValor(dic.get("ADJUST", ADJUST_BETTER))
-        self.cbResign.ponValor(dr.get("RESIGN", -800))
+        self.cbResign.ponValor(dic.get("RESIGN", -800))
 
         self.muestraOpening()
         self.muestraPosicion()

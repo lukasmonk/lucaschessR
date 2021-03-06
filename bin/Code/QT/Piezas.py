@@ -121,8 +121,8 @@ HIDE, GREY, CHECKER, SHOW = range(4)
 
 
 class BlindfoldConfig:
-    def __init__(self, nomPiezasOri, dicPiezas=None):
-        self.nomPiezasOri = nomPiezasOri
+    def __init__(self, nom_pieces_ori, dicPiezas=None):
+        self.nom_pieces_ori = nom_pieces_ori
         if dicPiezas is None:
             self.restore()
         else:
@@ -137,7 +137,7 @@ class BlindfoldConfig:
         tipo = self.dicPiezas[pzT]
         if tipo == SHOW:
             pz = ("w" if siWhite else "b") + pz
-            return Code.path_resource("Pieces", self.nomPiezasOri, pz + ".svg")
+            return Code.path_resource("Pieces", self.nom_pieces_ori, pz + ".svg")
         if tipo == HIDE:
             fich = "h"
         elif tipo == GREY:
@@ -157,12 +157,12 @@ class BlindfoldConfig:
 
 
 class Blindfold(ConjuntoPiezas):
-    def __init__(self, nomPiezasOri, tipo=BLINDFOLD_CONFIG):
+    def __init__(self, nom_pieces_ori, tipo=BLINDFOLD_CONFIG):
         self.name = "BlindFold"
         self.carpetaBF = os.path.join(Code.configuration.carpeta, "BlindFoldPieces")
         self.carpetaPZ = Code.path_resource("IntFiles")
         self.tipo = tipo
-        self.reset(nomPiezasOri)
+        self.reset(nom_pieces_ori)
 
     def leePiezas(self, name=None):  # name usado por compatibilidad
         dic = {}
@@ -173,7 +173,7 @@ class Blindfold(ConjuntoPiezas):
             dic[pieza] = qb
         return dic
 
-    def reset(self, nomPiezasOri):
+    def reset(self, nom_pieces_ori):
         if self.tipo == BLINDFOLD_CONFIG:
             dicTPiezas = None
         else:
@@ -186,7 +186,7 @@ class Blindfold(ConjuntoPiezas):
             for pieza in "rnbqkp":
                 dicTPiezas[pieza] = b
                 dicTPiezas[pieza.upper()] = w
-        self.configBF = BlindfoldConfig(nomPiezasOri, dicPiezas=dicTPiezas)
+        self.configBF = BlindfoldConfig(nom_pieces_ori, dicPiezas=dicTPiezas)
         if not os.path.isdir(self.carpetaBF):
             os.mkdir(self.carpetaBF)
 
@@ -201,15 +201,15 @@ class Blindfold(ConjuntoPiezas):
 
 
 class WBlindfold(QTVarios.WDialogo):
-    def __init__(self, owner, nomPiezasOri):
+    def __init__(self, owner, nom_pieces_ori):
 
         titulo = _("Blindfold") + " - " + _("Configuration")
         icono = Iconos.Ojo()
         extparam = "wblindfold"
         QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
 
-        self.config = BlindfoldConfig(nomPiezasOri)
-        self.nomPiezasOri = nomPiezasOri
+        self.config = BlindfoldConfig(nom_pieces_ori)
+        self.nom_pieces_ori = nom_pieces_ori
 
         lbWhite = Controles.LB(self, _("White")).ponTipoLetra(peso=75, puntos=10)
         lbBlack = Controles.LB(self, _("Black")).ponTipoLetra(peso=75, puntos=10)

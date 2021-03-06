@@ -460,9 +460,8 @@ def selectEngine(wowner):
     """
     # Pedimos el ejecutable
     folderEngines = Code.configuration.read_variables("FOLDER_ENGINES")
-    exeMotor = QTUtil2.leeFichero(
-        wowner, folderEngines if folderEngines else ".", "%s EXE (*.exe)" % _("File"), _("Engine")
-    )
+    extension = "%s EXE (*.exe)" if Code.is_windows else "%s (*)"
+    exeMotor = QTUtil2.leeFichero(wowner, folderEngines if folderEngines else ".", extension % _("File"), _("Engine"))
     if not exeMotor:
         return None
     folderEngines = Util.relative_path(os.path.dirname(exeMotor))

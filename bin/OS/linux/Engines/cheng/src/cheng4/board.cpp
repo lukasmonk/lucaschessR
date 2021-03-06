@@ -84,7 +84,7 @@ Draw Board::isDraw() const
 void Board::clear()
 {
 	memset( this, 0, sizeof(*this) );
-	frc = arenaMode = 0;
+	frc = 0;
 	curMove = 1;
 	bb[ BBI( ctWhite, ptPawn ) ]	= 0;
 	bb[ BBI( ctBlack, ptPawn ) ]	= 0;
@@ -113,7 +113,7 @@ void Board::clear()
 void Board::reset()
 {
 	memset( this, 0, sizeof(*this) );
-	frc = arenaMode = 0;
+	frc = 0;
 	curMove = 1;
 	bb[ BBI( ctWhite, ptPawn ) ]	= U64C( 0x00ff000000000000 );
 	bb[ BBI( ctBlack, ptPawn ) ]	= U64C( 0x000000000000ff00 );
@@ -490,7 +490,6 @@ const char *Board::fromFEN( const char *fen )
 		{
 			// white
 			File rf = (File)ch - 'A';
-			File orf = rf;
 			File kf = SquarePack::file( king( ctWhite ) );
 
 			Square rsq = SquarePack::init( rf, RANK1 );
@@ -526,8 +525,6 @@ const char *Board::fromFEN( const char *fen )
 						}
 					}
 				}
-				if ( rf != orf )
-					arenaMode = 1;
 			}
 
 			if ( ch )
@@ -539,7 +536,6 @@ const char *Board::fromFEN( const char *fen )
 		{
 			// black
 			File rf = (File)ch - 'a';
-			File orf = rf;
 			File kf = SquarePack::file( king( ctBlack ) );
 
 			Square rsq = SquarePack::init( rf, RANK8 );
@@ -575,22 +571,12 @@ const char *Board::fromFEN( const char *fen )
 						}
 					}
 				}
-				if ( rf != orf )
-					arenaMode = 1;
 			}
 			if ( ch )
 			{
 				bcastRights[ ctBlack ] = CastPack::loseRights( rf>kf, bcastRights[ ctBlack ] );
 				bcastRights[ ctBlack ] |= CastPack::initFile( rf>kf, rf );
 			}
-		}
-		// last Arena mode check: only if king is not E1/E8
-		if ( standardCastling )
-		{
-			if ( castRights( ctWhite ) && SquarePack::file( king(ctWhite) ) != EFILE )
-				arenaMode = 1;
-			if ( castRights( ctBlack ) && SquarePack::file( king(ctBlack) ) != EFILE )
-				arenaMode = 1;
 		}
 		fen++;
 	}
@@ -1196,7 +1182,7 @@ char *Board::toSAN( char *dst, Move m ) const
 		File ff = SquarePack::file( f );
 		Rank fr = SquarePack::rank( f );
 
-		u8 diffFile = 0, diffRank = 0;
+		u8 diffFile = 0, diffRank = 0, diffCount = 0;
 
 		MoveGen mg( *this );
 		Move lm;
@@ -1217,6 +1203,7 @@ char *Board::toSAN( char *dst, Move m ) const
 			File lff = SquarePack::file( lf );
 			Rank lfr = SquarePack::rank( lf );
 
+			diffCount++;
 			if ( ff != lff )
 				diffFile++;
 			if ( fr != lfr )
@@ -1226,12 +1213,12 @@ char *Board::toSAN( char *dst, Move m ) const
 		if ( ptype == ptPawn && MovePack::isCapture(m) )
 			diffFile = 1;						// force diffile for pawn captures
 
+		if ( diffFile && diffFile == diffCount )
+			diffRank = 0;
+		if ( diffRank && diffRank == diffCount )
+			diffFile = 0;
 		if ( diffFile )
-		{
 			*dst++ = 'a' + ff;
-			if ( diffRank == 1 )				// prefer file disambiguation
-				diffRank = 0;
-		}
 		if ( diffRank )
 			*dst++  = '8' - (fr ^ RANK8);
 		if ( MovePack::isCapture(m) )
@@ -1272,15 +1259,14 @@ std::string Board::toUCI( Move m ) const
 
 char *Board::toUCI( char *dst, Move m ) const
 {
-	if ( frc && !arenaMode && MovePack::isCastling( m ) )
+	if ( frc && MovePack::isCastling( m ) )
 	{
 		// handle FRC castling here (king captures rook)
-		// fortunately this is compatible with both Arena and Shredder
 		CastRights cr = castRights( turn() );
 		m = MovePack::init( MovePack::from(m), CastPack::rookSquare( MovePack::to(m), cr ) );
-		return MovePack::toUCI( dst, m, frc );
+		return MovePack::toUCI( dst, m );
 	}
-	return MovePack::toUCI( dst, m, frc );
+	return MovePack::toUCI( dst, m );
 }
 
 // move from UCI
@@ -1589,6 +1575,10 @@ Move Board::fromSAN( const char *&ptr ) const
 		count++;
 		if ( !MovePack::isCastling(m) )
 			continue;
+
+		// force KxR in FRC
+		if (frc)
+			--count;
 
 		// generate castling alternatives (king captures rook and rook captures king)
 		Square from = MovePack::from(m);

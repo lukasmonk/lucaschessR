@@ -20,11 +20,11 @@ class WindowTutor(QTVarios.WDialogo):
         QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, extparam)
 
         self.tutor = tutor
-        self.manager0 = manager.manager
+        self.manager = manager
         self.respLibro = None
         self.siElegidaOpening = False
 
-        self.x_tutor_view = manager.procesador.configuration.x_tutor_view
+        self.x_tutor_view = manager.configuration.x_tutor_view
 
         # ~ self.setStyleSheet("QDialog,QGroupBox { background: #f0f0f0; }")
 
@@ -153,7 +153,7 @@ class WindowTutor(QTVarios.WDialogo):
                 return
 
     def consultaLibro(self):
-        liMovs = self.manager0.librosConsulta(True)
+        liMovs = self.manager.librosConsulta(True)
         if liMovs:
             self.respLibro = liMovs[-1]
             self.save_video()

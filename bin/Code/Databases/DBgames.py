@@ -480,7 +480,7 @@ class DBgames:
                     litags.append((drots.get(field, field), v if type(v) == str else str(v)))
                     if field == "RESULT":
                         result = v if type(v) == str else str(v)
-        dcabs = self.recuperaConfig("dcabs")
+        dcabs = self.recuperaConfig("dcabs", {})
         if "Plycount" in dcabs:
             litags.append(("PlyCount", str(raw["PLYCOUNT"])))
         xpgn = raw["_DATA_"]

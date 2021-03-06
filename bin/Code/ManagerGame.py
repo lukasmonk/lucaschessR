@@ -25,6 +25,7 @@ class ManagerGame(Manager.Manager):
         self.with_previous_next = with_previous_next
         self.save_routine = save_routine
         self.changed = False
+        self.auto_rotate = False
 
         self.human_is_playing = True
         self.human_side = True

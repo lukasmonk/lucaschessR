@@ -65,11 +65,11 @@ class ManagerVariations(Manager.Manager):
         if key == TB_ACCEPT:
             self.siAceptado = True
             # self.resultado =
-            self.procesador.pararMotores()
+            self.procesador.stop_engines()
             self.main_window.accept()
 
         elif key == TB_CANCEL:
-            self.procesador.pararMotores()
+            self.procesador.stop_engines()
             self.main_window.reject()
 
         elif key == TB_TAKEBACK:
@@ -102,7 +102,7 @@ class ManagerVariations(Manager.Manager):
             return None
 
     def final_x(self):
-        self.procesador.pararMotores()
+        self.procesador.stop_engines()
         return True
 
     def atras(self):

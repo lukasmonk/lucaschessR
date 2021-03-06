@@ -749,6 +749,20 @@ class Configuration:
         li = sorted(li, key=operator.itemgetter(0))
         return li
 
+    def list_engines_show(self):
+        li = self.list_engines(False)
+        li_resp = []
+        maia = True
+        for engine in li:
+            if engine[0].startswith("Maia"):
+                if maia:
+                    engine[0] = "Maia 1100-1900"
+                    maia = False
+                else:
+                    continue
+            li_resp.append(engine)
+        return li_resp
+
     def dict_engines_fixed_elo(self):
         return OSEngines.dict_engines_fixed_elo(Code.folder_engines)
 

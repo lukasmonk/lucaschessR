@@ -90,9 +90,6 @@ class UnMove:
     def final(self):
         self.current_position = len(self.game) - 1
 
-    def numVariations(self):
-        return len(self.variantes)
-
     def damePosicion(self):
         if self.current_position == -1:
             position = self.game.first_position
@@ -292,10 +289,8 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.setAlternatingRowColors(True)
         self.listaMoves = owner.listaMoves
         self.procesador = procesador
-        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menuContexto)
 
-        self.setHeaderLabels((_("Moves"), _("Points"), _("Comments"), _("Variations"), "", ""))
+        self.setHeaderLabels((_("Moves"), _("Points"), _("Comments")))
         self.setColumnHidden(4, True)
 
         dic_nags = TrListas.dic_nags()
@@ -345,13 +340,10 @@ class TreeMoves(QtWidgets.QTreeWidget):
             moveOwner = listaMoves.moveOwner
             padre = self if moveOwner is None else moveOwner.item
             for n, mov in enumerate(liMoves):
-                n_var = mov.numVariations()
-                c_var = str(n_var) if n_var else ""
-                c_ord = "%02d" % (n + 1)
                 titulo = mov.titulo
                 if mov.conHijosDesconocidos(self.dbCache):
                     titulo += " ^"
-                item = QtWidgets.QTreeWidgetItem(padre, [titulo, mov.etiPuntos(False), mov.comment, c_var, c_ord])
+                item = QtWidgets.QTreeWidgetItem(padre, [titulo, mov.etiPuntos(False), mov.comment])
                 item.setTextAlignment(1, QtCore.Qt.AlignRight)
                 item.setTextAlignment(3, QtCore.Qt.AlignCenter)
                 if mov.siOculto:
@@ -391,9 +383,6 @@ class TreeMoves(QtWidgets.QTreeWidget):
 
         elif col == 2:
             self.editComentario(item, mov)
-
-        elif col == 3:
-            self.edit_variations(item, mov)
 
     def editComentario(self, item, mov):
 
@@ -452,57 +441,6 @@ class TreeMoves(QtWidgets.QTreeWidget):
             lineaPGN,
             titulo=mov.titulo + " - " + mov.etiPuntos(True),
         )
-
-    def ponVariations(self, mov):
-        num = len(mov.variantes)
-        txt = str(num) if num else ""
-        mov.item.setText(3, txt)
-
-    def edit_variations(self, item, mov):
-        import Code.Variations as Variations
-
-        if mov.variantes:
-            menu = QTVarios.LCMenu(self)
-            for num, una in enumerate(mov.variantes):
-                menu.opcion(num, una[:40], Iconos.PuntoAzul())
-            menu.separador()
-            menu.opcion(-1, _("New variation"), Iconos.Mas())
-            menu.separador()
-            menub = menu.submenu(_("Remove"), Iconos.Delete())
-            for num, una in enumerate(mov.variantes):
-                menub.opcion(-num - 2, una[:40], Iconos.PuntoNaranja())
-
-            resp = menu.lanza()
-            if resp is None:
-                return None
-            if resp == -1:
-                num = None
-                lineaPGN = ""
-            elif resp >= 0:
-                num = resp
-                lineaPGN = mov.variantes[num]
-            else:
-                num = -resp - 2
-                una = mov.variantes[num]
-                if QTUtil2.pregunta(self, _X(_("Delete %1?"), una[:40])):
-                    del mov.variantes[num]
-                    self.ponVariations(mov)
-                return
-        else:
-            lineaPGN = ""
-            num = None
-        fen = mov.game.last_position.fen()
-
-        wowner = self.owner
-        board = wowner.infoMove.board
-        resp = Variations.edit_variation_moves(self.procesador, wowner, board.is_white_bottom, fen, lineaPGN)
-        if resp:
-            una = resp[0]
-            if num is None:
-                mov.variantes.append(una)
-                self.ponVariations(mov)
-            else:
-                mov.variantes[num] = una
 
     def mostrarOcultar(self, item, mov):
 
@@ -669,30 +607,10 @@ class WMoves(QtWidgets.QWidget):
         self.tb.new(_("Rating"), self.tree.iconoValoracion(3), self.valorar)
         self.tb.new(_("Analyze"), Iconos.Analizar(), self.analizar)
         self.tb.new(_("Comments"), Iconos.ComentarioEditar(), self.comment)
-        self.tb.new(_("Variations"), Iconos.Variations(), self.variantes)
 
         layout = Colocacion.V().control(self.tb).control(self.tree).margen(1)
 
         self.setLayout(layout)
-
-    def menuContexto(self):
-        mov = self.tree.currentMov()
-        if not mov:
-            return
-
-        menu = QTVarios.LCMenu(self)
-
-        for comando in self.tb.li_acciones:
-            if comando:
-                txt, icono, accion = comando
-                if accion == self.rama and mov.listaMovesHijos:
-                    continue
-                menu.opcion(accion, txt, icono)
-                menu.separador()
-
-        resp = menu.lanza()
-        if resp is not None:
-            self.run_action(resp)
 
     def rama(self):
         mov = self.tree.currentMov()
@@ -717,12 +635,6 @@ class WMoves(QtWidgets.QWidget):
         if not mov:
             return
         self.tree.editComentario(mov.item, mov)
-
-    def variantes(self):
-        mov = self.tree.currentMov()
-        if not mov:
-            return
-        self.tree.edit_variations(mov.item, mov)
 
     def mostrar(self):
         mov = self.tree.currentMov()

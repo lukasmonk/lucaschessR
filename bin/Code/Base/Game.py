@@ -40,7 +40,7 @@ class Game:
             fen_inicial = self.first_position.fen()
             es_inicial = self.pending_opening = fen_inicial == FEN_INITIAL
             if not es_inicial:
-                self.add_tag("FEN", fen_inicial)
+                self.set_tag("FEN", fen_inicial)
         else:
             self.first_position = Position.Position()
             self.first_position.set_pos_initial()
@@ -61,15 +61,15 @@ class Game:
     def set_unknown(self):
         self.set_termination(TERMINATION_UNKNOWN, RESULT_UNKNOWN)
         if self.get_tag("Result"):
-            self.add_tag("Result", RESULT_UNKNOWN)
+            self.set_tag("Result", RESULT_UNKNOWN)
 
     def tag_timestart(self):
         t = Util.today()
-        self.add_tag("TimeStart", str(t)[:19])
+        self.set_tag("TimeStart", str(t)[:19])
 
     def tag_timeend(self):
         t = Util.today()
-        self.add_tag("TimeEnd", str(t)[:19])
+        self.set_tag("TimeEnd", str(t)[:19])
 
     @property
     def last_position(self):
@@ -150,7 +150,7 @@ class Game:
         self.li_tags = li_main
         self.li_tags.extend(li_resto)
 
-    def add_tag(self, key, value):
+    def set_tag(self, key, value):
         found = False
         for n, (xkey, xvalue) in enumerate(self.li_tags):
             if xkey == key:
@@ -162,14 +162,14 @@ class Game:
 
     def set_extend_tags(self):
         if self.result:
-            self.add_tag("Result", self.result)
+            self.set_tag("Result", self.result)
 
         if self.termination:
             tm = self.get_tag("Termination")
             if not tm:
                 txt = DIC_LABELS_TERMINATION.get(self.termination)
                 if txt:
-                    self.add_tag("Termination", txt)
+                    self.set_tag("Termination", txt)
 
         if self.siFenInicial():
             op = self.get_tag("OPENING")
@@ -182,10 +182,10 @@ class Game:
                     if not eco:
                         self.li_tags.append(["ECO", self.opening.eco])
         else:
-            self.add_tag("FEN", self.first_position.fen())
+            self.set_tag("FEN", self.first_position.fen())
 
         if self.num_moves():
-            self.add_tag("PlyCount", "%d" % self.num_moves())
+            self.set_tag("PlyCount", "%d" % self.num_moves())
 
     def readPGN(self, pgn):
         ok, game_tmp = pgn_game(pgn)
@@ -491,7 +491,7 @@ class Game:
 
     def test_tag_result(self):
         if not self.get_tag("RESULT"):
-            self.add_tag("Result", self.result)
+            self.set_tag("Result", self.result)
 
     def resultado(self):
         if self.result == RESULT_UNKNOWN:
@@ -929,13 +929,13 @@ def pgn_game(pgn):
                     if vl != FEN_INITIAL:
                         game.set_fen(vl)
                         last_posicion = game.first_position
-                        game.add_tag(lb, vl)
+                        game.set_tag(lb, vl)
                         si_fen = True
                 elif lbup == "RESULT":
                     game.result = vl
-                    game.add_tag("Result", vl)
+                    game.set_tag("Result", vl)
                 else:
-                    game.add_tag(lb, vl)
+                    game.set_tag(lb, vl)
 
         elif key == "M":
             a1h8 = elem[1:]

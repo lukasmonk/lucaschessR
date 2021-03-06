@@ -1,1 +1,2 @@
-../../../droidchain/bin/arm-linux-androideabi-g++ -s -Wall -W -O4 -fno-stack-protector -fomit-frame-pointer -fno-rtti -fno-exceptions -fexpensive-optimizations -DNDEBUG -U_FORTIFY_SOURCE -static allinone.cpp -o cheng4_droid
+../../droidchain/bin/arm-linux-androideabi-g++ -s -Wall -W -O4 -fno-stack-protector -fomit-frame-pointer -fno-rtti -fno-exceptions -fexpensive-optimizations -DNDEBUG -U_FORTIFY_SOURCE -static allinone.cpp -o cheng4_droid
+../../droidchain/bin/arm-linux-androideabi-g++ -s -march=armv7-a -Wall -W -O4 -fno-stack-protector -fomit-frame-pointer -fno-rtti -fno-exceptions -fexpensive-optimizations -DNDEBUG -U_FORTIFY_SOURCE -static allinone.cpp -o cheng4_droid_armv7a

@@ -3588,3 +3588,11 @@ def BinBook():
     return QtGui.QIcon(pmBinBook())
 
 
+def pmConnected():
+    return PM(942298,943916)
+
+
+def Connected():
+    return QtGui.QIcon(pmConnected())
+
+

@@ -18,8 +18,10 @@ void History::add( const Board &b, Move m, i32 depth )
 	Piece p = b.piece( MovePack::from(m) );
 	Color c = PiecePack::color( p );
 	Piece pt = PiecePack::type(p);
-	assert( pt != ptNone );
-	assert( c == b.turn() );
+
+	// might happen if invalid move comes from TT
+	if ( pt == ptNone || c != b.turn() )
+		return;
 
 	i32 val = depth*depth;			// causing a cutoff higher in the tree is more important
 	if ( depth < 0 )

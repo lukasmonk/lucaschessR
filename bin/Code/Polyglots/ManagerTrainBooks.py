@@ -50,8 +50,8 @@ class ManagerTrainBooks(Manager.Manager):
         w, b = self.book_player.name, self.book_rival.name
         if not is_white:
             w, b = b, w
-        self.game.add_tag("White", w)
-        self.game.add_tag("Black", b)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
 
         self.siguienteJugada()
 
@@ -348,7 +348,7 @@ class ManagerTrainBooks(Manager.Manager):
 
     def txt_matches(self):
         if self.movimientos:
-            self.game.add_tag("Score", "%d/%d" % (self.aciertos, self.movimientos))
+            self.game.set_tag("Score", "%d/%d" % (self.aciertos, self.movimientos))
             return "%s : %d/%d (%0.2f%%)" % (
                 _("Score"), self.aciertos, self.movimientos, 100.0 * self.aciertos / self.movimientos)
         else:

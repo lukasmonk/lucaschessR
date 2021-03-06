@@ -1,13 +1,12 @@
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore
 
 import struct
 import psutil
-import FasterCode
 
-from Code.Base import Game, Position
+from Code.Base import Game
 import Code
+from Code import Util
 from Code.Engines import EngineRun
-from Code.QT import Voyager
 from Code.Kibitzers import Kibitzers
 from Code.QT import Colocacion
 from Code.QT import Delegados
@@ -19,56 +18,16 @@ from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
 from Code.Kibitzers import WindowKibitzers
+from Code.Kibitzers import WKibCommon
 
 
-class WKibEngine(QtWidgets.QDialog):
+class WKibEngine(WKibCommon.WKibCommon):
     def __init__(self, cpu):
-        QtWidgets.QDialog.__init__(self)
-
-        self.cpu = cpu
-
-        self.kibitzer = cpu.kibitzer
+        WKibCommon.WKibCommon.__init__(self, cpu, Iconos.Kibitzer())
 
         self.siCandidates = cpu.tipo == Kibitzers.KIB_CANDIDATES
 
-        self.type = cpu.tipo
-
-        dicVideo = self.cpu.dic_video
-        if not dicVideo:
-            dicVideo = {}
-
-        self.siTop = dicVideo.get("SITOP", True)
-        self.show_board = dicVideo.get("SHOW_BOARD", True)
-        self.nArrows = dicVideo.get("NARROWS", 2)
-
-        self.game = None
-        self.li_moves = []
-
-        self.setWindowTitle(cpu.titulo)
-        self.setWindowIcon(Iconos.Kibitzer())
-
-        self.setWindowFlags(
-            QtCore.Qt.WindowCloseButtonHint
-            | QtCore.Qt.Dialog
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.WindowMinimizeButtonHint
-        )
-
-        self.setBackgroundRole(QtGui.QPalette.Light)
-
-        Code.configuration = cpu.configuration
-
-        Code.todasPiezas = Piezas.TodasPiezas()
-        config_board = cpu.configuration.config_board("kib" + cpu.kibitzer.huella, 24)
-        self.board = Board.Board(self, config_board)
-        self.board.crea()
-        self.board.set_dispatcher(self.mensajero)
-
-        self.with_figurines = cpu.configuration.x_pgn_withfigurines
-
-        Delegados.generaPM(self.board.piezas)
         delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.with_figurines else None
 
         o_columns = Columnas.ListaColumnas()
@@ -77,7 +36,7 @@ class WKibEngine(QtWidgets.QDialog):
         o_columns.nueva("BESTMOVE", _("Alternatives"), 80, centered=True, edicion=delegado)
         o_columns.nueva("EVALUATION", _("Evaluation"), 85, centered=True)
         o_columns.nueva("MAINLINE", _("Main line"), 400)
-        self.grid = Grid.Grid(self, o_columns, dicVideo=dicVideo, siSelecFilas=True)
+        self.grid = Grid.Grid(self, o_columns, dicVideo=self.dicVideo, siSelecFilas=True)
 
         self.lbDepth = Controles.LB(self)
 
@@ -108,7 +67,7 @@ class WKibEngine(QtWidgets.QDialog):
 
         if not self.show_board:
             self.board.hide()
-        self.restore_video(dicVideo)
+        self.restore_video(self.dicVideo)
         self.ponFlags()
 
         self.engine = self.lanzaMotor()
@@ -118,12 +77,6 @@ class WKibEngine(QtWidgets.QDialog):
         self.timer.start(500)
         self.depth = 0
         self.veces = 0
-
-    def takeback(self):
-        nmoves = len(self.game)
-        if nmoves:
-            self.game.shrink(nmoves-2)
-            self.reset()
 
     def compruebaInput(self):
         if not self.engine:
@@ -190,42 +143,6 @@ class WKibEngine(QtWidgets.QDialog):
                     self.engine.put_line(orden)
         self.play()
 
-    def ponFlags(self):
-        flags = self.windowFlags()
-        if self.siTop:
-            flags |= QtCore.Qt.WindowStaysOnTopHint
-        else:
-            flags &= ~QtCore.Qt.WindowStaysOnTopHint
-        flags |= QtCore.Qt.WindowCloseButtonHint
-        self.setWindowFlags(flags)
-        self.tb.setAccionVisible(self.windowTop, not self.siTop)
-        self.tb.setAccionVisible(self.windowBottom, self.siTop)
-        self.show()
-
-    def windowTop(self):
-        self.siTop = True
-        self.ponFlags()
-
-    def windowBottom(self):
-        self.siTop = False
-        self.ponFlags()
-
-    def terminar(self):
-        self.finalizar()
-        self.accept()
-
-    def pause(self):
-        self.siPlay = False
-        self.tb.setPosVisible(1, True)
-        self.tb.setPosVisible(2, False)
-        self.stop()
-
-    def play(self):
-        self.siPlay = True
-        self.tb.setPosVisible(1, False)
-        self.tb.setPosVisible(2, True)
-        self.reset()
-
     def stop(self):
         self.engine.ac_final(0)
 
@@ -286,12 +203,13 @@ class WKibEngine(QtWidgets.QDialog):
 
         self.nom_engine = self.kibitzer.name
         exe = self.kibitzer.path_exe
+        if not Util.exist_file(exe):
+            QTUtil2.message_error(self, "%s:\n  %s" % (_("Engine not found"), exe))
+            import sys
+            sys.exit()
         args = self.kibitzer.args
         li_uci = self.kibitzer.liUCI
         return EngineRun.RunEngine(self.nom_engine, exe, li_uci, self.numMultiPV, priority=self.cpu.prioridad, args=args)
-
-    def closeEvent(self, event):
-        self.finalizar()
 
     def valid_to_play(self):
         siw = self.game.last_position.is_white
@@ -335,54 +253,6 @@ class WKibEngine(QtWidgets.QDialog):
             QTUtil.ponPortapapeles(resp)
             QTUtil2.mensajeTemporal(self, _("The line selected is saved to the clipboard"), 0.7)
 
-    def save_video(self):
-        dic = {}
-
-        pos = self.pos()
-        dic["_POSICION_"] = "%d,%d" % (pos.x(), pos.y())
-
-        tam = self.size()
-        dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
-
-        dic["SHOW_BOARD"] = self.show_board
-        dic["NARROWS"] = self.nArrows
-
-        dic["SITOP"] = self.siTop
-
-        self.grid.save_video(dic)
-
-        self.cpu.save_video(dic)
-
-    def restore_video(self, dicVideo):
-        if dicVideo:
-            wE, hE = QTUtil.tamEscritorio()
-            x, y = dicVideo["_POSICION_"].split(",")
-            x = int(x)
-            y = int(y)
-            if not (0 <= x <= (wE - 50)):
-                x = 0
-            if not (0 <= y <= (hE - 50)):
-                y = 0
-            self.move(x, y)
-            if not ("_SIZE_" in dicVideo):
-                w, h = self.width(), self.height()
-                for k in dicVideo:
-                    if k.startswith("_TAMA"):
-                        w, h = dicVideo[k].split(",")
-            else:
-                w, h = dicVideo["_SIZE_"].split(",")
-            w = int(w)
-            h = int(h)
-            if w > wE:
-                w = wE
-            elif w < 20:
-                w = 20
-            if h > hE:
-                h = hE
-            elif h < 20:
-                h = 20
-            self.resize(w, h)
-
     def orden_game(self, game: Game.Game):
         posicion = game.last_position
 
@@ -400,23 +270,3 @@ class WKibEngine(QtWidgets.QDialog):
         if self.valid_to_play():
             self.engine.ac_inicio(game)
         self.grid.refresh()
-
-    def config_board(self):
-        self.show_board = not self.show_board
-        self.board.setVisible(self.show_board)
-        self.save_video()
-
-    def set_position(self):
-        resp = Voyager.voyager_position(self, self.game.last_position)
-        if resp is not None:
-            game = Game.Game(ini_posicion=resp)
-            self.orden_game(game)
-
-    def mensajero(self, from_sq, to_sq, promocion=""):
-        FasterCode.set_fen(self.game.last_position.fen())
-        if FasterCode.make_move(from_sq + to_sq + promocion):
-            self.game.read_pv(from_sq + to_sq + promocion)
-            self.reset()
-
-    def reset(self):
-        self.orden_game(self.game)

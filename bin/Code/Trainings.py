@@ -441,16 +441,11 @@ class Entrenamientos:
                     else:
                         db = UtilSQL.DictSQL(self.configuration.ficheroTrainings)
                         data = db[entreno]
-                        jump = False
-                        tipo = "s"
-                        if data is None:
-                            posUltimo = 1
-                        elif type(data) == int:
-                            posUltimo = data
-                        else:
-                            posUltimo = data["POSULTIMO"]
-                            jump = data["SALTA"]
-                            tipo = data["TYPE"]
+                        if type(data) != dict:
+                            data = {}
+                        posUltimo = data.get("POSULTIMO", 1)
+                        jump = data.get("SALTA", False)
+                        tipo = data.get("TYPE", "s")
                         resp = WCompetitionWithTutor.numPosicion(
                             self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo
                         )

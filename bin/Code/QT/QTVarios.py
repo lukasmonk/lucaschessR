@@ -898,10 +898,10 @@ class ReadAnnotation(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self, parent)
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.FramelessWindowHint)
 
-        self.edAnotacion = Controles.ED(self, "")
-        btAceptar = Controles.PB(self, "", rutina=self.aceptar).ponIcono(Iconos.Aceptar())
-        btCancelar = Controles.PB(self, "", rutina=self.cancelar).ponIcono(Iconos.Cancelar())
-        btAyuda = Controles.PB(self, "", rutina=self.ayuda).ponIcono(Iconos.AyudaGR())
+        self.edAnotacion = Controles.ED(self, "").ponTipoLetra(puntos=Code.configuration.x_menu_points)
+        btAceptar = Controles.PB(self, "", rutina=self.aceptar).ponIcono(Iconos.Aceptar(), 32)
+        btCancelar = Controles.PB(self, "", rutina=self.cancelar).ponIcono(Iconos.MainMenu(), 32)
+        btAyuda = Controles.PB(self, "", rutina=self.ayuda).ponIcono(Iconos.AyudaGR(), 32)
 
         self.objetivo = objetivo
         self.conAyuda = False
@@ -918,7 +918,7 @@ class ReadAnnotation(QtWidgets.QDialog):
             .margen(3)
         )
         self.setLayout(layout)
-        self.move(parent.x() + parent.board.width() - 212, parent.y() + parent.board.y() - 3)
+        self.move(parent.x() + parent.board.width() - 308, parent.y() + parent.board.y() - 18)
 
     def aceptar(self):
         txt = self.edAnotacion.texto()

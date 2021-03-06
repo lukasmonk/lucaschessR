@@ -1,3 +1,5 @@
+from Code.Base import Game
+
 from Code.SQL import UtilSQL
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -50,6 +52,7 @@ class WAnotar(QTVarios.WDialogo):
 
         self.register_grid(self.glista)
         self.restore_video(anchoDefecto=self.glista.anchoColumnas() + 20)
+        self.glista.gotop()
 
     def grid_doble_click(self, grid, row, o_column):
         self.repetir()
@@ -63,11 +66,16 @@ class WAnotar(QTVarios.WDialogo):
     def new(self):
         self.haz(None)
 
-    def haz(self, que):
+    def haz(self, game_saved):
+        if game_saved:
+            game = Game.Game()
+            game.restore(game_saved)
+        else:
+            game = None
         siblancasabajo = QTVarios.blancasNegras(self)
         if siblancasabajo is None:
             return
-        self.resultado = que, siblancasabajo
+        self.resultado = game, siblancasabajo
         self.save_video()
         self.db.close()
         self.accept()
@@ -88,6 +96,14 @@ class WAnotar(QTVarios.WDialogo):
     def grid_num_datos(self, grid):
         return len(self.lista)
 
+    def game(self, reg):
+        if isinstance(reg["PC"], Game.Game):
+            game = reg["PC"]
+        else:
+            game = Game.Game()
+            game.restore(reg["PC"])
+        return game
+
     def grid_dato(self, grid, row, o_column):
         col = o_column.key
         reg = self.db[self.lista[row]]
@@ -96,9 +112,9 @@ class WAnotar(QTVarios.WDialogo):
         if col == "DATE":
             return self.lista[row]
         elif col == "GAME":
-            return reg["PC"].titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")
+            return self.game(reg).titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")
         elif col == "MOVES":
-            total = len(reg["PC"])
+            total = reg.get("TOTAL_MOVES", len(self.game(reg)))
             moves = reg["MOVES"]
             if total == moves:
                 return str(total)

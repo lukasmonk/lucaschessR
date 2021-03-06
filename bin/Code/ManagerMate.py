@@ -394,13 +394,11 @@ class ManagerMate(Manager.Manager):
 
     def end_game(self):
         self.lbNivel.set_foreground_backgound("black", "white")
-
         self.board.remove_arrows()
         self.main_window.columnas60(False)
         self.procesador.start()
 
     def finJuego(self):
-
         self.ponRotuloNivel()
         self.ponRotuloBloque(False)
         self.main_window.base.pgn.show()

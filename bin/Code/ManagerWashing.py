@@ -72,13 +72,13 @@ class ManagerWashingReplay(Manager.Manager):
         self.pgnRefresh(True)
 
         self.game.pending_opening = True
-        self.game.add_tag("Event", _("The Washing Machine"))
+        self.game.set_tag("Event", _("The Washing Machine"))
 
         player = self.configuration.nom_player()
         other = self.engine.name
         w, b = (player, other) if self.human_side else (other, player)
-        self.game.add_tag("White", w)
-        self.game.add_tag("Black", b)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
         QTUtil.refresh_gui()
 
         self.check_boards_setposition()
@@ -500,8 +500,8 @@ class ManagerWashingCreate(Manager.Manager):
             player = self.configuration.nom_player()
             other = self.xrival.name
             w, b = (player, other) if self.human_side else (other, player)
-            self.game.add_tag("White", w)
-            self.game.add_tag("Black", b)
+            self.game.set_tag("White", w)
+            self.game.set_tag("Black", b)
 
         self.check_boards_setposition()
 
@@ -677,7 +677,7 @@ class ManagerWashingCreate(Manager.Manager):
             pointsBest, pointsUser = self.mrmTutor.difPointsBest(movimiento)
             if (pointsBest - pointsUser) > 0:
                 if not move.is_mate:
-                    tutor = Tutor.Tutor(self, self, move, from_sq, to_sq, False)
+                    tutor = Tutor.Tutor(self, move, from_sq, to_sq, False)
                     if tutor.elegir(True):
                         self.set_piece_again(from_sq)
                         from_sq = tutor.from_sq

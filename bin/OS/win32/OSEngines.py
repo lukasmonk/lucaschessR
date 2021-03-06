@@ -170,9 +170,9 @@ def read_engines(folder_engines):
 
     is64 = platform.machine().endswith("64")
     t32_64 = "64" if is64 else "32"
-    # if is64:
-        # if FasterCode.bmi2() == 1:
-            # t32_64 = "64-bmi2"
+    if is64:
+        if FasterCode.bmi2() == 1:
+            t32_64 = "64-bmi2"
 
     cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"12.1.1 {t32_64}", "https://komodochess.com/", f"komodo-12.1.1-{t32_64}.exe", 3300)
     cm.ordenUCI("Ponder", "false")

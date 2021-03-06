@@ -80,7 +80,7 @@ class WGM(QTVarios.WDialogo):
         self.rb_black.activa(False)
 
         # Contrario
-        self.chContrario = Controles.CHB(self, _("Choose the opponent's move, when there are multiple possible answers"), False)
+        self.ch_select_rival_move = Controles.CHB(self, _("Choose the opponent's move, when there are multiple possible answers"), False)
 
         # Juez
         liDepths = [("--", 0)]
@@ -165,7 +165,7 @@ class WGM(QTVarios.WDialogo):
         # Opciones avanzadas
         lyInicial = Colocacion.H().control(lbInicial).control(self.edJugInicial).relleno().control(lbBooks).control(self.cbBooks).relleno()
         vlayout = Colocacion.V().otro(lyInicial).control(gbOpening)
-        vlayout.espacio(5).control(self.chContrario).margen(20).relleno()
+        vlayout.espacio(5).control(self.ch_select_rival_move).margen(20).relleno()
         gbAdvanced = Controles.GB(self, "", vlayout)
         gbAdvanced.setFlat(True)
 
@@ -293,7 +293,7 @@ class WGM(QTVarios.WDialogo):
         elif key == "PUNTOS":
             return "%d" % dic["PUNTOS"]
         elif key == "ENGINE":
-            s = "%.02f" % (dic["TIME"] / 10.0,)
+            s = "%.02f" % (dic["TIEMPO"] / 10.0,)
             s = s.rstrip("0").rstrip(".")
             return '%s %s"' % (dic["JUEZ"], s)
         elif key == "RESUMEN":
@@ -385,7 +385,7 @@ class WGM(QTVarios.WDialogo):
         rk.mostrar = self.cbJshow.valor()
         rk.depth = self.cbJdepth.valor()
         rk.multiPV = self.cbJmultiPV.valor()
-        rk.rival_name = self.chContrario.isChecked()
+        rk.select_rival_move = self.ch_select_rival_move.isChecked()
         rk.jugInicial = self.edJugInicial.valor()
         if rk.with_adjudicator and rk.vtime <= 0 and rk.depth == 0:
             rk.with_adjudicator = False
@@ -428,7 +428,7 @@ class WGM(QTVarios.WDialogo):
             depth = dic.get("DEPTH", 0)
             multi_pv = dic.get("MULTIPV", "PD")
             mostrar = dic["MOSTRAR"]
-            rival_name = dic.get("JUGCONTRARIO", False)
+            select_rival_move = dic.get("JUGCONTRARIO", False)
             jug_inicial = dic.get("JUGINICIAL", 1)
             self.li_preferred_openings = dic.get("APERTURASFAVORITAS", [])
             self.opening_block = dic.get("APERTURA", None)
@@ -460,7 +460,7 @@ class WGM(QTVarios.WDialogo):
             self.change_depth(depth)
             self.cbJmultiPV.ponValor(multi_pv)
 
-            self.chContrario.setChecked(rival_name)
+            self.ch_select_rival_move.setChecked(select_rival_move)
 
             self.edJugInicial.ponValor(jug_inicial)
 

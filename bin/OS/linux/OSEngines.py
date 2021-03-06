@@ -1,6 +1,6 @@
 import os
 
-import Code
+import FasterCode
 
 from Code.Engines import Engines
 
@@ -17,7 +17,7 @@ def read_engines(folder_engines):
 
     mas("andscacs", "Daniel José Queraltó", "0.9532n", "http://www.andscacs.com/", "andscacs", 3240)
 
-    mas("cheng", "Martin Sedlák", "4 ver 0.39", "http://www.vlasak.biz/cheng", "cheng4_linux_x64", 2750)
+    mas("cheng", "Martin Sedlák", "4 ver 0.40", "http://www.vlasak.biz/cheng", "cheng4_linux_x64", 2750)
 
     mas("cinnamon", "Giuseppe Cannella", "1.2b", "http://cinnamonchess.altervista.org/", "cinnamon_1.2b-generic", 1930)
 
@@ -29,7 +29,9 @@ def read_engines(folder_engines):
     cm.ordenUCI("OwnBook", "false")
     cm.ordenUCI("Ponder", "false")
 
-    cm = mas("komodo", "Don Dailey, Larry Kaufman", "11.01", "http://komodochess.com/", "Linux/komodo-11.01-linux", 3240)
+    bmi2 = "-bmi2" if FasterCode.bmi2() else ""
+
+    cm = mas("komodo", "Don Dailey, Larry Kaufman", f"12.1.1{bmi2}", "http://komodochess.com/", f"Linux/komodo-12.1.1-linux{bmi2}", 3240)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "32")
     cm.ponMultiPV(20, 218)

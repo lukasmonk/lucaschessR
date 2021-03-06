@@ -73,7 +73,14 @@ class PotenciaHistorico:
         if not self.db.existeTabla(self.tabla):
             self.crea_tabla()
 
-        self.dbf = self.db.dbf(self.tabla, "REF,FECHA,SCORE,MOTOR,SEGUNDOS,MIN_MIN,MIN_MAX,LINE", orden="FECHA DESC")
+        self.dbf = self.db.dbf(self.tabla, "REF,FECHA,SCORE,ENGINE,SEGUNDOS,MIN_MIN,MIN_MAX,LINE", orden="FECHA DESC")
+
+        if not self.dbf.existe_column("ENGINE"):
+            self.dbf.add_column_varchar("ENGINE")
+            if self.dbf.existe_column("MOTOR"):
+                self.dbf.copy_column("MOTOR", "ENGINE")
+            self.dbf.cerrar()
+            self.dbf = self.db.dbf(self.tabla, "REF,FECHA,SCORE,ENGINE,SEGUNDOS,MIN_MIN,MIN_MAX,LINE", orden="FECHA DESC")
 
         self.dbf.leer()
 
@@ -92,7 +99,7 @@ class PotenciaHistorico:
         tb.nuevoCampo("FECHA", "VARCHAR", notNull=True, primaryKey=True)
         tb.nuevoCampo("REF", "INTEGER")
         tb.nuevoCampo("SCORE", "INTEGER")
-        tb.nuevoCampo("MOTOR", "VARCHAR")
+        tb.nuevoCampo("ENGINE", "VARCHAR")
         tb.nuevoCampo("SEGUNDOS", "INTEGER")
         tb.nuevoCampo("MIN_MIN", "INTEGER")
         tb.nuevoCampo("MIN_MAX", "INTEGER")
@@ -149,7 +156,7 @@ class PotenciaHistorico:
         br.REF = ref
         br.FECHA = self.fecha2txt(fecha)
         br.SCORE = score
-        br.MOTOR = engine
+        br.ENGINE = engine
         br.SEGUNDOS = segundos
         br.MIN_MIN = min_min
         br.MIN_MAX = min_max
@@ -464,7 +471,7 @@ class WPotenciaBase(QTVarios.WDialogo):
         elif col == "SCORE":
             return str(reg.SCORE)
         elif col == "ENGINE":
-            return reg.MOTOR
+            return reg.ENGINE
         elif col == "SEGUNDOS":
             return str(reg.SEGUNDOS)
         elif col == "MIN_MIN":

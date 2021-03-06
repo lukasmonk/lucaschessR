@@ -31,8 +31,8 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         w, b = self.configuration.nom_player(), dic_var["RIVAL"]
         if not is_white:
             w, b = b, w
-        self.game.add_tag("White", w)
-        self.game.add_tag("Black", b)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
 
         self.with_takeback = True
 

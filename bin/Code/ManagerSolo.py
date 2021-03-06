@@ -37,7 +37,7 @@ class ManagerSolo(Manager.Manager):
 
         if game_new:
             self.new_game()
-            self.game.add_tag("Event", _("Create your own game"))
+            self.game.set_tag("Event", _("Create your own game"))
 
         self.reinicio = dic
 
@@ -595,7 +595,7 @@ class ManagerSolo(Manager.Manager):
             if self.game.first_position == position:
                 return
             self.game = Game.Game(ini_posicion=position, li_tags=self.game.li_tags)
-            self.game.add_tag("FEN", None if self.game.siFenInicial() else position.fen())
+            self.game.set_tag("FEN", None if self.game.siFenInicial() else position.fen())
             self.game.order_tags()
             self.xfichero = None
             self.xpgn = None

@@ -52,7 +52,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     tutor_con_flechas = False
     tutor_book = None
     nAjustarFuerza = 0
-    resign_limit = 1000
+    resign_limit = -9999
     siBookAjustarFuerza = True
     siTiempo = False
     maxSegundos = 0
@@ -175,13 +175,13 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 self.xrival.maximizaMultiPV()
         self.resign_limit = dic_var["RESIGN"]
 
-        self.game.add_tag("Event", _("Play against an engine"))
+        self.game.set_tag("Event", _("Play against an engine"))
 
         player = self.configuration.nom_player()
         other = self.xrival.name
         w, b = (player, other) if self.human_side else (other, player)
-        self.game.add_tag("White", w)
-        self.game.add_tag("Black", b)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
 
         self.siBookAjustarFuerza = self.nAjustarFuerza != ADJUST_BETTER
 
@@ -201,9 +201,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             time_control = "%d" % int(self.maxSegundos)
             if self.segundosJugada:
                 time_control += "+%d" % self.segundosJugada
-            self.game.add_tag("TimeControl", time_control)
+            self.game.set_tag("TimeControl", time_control)
             if self.segExtra:
-                self.game.add_tag("TimeExtra" + "White" if self.human_side else "Black", "%d" % self.segExtra)
+                self.game.set_tag("TimeExtra" + "White" if self.human_side else "Black", "%d" % self.segExtra)
 
         self.pon_toolbar()
 
@@ -225,7 +225,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             pers = Personalities.Personalities(None, self.configuration)
             label = pers.label(self.nAjustarFuerza)
             if label:
-                self.game.add_tag("Strength", label)
+                self.game.set_tag("Strength", label)
 
         self.ponCapInfoPorDefecto()
 
@@ -1079,7 +1079,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                     self.sigueHumanoAnalisis()
                                     return False
                         if si_tutor:
-                            tutor = Tutor.Tutor(self, self, move, from_sq, to_sq, False)
+                            tutor = Tutor.Tutor(self, move, from_sq, to_sq, False)
 
                             if self.aperturaStd:
                                 liApPosibles = self.listaOpeningsStd.list_possible_openings(self.game)

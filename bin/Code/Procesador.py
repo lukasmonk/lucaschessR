@@ -2,6 +2,7 @@ import os
 import random
 import sys
 import webbrowser
+from stat import *
 
 import Code
 from Code import Util
@@ -86,15 +87,7 @@ class Procesador:
     def start_with_user(self, user):
         self.user = user
 
-        self.li_opciones_inicio = [
-            TB_QUIT,
-            TB_PLAY,
-            TB_TRAIN,
-            TB_COMPETE,
-            TB_TOOLS,
-            TB_OPTIONS,
-            TB_INFORMATION,
-        ]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
+        self.li_opciones_inicio = [TB_QUIT, TB_PLAY, TB_TRAIN, TB_COMPETE, TB_TOOLS, TB_OPTIONS, TB_INFORMATION]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
 
         self.configuration = Configuration.Configuration(user)
         self.configuration.start()
@@ -117,8 +110,8 @@ class Procesador:
 
         self.xrival = None
         self.xtutor = None  # creaTutor lo usa asi que hay que definirlo antes
-        self.xanalyzer = None   # cuando se juega ManagerEntMaq y el tutor danzando a toda maquina,
-                                # se necesita otro diferente
+        self.xanalyzer = None  # cuando se juega ManagerEntMaq y el tutor danzando a toda maquina,
+        # se necesita otro diferente
         self.replay = None
         self.replayBeep = None
 
@@ -205,7 +198,7 @@ class Procesador:
         self.board.remove_arrows()
         self.main_window.ajustaTam()
         self.main_window.ponTitulo()
-        self.pararMotores()
+        self.stop_engines()
 
         self.main_window.current_height = self.main_window.height()
 
@@ -224,6 +217,7 @@ class Procesador:
             self.siPrimeraVez = False
             self.presentacion()
         self.kibitzers_manager.stop()
+        self.stop_engines()
 
     def presentacion(self, siEmpezar=True):
         self.siPresentacion = siEmpezar
@@ -324,14 +318,15 @@ class Procesador:
         xmanager.setPriority(priority)
         return xmanager
 
-    def pararMotores(self):
+    def stop_engines(self):
         Code.list_engine_managers.close_all()
 
     # Added by GON
     def desactivarDGT(self):
         if Code.dgt:
             DGT.desactivar()
-    # ------------        
+
+    # ------------
 
     def menuplay(self):
         resp = BasicMenus.menuplay(self)
@@ -483,6 +478,7 @@ class Procesador:
         self.manager.start(xid)
 
     def run_action(self, key):
+        self.stop_engines()
         if self.siPresentacion:
             self.presentacion(False)
 
@@ -577,7 +573,7 @@ class Procesador:
         menu1.opcion(self.cambiaColores, _("General"), Iconos.Vista())
         menu.separador()
 
-        menu.opcion(self.atajos_edit,  _("Shortcuts"), Iconos.Atajos())
+        menu.opcion(self.atajos_edit, _("Shortcuts"), Iconos.Atajos())
         menu.separador()
 
         menu.opcion(self.sonidos, _("Custom sounds"), Iconos.SoundTool())
@@ -620,11 +616,7 @@ class Procesador:
         w.exec_()
 
     def folder_change(self):
-        carpeta = QTUtil2.leeCarpeta(
-            self.main_window,
-            self.configuration.carpeta,
-            _("Change the folder where all data is saved") + "\n" + _("Be careful please"),
-        )
+        carpeta = QTUtil2.leeCarpeta(self.main_window, self.configuration.carpeta, _("Change the folder where all data is saved") + "\n" + _("Be careful please"))
         if carpeta:
             if os.path.isdir(carpeta):
                 self.configuration.changeActiveFolder(carpeta)
@@ -835,9 +827,21 @@ class Procesador:
     def read_pgn(self, fichero_pgn):
         fichero_pgn = os.path.abspath(fichero_pgn)
         cfecha_pgn = str(os.path.getmtime(fichero_pgn))
-        cdir = self.configuration.folder_databases_pgn()
+        path_temp_pgns = self.configuration.folder_databases_pgn()
 
-        file_db = os.path.join(cdir, os.path.basename(fichero_pgn)[:-4] + "lcdb")
+        li = list(os.scandir(path_temp_pgns))
+        li_ant = []
+        for entry in li:
+            if entry.name.endswith(".lcdb"):
+                li_ant.append(entry)
+            else:
+                Util.remove_file(entry.path)
+        if len(li_ant) > 10:
+            li_ant.sort(key=lambda x: x.stat()[ST_ATIME], reverse=True)
+            for x in li_ant[10:]:
+                Util.remove_file(x.path)
+
+        file_db = os.path.join(path_temp_pgns, os.path.basename(fichero_pgn)[:-3] + "lcdb")
 
         if Util.exist_file(file_db):
             create = False
@@ -1086,9 +1090,7 @@ class Procesador:
             self.reiniciar()
 
     def unMomento(self, mensaje=None):
-        return QTUtil2.mensEspera.start(
-            self.main_window, mensaje if mensaje else _("One moment please..."), physical_pos="ad"
-        )
+        return QTUtil2.mensEspera.start(self.main_window, mensaje if mensaje else _("One moment please..."), physical_pos="ad")
 
     def num_rows(self):
         return 0
@@ -1109,14 +1111,10 @@ class Procesador:
         return True
 
     def clonVariations(self, window, xtutor=None, is_competitive=False):
-        return ProcesadorVariations(
-            window, xtutor, is_competitive=is_competitive, kibitzers_manager=self.kibitzers_manager
-        )
+        return ProcesadorVariations(window, xtutor, is_competitive=is_competitive, kibitzers_manager=self.kibitzers_manager)
 
     def manager_game(self, window, game, is_complete, only_consult, father_board, with_previous_next=None, save_routine=None):
-        clon_procesador = ProcesadorVariations(
-            window, self.xtutor, is_competitive=False, kibitzers_manager=self.kibitzers_manager
-        )
+        clon_procesador = ProcesadorVariations(window, self.xtutor, is_competitive=False, kibitzers_manager=self.kibitzers_manager)
         clon_procesador.manager = ManagerGame.ManagerGame(clon_procesador)
         clon_procesador.manager.start(game, is_complete, only_consult, with_previous_next, save_routine)
 
@@ -1152,15 +1150,7 @@ class ProcesadorVariations(Procesador):
 
         self.configuration = Code.configuration
 
-        self.li_opciones_inicio = [
-            TB_QUIT,
-            TB_PLAY,
-            TB_TRAIN,
-            TB_COMPETE,
-            TB_TOOLS,
-            TB_OPTIONS,
-            TB_INFORMATION,
-        ]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
+        self.li_opciones_inicio = [TB_QUIT, TB_PLAY, TB_TRAIN, TB_COMPETE, TB_TOOLS, TB_OPTIONS, TB_INFORMATION]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
 
         self.siPresentacion = False
 

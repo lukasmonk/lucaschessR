@@ -363,7 +363,7 @@ class WPlay(QTVarios.WDialogo):
 
         f = Controles.TipoLetra("", 11, 80, False, False, False, None)
 
-        bt = Controles.PB(self, _("End game"), self.terminar, plano=False).ponIcono(Iconos.FinPartida()).ponFuente(f)
+        bt = Controles.PB(self, _("Close"), self.terminar, plano=False).ponIcono(Iconos.MainMenu()).ponFuente(f)
         self.btBoard = (
             Controles.PB(self, _("Go to board"), self.activaBoard, plano=False)
             .ponIcono(Iconos.Board())

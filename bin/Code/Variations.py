@@ -1,4 +1,5 @@
 from Code import ManagerVariations
+from Code.Base import Game
 
 
 def edit_variation(procesador, game, titulo=None, with_engine_active=False, is_competitive=False, is_white_bottom=None):
@@ -19,14 +20,17 @@ def edit_variation(procesador, game, titulo=None, with_engine_active=False, is_c
 
 
 def edit_variation_moves(procesador, window, is_white_bottom, fen, linea_pgn, titulo=None):
-    procesador_variations = procesador.clonVariations(window)
+    game = Game.fen_game(fen, linea_pgn)
+    xtutor = procesador.XTutor()
+    procesador_variations = procesador.clonVariations(window, xtutor, is_competitive=False)
 
     manager_variations = ManagerVariations.ManagerVariations(procesador_variations)
-    manager_variations.start(fen, linea_pgn, False, is_white_bottom)
+    manager_variations.start(game, is_white_bottom, False, False)
     procesador_variations.manager = manager_variations
 
     if titulo is None:
-        titulo = linea_pgn
+        titulo = game.pgnBaseRAW()
+
     procesador_variations.main_window.show_variations(titulo)
 
-    return manager_variations.valor()  # pgn y a1h8, el a1h8 nos servira para edit las aperturas
+    return manager_variations.valor()

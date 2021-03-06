@@ -39,7 +39,7 @@ class ManagerGM(Manager.Manager):
         self.depth = record.depth
         self.multiPV = record.multiPV
         self.mostrar = record.mostrar
-        self.rival_name = record.rival_name
+        self.select_rival_move = record.select_rival_move
         self.jugInicial = record.jugInicial
         self.gameElegida = record.gameElegida
         self.bypass_book = record.bypass_book
@@ -246,7 +246,7 @@ class ManagerGM(Manager.Manager):
 
         if siRival:
             if nliAlternativas > 1:
-                if self.rival_name:
+                if self.select_rival_move:
                     li_moves = self.motorGM.get_moves_txt(self.game.last_position, False)
                     from_sq, to_sq, promotion = WindowGM.select_move(self, li_moves, False)
                     move = from_sq + to_sq + promotion
@@ -446,7 +446,7 @@ class ManagerGM(Manager.Manager):
         dic["PUNTOS"] = self.puntos
         dic["PACIERTOS"] = porc
         dic["JUEZ"] = self.engine
-        dic["TIME"] = self.vtime
+        dic["TIEMPO"] = self.vtime
         dic["RESUMEN"] = txtResumen
 
         liHisto = db_histo[gmK]

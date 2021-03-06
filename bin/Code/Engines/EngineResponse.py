@@ -57,7 +57,7 @@ class EngineResponse:
                 self.mate += 1
         self.is_white = not self.is_white
 
-    def siMejorQue(self, otra, difpts=0, difporc=0):
+    def siMejorQue(self, otra, control_difpts=0, control_difporc=0):
         if self.mate:
             if otra.mate < 0:
                 if self.mate < 0:
@@ -76,13 +76,12 @@ class EngineResponse:
         dif = self.puntos - otra.puntos
         if dif <= 0:
             return False
-        adif = abs(dif)
-        if difpts:
-            if adif <= difpts:
+        if control_difpts:
+            if dif <= control_difpts:
                 return False
-        if difporc:
-            porc = int(abs(self.puntos) * difporc / 100)
-            if adif < porc:
+        if control_difporc:
+            control = int(abs(self.puntos) * control_difporc / 100)
+            if dif < control:
                 return False
         return True
 

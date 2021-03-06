@@ -48,6 +48,11 @@ void SearchMode::reset()
 	fixedTime = 0;
 }
 
+bool SearchMode::analyzing() const
+{
+	return !maxTime && !mateSearch && !maxDepth && !absLimit && !fixedTime;
+}
+
 // SearchInfo
 
 void SearchInfo::reset()
@@ -87,18 +92,31 @@ static const i32 currmoveLimit = 1000;
 
 // beta razoring margins
 static TUNE_CONST Score betaMargins[] = {
-	0, 100, 150, 250, 500
+	0, 100, 150, 250, 400, 600, 850
 };
 
 // futility margins
 static TUNE_CONST Score futMargins[] = {
-	0, 100, 150, 250, 500
+	0, 100, 150, 250, 400, 600, 850
 };
 
 // razoring margins
 static TUNE_CONST Score razorMargins[] = {
 	0, 150, 200, 250
 };
+
+inline FracDepth Search::lmrFormula(Depth depth, size_t lmrCount)
+{
+	assert(depth > 0 && lmrCount > 0);
+
+	uint a = BitOp::getMSB(depth);
+	uint b = BitOp::getMSB(lmrCount);
+
+	FracDepth res = (FracDepth)(a*b*fracOnePly/3);
+	res = (res + fracOnePly/2) & ~(fracOnePly-1);
+
+	return res * (depth*fracOnePly > res);
+}
 
 // timed out?
 bool Search::timeOut()
@@ -175,7 +193,10 @@ template< bool pv, bool incheck > Score Search::qsearch( Ply ply, Depth depth, S
 #ifndef USE_TUNING
 	Depth ttDepth = qchecks ? 0 : -1;
 
-	Score ttScore = tt->probe( board.sig(), ply, ttDepth, alpha, beta, stack[ply].killers.hashMove );
+	TransEntry lte;
+
+	Score ttScore = tt->probe( board.sig(), ply, ttDepth, alpha, beta, stack[ply].killers.hashMove, lte );
+
 	if ( !pv && ttScore != scInvalid )
 	{
 		assert( ScorePack::isValid( ttScore ) );
@@ -197,6 +218,7 @@ template< bool pv, bool incheck > Score Search::qsearch( Ply ply, Depth depth, S
 		best = ev =  eval.eval( board, alpha, beta );
 
 #ifndef NDEBUG
+		// note: this won't work with contempt enabled, of course
 		Board tb(board);
 		tb.swap();
 		// FIXME: ok?
@@ -213,6 +235,13 @@ template< bool pv, bool incheck > Score Search::qsearch( Ply ply, Depth depth, S
 #endif
 
 		assert( !ScorePack::isMate( ev ) );
+
+#ifndef USE_TUNING
+		Score ttBetter = TransTable::probeEval( board.sig(), ply, ev, lte );
+		if ( ttBetter != scInvalid )
+			best = ev = ttBetter;
+#endif
+
 		if ( best >= beta )
 			return best;			// stand pat
 		if ( best > alpha )
@@ -237,7 +266,7 @@ template< bool pv, bool incheck > Score Search::qsearch( Ply ply, Depth depth, S
 
 		// delta/qsearch futility
 #ifndef USE_TUNING
-		if ( useFutility && !pv && !incheck && !ischeck && MovePack::isCapture(m) )
+		if ( useFutility && !pv && !incheck && !ischeck )
 		{
 			Score fscore = ev + board.moveGain( m );
 			if ( fscore + 200 <= alpha )
@@ -350,7 +379,18 @@ template< bool pv, bool incheck, bool donull >
 	if ( !pv && ttScore != scInvalid )
 	{
 		assert( ScorePack::isValid( ttScore ) );
-		stack[ply].current = stack[ply].killers.hashMove;
+
+		if (ttScore >= beta)
+		{
+			Move ttmove = stack[ply].current = stack[ply].killers.hashMove;
+
+			if ( ttmove && !MovePack::isSpecial( ttmove ) )
+			{
+				stack[ply].killers.addKiller( ttmove );
+				history.add( board, ttmove, depth );
+			}
+		}
+
 		return ttScore;					// tt cutoff
 	}
 
@@ -364,7 +404,7 @@ template< bool pv, bool incheck, bool donull >
 			fscore = ttBetter;
 		// beta razoring
 		Score razEval;
-		if ( useRazoring && depth <= 4 && (razEval = fscore - betaMargins[depth]) > alpha && !ScorePack::isMate(beta) )
+		if ( useRazoring && depth <= 6 && (razEval = fscore - betaMargins[depth]) > alpha && !ScorePack::isMate(beta) )
 			return razEval;
 	}
 
@@ -408,8 +448,7 @@ template< bool pv, bool incheck, bool donull >
 			// using nullmove reductions instead!
 			depth = depth*2/3;
 			fdepth = fdepth*2/3;
-			if ( depth <= 0 )
-				return qsearch< pv, incheck >( ply, 0, alpha, beta );
+			assert( depth > 0 );
 		}
 	}
 
@@ -445,9 +484,7 @@ template< bool pv, bool incheck, bool donull >
 	{
 		stack[ ply ].current = m;
 		count++;
-
-		if ( !MovePack::isSpecial(m) && mg.phase() >= mpQuietBuffer )
-			lmrCount++;
+		lmrCount = count;
 
 		if ( !MovePack::isSpecial( m ) )
 			failHist[ failHistCount++ ] = m;
@@ -458,14 +495,24 @@ template< bool pv, bool incheck, bool donull >
 
 		// extend
 		FracDepth extension = std::min( (FracDepth)fracOnePly, extend<pv>( m, ischeck, mg.discovered() ) );
+
+		// extend good SEE queen checks a full ply
+		// cures some of the tactical blindness
+		if (!pv && ischeck && depth >= 6 && (board.pieces(board.turn(), ptQueen) & Tables::oneShlTab[MovePack::from(m)]) && board.see<1>(m) >= 0)
+			extension = fracOnePly;
+
+		// single evasion extension
+		if (incheck && count == 1 && depth > 8 && !mg.peek())
+			extension = fracOnePly*3/2;
+
 		FracDepth newDepth = fdepth - fracOnePly + extension;
 
 		if ( useFutility && !pv && !incheck && mg.phase() >= mpQuietBuffer &&
-			!extension && depth <= 4 && !MovePack::isSpecial(m) && !ScorePack::isMate(beta) &&
+			!extension && depth <= 6 && !MovePack::isSpecial(m) && !ScorePack::isMate(beta) &&
 			board.canPrune(m) )
 		{
 			// futility pruning
-			Score futScore = fscore + futMargins[depth] - (Score)(20*lmrCount);
+			Score futScore = fscore + futMargins[depth] - (Score)(22*lmrCount);
 			if ( futScore <= alpha )
 				continue;
 		}
@@ -481,13 +528,15 @@ template< bool pv, bool incheck, bool donull >
 		score = alpha+1;
 		if ( pv && count > 1 )
 		{
-			if ( useLMR && !incheck && lmrCount >= 3 && mg.phase() >= mpQuietBuffer && !MovePack::isSpecial(m)
-				&& (depth > 6 || hist <= 0) && !ischeck && depth > 2 && !extension && board.canReduce(m) )
+			if ( useLMR && !incheck && mg.phase() >= mpQuietBuffer && !MovePack::isSpecial(m) &&
+				!ischeck && depth > 2 && !extension )
 			{
 				// LMR at pv nodes
-				stack[ ply ].reduction = (FracDepth)( fracOnePly*std::min((size_t)3, lmrCount/3 ) );
-				score = -search< 0, 0, 1 >( ply+1, newDepth - stack[ ply ].reduction, -alpha-1, -alpha );
-				stack[ ply ].reduction = 0;
+				FracDepth reduction = lmrFormula(depth, lmrCount);
+				reduction >>= int(hist > 0 || !board.canReduce(m));
+
+				if (reduction > 0)
+					score = -search< 0, 0, 1 >( ply+1, newDepth - reduction, -alpha-1, -alpha );
 			}
 
 			if ( score > alpha )
@@ -495,15 +544,16 @@ template< bool pv, bool incheck, bool donull >
 					-search< 0, 1, 1 >( ply+1, newDepth, -alpha-1, -alpha ) :
 					-search< 0, 0, 1 >( ply+1, newDepth, -alpha-1, -alpha );
 		}
-		// new: reduce bad captures as well
-		if ( useLMR && !pv && !incheck && lmrCount >= 3 && mg.phase() >= mpQuietBuffer &&
-			/*!MovePack::isSpecial(m) &&*/ (depth > 6 || hist <= 0) && !ischeck && depth > 2 &&
-			!extension && board.canReduce(m) )
+		// note: reducing bad captures as well
+		if ( useLMR && !pv && !incheck && mg.phase() >= mpQuietBuffer &&
+			!ischeck && depth > 2 && !extension )
 		{
 			// LMR at nonpv nodes
-			stack[ ply ].reduction = (FracDepth)( fracOnePly*std::min((size_t)3, lmrCount/3) );
-			score = -search< 0, 0, 1 >( ply+1, newDepth - stack[ ply ].reduction, -alpha-1, -alpha );
-			stack[ ply ].reduction = 0;
+			FracDepth reduction = lmrFormula(depth, lmrCount);
+			reduction >>= int(hist > 0 || !board.canReduce(m) || MovePack::isSpecial(m));
+
+			if (reduction > 0)
+				score = -search< 0, 0, 1 >( ply+1, newDepth - reduction, -alpha-1, -alpha );
 		}
 
 		if ( score > alpha )
@@ -573,7 +623,7 @@ template< bool pv, bool incheck, bool donull >
 Search::Search( size_t evalKilo, size_t pawnKilo, size_t matKilo ) : startTicks(0), nodeTicks(0),
 	timeOutCounter(0), triPV(0), newMultiPV(0), selDepth(0), tt(0), nodes(0), age(0), callback(0),
 	callbackParam(0), canStop(0), abortRequest(0), aborting(0), abortingSmp(0),
-	outputBest(1), ponderHit(0), maxThreads(63), eloLimit(0), maxElo(2500),
+	outputBest(1), ponderHit(0), maxThreads(63), eloLimit(0), maxElo(2500), contemptFactor(scDraw),
 	minQsDepth(-maxDepth), verbose(1), verboseFixed(1), searchFlags(0), startSearch(0), master(0)
 {
 	board.reset();
@@ -597,7 +647,7 @@ Search::Search( size_t evalKilo, size_t pawnKilo, size_t matKilo ) : startTicks(
 	triPV = new Move[maxTriPV];
 	memset( triPV, 0, sizeof(Move)*maxTriPV );
 
-	memset( &rootMoves, 0, sizeof(rootMoves) );
+	memset( (void *)&rootMoves, 0, sizeof(rootMoves) );
 
 	history.clear();
 }
@@ -701,6 +751,8 @@ Score Search::root( Depth depth, Score alpha, Score beta )
 	{
 		count++;
 		RootMove &rm = *rootMoves.sorted[i];
+
+		stack[ 0 ].current = rm.move;
 
 		if ( verbose )
 		{
@@ -875,8 +927,8 @@ Score Search::root( Depth depth, Score alpha, Score beta )
 			rootMoves = rm;
 
 			// we have to reset cached pvs if any
-			for (size_t i=0; i<rootMoves.count; i++)
-				infoPV[i].reset();
+			for (size_t j=0; j<rootMoves.count; j++)
+				infoPV[j].reset();
 
 			if ( rootMoves.count )
 				for (uint j=0; j<mode.multiPV; j++)
@@ -933,15 +985,26 @@ Score Search::iterate( Board &b, const SearchMode &sm, bool nosendbest )
 
 	Score res = scInvalid;
 
+	Score contempt = scDraw;
+
+	// ignore contempt when analyzing (=infinite time)
+	if ( !sm.analyzing() )
+		contempt = b.turn() == ctWhite ? contemptFactor : -contemptFactor;
+
+	eval.setContempt( contempt );
+
 	selDepth = 0;
 	for (size_t i=0; i<smpThreads.size(); i++)
+	{
 		smpThreads[i]->search.selDepth = 0;
+		smpThreads[i]->search.eval.setContempt( contempt );
+	}
 
 	initIteration();
 	startSearch.signal();
 
 	// don't output anything if we should think for a limited amount of time
-	verbose = verboseFixed = !sm.maxTime;
+	verbose = verboseFixed = !sm.maxTime || eloLimit;
 
 	board = b;
 	mode = sm;
@@ -1137,7 +1200,7 @@ Score Search::iterate( Board &b, const SearchMode &sm, bool nosendbest )
 			// -1600 = 65536x slower
 			// -1700 = 131072x slower
 			// .. etc
-			i32 delay = (i32)(pow(2.0, slowdown/100.0) * delta);
+			i64 delay = (i64)(floor(pow(2.0, slowdown/100.0) * std::max(delta, 1)) + 0.5);
 			delay -= delta + 1;			// adjust for sleep granularity
 			if ( sm.maxTime && ticks + delay - startTicks >= sm.maxTime )
 				aborting = 1;			// early exit => we won't be able to reach next iteration anyway
@@ -1151,11 +1214,22 @@ Score Search::iterate( Board &b, const SearchMode &sm, bool nosendbest )
 					aborting = 1;
 					break;
 				}
-				i32 current = Timer::getMillisec() - ticks;
-				if ( current >= delay )
-					break;
+				i32 current = Timer::getMillisec();
+				delay -= current - ticks;
+				ticks = current;
 			}
 		}
+
+		if ( mode.mateSearch )
+		{
+			Score score =  mode.multiPV ? res : lastIteration;
+
+			int msc = score >= 0 ? (scInfinity - score)/2 + 1 : (-scInfinity - score + 1)/2 - 1;
+
+			if ( msc == (int)mode.mateSearch )
+				break;
+		}
+
 		if ( aborting )
 			break;
 	}
@@ -1332,6 +1406,11 @@ void Search::setMaxElo( u32 elo )
 	maxElo = elo;
 }
 
+void Search::setContempt( Score contempt )
+{
+	contemptFactor = contempt;
+}
+
 // enable timeout
 void Search::enableTimeOut( bool enable )
 {
@@ -1405,7 +1484,7 @@ void Search::init()
 
 LazySMPThread::LazySMPThread() : searching(0), shouldQuit(0)
 {
-	memset( &commandData, 0, sizeof(commandData) );
+	memset( (void *)&commandData, 0, sizeof(commandData) );
 }
 
 void LazySMPThread::destroy()

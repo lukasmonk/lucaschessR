@@ -23,12 +23,35 @@ or as public domain (where applicable)
 
 #pragma once
 
+#include "chtypes.h"
+#include <vector>
+
+namespace cheng4
+{
+
+struct Feature
+{
+	const char *name;
+	i16 *table;
+	int size;
+	// start: index into featureVector
+	int start;
+};
+
+extern std::vector<Feature> features;
+extern std::vector<i16> featureVector;
+
+void addFeature(const char *name, i16 *ptr, int count = 1);
+bool saveFeatures(const char *filename);
+void extractFeatures();
+
+}
+
 #ifndef USE_TUNING
-#	define TUNE_STATIC static
-#	define TUNE_CONST const
+#	define TUNE_STATIC
+#	define TUNE_CONST
 #	define TUNE_EXPORT(x, y, z)
 #else
-#	include <vector>
 #	include <string>
 #	include <sstream>
 

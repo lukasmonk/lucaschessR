@@ -113,7 +113,7 @@ def menuplay_youngs(menu1):
         menu1.opcion(("person", name), trans, ico)
     menu1.separador()
 
-    menu2 = menu1.submenu(_("Albums of animals"), Iconos.Penguin())
+    menu2 = menu1.submenu(_("Album of animals"), Iconos.Penguin())
     albumes = Albums.AlbumesAnimales()
     dic = albumes.list_menu()
     anterior = None
@@ -125,7 +125,7 @@ def menuplay_youngs(menu1):
         anterior = animal
     menu1.separador()
 
-    menu2 = menu1.submenu(_("Albums of vehicles"), Iconos.Wheel())
+    menu2 = menu1.submenu(_("Album of vehicles"), Iconos.Wheel())
     albumes = Albums.AlbumesVehicles()
     dic = albumes.list_menu()
     anterior = None

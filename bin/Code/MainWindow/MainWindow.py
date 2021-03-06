@@ -46,9 +46,8 @@ class MainWindow(QTVarios.WDialogo):
         self.timer = None
         self.siTrabajando = False
 
-        self.cursorthinking = QtGui.QCursor(
-            Iconos.pmThinking() if self.manager.configuration.x_cursor_thinking else QtCore.Qt.BlankCursor
-        )
+        self.cursorthinking = QtGui.QCursor(Iconos.pmThinking() if self.manager.configuration.x_cursor_thinking else QtCore.Qt.BlankCursor)
+        self.cursorthinking_rival = QtGui.QCursor(Iconos.pmConnected())
         self.onTop = False
 
         self.board = self.base.board
@@ -118,7 +117,7 @@ class MainWindow(QTVarios.WDialogo):
     def quitTrayIcon(self):
         self.trayIcon.hide()
         self.accept()
-        self.manager.pararMotores()
+        self.manager.stop_engines()
 
     def pulsadoShortcutF12(self):
         if not self.trayIcon:
@@ -402,18 +401,14 @@ class MainWindow(QTVarios.WDialogo):
         QtGui.QCursor.setPos(p)
 
     def thinking(self, si_pensando):
+        if si_pensando:
+            if not self.cursor_pensado:
+                QtWidgets.QApplication.setOverrideCursor(self.cursorthinking_rival)
+        else:
+            if self.cursor_pensado:
+                QtWidgets.QApplication.restoreOverrideCursor()
+        self.cursor_pensado = si_pensando
         self.refresh()
-        pass
-        # if si_pensando:
-        #     if not self.cursor_pensado:
-        #         # QtWidgets.QApplication.setOverrideCursor(self.cursorthinking)
-        # else:
-        #     if self.cursor_pensado:
-        #         # QtWidgets.QApplication.restoreOverrideCursor()
-        #         self.wbase.lbRotulo_engine_working.hode()
-        #         self.set_label3(None) #_("Engine working..."))
-        # self.cursor_pensado = si_pensando
-        # self.refresh()
 
     def pensando_tutor(self, si_pensando):
         if si_pensando:

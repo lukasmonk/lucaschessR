@@ -318,20 +318,20 @@ class WTournamentRun(QtWidgets.QWidget):
                 self.save_game_done()
 
     def save_game_done(self):
-        self.game.add_tag("Site", Code.lucas_chess)
-        self.game.add_tag("Event", self.torneo.name())
+        self.game.set_tag("Site", Code.lucas_chess)
+        self.game.set_tag("Event", self.torneo.name())
 
         hoy = Util.today()
-        self.game.add_tag("Date", "%d-%02d-%02d" % (hoy.year, hoy.month, hoy.day))
+        self.game.set_tag("Date", "%d-%02d-%02d" % (hoy.year, hoy.month, hoy.day))
 
         motor_white = self.xengine[WHITE].confMotor
         motor_black = self.xengine[BLACK].confMotor
-        self.game.add_tag("White", motor_white.name)
-        self.game.add_tag("Black", motor_black.name)
+        self.game.set_tag("White", motor_white.name)
+        self.game.set_tag("Black", motor_black.name)
         if motor_white.elo:
-            self.game.add_tag("WhiteElo", motor_white.elo)
+            self.game.set_tag("WhiteElo", motor_white.elo)
         if motor_black.elo:
-            self.game.add_tag("BlackElo", motor_black.elo)
+            self.game.set_tag("BlackElo", motor_black.elo)
 
         self.game.set_extend_tags()
         self.game.sort_tags()

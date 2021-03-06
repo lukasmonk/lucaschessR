@@ -10,16 +10,15 @@ from Code import Util
 
 
 class Tutor:
-    def __init__(self, procesador, manager, move, from_sq, to_sq, siEntrenando):
-        self.procesador = procesador
+    def __init__(self, manager, move, from_sq, to_sq, siEntrenando):
         self.manager = manager
 
-        self.difpts = procesador.configuration.x_tutor_difpoints
-        self.difporc = procesador.configuration.x_tutor_difporc
+        self.difpts = manager.configuration.x_tutor_difpoints
+        self.difporc = manager.configuration.x_tutor_difporc
 
         self.game = manager.game
 
-        self.main_window = procesador.main_window
+        self.main_window = manager.main_window
         self.managerTutor = manager.xtutor
         self.last_position = self.game.last_position
         self.move = move
@@ -78,7 +77,7 @@ class Tutor:
         if in_the_opening:
             siRival = False
 
-        self.w = w = WindowTutor.WindowTutor(self, self, siRival, in_the_opening, self.is_white, siPuntos)
+        self.w = w = WindowTutor.WindowTutor(self.manager, self, siRival, in_the_opening, self.is_white, siPuntos)
 
         self.cambiadoRM(0)
 
