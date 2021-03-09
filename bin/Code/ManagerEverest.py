@@ -60,7 +60,7 @@ class ManagerEverest(Manager.Manager):
         self.play_next_move()
 
     def ponPuntos(self):
-        self.set_label2("%s : <b>%d</b>" % (_("Points"), self.puntos))
+        self.set_label2("%s : <b>%d</b>" % (_("Score"), self.puntos))
 
     def run_action(self, key):
         if key == TB_CANCEL:
@@ -310,7 +310,7 @@ class ManagerEverest(Manager.Manager):
                 comentarioObj = " %s" % (rmObj.abrTexto())
 
                 comentarioPuntos = "%s = %d %+d %+d = %d" % (
-                    _("Points"),
+                    _("Score"),
                     self.puntos - dpts,
                     rmUsu.centipawns_abs(),
                     -rmObj.centipawns_abs(),

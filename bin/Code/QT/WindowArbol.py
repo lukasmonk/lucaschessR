@@ -1,24 +1,22 @@
 import collections
 
 import FasterCode
-
 from PySide2 import QtWidgets, QtCore
 
+import Code
+from Code import TrListas
+from Code.Analysis import WindowAnalysisParam
 from Code.Base import Game, Position
+from Code.Base.Constantes import *
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.Analysis import WindowAnalysisParam
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import TrListas
 from Code.SQL import UtilSQL
-import Code
-
-from Code.Base.Constantes import *
 
 
 class UnMove:
@@ -290,7 +288,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.listaMoves = owner.listaMoves
         self.procesador = procesador
 
-        self.setHeaderLabels((_("Moves"), _("Points"), _("Comments")))
+        self.setHeaderLabels((_("Moves"), _("Score"), _("Comments")))
         self.setColumnHidden(4, True)
 
         dic_nags = TrListas.dic_nags()
@@ -601,7 +599,7 @@ class WMoves(QtWidgets.QWidget):
         self.tree = TreeMoves(owner, procesador)
 
         # ToolBar
-        self.tb = Controles.TBrutina(self, with_text=False, icon_size=16)
+        self.tb = Controles.TBrutina(self, with_text=False, icon_size=24)
         self.tb.new(_("Open new branch"), Iconos.Mas(), self.rama)
         self.tb.new(_("Show") + "/" + _("Hide"), Iconos.Mostrar(), self.mostrar)
         self.tb.new(_("Rating"), self.tree.iconoValoracion(3), self.valorar)
@@ -692,7 +690,7 @@ class InfoMove(QtWidgets.QWidget):
         self.ponValores()
 
     def atras(self):
-        self.movActual.takeback()
+        self.movActual.atras()
         self.ponValores()
 
     def adelante(self):
@@ -735,17 +733,19 @@ class WindowArbol(QTVarios.WDialogo):
 
         self.infoMove = InfoMove(position.is_white)
 
+        w = QtWidgets.QWidget(self)
+        ly = Colocacion.V().control(tb).control(self.infoMove)
+        w.setLayout(ly)
+
         self.wmoves = WMoves(self, procesador)
 
         self.splitter = splitter = QtWidgets.QSplitter(self)
-        splitter.addWidget(self.infoMove)
+        splitter.addWidget(w)
         splitter.addWidget(self.wmoves)
 
         ly = Colocacion.H().control(splitter).margen(0)
 
-        layout = Colocacion.V().control(tb).otro(ly).margen(3)
-
-        self.setLayout(layout)
+        self.setLayout(ly)
 
         self.wmoves.tree.setFocus()
 

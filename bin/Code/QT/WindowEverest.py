@@ -1,7 +1,15 @@
+import os
+import random
+
+import FasterCode
+
 from PySide2 import QtSvg, QtCore
 
 import Code
 from Code import Everest
+from Code.Base import Game
+from Code.Databases import DBgames
+from Code.SQL import Base
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -9,6 +17,7 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import FormLayout
 from Code import Util
 
 
@@ -27,8 +36,8 @@ class WNewExpedition(QTVarios.WDialogo):
         li = [("%s (%d)" % (_F(tourney["TOURNEY"]), len(tourney["GAMES"])), tourney) for tourney in self.litourneys]
         li.sort(key=lambda x: x[0])
         self.cbtourney, lbtourney = QTUtil2.comboBoxLB(self, li, li[0], _("Expedition"))
-
-        lytourney = Colocacion.H().control(lbtourney).control(self.cbtourney).relleno(1)
+        btmas = Controles.PB(self, "", self.mas).ponIcono(Iconos.Mas22())
+        lytourney = Colocacion.H().control(lbtourney).control(self.cbtourney).control(btmas).relleno(1)
 
         # tolerance
         self.sbtolerance_min, lbtolerance_min = QTUtil2.spinBoxLB(self, 20, 0, 99999, _("From"))
@@ -89,6 +98,103 @@ class WNewExpedition(QTVarios.WDialogo):
         if self.sbtries_max.valor() < tries_min:
             self.sbtries_max.ponValor(tries_min)
 
+    def mas(self):
+        path_pgn = QTVarios.select_pgn(self)
+        if not path_pgn:
+            return
+
+        path_db = self.configuration.ficheroTemporal("lcdb")
+        db = DBgames.DBgames(path_db)
+        dlTmp = QTVarios.ImportarFicheroPGN(self)
+        dlTmp.show()
+        db.import_pgns([path_pgn], dlTmp=dlTmp)
+        db.close()
+        dlTmp.close()
+
+        db = DBgames.DBgames(path_db)
+        nreccount = db.all_reccount()
+        if nreccount == 0:
+            return
+
+        plant = ""
+        shuffle = False
+        reverse = False
+        todos = range(1, nreccount + 1)
+        li_regs = []
+        max_moves = 0
+        while True:
+            sep = FormLayout.separador
+            liGen = []
+            liGen.append((None, "%s: %d" % (_("Total games"), nreccount)))
+            liGen.append(sep)
+            config = FormLayout.Editbox(_("Select games") + "<br>" +
+                                        _("By example:") + " -5,7-9,14,19-" + "<br>" +
+                                        _("Empty means all games"),
+                                        rx="[0-9,\-,\,]*")
+            liGen.append((config, plant))
+
+            liGen.append(sep)
+
+            liGen.append((_("Shuffle") + ":", shuffle))
+
+            liGen.append(sep)
+
+            liGen.append((_("Reverse") + ":", reverse))
+
+            liGen.append(sep)
+
+            config = FormLayout.Spinbox(_("Max moves"), 0, 999, 50)
+            liGen.append((config, 0))
+
+            resultado = FormLayout.fedit(liGen, title=_("Select games"), parent=self, anchoMinimo=200,
+                                         icon=Iconos.Opciones())
+            if resultado:
+                accion, liResp = resultado
+                plant, shuffle, reverse, max_moves = liResp
+                if plant:
+                    ln = Util.ListaNumerosImpresion(plant)
+                    li_regs = ln.selected(todos)
+                else:
+                    li_regs = todos
+                nregs = len(li_regs)
+                if 12 <= nregs <= 500:
+                    break
+                else:
+                    QTUtil2.message_error(self, "%s (%d)" % (_("Number of games must be in range 12-500"), nregs))
+                    li_regs = None
+            else:
+                break
+
+        if li_regs:
+            if shuffle:
+                random.shuffle(li_regs)
+            if reverse:
+                li_regs.sort(reverse=True)
+            li_regs = [x - 1 for x in li_regs]  # 0 init
+
+            dic = {}
+            dic["TOURNEY"] = os.path.basename(path_pgn)[:-4]
+            games = dic["GAMES"] = []
+
+            for recno in li_regs:
+                g = db.read_game_recno(recno)
+                pv = g.pv()
+                if max_moves:
+                    lipv = pv.strip().split(" ")
+                    if len(lipv) > max_moves:
+                        pv = " ".join(lipv[:max_moves])
+                dt = {
+                    "LABELS": g.li_tags,
+                    "XPV": FasterCode.pv_xpv(pv)
+                }
+                games.append(dt)
+
+            self.litourneys.append(dic)
+
+            li = [("%s (%d)" % (tourney["TOURNEY"], len(tourney["GAMES"])), tourney) for tourney in self.litourneys]
+            self.cbtourney.rehacer(li, dic)
+
+        db.close()
 
 class WExpedition(QTVarios.WDialogo):
     def __init__(self, wowner, configuration, recno):

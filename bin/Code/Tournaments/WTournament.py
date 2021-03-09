@@ -96,6 +96,9 @@ class WTournament(QTVarios.WDialogo):
         lbBookDepth = Controles.LB(self, _("Max depth of book (0=Maximum)") + ": ")
         self.sbBookDepth = Controles.SB(self, torneo.bookDepth(), 0, 200)
 
+        lb_slow = Controles.LB(self, _("Slow down the movement of pieces") + ": ")
+        self.chb_slow = Controles.CHB(self, " ", self.torneo.slow_pieces())
+
         # Posicion inicial
         lbFEN = Controles.LB(self, _("Initial position") + ": ")
         self.fen = torneo.fen()
@@ -131,6 +134,7 @@ class WTournament(QTVarios.WDialogo):
         layout.controld(lbBookDepth, 4, 0).control(self.sbBookDepth, 4, 1)
         layout.controld(lbFEN, 5, 0).otro(lyFEN, 5, 1)
         layout.controld(lbNorman, 6, 0).control(self.chbNorman, 6, 1)
+        layout.controld(lb_slow, 7, 0).control(self.chb_slow, 7, 1)
         layoutV = Colocacion.V().relleno().otro(layout).control(self.gbJ).relleno()
         layoutH = Colocacion.H().relleno().otro(layoutV).relleno()
 
@@ -556,6 +560,7 @@ class WTournament(QTVarios.WDialogo):
                 or self.torneo.drawRange() != self.ed_draw_range.textoInt()
                 or self.torneo.fen() != self.fen
                 or self.torneo.norman() != self.chbNorman.valor()
+                or self.torneo.slow_pieces() != self.chb_slow.valor()
                 or self.torneo.book() != self.cbBooks.valor()
                 or self.torneo.bookDepth() != self.sbBookDepth.valor()
                 or self.torneo.adjudicator_active() != self.gbJ.isChecked()
@@ -583,6 +588,7 @@ class WTournament(QTVarios.WDialogo):
             self.torneo.drawRange(self.ed_draw_range.textoInt())
             self.torneo.fen(self.fen)
             self.torneo.norman(self.chbNorman.valor())
+            self.torneo.slow_pieces(self.chb_slow.valor())
             self.torneo.book(self.cbBooks.valor())
             self.torneo.bookDepth(self.sbBookDepth.valor())
             self.torneo.adjudicator_active(self.gbJ.isChecked())

@@ -53,7 +53,7 @@ class WHistorialBMT(QTVarios.WDialogo):
         # Lista
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("STATE", "", 26, edicion=Delegados.PmIconosBMT(), centered=True)
-        o_columns.nueva("PUNTOS", _("Points"), 104, centered=True)
+        o_columns.nueva("PUNTOS", _("Score"), 104, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         o_columns.nueva("FFINAL", _("End date"), 90, centered=True)
 
@@ -155,7 +155,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         # Info -------------------------------------------------------------------
         colorFondo = QTUtil.qtColor(config_board.colorNegras())
-        self.trPuntos = "<big><b>" + _("Points") + "<br>%s</b></big>"
+        self.trPuntos = "<big><b>" + _("Score") + "<br>%s</b></big>"
         self.trSegundos = "<big><b>" + _("Time") + "<br>%s</b></big>"
         self.lbPuntos = Controles.LB(self, "").set_color_background(colorFondo).align_center().anchoMinimo(80)
         self.lbSegundos = Controles.LB(self, "").set_color_background(colorFondo).align_center().anchoMinimo(80)
@@ -858,7 +858,7 @@ class WBMT(QTVarios.WDialogo):
         o_columns.nueva("NOMBRE", _("Name"), 274, edicion=Delegados.LineaTextoUTF8())
         o_columns.nueva("EXTRA", _("Extra info."), 64, centered=True)
         o_columns.nueva("HECHOS", _("Made"), 84, centered=True)
-        o_columns.nueva("PUNTOS", _("Points"), 84, centered=True)
+        o_columns.nueva("PUNTOS", _("Score"), 84, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         o_columns.nueva("REPETICIONES", _("Rep."), 50, centered=True)
         o_columns.nueva("ORDEN", _("Order"), 70, centered=True)
@@ -875,7 +875,7 @@ class WBMT(QTVarios.WDialogo):
         o_columns.nueva("NOMBRE", _("Name"), 240)
         o_columns.nueva("EXTRA", _("Extra info."), 64, centered=True)
         o_columns.nueva("HECHOS", _("Positions"), 64, centered=True)
-        o_columns.nueva("PUNTOS", _("Points"), 84, centered=True)
+        o_columns.nueva("PUNTOS", _("Score"), 84, centered=True)
         o_columns.nueva("FFINAL", _("End date"), 90, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         o_columns.nueva("REPETICIONES", _("Rep."), 50, centered=True)

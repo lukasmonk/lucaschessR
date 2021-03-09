@@ -57,10 +57,10 @@ class WKibIndex(QtWidgets.QDialog):
         self.board.set_dispatcher(self.mensajero)
 
         o_columns = Columnas.ListaColumnas()
-        o_columns.nueva("titulo", "", 100, siDerecha=True)
+        o_columns.nueva("titulo", "", 110, siDerecha=True)
         o_columns.nueva("valor", "", 100, centered=True)
-        o_columns.nueva("info", "", 100)
-        self.grid = Grid.Grid(self, o_columns, dicVideo=dicVideo, siSelecFilas=True, siCabeceraVisible=False)
+        o_columns.nueva("info", "", 110)
+        self.grid = Grid.Grid(self, o_columns, dicVideo=dicVideo, siSelecFilas=True, siCabeceraVisible=True, altoCabecera=4)
 
         li_acciones = (
             (_("Continue"), Iconos.Kibitzer_Play(), self.play),
@@ -125,13 +125,12 @@ class WKibIndex(QtWidgets.QDialog):
                         mas = ""
                         if pts:
                             w, b = _("White"), _("Black")
-                            siW = "w" in self.fen
+                            siW = cp.is_white
                             if pts > 0:
                                 mas = w if siW else b
                             elif pts < 0:
                                 mas = b if siW else w
                             mas += "-"
-
                         tr(AnalysisIndexes.tp_winprobability(cp, mrm), mas)
                         tr(AnalysisIndexes.tp_complexity(cp, mrm))
                         tr(AnalysisIndexes.tp_efficientmobility(cp, mrm))

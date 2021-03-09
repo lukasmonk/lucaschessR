@@ -360,7 +360,7 @@ class WBlqMove(QtWidgets.QWidget):
         return self.wm.resultado()
 
     def ponPuntos(self, puntos):
-        self.ms.set_text("%s: %d/100" % (_("Points"), puntos))
+        self.ms.set_text("%s: %d/100" % (_("Score"), puntos))
         self.ms.show()
         self.an.show()
 
@@ -396,8 +396,8 @@ class WPotenciaBase(QTVarios.WDialogo):
         o_columns.nueva("SCORE", _("Score"), 100, centered=True)
         o_columns.nueva("ENGINE", _("Engine"), 120, centered=True)
         o_columns.nueva("SEGUNDOS", _("Second(s)"), 80, centered=True)
-        o_columns.nueva("MIN_MIN", _("Minimum minutes"), 90, centered=True)
-        o_columns.nueva("MIN_MAX", _("Maximum minutes"), 90, centered=True)
+        o_columns.nueva("MIN_MIN", _("Minimum minutes"), 100, centered=True)
+        o_columns.nueva("MIN_MAX", _("Maximum minutes"), 100, centered=True)
         self.ghistorico = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)
         self.ghistorico.setMinimumWidth(self.ghistorico.anchoColumnas() + 20)
 
@@ -512,10 +512,10 @@ class WPotenciaBase(QTVarios.WDialogo):
         li_gen.append((config, self.segundos))
 
         # Minutos
-        config = FormLayout.Spinbox(_("Minimum minutes"), 0, 99, 50)
+        config = FormLayout.Spinbox(_("Observation time in minutes"), 0, 99, 50)
         li_gen.append((config, self.min_min))
 
-        config = FormLayout.Spinbox(_("Maximum minutes"), 0, 99, 50)
+        config = FormLayout.Spinbox(_("Total time (observation + resolution) in minutes"), 0, 99, 50)
         li_gen.append((config, self.min_max))
 
         # Editamos

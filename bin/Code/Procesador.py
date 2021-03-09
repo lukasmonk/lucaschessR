@@ -525,6 +525,7 @@ class Procesador:
             si_run, key, tp = resp
             if si_run:
                 dic = Adjournments.Adjournments().get(key)
+
                 Adjournments.Adjournments().remove(key)
                 if tp == GT_AGAINST_ENGINE:
                     self.manager = ManagerPlayAgainstEngine.ManagerPlayAgainstEngine(self)

@@ -219,6 +219,9 @@ class Tournament:
     def resign(self, valor=None):
         return self.config("resign", valor, 350)
 
+    def slow_pieces(self, valor=None):
+        return self.config("slow_pieces", valor, False)
+
     def drawMinPly(self, valor=None):
         return self.config("drawminply", valor, 50)
 

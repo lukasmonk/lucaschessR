@@ -1511,7 +1511,7 @@ class Manager:
 
         elif resp.startswith("vol"):
             accion = resp[3:]
-            if accion == "file":
+            if accion == "fichero":
                 resp = QTUtil2.salvaFichero(
                     self.main_window,
                     _("File to save"),
@@ -1536,7 +1536,7 @@ class Manager:
 
         elif resp.startswith("fen") or resp.startswith("fns"):
             extension = resp[:3]
-            si_fichero = resp.endswith("file")
+            si_fichero = resp.endswith("fichero")
             self.salvaFEN_FNS(extension, si_fichero)
 
         return None

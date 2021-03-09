@@ -826,6 +826,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.activate_side(is_white)
 
     def juegaRival(self, is_white):
+        self.board.remove_arrows()
         self.human_is_playing = False
         self.rm_rival = None
         self.pon_toolbar()
@@ -948,7 +949,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             Analysis.show_analysis(
                 self.procesador, self.xtutor, move, self.board.is_white_bottom, 999, 0, must_save=False
             )
-
 
     def juegaPorMi(self):
         if self.state != ST_PLAYING or self.is_finished():

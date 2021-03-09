@@ -343,7 +343,7 @@ class WUnSTSMap(QTVarios.WDialogo):
 
         mens = "<h2>%s</h2><br>" % self.alm.name
 
-        mens += "<table><tr><th>%s</th><th>%s</th></tr>" % (_("Move"), _("Points"))
+        mens += "<table><tr><th>%s</th><th>%s</th></tr>" % (_("Move"), _("Score"))
         mx = 0
         ok = False
         stylePV = ' style="color:red;"'
@@ -366,7 +366,7 @@ class WUnSTSMap(QTVarios.WDialogo):
         self.alm.puntos = dicResults.get(donePV, 0)
         self.alm.total = mx
 
-        mens += "<br><h2>%s: %d/%d</h2>" % (_("Points"), self.alm.puntos, self.alm.total)
+        mens += "<br><h2>%s: %d/%d</h2>" % (_("Score"), self.alm.puntos, self.alm.total)
         self.lbJuego.set_text(mens)
 
         self.workmap.winAim(donePV)

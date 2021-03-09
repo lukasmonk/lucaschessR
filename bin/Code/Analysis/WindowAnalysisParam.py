@@ -117,7 +117,7 @@ def form_variations(alm):
     li_var.append((_("Include info about engine") + ":", alm.info_variation))
     li_var.append(SEPARADOR)
 
-    li_var.append(("%s %s/%s/%s:" % (_("Format"), _("Points"), _("Depth"), _("Time")), alm.si_pdt))
+    li_var.append(("%s %s/%s/%s:" % (_("Format"), _("Score"), _("Depth"), _("Time")), alm.si_pdt))
     li_var.append(SEPARADOR)
 
     li_var.append((_("Only one move of each variation") + ":", alm.one_move_variation))

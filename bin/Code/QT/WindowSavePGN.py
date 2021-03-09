@@ -175,6 +175,12 @@ class WSave(QTVarios.WDialogo):
         self.game = game
         self.game.order_tags()
         self.body = self.game.pgnBase()
+        if self.game.opening:
+            if not self.game.get_tag("ECO"):
+                self.game.set_tag("ECO", self.game.opening.eco)
+            if not self.game.get_tag("Opening"):
+                self.game.set_tag("Opening", self.game.opening.trNombre)
+
         self.li_labels = [[k,v] for k, v in self.game.li_tags]
         self.configuration = configuration
         self.file = ""

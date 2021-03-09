@@ -133,7 +133,14 @@ def menuplay_youngs(menu1):
         is_disabled = False
         if anterior and not dic[anterior]:
             is_disabled = True
-        menu2.opcion(("vehicles", character), _F(character), Iconos.icono(character), is_disabled=is_disabled)
+        trans = ""
+        for c in character:
+            if c.isupper():
+                if trans:
+                    trans += " "
+            trans += c
+        trans = _F(trans)
+        menu2.opcion(("vehicles", character), trans, Iconos.icono(character), is_disabled=is_disabled)
         anterior = character
 
 

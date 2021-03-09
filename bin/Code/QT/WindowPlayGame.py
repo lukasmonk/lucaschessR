@@ -200,7 +200,7 @@ class WPlay1(QTVarios.WDialogo):
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 80, centered=True)
         o_columns.nueva("COLOR", _("Play with"), 80, centered=True)
-        o_columns.nueva("POINTS", _("Points"), 80, centered=True)
+        o_columns.nueva("POINTS", _("Score"), 80, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)
         self.grid.setMinimumWidth(self.grid.anchoColumnas() + 20)

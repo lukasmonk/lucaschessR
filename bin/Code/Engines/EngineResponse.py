@@ -119,6 +119,17 @@ class EngineResponse:
 
         return puntos
 
+    def texto_tutor(self):
+        if self.mate and -1 <= self.mate <= 1:
+            d = {True: _("White mates in %1"), False: _("Black mates in %1")}
+            if self.mate > 0:
+                t = self.is_white
+            else:
+                t = not self.is_white
+            return _X(d[t], str(abs(self.mate)))
+        else:
+            return self.texto()
+
     def texto(self):
         if self.mate:
             if -1 <= self.mate <= 1:

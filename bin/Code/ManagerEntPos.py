@@ -117,7 +117,7 @@ class ManagerEntPos(Manager.Manager):
             self.xrival = self.procesador.creaManagerMotor(self.configuration.tutor, self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth)
 
         player = self.configuration.nom_player()
-        other = self.xrival.name
+        other = _("the engine")
         w, b = (player, other) if self.human_side else (other, player)
         self.game.set_tag("White", w)
         self.game.set_tag("Black", b)

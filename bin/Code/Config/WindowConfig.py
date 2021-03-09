@@ -195,7 +195,7 @@ def options(parent, configuration):
     form.separador()
     form.spinbox(_("Degree of effect of bad moves on the game elo") + d(2), 0, 5, 40, perf.bad_factor)
     form.separador()
-    form.apart(_("Good moves: minimum depth required by the engine to discover the move"))
+    form.apart(_("Good moves: minimum depth required from the engine to discover the move"))
     form.spinbox(_("Good move") + d(3), 2, 20, 40, perf.good_depth)
     form.spinbox(_("Very good move") + d(6), 3, 20, 40, perf.very_good_depth)
 

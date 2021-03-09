@@ -75,19 +75,6 @@ BEEP_DRAW_MATERIAL = "TABLASFALTAMATERIAL"
 BEEP_WIN_PLAYER_TIME = ("GANAMOSTIEMPO",)
 BEEP_WIN_OPPONENT_TIME = "GANARIVALTIEMPO"
 
-DIC_LABELS_TERMINATION = {
-    TERMINATION_MATE: _("Mate"),
-    TERMINATION_DRAW_STALEMATE: _("Stalemate"),
-    TERMINATION_DRAW_REPETITION: _("Draw by threefold repetition"),
-    TERMINATION_DRAW_MATERIAL: _("Draw by insufficient material"),
-    TERMINATION_DRAW_50: _("Draw by fifty-move rule"),
-    TERMINATION_DRAW_AGREEMENT: _("Draw by agreement"),
-    TERMINATION_RESIGN: _("Resignation"),
-    TERMINATION_ADJUDICATION: _("Adjudication"),
-    TERMINATION_WIN_ON_TIME: _("Won on time"),
-    TERMINATION_UNKNOWN: _("Unknown"),
-}
-
 GO_FORWARD, GO_BACK, GO_START, GO_END, GO_FREE, GO_CLOCK = range(6)
 
 # TOOLBAR

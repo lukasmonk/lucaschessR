@@ -167,7 +167,7 @@ class Game:
         if self.termination:
             tm = self.get_tag("Termination")
             if not tm:
-                txt = DIC_LABELS_TERMINATION.get(self.termination)
+                txt = self.label_termination()
                 if txt:
                     self.set_tag("Termination", txt)
 
@@ -237,9 +237,7 @@ class Game:
         move = self.move(-1)
         if move.position.is_finished():
             if move.is_check:
-                self.set_termination(
-                    TERMINATION_MATE, RESULT_WIN_WHITE if move.position_before.is_white else RESULT_WIN_BLACK
-                )
+                self.set_termination(TERMINATION_MATE, RESULT_WIN_WHITE if move.position_before.is_white else RESULT_WIN_BLACK)
             else:
                 self.set_termination(TERMINATION_DRAW_STALEMATE, RESULT_DRAW)
 
@@ -302,13 +300,7 @@ class Game:
         position = self.last_position
         pv = []
         for mov in lipv:
-            if (
-                len(mov) >= 4
-                and mov[0] in "abcdefgh"
-                and mov[1] in "12345678"
-                and mov[2] in "abcdefgh"
-                and mov[3] in "12345678"
-            ):
+            if len(mov) >= 4 and mov[0] in "abcdefgh" and mov[1] in "12345678" and mov[2] in "abcdefgh" and mov[3] in "12345678":
                 pv.append(mov)
             else:
                 break
@@ -809,18 +801,14 @@ class Game:
 
         mensaje = ""
         beep = None
-        if (self.result == RESULT_WIN_WHITE and player_side == WHITE) or (
-            self.result == RESULT_WIN_BLACK and player_side == BLACK
-        ):
+        if (self.result == RESULT_WIN_WHITE and player_side == WHITE) or (self.result == RESULT_WIN_BLACK and player_side == BLACK):
             mensaje = _X(_("Congratulations you have won against %1."), nom_other)
             if self.termination == TERMINATION_WIN_ON_TIME:
                 beep = BEEP_WIN_PLAYER_TIME
             else:
                 beep = BEEP_WIN_PLAYER
 
-        elif (self.result == RESULT_WIN_WHITE and player_side == BLACK) or (
-            self.result == RESULT_WIN_BLACK and player_side == WHITE
-        ):
+        elif (self.result == RESULT_WIN_WHITE and player_side == BLACK) or (self.result == RESULT_WIN_BLACK and player_side == WHITE):
             mensaje = _X(_("Unfortunately you have lost against %1"), nom_other)
             if self.termination == TERMINATION_WIN_ON_TIME:
                 beep = BEEP_WIN_OPPONENT_TIME
@@ -838,15 +826,26 @@ class Game:
                 beep = BEEP_DRAW_MATERIAL
 
         if self.termination != TERMINATION_UNKNOWN:
-            mensaje += "\n\n%s: %s" % (_("Result"), DIC_LABELS_TERMINATION[self.termination])
+            mensaje += "\n\n%s: %s" % (_("Result"), self.label_termination())
 
         return mensaje, beep, beep in (BEEP_WIN_PLAYER_TIME, BEEP_WIN_PLAYER)
 
     def label_termination(self):
-        return DIC_LABELS_TERMINATION.get(self.termination, "")
+        return {
+            TERMINATION_MATE: _("Mate"),
+            TERMINATION_DRAW_STALEMATE: _("Stalemate"),
+            TERMINATION_DRAW_REPETITION: _("Draw by threefold repetition"),
+            TERMINATION_DRAW_MATERIAL: _("Draw by insufficient material"),
+            TERMINATION_DRAW_50: _("Draw by fifty-move rule"),
+            TERMINATION_DRAW_AGREEMENT: _("Draw by agreement"),
+            TERMINATION_RESIGN: _("Resignation"),
+            TERMINATION_ADJUDICATION: _("Adjudication"),
+            TERMINATION_WIN_ON_TIME: _("Won on time"),
+            TERMINATION_UNKNOWN: _("Unknown"),
+        }.get(self.termination, "")
 
     def shrink(self, until_move: int):
-        self.li_moves = self.li_moves[:until_move+1]
+        self.li_moves = self.li_moves[: until_move + 1]
 
     def copy_raw(self, xto):
         g = Game(self.first_position)
@@ -902,18 +901,7 @@ def pgn_game(pgn):
         return False, game
 
     si_fen = False
-    dic_nags = {
-        "!": NAG_1,
-        "?": NAG_2,
-        "!!": NAG_3,
-        "‼": NAG_3,
-        "??": NAG_4,
-        "⁇": NAG_4,
-        "!?": NAG_5,
-        "⁉": NAG_5,
-        "?!": NAG_6,
-        "⁈": NAG_6,
-    }
+    dic_nags = {"!": NAG_1, "?": NAG_2, "!!": NAG_3, "‼": NAG_3, "??": NAG_4, "⁇": NAG_4, "!?": NAG_5, "⁉": NAG_5, "?!": NAG_6, "⁈": NAG_6}
     FasterCode.set_init_fen()
     for elem in li:
         key = elem[0] if elem else ""

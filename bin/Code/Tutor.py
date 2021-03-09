@@ -87,7 +87,7 @@ class Tutor:
         self.posUsuario = 0
         self.maxUsuario = len(self.gameUsuario.li_moves)
         self.boardUsuario.set_position(self.move.position)
-        w.ponPuntuacionUsuario(self.rmUsuario.texto())
+        w.ponPuntuacionUsuario(self.rmUsuario.texto_tutor())
 
         if siRival:
             self.rm_rival.cambiaColor()
@@ -106,7 +106,7 @@ class Tutor:
                 if self.maxRival >= 0:
                     self.boardRival.set_position(self.gameRival.li_moves[0].position)
                     self.play_rival(True)
-                    w.ponPuntuacionRival(self.rm_rival.texto())
+                    w.ponPuntuacionRival(self.rm_rival.texto_tutor())
 
         self.moving_tutor(True)
         self.moving_user(True)
@@ -175,6 +175,8 @@ class Tutor:
         self.moving_tutor(True)
 
     def mueve(self, quien, que):
+        if quien not in ("user", "tutor"):
+            return
 
         funcion = eval("self.moving_" + quien)
 

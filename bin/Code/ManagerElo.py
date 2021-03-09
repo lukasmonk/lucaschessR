@@ -361,6 +361,8 @@ class ManagerElo(Manager.Manager):
         engine.ptablas = dic["PTABLAS"]
         self.base_inicio(engine)
         self.human_side = dic["ISWHITE"]
+        self.is_engine_side_white = not self.human_side
+        self.put_pieces_bottom(self.human_side)
 
         self.game.restore(dic["GAME_SAVE"])
         self.goto_end()

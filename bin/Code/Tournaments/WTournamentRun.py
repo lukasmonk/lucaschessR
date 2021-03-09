@@ -21,6 +21,8 @@ from Code.QT import QTVarios
 from Code.Tournaments import Tournament
 from Code.Base.Constantes import *
 
+from Code import CPU
+
 
 class TournamentRun:
     def __init__(self, file_tournament):
@@ -64,6 +66,10 @@ class TournamentRun:
         with self.tournament() as torneo:
             return torneo.fenNorman()
 
+    def slow_pieces(self):
+        with self.tournament() as torneo:
+            return torneo.slow_pieces()
+
     def adjudicator_active(self):
         with self.tournament() as torneo:
             return torneo.adjudicator_active()
@@ -101,6 +107,8 @@ class WTournamentRun(QtWidgets.QWidget):
         self.file_work = file_work
         self.db_work = UtilSQL.ListSQL(file_work)
 
+        self.slow_pieces = self.torneo.slow_pieces()
+
         self.setWindowTitle("%s - %s %d" % (self.torneo.name(), _("Worker"), int(file_work[-5:])))
         self.setWindowIcon(Iconos.Torneos())
 
@@ -127,6 +135,8 @@ class WTournamentRun(QtWidgets.QWidget):
 
         layout = Colocacion.H().otro(ly_tt).otro(ly_pgn).relleno().margen(3)
         self.setLayout(layout)
+
+        self.cpu = CPU.CPU(self)
 
         self.pon_estado(ST_WAITING)
 
@@ -642,10 +652,46 @@ class WTournamentRun(QtWidgets.QWidget):
         return False
 
     def move_the_pieces(self, liMovs):
-        for movim in liMovs:
-            if movim[0] == "b":
-                self.board.borraPieza(movim[1])
-            elif movim[0] == "m":
-                self.board.muevePieza(movim[1], movim[2])
-            elif movim[0] == "c":
-                self.board.cambiaPieza(movim[1], movim[2])
+        if self.slow_pieces:
+
+            rapidez = self.configuration.x_pieces_speed * 1.0 / 100.0
+            cpu = self.cpu
+            cpu.reset()
+            segundos = None
+
+            # primero los movimientos
+            for movim in liMovs:
+                if movim[0] == "m":
+                    if segundos is None:
+                        from_sq, to_sq = movim[1], movim[2]
+                        dc = ord(from_sq[0]) - ord(to_sq[0])
+                        df = int(from_sq[1]) - int(to_sq[1])
+                        # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 segundos
+                        dist = (dc ** 2 + df ** 2) ** 0.5
+                        segundos = 4.0 * dist / (9.9 * rapidez)
+                    cpu.muevePieza(movim[1], movim[2], siExclusiva=False, segundos=segundos)
+
+            if segundos is None:
+                segundos = 1.0
+
+            # segundo los borrados
+            for movim in liMovs:
+                if movim[0] == "b":
+                    n = cpu.duerme(segundos * 0.80 / rapidez)
+                    cpu.borraPieza(movim[1], padre=n)
+
+            # tercero los cambios
+            for movim in liMovs:
+                if movim[0] == "c":
+                    cpu.cambiaPieza(movim[1], movim[2], siExclusiva=True)
+
+            cpu.runLineal()
+
+        else:
+            for movim in liMovs:
+                if movim[0] == "b":
+                    self.board.borraPieza(movim[1])
+                elif movim[0] == "m":
+                    self.board.muevePieza(movim[1], movim[2])
+                elif movim[0] == "c":
+                    self.board.cambiaPieza(movim[1], movim[2])

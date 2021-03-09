@@ -226,7 +226,7 @@ class ManagerAlbum(Manager.Manager):
 
         self.beepResultado(beep)
         self.guardarGanados(player_win)
-        self.mensaje(mensaje)
+
 
         if player_win:
             mensaje = _X(_("Congratulations you have a new sticker %1."), self.cromo.name)
@@ -238,7 +238,7 @@ class ManagerAlbum(Manager.Manager):
                 if nuevo:
                     mensaje += "\n\n%s" % _X(_("Now you can play with album %1"), _F(nuevo))
 
-            self.mensaje(mensaje)
+        self.mensaje(mensaje)
         self.ponFinJuego()
         self.xrival.cerrar()
         self.autosave()

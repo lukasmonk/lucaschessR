@@ -146,7 +146,7 @@ class ManagerFideFics(Manager.Manager):
         self.check_boards_setposition()
 
     def ponPuntos(self):
-        self.set_label2("%s : <b>%d</b>" % (_("Points"), self.puntos))
+        self.set_label2("%s : <b>%d</b>" % (_("Score"), self.puntos))
 
     def pon_toolbar(self):
         liTool = (TB_RESIGN, TB_ADJOURN, TB_CONFIG, TB_UTILITIES)
@@ -353,7 +353,7 @@ class ManagerFideFics(Manager.Manager):
             comentarioObj += " %s" % (rmObj.abrTexto())
 
             comentarioPuntos = "%s = %d %+d %+d = %d" % (
-                _("Points"),
+                _("Score"),
                 self.puntos - dpts,
                 rmUsu.centipawns_abs(),
                 -rmObj.centipawns_abs(),

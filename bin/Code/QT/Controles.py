@@ -792,13 +792,14 @@ class TBrutina(QtWidgets.QToolBar):
     def __init__(self, parent, li_acciones=None, with_text=True, icon_size=None, puntos=None, background=None, style=None):
 
         QtWidgets.QToolBar.__init__(self, "BASIC", parent)
-
         if style:
             self.setToolButtonStyle(style)
             if style != QtCore.Qt.ToolButtonTextUnderIcon and icon_size is None:
                 icon_size = 16
         elif with_text:
             self.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        # else:
+        #     self.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
 
         tam = 32 if icon_size is None else icon_size
         self.setIconSize(QtCore.QSize(tam, tam))

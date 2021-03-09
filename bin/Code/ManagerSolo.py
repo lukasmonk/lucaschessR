@@ -560,7 +560,7 @@ class ManagerSolo(Manager.Manager):
                 self.xpgn = None
                 self.xjugadaInicial = None
                 dic = self.creaDic()
-                dic["GAME"] = ptxt.save()
+                dic["GAME"] = ptxt
                 dic["WHITEBOTTOM"] = self.board.is_white_bottom
                 self.reiniciar(dic)
 

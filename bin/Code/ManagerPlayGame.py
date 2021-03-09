@@ -66,7 +66,7 @@ class ManagerPlayGame(Manager.Manager):
         self.play_next_move()
 
     def ponPuntos(self):
-        self.set_label2("%s : <b>%d (%d)</b>" % (_("Points"), self.puntos, -self.puntosMax))
+        self.set_label2("%s : <b>%d (%d)</b>" % (_("Score"), self.puntos, -self.puntosMax))
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -258,7 +258,7 @@ class ManagerPlayGame(Manager.Manager):
             comentarioObj = " %s" % (rmObj.abrTexto())
 
             comentarioPuntos = "%s = %d %+d %+d = %d" % (
-                _("Points"),
+                _("Score"),
                 self.puntos - dpts,
                 rmUsu.centipawns_abs(),
                 -rmObj.centipawns_abs(),

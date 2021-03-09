@@ -86,7 +86,7 @@ class ManagerResistance(Manager.Manager):
         if self.puntosRival != 0:
             color = "red" if self.puntosRival > 0 else "green"
 
-        label += '<br><b>%s</b>: <font color="%s"><b>%d</b></font>' % (_("Points"), color, -self.puntosRival)
+        label += '<br><b>%s</b>: <font color="%s"><b>%d</b></font>' % (_("Score"), color, -self.puntosRival)
 
         self.set_label2(label)
 
