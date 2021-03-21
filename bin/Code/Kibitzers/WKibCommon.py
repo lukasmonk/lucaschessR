@@ -4,6 +4,7 @@ import FasterCode
 
 import Code
 from Code.Base import Game
+from Code.Kibitzers import Kibitzers
 from Code.QT import Piezas
 from Code.Board import Board
 from Code.QT import Delegados
@@ -33,14 +34,9 @@ class WKibCommon(QtWidgets.QDialog):
 
         self.siTop = self.dicVideo.get("SITOP", True)
         self.show_board = self.dicVideo.get("SHOW_BOARD", True)
-        self.nArrows = self.dicVideo.get("NARROWS", 2)
+        self.nArrows = self.dicVideo.get("NARROWS", 1 if cpu.tipo == Kibitzers.KIB_THREATS else 2)
 
-        self.setWindowFlags(
-            QtCore.Qt.WindowCloseButtonHint
-            | QtCore.Qt.Dialog
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.WindowMinimizeButtonHint
-        )
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint)
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
@@ -60,7 +56,7 @@ class WKibCommon(QtWidgets.QDialog):
     def takeback(self):
         nmoves = len(self.game)
         if nmoves:
-            self.game.shrink(nmoves-2)
+            self.game.shrink(nmoves - 2)
             self.reset()
 
     def save_video(self):
@@ -176,9 +172,13 @@ class WKibCommon(QtWidgets.QDialog):
 
     def color(self):
         menu = QTVarios.LCMenu(self)
-        menu.opcion("blancas", _("White"), Iconos.PuntoNaranja())
-        menu.opcion("negras", _("Black"), Iconos.PuntoNegro())
-        menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), Iconos.PuntoVerde())
+
+        def ico(ok):
+            return Iconos.Aceptar() if ok else Iconos.PuntoAmarillo()
+
+        menu.opcion("blancas", _("White"), ico(self.is_white and not self.is_black))
+        menu.opcion("negras", _("Black"), ico(not self.is_white and self.is_black))
+        menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), ico(self.is_white and self.is_black))
         resp = menu.lanza()
         if resp:
             self.is_black = True

@@ -1,4 +1,3 @@
-import re
 from PySide2 import QtWidgets, QtCore
 from PySide2.QtCore import Qt
 
@@ -99,6 +98,7 @@ class WInfomove(QtWidgets.QWidget):
         self.setLayout(layout)
 
         self.usoNormal = True
+        self.pos_move = -1
 
         self.siReloj = False
 

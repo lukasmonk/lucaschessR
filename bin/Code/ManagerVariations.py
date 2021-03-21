@@ -73,7 +73,7 @@ class ManagerVariations(Manager.Manager):
             self.main_window.reject()
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_REINIT:
             self.reiniciar()
@@ -105,7 +105,7 @@ class ManagerVariations(Manager.Manager):
         self.procesador.stop_engines()
         return True
 
-    def atras(self):
+    def takeback(self):
         if len(self.game):
             self.game.anulaSoloUltimoMovimiento()
             if not self.fen:

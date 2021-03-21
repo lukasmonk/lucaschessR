@@ -96,7 +96,7 @@ class ManagerCompeticion(Manager.Manager):
             self.rendirse()
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_REINIT:
             self.reiniciar()
@@ -189,7 +189,7 @@ class ManagerCompeticion(Manager.Manager):
 
         return False
 
-    def atras(self):
+    def takeback(self):
         if self.hints and len(self.game):
             if QTUtil2.pregunta(self.main_window, _("Do you want to go back in the last movement?")):
                 self.hints -= 1

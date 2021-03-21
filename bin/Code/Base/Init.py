@@ -8,6 +8,7 @@ from Code.QT import Gui
 
 from Code.Base.Constantes import *
 
+
 def init():
     if not Code.DEBUG:
         sys.stderr = Util.Log("bug.log")

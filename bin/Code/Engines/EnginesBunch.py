@@ -33,8 +33,9 @@ def bunch(key_engine, tam_bunch, dic_engines):
     for x in range(tam_bunch - 1):
         nueva = selecciona(dic_relac_total[clave_work], st_no_incluir)
         st_no_incluir.add(nueva)
-        li_claves.append(nueva)
-        clave_work = nueva
+        if nueva in dic_engines:
+            li_claves.append(nueva)
+            clave_work = nueva
 
     li_claves.sort(key=lambda xr: dic_engines[xr].elo)
     return li_claves

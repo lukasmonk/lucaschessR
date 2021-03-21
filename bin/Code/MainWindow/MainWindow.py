@@ -292,6 +292,9 @@ class MainWindow(QTVarios.WDialogo):
     def show_option_toolbar(self, opcion, must_show):
         self.base.show_option_toolbar(opcion, must_show)
 
+    def is_enabled_option_toolbar(self, opcion):
+        return self.base.is_enabled_option_toolbar(opcion)
+
     def pgnRefresh(self, is_white):
         self.base.pgnRefresh()
         self.base.pgn.gobottom(2 if is_white else 1)

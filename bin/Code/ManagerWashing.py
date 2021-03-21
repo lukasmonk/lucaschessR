@@ -590,7 +590,7 @@ class ManagerWashingCreate(Manager.Manager):
             self.reiniciar()
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_CLOSE:
             self.final_x()
@@ -749,7 +749,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.dbwashing.saveGame(None, False)
         self.add_game()
 
-    def atras(self):
+    def takeback(self):
         if len(self.game):
             self.analizaTerminar()
             self.game.anulaUltimoMovimiento(self.human_side)

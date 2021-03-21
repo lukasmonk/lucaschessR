@@ -28,7 +28,8 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         self.human_side = is_white
         self.is_engine_side_white = not is_white
 
-        w, b = self.configuration.nom_player(), dic_var["RIVAL"]
+
+        w, b = self.configuration.nom_player(), _F(dic_var["RIVAL"])
         if not is_white:
             w, b = b, w
         self.game.set_tag("White", w)

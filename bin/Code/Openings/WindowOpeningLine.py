@@ -270,7 +270,7 @@ class WLines(QTVarios.WDialogo):
             submenu.separador()
         submenu1 = submenu.submenu(_("Create trainings"), Iconos.Modificar())
         submenu1.opcion("new_ssp", "%s - %s - %s" % (_("Sequential"), _("Static"), _("Positions")), Iconos.TrainSequential())
-        submenu1.opcion("new_eng", "With engines", Iconos.TrainEngines())
+        submenu1.opcion("new_eng", _("With engines"), Iconos.TrainEngines())
 
         resp = menu.lanza()
         if resp is None:
@@ -383,7 +383,7 @@ class WLines(QTVarios.WDialogo):
         config = FormLayout.Spinbox("%s: %s" % (_("Automatic selection"), _("number of engines")), 0, len(li_engines), 50)
         li_gen.append((config, num_engines))
 
-        likeys = [(dic_engines[x].name, x) for x in li_engines]
+        likeys = [(dic_engines[x].name, x) for x in li_engines if x in dic_engines]
         config = FormLayout.Combobox("%s: %s" % (_("Automatic selection"), _("bunch of engines")), likeys)
         li_gen.append((config, key_engine))
         li_gen.append(separador)

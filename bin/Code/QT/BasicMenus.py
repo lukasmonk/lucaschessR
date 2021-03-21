@@ -98,7 +98,8 @@ def menu_tools_savemenu(procesador, dic_data=None):
     menu1.opcion("kibitzers", _("Kibitzers"), Iconos.Kibitzer())
     savemenu.separador()
 
-    # savemenu.opcion("bridge", _("Data conversion from version 11"), Iconos.Bridge())
+    # if Code.is_windows:
+    #     savemenu.opcion("bridge11", _("Data conversion from version 11"), Iconos.Bridge())
 
     return savemenu
 

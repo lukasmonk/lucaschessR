@@ -63,7 +63,7 @@ class ManagerTrainBooks(Manager.Manager):
             self.reiniciar()
 
         elif clave == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif clave == TB_CONFIG:
             self.configurar(siSonidos=True)
@@ -292,7 +292,7 @@ class ManagerTrainBooks(Manager.Manager):
 
         self.compruebaDGT(True)
 
-    def atras(self):
+    def takeback(self):
         if len(self.game):
             self.state = ST_PLAYING
             self.movimientos -= 1

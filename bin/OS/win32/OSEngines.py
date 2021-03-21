@@ -180,7 +180,7 @@ def read_engines(folder_engines):
     cm.ponMultiPV(20, 218)
 
     if is64:
-        mas("lc0", "The LCZero Authors", "v0.26.2", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
+        mas("lc0", "The LCZero Authors", "v0.27.0", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
 
     cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"13 {t32_64}", "https://stockfishchess.org/",
              f"Stockfish-13_x{t32_64}.exe", 3500)

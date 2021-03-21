@@ -110,7 +110,7 @@ class ManagerSolo(Manager.Manager):
             self.end_game()
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_FILE:
             self.file()
@@ -675,7 +675,7 @@ class ManagerSolo(Manager.Manager):
                 self.juegaRival()
                 self.play_against_engine = True
 
-    def atras(self):
+    def takeback(self):
         if len(self.game):
             self.game.anulaSoloUltimoMovimiento()
             if self.play_against_engine:

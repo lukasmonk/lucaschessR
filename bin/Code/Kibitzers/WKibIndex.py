@@ -39,12 +39,7 @@ class WKibIndex(QtWidgets.QDialog):
         self.setWindowTitle(cpu.titulo)
         self.setWindowIcon(Iconos.Motor())
 
-        self.setWindowFlags(
-            QtCore.Qt.WindowCloseButtonHint
-            | QtCore.Qt.Dialog
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.WindowMinimizeButtonHint
-        )
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint)
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
@@ -72,7 +67,7 @@ class WKibIndex(QtWidgets.QDialog):
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
         )
-        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=16)
+        self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=24)
         self.tb.setAccionVisible(self.play, False)
 
         ly1 = Colocacion.H().control(self.tb).relleno()
@@ -185,7 +180,7 @@ class WKibIndex(QtWidgets.QDialog):
         self.siPlay = True
         self.tb.setPosVisible(0, False)
         self.tb.setPosVisible(1, True)
-        self.put_game(self.game)
+        self.reset()
 
     def stop(self):
         self.siPlay = False
@@ -220,16 +215,20 @@ class WKibIndex(QtWidgets.QDialog):
         self.finalizar()
 
     def if_to_analyze(self):
-        siW = self.game.last_position.is_white
-        if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
+        if not self.siPlay:
             return False
-        return True
+        siw = self.game.last_position.is_white
+        return (siw and self.is_white) or (not siw and self.is_black)
 
     def color(self):
         menu = QTVarios.LCMenu(self)
-        menu.opcion("blancas", _("White"), Iconos.PuntoNaranja())
-        menu.opcion("negras", _("Black"), Iconos.PuntoNegro())
-        menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), Iconos.PuntoVerde())
+
+        def ico(ok):
+            return Iconos.Aceptar() if ok else Iconos.PuntoAmarillo()
+
+        menu.opcion("blancas", _("White"), ico(self.is_white and not self.is_black))
+        menu.opcion("negras", _("Black"), ico(not self.is_white and self.is_black))
+        menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), ico(self.is_white and self.is_black))
         resp = menu.lanza()
         if resp:
             self.is_black = True
@@ -238,8 +237,7 @@ class WKibIndex(QtWidgets.QDialog):
                 self.is_black = False
             elif resp == "negras":
                 self.is_white = False
-            if self.if_to_analyze():
-                self.put_game(self.game)
+            self.reset()
 
     def finalizar(self):
         self.save_video()
@@ -297,6 +295,7 @@ class WKibIndex(QtWidgets.QDialog):
             self.resize(w, h)
 
     def orden_game(self, game):
+        self.siPlay = False
         self.game = game
         position = game.last_position
         self.siW = position.is_white
@@ -305,6 +304,18 @@ class WKibIndex(QtWidgets.QDialog):
 
         self.escribe("stop")
 
+        if position.is_white:
+            if not self.is_white:
+                self.liData = []
+                self.grid.refresh()
+                return
+        else:
+            if not self.is_black:
+                self.liData = []
+                self.grid.refresh()
+                return
+
+        self.siPlay = True
         self.engine.ac_inicio(game)
 
     def escribe(self, linea):
@@ -318,7 +329,7 @@ class WKibIndex(QtWidgets.QDialog):
     def takeback(self):
         nmoves = len(self.game)
         if nmoves:
-            self.game.shrink(nmoves-2)
+            self.game.shrink(nmoves - 2)
             self.orden_game(self.game)
 
     def mensajero(self, from_sq, to_sq, promocion=""):

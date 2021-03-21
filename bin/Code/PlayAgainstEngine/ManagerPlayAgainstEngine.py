@@ -52,7 +52,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     tutor_con_flechas = False
     tutor_book = None
     nAjustarFuerza = 0
-    resign_limit = -9999
+    resign_limit = -99999
     siBookAjustarFuerza = True
     siTiempo = False
     maxSegundos = 0

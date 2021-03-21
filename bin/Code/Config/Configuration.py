@@ -228,9 +228,7 @@ class Configuration:
 
         self.x_pgn_english = False
 
-        self.x_autopromotion_q = True
-
-        # self.x_capture_option = "D"
+        self.x_autopromotion_q = False
 
         self.x_font_family = ""
 
@@ -821,7 +819,12 @@ class Configuration:
         if not ("BASE" in self.dic_conf_boards_pk):
             with open(Code.path_resource("IntFiles", "basepk.board"), "rb") as f:
                 var = pickle.loads(f.read())
-                var['x_anchoPieza'] = int(QTUtil.altoEscritorio()*8/100)
+                alto = QTUtil.altoEscritorio()
+                ancho = QTUtil.anchoEscritorio()
+                base = ancho * 950 / 1495
+                if alto > base:
+                    alto = base
+                var['x_anchoPieza'] = int(alto*8/100)
                 db["BASE"] = self.dic_conf_boards_pk["BASE"] = var
         # with open("../resources/IntFiles/basepk.board", "wb") as f:
         #      f.write(pickle.dumps(db["BASE"]))

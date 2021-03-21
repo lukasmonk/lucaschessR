@@ -14,10 +14,8 @@ from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 from Code.Kibitzers import WindowKibitzers
 from Code.Kibitzers import WKibCommon
 
@@ -26,21 +24,28 @@ class WKibEngine(WKibCommon.WKibCommon):
     def __init__(self, cpu):
         WKibCommon.WKibCommon.__init__(self, cpu, Iconos.Kibitzer())
 
-        self.siCandidates = cpu.tipo == Kibitzers.KIB_CANDIDATES
+        self.siCandidates = cpu.tipo == Kibitzers.KIB_CANDIDATES or Kibitzers.KIB_THREATS
+
+        if cpu.tipo == Kibitzers.KIB_BESTMOVE:
+            rotulo = _("Best move")
+        elif cpu.tipo == Kibitzers.KIB_THREATS:
+            rotulo = _("Threats")
+        else:
+            rotulo = _("Alternatives")
 
         delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.with_figurines else None
 
         o_columns = Columnas.ListaColumnas()
         if not self.siCandidates:
             o_columns.nueva("DEPTH", "^", 40, centered=True)
-        o_columns.nueva("BESTMOVE", _("Alternatives"), 80, centered=True, edicion=delegado)
+        o_columns.nueva("BESTMOVE", rotulo, 80, centered=True, edicion=delegado)
         o_columns.nueva("EVALUATION", _("Evaluation"), 85, centered=True)
         o_columns.nueva("MAINLINE", _("Main line"), 400)
         self.grid = Grid.Grid(self, o_columns, dicVideo=self.dicVideo, siSelecFilas=True)
 
         self.lbDepth = Controles.LB(self)
 
-        li_acciones = (
+        li_acciones = [
             (_("Quit"), Iconos.Kibitzer_Close(), self.terminar),
             (_("Continue"), Iconos.Kibitzer_Play(), self.play),
             (_("Pause"), Iconos.Kibitzer_Pause(), self.pause),
@@ -52,7 +57,9 @@ class WKibEngine(WKibCommon.WKibCommon):
             ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Kibitzer_Up(), self.windowTop),
             ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Kibitzer_Down(), self.windowBottom),
             (_("Options"), Iconos.Kibitzer_Options(), self.change_options),
-        )
+        ]
+        if cpu.tipo == Kibitzers.KIB_THREATS:
+            del li_acciones[4]
         self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=24)
         self.tb.setAccionVisible(self.play, False)
 
@@ -216,18 +223,6 @@ class WKibEngine(WKibCommon.WKibCommon):
         if not self.siPlay or (siw and not self.is_white) or (not siw and not self.is_black):
             return False
         return True
-
-    def color(self):
-        menu = QTVarios.LCMenu(self)
-        menu.opcion("blancas", _("White"), siChecked=self.is_white)
-        menu.opcion("negras", _("Black"), siChecked=self.is_black)
-        resp = menu.lanza()
-        if resp:
-            if resp == "blancas":
-                self.is_white = not self.is_white
-            elif resp == "negras":
-                self.is_black = not self.is_black
-            self.reset()
 
     def finalizar(self):
         self.save_video()

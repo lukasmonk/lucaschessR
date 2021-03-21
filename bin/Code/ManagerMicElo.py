@@ -219,7 +219,7 @@ class ManagerMicElo(Manager.Manager):
             self.configurar(siSonidos=True)
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_UTILITIES:
             self.utilidadesElo()
@@ -561,7 +561,7 @@ class ManagerMicElo(Manager.Manager):
                 else:
                     self.main_window.ponRelojNegras(eti, eti2)
 
-    def atras(self):
+    def takeback(self):
         if len(self.game) > 2:
             self.game.anulaUltimoMovimiento(self.human_side)
             self.game.assign_opening()

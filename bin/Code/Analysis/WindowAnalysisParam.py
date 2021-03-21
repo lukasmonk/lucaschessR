@@ -329,7 +329,7 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
 
     # Depth
     liDepths = [("--", 0)]
-    for x in range(1, 31):
+    for x in range(1, 100):
         liDepths.append((str(x), x))
     config = FormLayout.Combobox(_("Depth"), liDepths)
     liGen.append((config, alm.depth))

@@ -626,6 +626,8 @@ class WGames(QtWidgets.QWidget):
         if dic_data is None:
             return
 
+        self.dbGames.read_options()
+
         # Comprobamos depth
         new_depth = dic_data["SUMMARY_DEPTH"]
         if new_depth != self.dbGames.depth_stat():

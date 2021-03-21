@@ -108,7 +108,7 @@ class WKibLinea(QtWidgets.QDialog):
         self.veces += 1
         if self.veces == 3:
             self.veces = 0
-            if self.siPlay:
+            if self.valid_to_play():
                 mrm = self.engine.ac_estado()
                 rm = mrm.rmBest()
                 if rm and rm.depth > self.depth:
@@ -117,6 +117,8 @@ class WKibLinea(QtWidgets.QDialog):
                     game.read_pv(rm.pv)
                     if len(game):
                         self.em.ponHtml("[%02d] %s | %s" % (rm.depth, rm.abrTexto(), game.pgnBaseRAW()))
+            else:
+                self.em.ponHtml("")
 
                 QTUtil.refresh_gui()
 
@@ -203,9 +205,13 @@ class WKibLinea(QtWidgets.QDialog):
 
     def color(self):
         menu = QTVarios.LCMenu(self)
-        menu.opcion("blancas", _("White"), Iconos.PuntoNaranja())
-        menu.opcion("negras", _("Black"), Iconos.PuntoNegro())
-        menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), Iconos.PuntoVerde())
+
+        def ico(ok):
+            return Iconos.Aceptar() if ok else Iconos.PuntoAmarillo()
+
+        menu.opcion("blancas", _("White"), ico(self.is_white and not self.is_black))
+        menu.opcion("negras", _("Black"), ico(not self.is_white and self.is_black))
+        menu.opcion("blancasnegras", "%s + %s" % (_("White"), _("Black")), ico(self.is_white and self.is_black))
         resp = menu.lanza()
         if resp:
             self.is_black = True
@@ -214,8 +220,7 @@ class WKibLinea(QtWidgets.QDialog):
                 self.is_black = False
             elif resp == "negras":
                 self.is_white = False
-            if self.if_to_analyze():
-                self.orden_game(self.game)
+            self.orden_game(self.game)
 
     def finalizar(self):
         self.save_video()
@@ -278,7 +283,16 @@ class WKibLinea(QtWidgets.QDialog):
         self.game = game
         self.depth = 0
 
-        self.engine.ac_inicio(game)
+        if self.valid_to_play():
+            self.engine.ac_inicio(game)
+        else:
+            self.em.setText("")
+
+    def valid_to_play(self):
+        siw = self.game.last_position.is_white
+        if not self.siPlay or (siw and not self.is_white) or (not siw and not self.is_black):
+            return False
+        return True
 
     def escribe(self, linea):
         self.engine.put_line(linea)

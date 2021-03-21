@@ -64,6 +64,7 @@ from Code.Kibitzers import KibitzersManager
 from Code.Tournaments import WTournaments
 from Code.Polyglots import WFactory, WPolyglot, Books, WindowBooksTrain, ManagerTrainBooks
 from Code.Endings import WEndingsGTB
+from Code.Bridge11 import Bridge11
 
 
 class Procesador:
@@ -531,6 +532,8 @@ class Procesador:
                     self.manager = ManagerPlayAgainstEngine.ManagerPlayAgainstEngine(self)
                 elif tp == GT_ALBUM:
                     self.manager = ManagerAlbum.ManagerAlbum(self)
+                elif tp == GT_AGAINST_CHILD_ENGINE:
+                    self.manager = ManagerPerson.ManagerPerson(self)
                 elif tp == GT_MICELO:
                     self.manager = ManagerMicElo.ManagerMicElo(self)
                 elif tp == GT_COMPETITION_WITH_TUTOR:
@@ -709,6 +712,14 @@ class Procesador:
             self.aperturaspers()
         elif resp == "openings":
             self.openings()
+
+        elif resp == "bridge11":
+            self.bridge11()
+
+    def bridge11(self):
+        b = Bridge11.Bridge11(self)
+        b.run()
+
 
     def openings(self):
         dicline = WindowOpeningLines.openingLines(self)

@@ -113,7 +113,7 @@ class ManagerGame(Manager.Manager):
             self.reiniciar()
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_SAVE:
             if self.save_routine:
@@ -310,7 +310,8 @@ class ManagerGame(Manager.Manager):
             if new_position and new_position != ini_position:
                 self.game.set_position(new_position)
                 self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
-
+                self.changed = True
+                self.put_toolbar()
 
         elif resp == "pasteposicion":
             texto = QTUtil.traePortapapeles()
@@ -322,6 +323,8 @@ class ManagerGame(Manager.Manager):
                     if new_position and new_position != ini_position:
                         self.game.set_position(new_position)
                         self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+                        self.changed = True
+                        self.put_toolbar()
 
                 except:
                     pass
@@ -426,7 +429,7 @@ class ManagerGame(Manager.Manager):
                 result = valor
         return "%s-%s (%s, %s,%s)" % (white, black, event, date, result)
 
-    def atras(self):
+    def takeback(self):
         if len(self.game):
             self.game.anulaSoloUltimoMovimiento()
             self.game.assign_opening()

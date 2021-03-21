@@ -54,10 +54,7 @@ class DBgames:
 
         self.li_fields = self.lista_campos()
 
-        self.allows_duplicates = self.recuperaConfig("ALLOWS_DUPLICATES", True)
-        self.allows_positions = self.recuperaConfig("ALLOWS_POSITIONS", True)
-        self.allows_complete_game = self.recuperaConfig("ALLOWS_COMPLETE_GAMES", True)
-        self.allows_zero_moves = self.recuperaConfig("ALLOWS_ZERO_MOVES", True)
+        self.read_options()
 
         self.li_order = []
 
@@ -71,6 +68,12 @@ class DBgames:
         self.rowidReader = UtilSQL.RowidReader(self.nom_fichero, "Games")
 
         self.with_plycount = "PLYCOUNT" in self.recuperaConfig("dcabs", {})
+
+    def read_options(self):
+        self.allows_duplicates = self.recuperaConfig("ALLOWS_DUPLICATES", True)
+        self.allows_positions = self.recuperaConfig("ALLOWS_POSITIONS", True)
+        self.allows_complete_game = self.recuperaConfig("ALLOWS_COMPLETE_GAMES", True)
+        self.allows_zero_moves = self.recuperaConfig("ALLOWS_ZERO_MOVES", True)
 
     def remove_columns(self, lista):
         self.rowidReader.stopnow()
@@ -440,9 +443,13 @@ class DBgames:
         p = Game.Game()
         xpgn = raw["_DATA_"]
         ok = False
+        fen, pv = self.read_xpv(raw["XPV"])
         if xpgn:
             if xpgn.startswith(BODY_SAVE):
-                ok, p = Game.pgn_game(xpgn[len(BODY_SAVE):].strip())
+                pgn_read = xpgn[len(BODY_SAVE):].strip()
+                if fen:
+                    pgn_read = b'[FEN "%s"]\n' % fen.encode() + pgn_read
+                ok, p = Game.pgn_game(pgn_read)
             else:
                 try:
                     p.restore(xpgn)
@@ -451,7 +458,6 @@ class DBgames:
                     ok = False
 
         if not ok:
-            fen, pv = self.read_xpv(raw["XPV"])
             if fen:
                 p.set_fen(fen)
             p.read_pv(pv)
@@ -620,7 +626,7 @@ class DBgames:
                     if fen:
                         if fen == FEN_INITIAL:
                             del dCab["FEN"]
-                            del dCablwr["fen"]
+                            del dCablwr["FEN"]
                             fen = None
                         else:
                             if not allows_fen:

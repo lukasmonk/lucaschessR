@@ -695,21 +695,21 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         menu.setToolTip(_("To choose: <b>left button</b> <br>To erase: <b>right button</b>"))
         f = Controles.TipoLetra(puntos=8, peso=75)
         menu.ponFuente(f)
-        nPos = 0
+        n_pos = 0
         for nli, bloque in enumerate(self.li_preferred_openings):
             if type(bloque) == tuple:  # compatibilidad con versiones anteriores
                 bloque = bloque[0]
                 self.li_preferred_openings[nli] = bloque
-            menu.opcion(bloque, bloque.trNombre, Iconos.PuntoVerde())
-            nPos += 1
+            menu.opcion((nli, bloque), bloque.trNombre, Iconos.PuntoVerde())
+            n_pos += 1
 
         resp = menu.lanza()
         if resp:
             if menu.siIzq:
-                self.opening_block = resp
+                pos, self.opening_block = resp
                 self.muestraOpening()
             elif menu.siDer:
-                opening_block = resp
+                pos, opening_block = resp
                 if QTUtil2.pregunta(
                     self,
                     _X(
@@ -717,7 +717,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
                         opening_block.trNombre,
                     ),
                 ):
-                    del self.li_preferred_openings[nPos]
+                    del self.li_preferred_openings[pos]
 
     def muestraOpening(self):
         if self.opening_block:

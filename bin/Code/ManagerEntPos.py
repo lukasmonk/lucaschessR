@@ -139,7 +139,7 @@ class ManagerEntPos(Manager.Manager):
             self.end_game()
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_REINIT:
             self.reiniciar()
@@ -212,7 +212,7 @@ class ManagerEntPos(Manager.Manager):
         self.end_game()
         return False
 
-    def atras(self):
+    def takeback(self):
         if self.is_rival_thinking:
             return
         if len(self.game):
@@ -364,6 +364,7 @@ class ManagerEntPos(Manager.Manager):
         if not move:
             return False
 
+        self.analizaFinal(move.is_mate)  # tiene que acabar siempre
         a1h8 = move.movimiento()
         ok = False
         if self.is_playing_gameobj():

@@ -160,7 +160,7 @@ class ManagerFideFics(Manager.Manager):
             self.configurar(siSonidos=True)
 
         elif key == TB_TAKEBACK:
-            self.atras()
+            self.takeback()
 
         elif key == TB_UTILITIES:
             self.utilidadesElo()
@@ -463,7 +463,7 @@ class ManagerFideFics(Manager.Manager):
         dd.close()
         return not previo
 
-    def atras(self):
+    def takeback(self):
         if len(self.game) > 2:
             self.analizaFinal()
             ndel = self.game.anulaUltimoMovimiento(self.human_side)
