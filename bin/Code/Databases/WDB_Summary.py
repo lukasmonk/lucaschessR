@@ -12,6 +12,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.Databases import WDB_Analysis
 
 
 class WSummary(QtWidgets.QWidget):
@@ -23,12 +24,12 @@ class WSummary(QtWidgets.QWidget):
         self.dbGames = dbGames  # <--setdbGames
         self.infoMove = None  # <-- setInfoMove
         self.wmoves = None  # <-- setwmoves
-        self.fenm2 = None
         self.liMoves = []
-        self.analisisMRM = None
         self.siMoves = siMoves
         self.procesador = procesador
         self.configuration = procesador.configuration
+
+        self.wdb_analysis = WDB_Analysis.WDBAnalisis(self)
 
         self.leeConfig()
 
@@ -107,6 +108,11 @@ class WSummary(QtWidgets.QWidget):
             QTUtil.qtColorRGB(255, 217, 217),
         )
         self.qtColorTotales = QTUtil.qtColorRGB(170, 170, 170)
+
+    def close_db(self):
+        if self.wdb_analysis:
+            self.wdb_analysis.close()
+            self.wdb_analysis = None
 
     def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
@@ -222,22 +228,8 @@ class WSummary(QtWidgets.QWidget):
         return pv
 
     def analizar(self):
-        if not self.fenm2:
-            return
-
-        row = self.grid.recno()
-
-        def dispatch(nada):
-            self.actualizaPV(self.pvBase)
-
-        # TODO pendiente
-        # analysis = WBG_Comun.Analisis(self, self.de, dispatch, self.procesador)
-        # resp = analysis.menuAnalizar(self.fenm2, None, siShowMoves)
-        # if resp:
-        #     game = wk["game"]
-        #     fen = game.last_jg().position_before.fen()
-        #     pv = wk["pv"]
-        #     analysis.exeAnalizar(self.fenm2, resp, None, fen, pv, rmAnalisis)
+        self.wdb_analysis.menu(self.pvBase)
+        self.actualizaPV(self.pvBase)
 
     def start(self):
         self.actualizaPV("")
@@ -273,35 +265,8 @@ class WSummary(QtWidgets.QWidget):
                 self.actualizaPV(pv)
                 self.cambiaInfoMove()
 
-    def ponPV(self, pvMirar):
-        if not pvMirar:
-            self.actualizaPV(None)
-        else:
-            self.analisisMRM = None
-            dicAnalisis = {}
-            self.fenm2 = None
-            p = Game.Game()
-            if pvMirar:
-                p.read_pv(pvMirar)
-            self.fenm2 = p.last_position.fenm2()
-            self.analisisMRM = None
-            # TODO analysis
-            #     self.dbAnalisis.mrm(self.fenm2)
-            # if self.analisisMRM:
-            #     for rm in self.analisisMRM.li_rm:
-            #         dicAnalisis[rm.movimiento()] = rm
-            li = pvMirar.split(" ")
-            self.pvBase = " ".join(li[:-1])
-            busca = li[-1]
-            self.liMoves = self.dbGames.get_summary(pvMirar, dicAnalisis, self.si_figurines_pgn)
-            for row, move in enumerate(self.liMoves):
-                if move.get("pvmove") == busca:
-                    self.grid.goto(row, 0)
-                    break
-        self.cambiaInfoMove()
-
     def reindexar(self, depth=None):
-        if depth is None:
+        if not depth:
             if not QTUtil2.pregunta(self, _("Do you want to rebuild stats?")):
                 return
 
@@ -310,7 +275,7 @@ class WSummary(QtWidgets.QWidget):
             liGen.append((None, _("Select the number of moves <br> for each game to be considered")))
             liGen.append((None, None))
 
-            config = FormLayout.Spinbox(_("Depth"), 3, 255, 50)
+            config = FormLayout.Spinbox(_("Depth"), 0, 255, 50)
             liGen.append((config, self.dbGames.depth_stat()))
 
             resultado = FormLayout.fedit(liGen, title=_("Rebuild"), parent=self, icon=Iconos.Reindexar())
@@ -377,20 +342,12 @@ class WSummary(QtWidgets.QWidget):
         else:
             pvMirar = self.pvBase
 
-        self.analisisMRM = None
-        dicAnalisis = {}
-        self.fenm2 = None
-        if pvMirar:
-            p = Game.Game()
-            if pvMirar:
-                p.read_pv(pvMirar)
-            self.fenm2 = p.last_position.fenm2()
-            # TODO añadir el análisis
-            # self.analisisMRM = self.dbAnalisis.mrm(self.fenm2)
-            # if self.analisisMRM:
-            #     for rm in self.analisisMRM.li_rm:
-            #         dicAnalisis[rm.movimiento()] = rm
-        self.liMoves = self.dbGames.get_summary(pvMirar, dicAnalisis, self.si_figurines_pgn, self.allmoves)
+        dic_analisis = {}
+        analisisMRM = self.wdb_analysis.mrm(pvMirar)
+        if analisisMRM:
+             for rm in analisisMRM.li_rm:
+                 dic_analisis[rm.movimiento()] = rm
+        self.liMoves = self.dbGames.get_summary(pvMirar, dic_analisis, self.si_figurines_pgn, self.allmoves)
 
         self.grid.refresh()
         self.grid.gotop()
@@ -431,69 +388,6 @@ class WSummary(QtWidgets.QWidget):
         dicConfig = {"allmoves": self.allmoves}
         self.configuration.write_variables("DBSUMMARY", dicConfig)
         self.configuration.graba()
-
-    # def pr int_repertorio(self):
-    #     siW = True
-    #     basepv = "e2e4"
-    #     k = [0, []]
-
-    #     def haz(lipv):
-    #         npv = len(lipv)
-    #         liChildren = self.dbGames.db_stat.children(" ".join(lipv), False)
-    #         if len(liChildren) == 0:
-    #             return
-    #         suma = 0
-    #         for n, alm in enumerate(liChildren):
-    #             alm.tt = alm.W + alm.B + alm.D + alm.O
-    #             suma += alm.tt
-    #         if (npv % 2 == 0) and siW:
-    #             # buscamos la que tenga mas tt
-    #             mx = 0
-    #             mx_alm = None
-    #             for alm in liChildren:
-    #                 if alm.tt > mx:
-    #                     mx_alm = alm
-    #                     mx = alm.tt
-    #             li = lipv[:]
-    #             if mx_alm:
-    #                 li.append(mx_alm.move)
-    #                 haz(li)
-    #         else:
-    #             if suma < 2000 and npv < 20:
-    #                 k[0] += 1
-    #                 liLast = k[1]
-    #                 nl = len(liLast)
-    #                 ok = False
-    #                 lip = []
-    #                 for nr, pv in enumerate(lipv):
-    #                     if nr < nl and not ok:
-    #                         if pv == liLast[nr]:
-    #                             lip.append("....")
-    #                         else:
-    #                             lip.append(pv)
-    #                             ok = True
-    #                     else:
-    #                         lip.append(pv)
-    #                 k[1] = lipv
-    #                 # liW = []
-    #                 # liB = []
-    #                 # sitW = True
-    #                 # for pv in lip:
-    #                 #     if sitW:
-    #                 #         liW.append(pv)
-    #                 #     else:
-    #                 #         liB.append(pv)
-    #                 #     sitW = not sitW
-    #                 #
-    #                 # p rint " ".join(liW)
-    #                 # pr int " ".join(liB)
-    #                 pri nt " ".join(lip)
-    #                 return
-    #             for alm in liChildren:
-    #                 li = lipv[:]
-    #                 li.append(alm.move)
-    #                 haz(li)
-    #     haz([basepv,])
 
     def config(self):
         menu = QTVarios.LCMenu(self)

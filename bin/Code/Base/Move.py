@@ -1,11 +1,9 @@
+import Code.Base.Game  # To prevent recursivity in Variations -> import direct
+from Code import TrListas
 from Code import Util
 from Code.Base import Position
-from Code.Engines import EngineResponse
-from Code import TrListas
-
-import Code.Base.Game  # To prevent recursivity in Variations -> import direct
-
 from Code.Base.Constantes import *
+from Code.Engines import EngineResponse
 
 
 def creaDicHTML():

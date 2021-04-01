@@ -175,17 +175,13 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         btNegras = Controles.PB(self, "", rutina=self.negras, plano=False).ponIcono(icop, icon_size=64)
 
         # Tiempo
-        self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(self, 5, 0, 999, maxTam=50, etiqueta=_("Total minutes"))
-        self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(
-            self, 10, 0, 999, maxTam=50, etiqueta=_("Seconds added per move")
-        )
+        self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(self, 10, 0, 999, maxTam=50, etiqueta=_("Total minutes"))
+        self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(self, 0, 0, 999, maxTam=50, etiqueta=_("Seconds added per move"))
         ly = Colocacion.G()
         ly.controld(self.lbMinutos, 0, 0).control(self.edMinutos, 0, 1)
         ly.controld(self.lbSegundos, 0, 2).control(self.edSegundos, 0, 3)
-        self.gbT = Controles.GB(self, _("Time"), ly).to_connect(self.cambiaTiempo)
-        self.cambiaTiempo()
+        self.gbT = Controles.GB(self, _("Time"), ly).to_connect(self.change_time)
 
-        # Fast moves
         self.chb_fastmoves = Controles.CHB(self, _("Fast moves"), False)
 
         self.color = None
@@ -194,6 +190,30 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         ly.margen(10)
         layout = Colocacion.V().otro(ly).espacio(10).control(self.gbT).control(self.chb_fastmoves).margen(5)
         self.setLayout(layout)
+
+        self.read_saved()
+
+    def read_saved(self):
+        dic = Code.configuration.read_variables("BLANCASNEGRASTIEMPO")
+        with_time = dic.get("WITH_TIME", False)
+        minutes = dic.get("MINUTES", 10)
+        seconds = dic.get("SECONDS", 0)
+        fast_moves = dic.get("FAST_MOVES", False)
+        self.gbT.setChecked(with_time)
+        if with_time:
+            self.edMinutos.ponValor(minutes)
+            self.edSegundos.ponValor(minutes)
+        self.chb_fastmoves.ponValor(fast_moves)
+        self.muestra_tiempo(with_time)
+
+    def save(self):
+        dic = {
+            "WITH_TIME": self.gbT.isChecked(),
+            "MINUTES": self.edMinutos.valor(),
+            "SECONDS": self.edSegundos.valor(),
+            "FAST_MOVES": self.chb_fastmoves.valor()
+        }
+        Code.configuration.write_variables("BLANCASNEGRASTIEMPO", dic)
 
     def resultado(self):
         return (
@@ -204,17 +224,21 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
             self.chb_fastmoves.valor(),
         )
 
-    def cambiaTiempo(self):
-        si = self.gbT.isChecked()
+    def change_time(self):
+        self.muestra_tiempo(self.gbT.isChecked())
+
+    def muestra_tiempo(self, si):
         for control in (self.edMinutos, self.lbMinutos, self.edSegundos, self.lbSegundos):
             control.setVisible(si)
 
     def blancas(self):
         self.color = True
+        self.save()
         self.accept()
 
     def negras(self):
         self.color = False
+        self.save()
         self.accept()
 
 
@@ -289,7 +313,7 @@ def lyBotonesMovimiento(
         li_acciones.append((tr, icono, key + tit))
 
     li_acciones.append(None)
-    x("MoverInicio", _("First move"), Iconos.MoverInicio())
+    x("MoverInicio", _("Start position"), Iconos.MoverInicio())
     li_acciones.append(None)
     x("MoverAtras", _("Previous move"), Iconos.MoverAtras())
     li_acciones.append(None)
@@ -861,16 +885,18 @@ class ElemDB:
                 submenu.opcion(previo + elem.path, elem.name, rondo.otro())
 
 
-def lista_db(configuration, siAll):
+def lista_db(configuration, siAll, remove_autosave=False):
     lista = ElemDB(configuration.folder_databases(), True)
     if not siAll:
         lista.remove(configuration.get_last_database())
+    if remove_autosave:
+        lista.remove(configuration.file_autosave())
     lista.remove_empties()
     return lista
 
 
-def select_db(owner, configuration, siAll, siNew):
-    lista = lista_db(configuration, siAll)
+def select_db(owner, configuration, siAll, siNew, remove_autosave=False):
+    lista = lista_db(configuration, siAll, remove_autosave=remove_autosave)
     if lista.is_empty() and not siNew:
         return None
 
@@ -884,8 +910,8 @@ def select_db(owner, configuration, siAll, siNew):
     return menu.lanza()
 
 
-def menuDB(submenu, configuration, siAll, indicador_previo=None):
-    lista = lista_db(configuration, siAll)
+def menuDB(submenu, configuration, siAll, indicador_previo=None, remove_autosave=False):
+    lista = lista_db(configuration, siAll, remove_autosave=remove_autosave)
     if lista.is_empty():
         return None
 

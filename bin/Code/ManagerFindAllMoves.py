@@ -135,7 +135,7 @@ class ManagerFindAllMoves(Manager.Manager):
             self.finJuego()
 
         else:
-            self.rutinaAccionDef(key)
+            Manager.Manager.rutinaAccionDef(self, key)
 
     def fin60(self):
         self.main_window.board.siPosibleRotarBoard = True

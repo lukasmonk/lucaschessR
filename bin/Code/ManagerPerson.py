@@ -28,7 +28,6 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         self.human_side = is_white
         self.is_engine_side_white = not is_white
 
-
         w, b = self.configuration.nom_player(), _F(dic_var["RIVAL"])
         if not is_white:
             w, b = b, w
@@ -60,7 +59,6 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
 
         self.set_dispatcher(self.player_has_moved)
         self.main_window.set_notify(self.mueve_rival_base)
-
 
         self.thinking(True)
 
@@ -103,16 +101,22 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
 
         self.pgnRefresh(True)
 
+        rival = self.xrival.name
+        player = self.configuration.x_player
+        bl, ng = player, rival
+        if self.is_engine_side_white:
+            bl, ng = ng, bl
         if self.siTiempo:
             self.made_the_first_move = False
             tpBL = self.vtime[True].etiqueta()
             tpNG = self.vtime[False].etiqueta()
-            player = self.configuration.x_player
-            bl, ng = player, self.rival_name
-            if self.is_engine_side_white:
-                bl, ng = ng, bl
             self.main_window.ponDatosReloj(bl, tpBL, ng, tpNG)
             self.refresh()
+            self.main_window.start_clock(self.set_clock, 400)
+        else:
+            self.main_window.base.change_player_labels(bl, ng)
+
+        self.main_window.set_notify(self.mueve_rival_base)
 
         self.check_boards_setposition()
 

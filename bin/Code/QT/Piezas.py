@@ -332,7 +332,7 @@ class WBlindfold(QTVarios.WDialogo):
                     liGen,
                     title=_("Save current configuration"),
                     parent=self,
-                    min_width=460,
+                    anchoMinimo=460,
                     icon=Iconos.TutorialesCrear(),
                 )
                 if resultado is None:

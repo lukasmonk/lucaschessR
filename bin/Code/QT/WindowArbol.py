@@ -268,7 +268,7 @@ class ListaMoves:
 
     def buscaMovVisibleDesde(self, mov):
         pos = self.liMoves.index(mov)
-        li = range(pos, len(self.liMoves))
+        li = list(range(pos, len(self.liMoves)))
         if pos:
             li.extend(range(pos, -1, -1))
         for x in li:

@@ -190,6 +190,7 @@ class ManagerEntPos(Manager.Manager):
             pos = 1
         elif pos == 0:
             pos = self.num_trainings
+        self.analiza_stop()
         self.start(pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump)
 
     def control_teclado(self, nkey):
@@ -332,6 +333,11 @@ class ManagerEntPos(Manager.Manager):
         else:
             self.mrmTutor = self.analizaTutor()
         self.is_analyzed_by_tutor = True
+
+    def analiza_stop(self):
+        if self.is_analyzing:
+            self.xtutor.stop()
+
 
     def sigue(self):
         self.state = ST_PLAYING

@@ -362,6 +362,12 @@ int parse_body( char * fen, char * body, char * resp )
                 *r++ = '?';
                 c++;
             }
+            else {
+                if (*c == '!') {
+                    *r++ = '!';
+                    c++;
+                }
+            }
             *r++ = '\n';
             break;
 
@@ -371,6 +377,12 @@ int parse_body( char * fen, char * body, char * resp )
             if (*c == '!') {
                 *r++ = '!';
                 c++;
+            }
+            else {
+                if (*c == '?') {
+                    *r++ = '?';
+                    c++;
+                }
             }
             *r++ = '\n';
             break;

@@ -1,9 +1,9 @@
 import FasterCode
-import Code
-from Code.Base.Constantes import *
 
+import Code
 from Code import Util
 from Code.Base import Move, Position
+from Code.Base.Constantes import *
 from Code.Openings import OpeningsStd, Opening
 
 
@@ -801,22 +801,33 @@ class Game:
 
         mensaje = ""
         beep = None
+        player_lost = False
         if (self.result == RESULT_WIN_WHITE and player_side == WHITE) or (self.result == RESULT_WIN_BLACK and player_side == BLACK):
-            mensaje = _X(_("Congratulations you have won against %1."), nom_other)
+            if nom_other:
+                mensaje = _X(_("Congratulations you have won against %1."), nom_other)
+            else:
+                mensaje = _("Congratulations you have won")
             if self.termination == TERMINATION_WIN_ON_TIME:
                 beep = BEEP_WIN_PLAYER_TIME
             else:
                 beep = BEEP_WIN_PLAYER
 
         elif (self.result == RESULT_WIN_WHITE and player_side == BLACK) or (self.result == RESULT_WIN_BLACK and player_side == WHITE):
-            mensaje = _X(_("Unfortunately you have lost against %1"), nom_other)
+            player_lost = True
+            if nom_other:
+                mensaje = _X(_("Unfortunately you have lost against %1"), nom_other)
+            else:
+                mensaje = _("Unfortunately you have lost")
             if self.termination == TERMINATION_WIN_ON_TIME:
                 beep = BEEP_WIN_OPPONENT_TIME
             else:
                 beep = BEEP_WIN_OPPONENT
 
         elif self.result == RESULT_DRAW:
-            mensaje = _X(_("Draw against %1."), nom_other)
+            if nom_other:
+                mensaje = _X(_("Draw against %1."), nom_other)
+            else:
+                mensaje = _("Draw")
             beep = BEEP_DRAW
             if self.termination == TERMINATION_DRAW_REPETITION:
                 beep = BEEP_DRAW_REPETITION
@@ -826,7 +837,12 @@ class Game:
                 beep = BEEP_DRAW_MATERIAL
 
         if self.termination != TERMINATION_UNKNOWN:
-            mensaje += "\n\n%s: %s" % (_("Result"), self.label_termination())
+            if self.termination == TERMINATION_WIN_ON_TIME and player_lost:
+                label = _("Lost on time")
+            else:
+                label = self.label_termination()
+
+            mensaje += "\n\n%s: %s" % (_("Result"), label)
 
         return mensaje, beep, beep in (BEEP_WIN_PLAYER_TIME, BEEP_WIN_PLAYER)
 

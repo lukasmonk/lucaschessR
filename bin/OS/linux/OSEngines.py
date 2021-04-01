@@ -36,7 +36,7 @@ def read_engines(folder_engines):
     cm.ordenUCI("Hash", "32")
     cm.ponMultiPV(20, 218)
 
-    cm = mas("stockfish", "Tord Romstad, Marco Costalba, Joona Kiiski", "11", "http://stockfishchess.org/", "Linux/stockfish_20011801_x64", 3300)
+    cm = mas("stockfish", "Tord Romstad, Marco Costalba, Joona Kiiski", f"13{bmi2}", "http://stockfishchess.org/", f"stockfish_13_linux_x64{bmi2}", 3300)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "64")
     cm.ordenUCI("Threads", "1")
@@ -81,15 +81,26 @@ def read_engines(folder_engines):
 
     cm = mas("zappa", "Anthony Cozzie", "1.1", "http://www.acoz.net/zappa/", "zappa.exe", 2614)
 
+    for level in range(1100, 2000, 100):
+        cm = mas(
+            "maia-%d" % level,
+            "Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang + LcZero team",
+            "%d" % level,
+            "https://maiachess.com/",
+            "lc0",
+            level,
+        )
+        cm.ordenUCI("WeightsFile", "maia-%d.pb.gz" % level)
+        cm.path_exe = os.path.join(folder_engines, "maia", "lc0")
+        cm.name = "Maia-%d" % level
+
     return dic_engines
 
 
 def dict_engines_fixed_elo(folder_engines):
     d = read_engines(folder_engines)
     dic = {}
-    for nm, xfrom, xto in (
-        ("stockfish", 1350, 2850),
-    ):
+    for nm, xfrom, xto in (("stockfish", 1350, 2850),):
         for elo in range(xfrom, xto + 100, 100):
             cm = d[nm].clona()
             if elo not in dic:

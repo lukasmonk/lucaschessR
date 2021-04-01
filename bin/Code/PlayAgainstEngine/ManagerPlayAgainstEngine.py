@@ -1,25 +1,26 @@
 import os
+
 import FasterCode
+from PySide2 import QtCore
 
 import Code
-from Code.Analysis import Analysis
-from Code.Openings import Opening
-from Code.Polyglots import Books, WindowBooks
+from Code import Adjournments
 from Code import DGT
 from Code import Manager
-from Code.Base import Game, Move, Position
 from Code import Personalities
+from Code import Tutor
+from Code import Util
+from Code.Analysis import Analysis
+from Code.Base import Game, Move, Position
+from Code.Base.Constantes import *
+from Code.Engines import EngineResponse, SelectEngines
+from Code.Openings import Opening
+from Code.PlayAgainstEngine import WPlayAgainstEngine
+from Code.Polyglots import Books, WindowBooks
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import Tutor
-from Code import Util
-from Code import Adjournments
-from Code.Engines import EngineResponse, SelectEngines
-from Code.PlayAgainstEngine import WPlayAgainstEngine
-
-from Code.Base.Constantes import *
 
 
 class ManagerPlayAgainstEngine(Manager.Manager):
@@ -443,7 +444,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.stop_engine()
 
         else:
-            self.rutinaAccionDef(key)
+            Manager.Manager.rutinaAccionDef(self, key)
 
     def save_state(self):
         self.analizaTerminar()
@@ -691,16 +692,31 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if not self.tutor_con_flechas:
             if self.aperturaObl or not self.is_tutor_enabled or self.ayudas_iniciales <= 0:
                 return
-        if self.continueTt:
-            if not self.is_finished():
-                self.xtutor.ac_inicio(self.game)
-                self.is_analyzing = True
-                # QtCore.QTimer.singleShot(2000 if self.tutor_con_flechas else 200, self.analizaSiguiente)
-        else:
-            mrm = self.analizaTutor()
-            if mrm and self.tutor_con_flechas:
-                self.ponFlechasTutor(mrm, self.nArrowsTt)
+        if not self.is_finished():
+            self.xtutor.ac_inicio(self.game)
+            self.is_analyzing = True
+        if not self.continueTt:
+            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
+
+    def analiza_control_no_continuett(self):
+        if self.is_analyzed_by_tutor or not self.is_analyzing:
+            return
+
+        mrm = self.xtutor.ac_estado()
+        rm = mrm.mejorMov()
+        ok_end = False
+        if self.xtutor.motorTiempoJugada:
+            ok_end = rm.time >= self.xtutor.motorTiempoJugada
+        if not ok_end:
+            if self.xtutor.motorProfundidad:
+                ok_end = rm.depth >= self.xtutor.motorProfundidad
+        if ok_end:
+            self.xtutor.stop()
+            self.mrmTutor = mrm
             self.is_analyzed_by_tutor = True
+            self.is_analyzing = False
+        else:
+            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
 
     def analizaFinal(self, is_mate=False):
         if is_mate:
@@ -711,6 +727,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.is_analyzing:
                 self.xtutor.stop()
             return
+        if self.is_analyzed_by_tutor:
+            return
         estado = self.is_analyzing
         self.is_analyzing = False
         if not self.tutor_con_flechas:
@@ -718,14 +736,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 return
         if self.is_analyzed_by_tutor:
             return
-        if self.continueTt and estado:
-            self.main_window.pensando_tutor(True)
-            self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
-            self.main_window.pensando_tutor(False)
-        else:
-            self.mrmTutor = self.analizaTutor()
-            if self.mrmTutor and self.tutor_con_flechas:
-                self.ponFlechasTutor(self.mrmTutor, self.nArrowsTt)
+        self.main_window.pensando_tutor(True)
+        self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+        self.main_window.pensando_tutor(False)
         self.is_analyzed_by_tutor = True
 
     def ajustaPlayer(self, mrm):
@@ -1313,7 +1326,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         if not (hasattr(move, "analysis") and move.analysis):
             me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad")
-            mrm, pos = self.xanalyzer.analyse_move(
+            mrm, pos = self.xanalyzer.analysis_move(
                 move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad
             )
             move.analysis = mrm, pos

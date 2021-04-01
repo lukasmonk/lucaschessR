@@ -207,25 +207,25 @@ class WOpenings(QTVarios.WDialogo):
     def process_toolbar(self):
         accion = self.sender().key
         if accion == "MoverAdelante":
-            self.mueve(nSaltar=1)
+            self.mueve(n_saltar=1)
         elif accion == "MoverAtras":
-            self.mueve(nSaltar=-1)
+            self.mueve(n_saltar=-1)
         elif accion == "MoverInicio":
-            self.mueve(siInicio=True)
+            self.mueve(si_inicio=True)
         elif accion == "MoverFinal":
             self.mueve(siFinal=True)
         elif accion == "MoverTiempo":
             self.move_timed()
 
-    def mueve(self, siInicio=False, nSaltar=0, siFinal=False):
+    def mueve(self, si_inicio=False, n_saltar=0, siFinal=False):
         num_moves = len(self.game)
-        if nSaltar:
-            pos = self.posCurrent + nSaltar
+        if n_saltar:
+            pos = self.posCurrent + n_saltar
             if 0 <= pos < num_moves:
                 self.posCurrent = pos
             else:
                 return
-        elif siInicio:
+        elif si_inicio:
             self.posCurrent = -1
         elif siFinal:
             self.posCurrent = num_moves - 1
@@ -239,13 +239,13 @@ class WOpenings(QTVarios.WDialogo):
 
         else:
             self.is_moving_time = True
-            self.mueve(siInicio=True)
+            self.mueve(si_inicio=True)
             QtCore.QTimer.singleShot(1000, self.siguienteTiempo)
 
     def siguienteTiempo(self):
         if self.is_moving_time:
             if self.posCurrent < len(self.game) - 1:
-                self.mueve(nSaltar=1)
+                self.mueve(n_saltar=1)
                 QtCore.QTimer.singleShot(2500, self.siguienteTiempo)
             else:
                 self.is_moving_time = False

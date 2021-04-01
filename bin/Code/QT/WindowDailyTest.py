@@ -421,7 +421,7 @@ class WDailyTest(QTVarios.WDialogo):
         vtime = time.time() - self.iniTiempo
 
         um = QTUtil2.analizando(self)
-        self.rmr, pos = self.xtutor.analyse_move(self.move, self.xtutor.motorTiempoJugada)
+        self.rmr, pos = self.xtutor.analysis_move(self.move, self.xtutor.motorTiempoJugada)
         self.move.analysis = self.rmr, pos
         um.final()
         pv = self.move.movimiento()

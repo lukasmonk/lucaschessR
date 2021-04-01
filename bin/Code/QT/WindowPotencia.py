@@ -757,7 +757,7 @@ class WPotencia(QTVarios.WDialogo):
                     siError = True
                     break
                 move = Move.Move(None, cp, cpNue, from_sq, to_sq, promotion)
-                mrm, pos = self.xtutor.analyse_move(move, self.xtutor.motorTiempoJugada)
+                mrm, pos = self.xtutor.analysis_move(move, self.xtutor.motorTiempoJugada)
                 move.analysis = mrm, pos
 
                 self.li_analysis.append(move)

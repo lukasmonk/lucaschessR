@@ -4,7 +4,7 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code.Databases import WDB_Games, WDB_Summary, WDB_Players, WDB_InfoMove, DBgames
+from Code.Databases import WDB_Games, WDB_Summary, WDB_Players, WDB_InfoMove, DBgames, WDB_Analysis
 
 
 class WBDatabase(QTVarios.WDialogo):
@@ -53,7 +53,6 @@ class WBDatabase(QTVarios.WDialogo):
         if self.owner and not self.temporary:
             liAccionesWork = [
                 (_("Select other"), Iconos.Database(), self.tw_select_other),
-                # (_("Create new"), Iconos.DatabaseMas(), self.tw_create_new),
             ]
             self.tbWork = QTVarios.LCTB(self, liAccionesWork, icon_size=20)
             self.tbWork.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
@@ -99,6 +98,9 @@ class WBDatabase(QTVarios.WDialogo):
 
     def tw_terminar(self):
         self.wgames.tw_terminar()
+        if self.wsummary:
+            self.wsummary.close_db()
+            self.wsummary = None
         self.salvar()
         self.accept()
 

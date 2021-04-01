@@ -1,3 +1,5 @@
+import webbrowser
+
 import FasterCode
 
 from io import BytesIO
@@ -157,6 +159,10 @@ class Board(QtWidgets.QGraphicsView):
             # ALT-K
             elif key == Qt.Key_K:
                 self.showKeys()
+
+            # ALT-L
+            elif key == Qt.Key_L:
+                webbrowser.open("https://lichess.org/analysis/standard/" + self.last_position.fen())
 
             elif hasattr(self.main_window, "manager") and self.main_window.manager and key in (Qt.Key_P, Qt.Key_N, Qt.Key_C):
                 # P -> show information
@@ -680,6 +686,9 @@ class Board(QtWidgets.QGraphicsView):
             if hasattr(self.main_window.manager, "listHelpTeclado"):
                 liKeys.append((None, None))
                 liKeys.extend(self.main_window.manager.listHelpTeclado())
+
+        liKeys.append((None, None))
+        liKeys.append((_("ALT") + " L", _("Open position in LiChess")))
 
         rondo = QTVarios.rondoPuntos()
         menu = QTVarios.LCMenu(self)

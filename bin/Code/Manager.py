@@ -918,7 +918,7 @@ class Manager:
         self.put_view()
 
     def analizar(self):
-        Analysis.analyse_game(self)
+        Analysis.analysis_game(self)
         self.refresh()
 
     def borrar(self):
@@ -1221,7 +1221,7 @@ class Manager:
         if len(listaGMotores) > 0:
             for pos, gmotor in enumerate(listaGMotores):
                 ico = Iconos.Aceptar() if gmotor.ficheroLog else None
-                smenu.opcion("log_%d" % pos, gmotor.name, ico)
+                smenu.opcion("log_%d" % pos, gmotor.name + " (%s)" % gmotor.function, ico)
 
         menu.separador()
 
@@ -1538,7 +1538,7 @@ class Manager:
             QTUtil2.message_error(self.main_window, _("This game already exists."))
 
     def save_lcsb(self):
-        if self.game_type == GT_ALONE:
+        if self.game_type == GT_ALONE and hasattr(self, "grabarComo"):
             return getattr(self, "grabarComo")()
 
         dic = dict(GAME=self.game.save(True))

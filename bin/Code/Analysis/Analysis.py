@@ -43,11 +43,7 @@ class AnalyzeGame:
         # oriblunders: si se guarda la game original
         # bmtblunders: name del entrenamiento BMT a crear
         self.kblunders = alm.kblunders
-        self.tacticblunders = (
-            os.path.join(self.configuration.personal_training_folder, "../Tactics", alm.tacticblunders)
-            if alm.tacticblunders
-            else None
-        )
+        self.tacticblunders = os.path.join(self.configuration.personal_training_folder, "../Tactics", alm.tacticblunders) if alm.tacticblunders else None
         self.pgnblunders = alm.pgnblunders
         self.oriblunders = alm.oriblunders
         self.bmtblunders = alm.bmtblunders
@@ -199,7 +195,7 @@ class AnalyzeGame:
             f.write("%s||%s|%s%s\n" % (fen, p.pgnBaseRAW(), cab, game.pgnBaseRAWcopy(None, njg)))
 
         self.siTacticBlunders = True
-        
+
         if hasattr(self.procesador, "entrenamientos") and self.procesador.entrenamientos:
             self.procesador.entrenamientos.menu = None
 
@@ -258,7 +254,7 @@ class AnalyzeGame:
         cab += '[Result "%s"]\n' % result
 
         with open(file, "at", encoding="utf-8", errors="ignore") as q:
-            texto = (cab + "\n" + p.pgnBase() + mas + "\n\n")
+            texto = cab + "\n" + p.pgnBase() + mas + "\n\n"
             q.write(texto)
 
         return True
@@ -431,8 +427,8 @@ class AnalyzeGame:
                 # continue
 
             # # white y black
-            is_white = move.position_before.is_white
-            if is_white:
+            white_move = move.position_before.is_white
+            if white_move:
                 if not is_white:
                     continue
             else:
@@ -552,7 +548,7 @@ class TabAnalysis:
         self.list_rm_name = self.do_lirm()  # rm, name, centpawns
 
     def time_engine(self):
-        return self.mrm.name
+        return self.mrm.name.strip()
 
     def time_label(self):
         if self.mrm.max_time:
@@ -673,14 +669,14 @@ class TabAnalysis:
         pts = self.score_active()
         AnalisisVariations(wowner, self.xengine, move, is_white, pts, max_recursion=self.tb_analysis.max_recursion)
 
-    def save_base(self, game, rm):
+    def save_base(self, game, rm, is_complete):
         name = self.time_engine()
         vtime = self.time_label()
-        comment = " {%s %s %s} " % (rm.abrTexto(), name, vtime)
+        variation = game.copia() if is_complete else game.copia(0)
 
-        variation = game.copiaDesde(self.move.position_before.num_moves)
         if len(variation) > 0:
-            variation.move(0).comment = comment
+            comment = "%s %s %s" % (rm.abrTexto(), name, vtime)
+            variation.move(0).comment = comment.strip()
         self.move.add_variation(variation)
 
     def put_view_manager(self):
@@ -700,15 +696,13 @@ class MuestraAnalisis:
     def create_initial_show(self, main_window, xengine):
         move = self.move
         if move.analysis is None:
-            me = QTUtil2.mensEspera.start(
-                main_window, _("Analyzing the move...."), physical_pos="ad"
-                , siCancelar=True)
+            me = QTUtil2.mensEspera.start(main_window, _("Analyzing the move...."), physical_pos="ad", siCancelar=True)
 
             def mira(rm):
                 return not me.cancelado()
 
             xengine.ponGuiDispatch(mira)
-            mrm, pos = xengine.analyse_move(move, xengine.motorTiempoJugada, xengine.motorProfundidad)
+            mrm, pos = xengine.analysis_move(move, xengine.motorTiempoJugada, xengine.motorProfundidad)
             move.analysis = mrm, pos
             si_cancelado = me.cancelado()
             me.final()
@@ -734,7 +728,7 @@ class MuestraAnalisis:
             xengine = self.procesador.creaManagerMotor(conf_engine, alm.vtime, alm.depth, siMultiPV=True)
 
         me = QTUtil2.mensEspera.start(main_window, _("Analyzing the move...."), physical_pos="ad")
-        mrm, pos = xengine.analyse_move(self.move, alm.vtime, alm.depth)
+        mrm, pos = xengine.analysis_move(self.move, alm.vtime, alm.depth)
         me.final()
 
         um = TabAnalysis(self, mrm, pos, self.li_tabs_analysis[-1].number + 1, xengine)
@@ -793,9 +787,7 @@ class AnalisisVariations:
         else:
             segundos_pensando = 3
 
-        self.w = WindowAnalysis.WAnalisisVariations(
-            self, self.owner, segundos_pensando, self.is_white, cbase_points, max_recursion
-        )
+        self.w = WindowAnalysis.WAnalisisVariations(self, self.owner, segundos_pensando, self.is_white, cbase_points, max_recursion)
         self.reset()
         self.w.exec_()
 
@@ -819,12 +811,12 @@ class AnalisisVariations:
 
             self.move_the_pieces(new_move.liMovs)
             self.w.board.put_arrow_sc(new_move.from_sq, new_move.to_sq)
-            self.analyse_move(new_move)
+            self.analysis_move(new_move)
             return True
         else:
             return False
 
-    def analyse_move(self, new_move):
+    def analysis_move(self, new_move):
         me = QTUtil2.mensEspera.start(self.w, _("Analyzing the move...."))
 
         secs = self.w.dameSegundos()
@@ -932,9 +924,9 @@ class AnalisisVariations:
             self.w.stop_clock()
             return
         if self.time_pos == 0:
-            self.time_function(siInicio=True)
+            self.time_function(si_inicio=True)
         else:
-            self.time_function(nSaltar=1)
+            self.time_function(n_saltar=1)
 
     def external_analysis(self, max_recursion):
         move = self.game_tutor.move(self.pos_tutor)
@@ -942,7 +934,7 @@ class AnalisisVariations:
         AnalisisVariations(self.w, self.xtutor, move, self.is_white, pts, max_recursion)
 
 
-def analyse_game(manager):
+def analysis_game(manager):
     game = manager.game
     procesador = manager.procesador
     main_window = manager.main_window

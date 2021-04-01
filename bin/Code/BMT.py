@@ -12,10 +12,10 @@ class BMT(SQLBase.DBBase):
         if not self.existeTabla(self.tabla):
             cursor = self.conexion.cursor()
             for sql in (
-                "CREATE TABLE %s( ESTADO VARCHAR(1),ORDEN INTEGER,NOMBRE TEXT,EXTRA TEXT,TOTAL INTEGER,HECHOS INTEGER,"
-                "PUNTOS INTEGER,MAXPUNTOS INTEGER,FINICIAL VARCHAR(8),FFINAL VARCHAR(8),SEGUNDOS INTEGER,REPE INTEGER,"
-                "BMT_LISTA BLOB,HISTORIAL BLOB);",
-                "CREATE INDEX [NOMBRE] ON '%s'(ORDEN DESC,NOMBRE);",
+                    "CREATE TABLE %s( ESTADO VARCHAR(1),ORDEN INTEGER,NOMBRE TEXT,EXTRA TEXT,TOTAL INTEGER,HECHOS INTEGER,"
+                    "PUNTOS INTEGER,MAXPUNTOS INTEGER,FINICIAL VARCHAR(8),FFINAL VARCHAR(8),SEGUNDOS INTEGER,REPE INTEGER,"
+                    "BMT_LISTA BLOB,HISTORIAL BLOB);",
+                    "CREATE INDEX [NOMBRE] ON '%s'(ORDEN DESC,NOMBRE);",
             ):
                 cursor.execute(sql % self.tabla)
                 self.conexion.commit()
@@ -71,6 +71,9 @@ class BMTUno:
             if self.max_puntos:
                 self.state = int(7.0 * self.puntos / self.max_puntos) + 1
 
+    def is_max_state(self):
+        return self.state == 8
+
     def reiniciar(self):
         for rm in self.mrm.li_rm:
             rm.siElegirPartida = False
@@ -78,6 +81,25 @@ class BMTUno:
         self.segundos = 0
         self.state = 0
         self.finished = False
+
+    def calc_profundidad(self):
+        prof = 0
+        mrm = self.mrm
+        best_move = mrm.li_rm[0].from_sq + mrm.li_rm[0].to_sq
+
+        dic = mrm.dicDepth
+
+        if len(dic) > 0:
+            prof = 1
+        else:
+            prof = 0
+
+        for num, val in dic.items():
+            for mm, pts in val.items():
+                if mm != best_move:
+                    prof = num + 1
+                break
+        return prof
 
 
 class BMTLista:
@@ -120,9 +142,10 @@ class BMTLista:
             mx += bmt.max_puntos
         return mx
 
-    def reiniciar(self):
+    def reiniciar(self, debajo_state=9999):
         for bmt in self.li_bmt_uno:
-            bmt.reiniciar()
+            if bmt.state < debajo_state:
+                bmt.reiniciar()
 
     def calc_thpse(self):
         hechos = 0
@@ -158,3 +181,9 @@ class BMTLista:
                 uno.reiniciar()
                 nv.nuevo(uno)
         return nv
+
+    def borrar_fen_lista(self, borrar_fen_lista):
+        for num in range(0, len(self.li_bmt_uno)):
+            while num < len(self.li_bmt_uno) and self.li_bmt_uno[num].fen in borrar_fen_lista:
+                del self.li_bmt_uno[num]
+

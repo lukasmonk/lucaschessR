@@ -1,7 +1,7 @@
 import PySide2.QtGui
 from PySide2 import QtWidgets, QtCore
 
-from Code.Base import Move
+from Code.Base import Move, Game
 from Code.QT import Controles, Colocacion, QTVarios, Iconos, QTUtil2
 
 
@@ -139,9 +139,12 @@ class ShowPGN(QtWidgets.QScrollArea):
         self.move: Move.Move = work_move
         self.selected_link = selected_link
 
-        def do_variation(variation_game, base_select):
+        def do_variation(variation_game:Game.Game, base_select):
             num_move = variation_game.primeraJugada()
             pgn_work = ""
+            if variation_game.first_comment:
+                pgn_work = "{%s} " % variation_game.first_comment
+
             if variation_game.if_starts_with_black:
                 pgn_work += '<span style="%s">%d...</span>' % (style_number, num_move)
                 num_move += 1

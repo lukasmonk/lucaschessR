@@ -84,8 +84,6 @@ def options(parent, configuration):
     form.separador()
     form.checkbox(_("Work in the background, when possible"), not configuration.x_engine_notbackground)
     form.separador()
-    form.checkbox("%s -> %s" % (_("Save engines log"), "UserData/EngineLogs"), configuration.x_log_engines)
-    form.separador()
     form.folder(_("Gaviota Tablebases"), configuration.x_carpeta_gaviota, configuration.carpeta_gaviota_defecto())
     form.separador()
 
@@ -116,16 +114,6 @@ def options(parent, configuration):
     form.checkbox(_("Show candidates"), configuration.x_show_candidates)
     form.checkbox(_("Always promote to queen\nALT key allows to change"), configuration.x_autopromotion_q)
     form.checkbox(_("Show cursor when engine is thinking"), configuration.x_cursor_thinking)
-    form.separador()
-    form.checkbox(_("Enable captured material window by default"), configuration.x_captures_activate)
-    # liMat = [
-    #     (_("Difference material"), "D"),
-    #     (_("Captured material at beginning"), "C"),
-    #     (_("Material advantage"), "M"),
-    # ]
-    # form.combobox(_("Show material"), liMat, configuration.x_capture_option)
-    form.separador()
-    form.checkbox(_("Enable information panel by default"), configuration.x_info_activate)
     form.separador()
 
     x = " - %s Graham O'Neill (https://goneill.co.nz)" % _("developed by")
@@ -179,6 +167,9 @@ def options(parent, configuration):
     form.checkbox(_("PGN with figurines"), configuration.x_pgn_withfigurines)
     form.separador()
 
+    form.checkbox(_("Enable captured material window by default"), configuration.x_captures_activate)
+    form.checkbox(_("Enable information panel by default"), configuration.x_info_activate)
+    form.separador()
     form.spinbox(_("Font size of information labels"), 8, 30, 70, configuration.x_sizefont_infolabels)
 
     form.add_tab(_("Appearance"))
@@ -263,6 +254,8 @@ def options(parent, configuration):
             configuration.x_pgn_fontpoints,
             configuration.x_pgn_english,
             configuration.x_pgn_withfigurines,
+            configuration.x_captures_activate,
+            configuration.x_info_activate,
             configuration.x_sizefont_infolabels,
         ) = li_asp
         if configuration.x_font_family == "System":
@@ -297,7 +290,7 @@ def options(parent, configuration):
             configuration.x_lichess,
         ) = li_nc
 
-        (workinbackground, configuration.x_log_engines, configuration.x_carpeta_gaviota) = li_eng
+        (workinbackground, configuration.x_carpeta_gaviota) = li_eng
         configuration.x_engine_notbackground = not workinbackground
 
         (
@@ -307,8 +300,6 @@ def options(parent, configuration):
             configuration.x_show_candidates,
             configuration.x_autopromotion_q,
             configuration.x_cursor_thinking,
-            configuration.x_captures_activate,
-            configuration.x_info_activate,
             dboard,
             toolIcon,
             configuration.x_position_tool_board,

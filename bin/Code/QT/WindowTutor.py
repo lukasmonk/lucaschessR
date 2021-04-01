@@ -47,8 +47,8 @@ class WindowTutor(QTVarios.WDialogo):
             lytb, tb = QTVarios.lyBotonesMovimiento(self, name, siLibre, siMas=siMas)
             return board, lytb, tb
 
-        self.boardTutor, lytbTutor, self.tbTutor = create_board("tutor")
-        self.boardUsuario, lytbUsuario, self.tbUsuario = create_board("user")
+        self.boardTutor, lytbtutor, self.tbtutor = create_board("tutor")
+        self.boardUsuario, lytbuser, self.tbuser = create_board("user")
         self.boardRival, lytbRival, self.tbRival = create_board("rival", siRival)
         self.boardOpening, lytbOpening, self.tbOpening = create_board("opening", siOpenings, siLibre=False)
         tutor.ponBoardsGUI(self.boardTutor, self.boardUsuario, self.boardRival, self.boardOpening)
@@ -113,9 +113,9 @@ class WindowTutor(QTVarios.WDialogo):
         fr, cr = riv
 
         layout = Colocacion.G()
-        layout.controlc(gbTutor, 0, 0).controlc(self.boardTutor, 1, 0).otro(lytbTutor, 2, 0).otroc(lyRM, 3, 0)
+        layout.controlc(gbTutor, 0, 0).controlc(self.boardTutor, 1, 0).otro(lytbtutor, 2, 0).otroc(lyRM, 3, 0)
         layout.controlc(gbUsuario, fu, cu).controlc(self.boardUsuario, fu + 1, cu).otro(
-            lytbUsuario, fu + 2, cu
+            lytbuser, fu + 2, cu
         ).controlc(btLibros, fu + 3, cu)
         if siRival:
             layout.controlc(gbRival, fr, cr).controlc(self.boardRival, fr + 1, cr).otro(lytbRival, fr + 2, cr)

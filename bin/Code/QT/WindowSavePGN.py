@@ -384,7 +384,10 @@ class WSave(QTVarios.WDialogo):
             value = value.strip()
             if key and value:
                 pgn += '[%s "%s"]\n' % (key, value)
-        pgn += "\n%s\n" % self.em_body.texto().strip()
+        body = self.em_body.texto().strip()
+        if not body:
+            body = "*"
+        pgn += "\n%s\n" % body
         if "\r\n" in pgn:
             pgn = pgn.replace("\r\n", "\n")
 
@@ -439,7 +442,7 @@ class WSave(QTVarios.WDialogo):
     def portapapeles(self):
         pgn = self.current_pgn()
         QTUtil.ponPortapapeles(pgn)
-        self.terminar()
+        QTUtil2.mensajeTemporal(self, _("It is saved in the clipboard to paste it wherever you want."), 2)
 
     def terminar(self):
         self.vars_save()
@@ -448,7 +451,14 @@ class WSave(QTVarios.WDialogo):
 
     def reinit(self):
         self.vars_read()
-        self.pgn_read(self.pgn_init)
+        self.body = self.game.pgnBase()
+        if self.game.opening:
+            if not self.game.get_tag("ECO"):
+                self.game.set_tag("ECO", self.game.opening.eco)
+            if not self.game.get_tag("Opening"):
+                self.game.set_tag("Opening", self.game.opening.trNombre)
+
+        self.li_labels = [[k,v] for k, v in self.game.li_tags]
         self.grid_labels.refresh()
         self.em_body.set_text(self.body)
 

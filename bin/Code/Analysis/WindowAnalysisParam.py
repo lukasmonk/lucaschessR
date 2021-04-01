@@ -9,7 +9,7 @@ from Code.Engines import Priorities
 SEPARADOR = FormLayout.separador
 
 
-def leeDicParametros(configuration):
+def read_dic_params(configuration):
     file = configuration.file_param_analysis()
     dic = Util.restore_pickle(file)
     if not dic:
@@ -49,58 +49,58 @@ def leeDicParametros(configuration):
     return alm
 
 
-def formBlundersBrilliancies(alm, configuration):
-    liBlunders = [SEPARADOR]
+def form_blunders_brilliancies(alm, configuration):
+    li_blunders = [SEPARADOR]
 
-    liBlunders.append((FormLayout.Editbox(_("Is considered wrong move when the loss of points is greater than"), tipo=int, ancho=50), alm.kblunders))
-    liBlunders.append(SEPARADOR)
+    li_blunders.append((FormLayout.Editbox(_("Is considered wrong move when the loss of points is greater than"), tipo=int, ancho=50), alm.kblunders))
+    li_blunders.append(SEPARADOR)
 
-    def fileNext(base, ext):
+    def file_next(base, ext):
         return Util.file_next(configuration.personal_training_folder, base, ext)
 
-    path_pgn = fileNext("Blunders", "pgn")
+    path_pgn = file_next("Blunders", "pgn")
 
-    liBlunders.append((None, _("Generate a training file with these moves")))
+    li_blunders.append((None, _("Generate a training file with these moves")))
 
     config = FormLayout.Editbox(_("Tactics name"), rx="[^\\:/|?*^%><()]*")
-    liBlunders.append((config, ""))
+    li_blunders.append((config, ""))
 
     config = FormLayout.Fichero(_("PGN Format"), "%s (*.pgn)" % _("PGN Format"), True, anchoMinimo=280, ficheroDefecto=path_pgn)
-    liBlunders.append((config, ""))
+    li_blunders.append((config, ""))
 
-    liBlunders.append((_("Also add complete game to PGN") + ":", False))
+    li_blunders.append((_("Also add complete game to PGN") + ":", False))
 
-    liBlunders.append(SEPARADOR)
+    li_blunders.append(SEPARADOR)
 
     eti = '"%s"' % _("Find best move")
-    liBlunders.append((_X(_("Add to the training %1 with the name"), eti) + ":", ""))
+    li_blunders.append((_X(_("Add to the training %1 with the name"), eti) + ":", ""))
 
-    liBrilliancies = [SEPARADOR]
+    li_brilliancies = [SEPARADOR]
 
-    liBrilliancies.append((FormLayout.Spinbox(_("Minimum depth"), 3, 30, 50), alm.dpbrilliancies))
+    li_brilliancies.append((FormLayout.Spinbox(_("Minimum depth"), 3, 30, 50), alm.dpbrilliancies))
 
-    liBrilliancies.append((FormLayout.Spinbox(_("Minimum gain points"), 30, 30000, 50), alm.ptbrilliancies))
-    liBrilliancies.append(SEPARADOR)
+    li_brilliancies.append((FormLayout.Spinbox(_("Minimum gain points"), 30, 30000, 50), alm.ptbrilliancies))
+    li_brilliancies.append(SEPARADOR)
 
-    path_fns = fileNext("Brilliancies", "fns")
-    path_pgn = fileNext("Brilliancies", "pgn")
+    path_fns = file_next("Brilliancies", "fns")
+    path_pgn = file_next("Brilliancies", "pgn")
 
-    liBrilliancies.append((None, _("Generate a training file with these moves")))
+    li_brilliancies.append((None, _("Generate a training file with these moves")))
 
     config = FormLayout.Fichero(_("List of FENs"), "%s (*.fns)" % _("List of FENs"), True, anchoMinimo=280, ficheroDefecto=path_fns)
-    liBrilliancies.append((config, ""))
+    li_brilliancies.append((config, ""))
 
     config = FormLayout.Fichero(_("PGN Format"), "%s (*.pgn)" % _("PGN Format"), True, anchoMinimo=280, ficheroDefecto=path_pgn)
-    liBrilliancies.append((config, ""))
+    li_brilliancies.append((config, ""))
 
-    liBrilliancies.append((_("Also add complete game to PGN"), False))
+    li_brilliancies.append((_("Also add complete game to PGN"), False))
 
-    liBrilliancies.append(SEPARADOR)
+    li_brilliancies.append(SEPARADOR)
 
     eti = '"%s"' % _("Find best move")
-    liBrilliancies.append((_X(_("Add to the training %1 with the name"), eti) + ":", ""))
+    li_brilliancies.append((_X(_("Add to the training %1 with the name"), eti) + ":", ""))
 
-    return liBlunders, liBrilliancies
+    return li_blunders, li_brilliancies
 
 
 def form_variations(alm):
@@ -125,10 +125,10 @@ def form_variations(alm):
 
 
 def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=False):
-    alm = leeDicParametros(configuration)
+    alm = read_dic_params(configuration)
 
     # Datos
-    liGen = [SEPARADOR]
+    li_gen = [SEPARADOR]
 
     # # Tutor
     if siTodosMotores:
@@ -136,39 +136,39 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
     else:
         li = configuration.ayudaCambioTutor()
         li[0] = alm.engine
-    liGen.append((_("Engine") + ":", li))
+    li_gen.append((_("Engine") + ":", li))
 
     # # Time
-    liGen.append(SEPARADOR)
+    li_gen.append(SEPARADOR)
     config = FormLayout.Editbox(_("Duration of engine analysis (secs)"), 40, tipo=float)
-    liGen.append((config, alm.vtime / 1000.0))
+    li_gen.append((config, alm.vtime / 1000.0))
 
     # Depth
     liDepths = [("--", 0)]
     for x in range(1, 51):
         liDepths.append((str(x), x))
     config = FormLayout.Combobox(_("Depth"), liDepths)
-    liGen.append((config, alm.depth))
+    li_gen.append((config, alm.depth))
 
     # Time+Depth
-    liGen.append(("%s+%s:" % (_("Time"), _("Depth")), alm.timedepth))
+    li_gen.append(("%s+%s:" % (_("Time"), _("Depth")), alm.timedepth))
 
     # MultiPV
-    liGen.append(SEPARADOR)
+    li_gen.append(SEPARADOR)
     li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
     for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), str(x)))
     config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
-    liGen.append((config, alm.multiPV))
+    li_gen.append((config, alm.multiPV))
 
     # Priority
-    liGen.append(SEPARADOR)
+    li_gen.append(SEPARADOR)
     config = FormLayout.Combobox(_("Process priority"), Priorities.priorities.combo())
-    liGen.append((config, alm.priority))
+    li_gen.append((config, alm.priority))
 
     # Completo
     if siModoAmpliado:
-        liGen.append(SEPARADOR)
+        li_gen.append(SEPARADOR)
 
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK"), (_("White & Black"), "BOTH")]
         config = FormLayout.Combobox(_("Analyze only color"), liJ)
@@ -180,10 +180,10 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
             color = "WHITE"
         else:
             color = "BOTH"
-        liGen.append((config, color))
+        li_gen.append((config, color))
 
         config = FormLayout.Editbox('<div align="right">' + _("Moves") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx="[0-9,\-,\,]*")
-        liGen.append((config, ""))
+        li_gen.append((config, ""))
 
         fvar = configuration.file_books
         list_books = Books.ListBooks()
@@ -197,20 +197,20 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
                 defecto = book
             li.append((book.name, book))
         config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
-        liGen.append((config, defecto))
-        liGen.append(SEPARADOR)
+        li_gen.append((config, defecto))
+        li_gen.append(SEPARADOR)
 
-        liGen.append((_("Redo any existing prior analyses (if they exist)") + ":", alm.delete_previous))
+        li_gen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
 
-        liGen.append((_("Start from the end of the game") + ":", alm.from_last_move))
+        li_gen.append((_("Start from the end of the game") + ":", alm.from_last_move))
 
-        liGen.append(SEPARADOR)
+        li_gen.append(SEPARADOR)
 
-        liGen.append((_("Show graphics") + ":", alm.show_graphs))
+        li_gen.append((_("Show graphics") + ":", alm.show_graphs))
 
         liVar = form_variations(alm)
 
-        liBlunders, liBrilliancies = formBlundersBrilliancies(alm, configuration)
+        liBlunders, liBrilliancies = form_blunders_brilliancies(alm, configuration)
 
         liST = [SEPARADOR]
         liST.append((_("Activate") + ":", alm.stability))
@@ -222,14 +222,14 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         liST.append((FormLayout.Spinbox(_("Additional time limit"), 0, 99999, 60), alm.st_timelimit))
 
         lista = []
-        lista.append((liGen, _("General options"), ""))
+        lista.append((li_gen, _("General options"), ""))
         lista.append((liVar, _("Variations"), ""))
         lista.append((liBlunders, _("Wrong moves"), ""))
         lista.append((liBrilliancies, _("Brilliancies"), ""))
         lista.append((liST, _("Stability control"), ""))
 
     else:
-        lista = liGen
+        lista = li_gen
 
     reg = Util.Record()
     reg.form = None
@@ -269,27 +269,27 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         accion, liResp = resultado
 
         if siModoAmpliado:
-            liGen, liVar, liBlunders, liBrilliancies, liST = liResp
+            li_gen, liVar, liBlunders, liBrilliancies, liST = liResp
         else:
-            liGen = liResp
+            li_gen = liResp
 
-        alm.engine = liGen[0]
-        alm.vtime = int(liGen[1] * 1000)
-        alm.depth = liGen[2]
-        alm.timedepth = liGen[3]
-        alm.multiPV = liGen[4]
-        alm.priority = liGen[5]
+        alm.engine = li_gen[0]
+        alm.vtime = int(li_gen[1] * 1000)
+        alm.depth = li_gen[2]
+        alm.timedepth = li_gen[3]
+        alm.multiPV = li_gen[4]
+        alm.priority = li_gen[5]
 
         if siModoAmpliado:
-            color = liGen[6]
+            color = li_gen[6]
             alm.white = color != "BLACK"
             alm.black = color != "WHITE"
-            alm.num_moves = liGen[7]
-            alm.book = liGen[8]
+            alm.num_moves = li_gen[7]
+            alm.book = li_gen[8]
             alm.book_name = alm.book.name if alm.book else None
-            alm.delete_previous = liGen[9]
-            alm.from_last_move = liGen[10]
-            alm.show_graphs = liGen[11]
+            alm.delete_previous = li_gen[9]
+            alm.from_last_move = li_gen[10]
+            alm.show_graphs = li_gen[11]
 
             (alm.include_variations, alm.limit_include_variations, alm.best_variation, alm.info_variation, alm.si_pdt, alm.one_move_variation) = liVar
 
@@ -311,7 +311,7 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
 
 
 def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, siDatabase=False):
-    alm = leeDicParametros(configuration)
+    alm = read_dic_params(configuration)
 
     # Datos
     liGen = [SEPARADOR]
@@ -377,14 +377,14 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
     liGen.append((_("Start from the end of the game") + ":", alm.from_last_move))
 
     liGen.append(SEPARADOR)
-    liGen.append((_("Redo any existing prior analyses (if they exist)") + ":", alm.delete_previous))
+    liGen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
 
     liGen.append(SEPARADOR)
     liGen.append((_("Only selected games") + ":", siVariosSeleccionados))
 
     liVar = form_variations(alm)
 
-    liBlunders, liBrilliancies = formBlundersBrilliancies(alm, configuration)
+    liBlunders, liBrilliancies = form_blunders_brilliancies(alm, configuration)
 
     lista = []
     lista.append((liGen, _("General options"), ""))

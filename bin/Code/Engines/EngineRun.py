@@ -69,8 +69,8 @@ class RunEngine:
 
         self.orden_uci()
 
-        txt_uci_analysemode = "UCI_AnalyseMode"
-        uci_analysemode = False
+        txt_uci_analysismode = "UCI_AnalyseMode"
+        uci_analysismode = False
 
         setoptions = False
         if liOpcionesUCI:
@@ -79,15 +79,15 @@ class RunEngine:
                     valor = str(valor).lower()
                 self.set_option(opcion, valor)
                 setoptions = True
-                if opcion == txt_uci_analysemode:
-                    uci_analysemode = True
+                if opcion == txt_uci_analysismode:
+                    uci_analysismode = True
                 if opcion.lower() == "ponder":
                     self.ponder = valor == "true"
 
         self.nMultiPV = nMultiPV
         if nMultiPV:
             self.ponMultiPV(nMultiPV)
-            if not uci_analysemode:
+            if not uci_analysismode:
                 for line in self.uci_lines:
                     if "UCI_AnalyseMode" in line:
                         self.set_option("UCI_AnalyseMode", "true")
@@ -424,9 +424,12 @@ class RunEngine:
 
     def ac_lee(self):
         if self.lockAC:
-            return
+            return True
+        nlines = 0
         for line in self.get_lines():
             self.mrm.dispatch(line)
+            nlines += 1
+        return nlines
 
     def ac_estado(self):
         self.ac_lee()
@@ -438,9 +441,12 @@ class RunEngine:
         self.mrm.ordena()
         rm = self.mrm.mejorMov()
         tm = rm.time  # problema cuando da por terminada la lectura y el rm.time siempre es el mismo
+        bucle = 0
         while rm.time < minimoTiempo and tm < minimoTiempo:
-            self.ac_lee()
             time.sleep(0.1)
+            bucle += 1
+            if bucle > 1 and self.ac_lee() == 0:
+                break
             tm += 100
             rm = self.mrm.mejorMov()
         self.lockAC = lockAC
@@ -451,8 +457,8 @@ class RunEngine:
         self.mrm.ordena()
         rm = self.mrm.mejorMov()
         while rm.time < minTime or rm.depth < minDepth:
-            self.ac_lee()
             time.sleep(0.1)
+            self.ac_lee()
             rm = self.mrm.mejorMov()
         self.lockAC = lockAC
         return self.ac_estado()

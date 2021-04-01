@@ -32,6 +32,8 @@ class EngineManager:
         self.key = confMotor.key
         self.nMultiPV = 0
 
+        self.function = _("Opponent").lower() # para distinguir entre tutor y analizador
+
         self.priority = Priorities.priorities.normal
 
         self.dispatching = None
@@ -42,8 +44,6 @@ class EngineManager:
 
         self.direct = direct
         Code.list_engine_managers.append(self)
-        if Code.configuration.x_log_engines:
-            self.log_open()
 
     def set_direct(self):
         self.direct = True
@@ -114,7 +114,7 @@ class EngineManager:
 
     def testEngine(self, nMultiPV=0):
         if self.engine is not None:
-            return
+            return False
         if self.nMultiPV:
             self.nMultiPV = min(self.nMultiPV, self.confMotor.maxMultiPV)
 
@@ -138,6 +138,8 @@ class EngineManager:
             self.engine.ponGuiDispatch(rutina, whoDispatch)
         if self.ficheroLog:
             self.engine.log_open(self.ficheroLog)
+
+        return True
 
     def juegaSegundos(self, segundos):
         self.testEngine()
@@ -250,7 +252,7 @@ class EngineManager:
             self.engine = None
             self.activo = False
 
-    def analyse_move(self, move, vtime, depth=0, brDepth=5, brPuntos=50):
+    def analysis_move(self, move, vtime, depth=0, brDepth=5, brPuntos=50):
         self.testEngine()
 
         mrm = self.engine.bestmove_fen(move.position_before.fen(), vtime, depth, is_savelines=True)
@@ -303,11 +305,13 @@ class EngineManager:
         st_timelimit=0,
     ):
         self.testEngine()
-
         if stability:
             mrm = self.engine.analysis_stable(game, njg, vtime, depth, True, st_centipawns, st_depths, st_timelimit)
         else:
             mrm = self.engine.bestmove_game_jg(game, njg, vtime, depth, is_savelines=True)
+
+        if njg > 9000:
+            return mrm, 0
 
         move = game.move(njg)
         mv = move.movimiento()

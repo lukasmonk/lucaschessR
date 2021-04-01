@@ -3,10 +3,14 @@ import time
 
 from PySide2 import QtCore
 
-from Code.Analysis import Analysis
 from Code import BMT
 from Code import ControlPGN
+from Code import TrListas
+from Code import Util
+from Code.Analysis import Analysis
 from Code.Base import Game, Position
+from Code.Base.Constantes import *
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -17,10 +21,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import TrListas
-from Code import Util
-from Code.Base.Constantes import *
 
 
 class WHistorialBMT(QTVarios.WDialogo):
@@ -36,6 +36,7 @@ class WHistorialBMT(QTVarios.WDialogo):
         bmt_lista = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA"))
         self.liHistorial = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "HISTORIAL"))
         self.max_puntos = dbf.MAXPUNTOS
+
         if bmt_lista.is_finished():
             dic = {"FFINAL": dbf.FFINAL, "STATE": dbf.ESTADO, "PUNTOS": dbf.PUNTOS, "SEGUNDOS": dbf.SEGUNDOS}
             self.liHistorial.append(dic)
@@ -113,6 +114,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         self.iniTiempo = None
         self.antTxtSegundos = ""
+        self.pts_tolerance = 0
 
         self.game = Game.Game()
         self.siMostrarPGN = False
@@ -125,6 +127,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         self.state = None  # compatibilidad con ControlPGN
         self.human_is_playing = False  # compatibilidad con ControlPGN
+        self.borrar_fen_lista = set()
 
         # Datos ----------------------------------------------------------------
         self.dbf = dbf
@@ -159,7 +162,10 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.trSegundos = "<big><b>" + _("Time") + "<br>%s</b></big>"
         self.lbPuntos = Controles.LB(self, "").set_color_background(colorFondo).align_center().anchoMinimo(80)
         self.lbSegundos = Controles.LB(self, "").set_color_background(colorFondo).align_center().anchoMinimo(80)
-        self.lbPrimera = Controles.LB(self, _("* indicates actual move played in game"))
+        self.texto_lbPrimera = _("* indicates actual move played in game")
+        self.ptsMejor = 0
+        self.ptsPrimero = 0
+        self.lbPrimera = Controles.LB(self, _(self.texto_lbPrimera))
         f = Controles.TipoLetra(puntos=8)
         self.lbCondiciones = Controles.LB(self, "").ponFuente(f)
 
@@ -235,11 +241,13 @@ class WEntrenarBMT(QTVarios.WDialogo):
         # Tool bar ---------------------------------------------------------------
         li_acciones = (
             (_("Close"), Iconos.MainMenu(), "terminar"),
-            (_("Next"), Iconos.Siguiente(), "seguir"),
             (_("Repeat"), Iconos.Pelicula_Repetir(), "repetir"),
             (_("Resign"), Iconos.Abandonar(), "abandonar"),
+            (_("Remove"), Iconos.Borrar(), "borrar"),
+            (_("Options"), Iconos.Opciones(), "opciones"),
             (_("Start"), Iconos.Empezar(), "empezar"),
             (_("Actual game"), Iconos.PartidaOriginal(), "original"),
+            (_("Next"), Iconos.Siguiente(), "seguir"),
         )
         self.tb = Controles.TB(self, li_acciones)
 
@@ -262,17 +270,29 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.muestraControles(False)
 
     def muestraControles(self, si):
-        for control in (
-            self.lbJuegan,
-            self.board,
-            self.lbPuntos,
-            self.lbSegundos,
-            self.lbPrimera,
-            self.lbCondiciones,
-            self.pgn,
-            self.gbRM,
-        ):
+        for control in (self.lbJuegan, self.board, self.lbPuntos, self.lbSegundos, self.lbPrimera, self.lbCondiciones, self.pgn, self.gbRM):
             control.setVisible(si)
+
+    def seguir(self):
+        self.muestraControles(True)
+        pos = self.actualP + 1
+        if pos >= len(self.liBT):
+            pos = 0
+        self.buscaPrimero(pos)
+
+    def opciones(self):
+        # Se pide name y extra
+        liGen = [(None, None)]
+
+        # # Nombre del entrenamiento
+        liGen.append((FormLayout.Editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50), self.pts_tolerance))
+
+        titulo = "Training settings"
+        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        if not resultado:
+            return
+        accion, liGen = resultado
+        self.pts_tolerance = liGen[0]
 
     def process_toolbar(self):
         accion = self.sender().key
@@ -280,16 +300,17 @@ class WEntrenarBMT(QTVarios.WDialogo):
             self.terminar()
             self.accept()
         elif accion == "seguir":
-            self.muestraControles(True)
-            pos = self.actualP + 1
-            if pos >= len(self.liBT):
-                pos = 0
-            self.buscaPrimero(pos)
+            self.seguir()
         elif accion == "abandonar":
             self.bmt_uno.puntos = 0
             self.activaJugada(0)
             self.ponPuntos(0)
             self.pon_toolbar()
+        elif accion == "borrar":
+            if QTUtil2.pregunta(self, _("Do you want to delete this position?")):
+                self.borrar_fen_lista.add(self.bmt_uno.fen)
+                QTUtil2.message(self, _("This position will be deleted on exit."))
+                self.seguir()
         elif accion == "repetir":
             self.muestraControles(True)
             self.repetir()
@@ -298,6 +319,8 @@ class WEntrenarBMT(QTVarios.WDialogo):
             self.empezar()
         elif accion == "original":
             self.original()
+        elif accion == "opciones":
+            self.opciones()
 
     def closeEvent(self, event):
         self.terminar()
@@ -311,17 +334,26 @@ class WEntrenarBMT(QTVarios.WDialogo):
     def terminar(self):
         self.finalizaTiempo()
 
+        if len(self.borrar_fen_lista) > 0:
+            self.bmt_lista.borrar_fen_lista(self.borrar_fen_lista)
+
         atotal, ahechos, at_puntos, at_segundos, at_estado = self.datosInicio
 
         total, hechos, t_puntos, t_segundos, t_estado = self.bmt_lista.calc_thpse()
 
-        if (hechos != ahechos) or (t_puntos != at_puntos) or (t_segundos != at_segundos) or (t_estado != at_estado):
+        if (hechos != ahechos) or (t_puntos != at_puntos) or (t_segundos != at_segundos) or (t_estado != at_estado) or len(self.borrar_fen_lista) > 0:
 
             reg = self.dbf.baseRegistro()
+
             reg.BMT_LISTA = Util.var2zip(self.bmt_lista)
+
             reg.HECHOS = hechos
             reg.SEGUNDOS = t_segundos
             reg.PUNTOS = t_puntos
+            # Si hay posiciones borradas, tenemos que actualizar TOTAL y MAXPUNTOS
+            reg.TOTAL = len(self.bmt_lista)
+            reg.MAXPUNTOS = self.bmt_lista.max_puntos()
+
             if self.historial:
                 reg.HISTORIAL = Util.var2zip(self.historial)
                 reg.REPE = len(reg.HISTORIAL)
@@ -336,8 +368,41 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.save_video()
 
     def repetir(self):
-        if not QTUtil2.pregunta(self, _("Do you want to repeat this training?")):
+        # # Opcion de repetir solo las posiciones dificiles
+        # Contamos las posiciones debajo un cierto state para el combobox
+
+        num_pos_estate = {}
+        for y in range(0, 9):
+            num_pos_estate[y] = 0
+
+        nposic = len(self.bmt_lista)
+        for x in range(nposic):
+            estado = self.bmt_lista.state(x)
+            for y in range(0, 9):
+                if estado < y:
+                    num_pos_estate[y] += 1
+
+        num_pos_estate[9] = nposic
+        labels_score = {9: "Repeat all", 8: "Best move", 7: "Excellent", 6: "Very good", 5: "Good", 4: "Acceptable"}
+
+        liGen = [(None, None)]
+        liJ = []
+
+        for x in reversed(range(5, 10)):
+            if num_pos_estate[x] > 0:
+                label = "%s (%s)" % (labels_score[x], num_pos_estate[x])
+                liJ.append((label, x))
+
+        config = FormLayout.Combobox(_("Repeat only below score"), liJ)
+        liGen.append((config, 9))
+
+        titulo = "%s" % (_("Do you want to repeat this training?"))
+        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        if not resultado:
             return
+
+        accion, liGen = resultado
+        reiniciar_debajo_state = liGen[0]
 
         self.quitaReloj()
 
@@ -351,9 +416,14 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         self.historial.append(dic)
 
-        self.bmt_lista.reiniciar()
-        for bt in self.liBT:
-            bt.ponIcono(self.dicIconos[0])
+        self.bmt_lista.reiniciar(reiniciar_debajo_state)
+
+        for x in range(nposic):
+            estado = self.bmt_lista.state(x)
+            self.liBT[x].ponIcono(self.dicIconos[estado])
+
+        # for bt in self.liBT:
+        #    bt.ponIcono(self.dicIconos[0])
 
         self.siTerminadaAntes = self.is_finished = False
         self.board.set_position(Position.Position().logo())
@@ -364,8 +434,12 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.lbPuntos.set_text("")
         self.lbSegundos.set_text("")
         self.lbJuegan.set_text("")
+        self.lbPrimera.set_text(self.texto_lbPrimera)
         self.lbPrimera.setVisible(False)
         self.pon_toolbar(["terminar", "empezar"])
+        # Ahora la ventana se queda vacia - por eso lo cierro
+        self.terminar()
+        self.accept()
 
     def disable_all(self):  # compatibilidad ControlPGN
         return
@@ -502,15 +576,20 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
     def pon_toolbar(self, li=None):
         if not li:
-            li = ["terminar", "seguir"]
+            li = ["terminar"]
 
             if not self.bmt_uno.finished:
                 li.append("abandonar")
-            else:
+
+            li.append("borrar")
+            li.append("opciones")
+
+            if self.bmt_uno.finished:
                 if self.is_finished:
                     li.append("repetir")
                 if self.bmt_uno.cl_game:
                     li.append("original")
+            li.append("seguir")
         self.tb.clear()
         for k in li:
             self.tb.dic_toolbar[k].setVisible(True)
@@ -561,6 +640,8 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
     def activaJugada1(self, num):
         rm = self.bmt_uno.mrm.li_rm[num]
+        if num == 0:
+            self.ptsMejor = rm.centipawns_abs()
         game = Game.Game()
         game.restore(rm.txtPartida)
 
@@ -569,6 +650,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         if rm.siPrimero:
             txt = "%s *" % txt
             self.lbPrimera.setVisible(True)
+            self.ptsPrimero = rm.centipawns_abs()
 
         bt.set_text(txt)
         bt.setEnabled(True)
@@ -576,11 +658,14 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
     def activaJugada(self, num):
         rm = self.bmt_uno.mrm.li_rm[num]
-        if rm.nivelBMT == 0:
+        mm = self.bmt_uno.mrm.li_rm[0]
+        if rm.nivelBMT == 0 or abs(rm.centipawns_abs() - mm.centipawns_abs()) <= self.pts_tolerance:
             self.finalizaTiempo()
             for n in range(len(self.bmt_uno.mrm.li_rm)):
                 self.activaJugada1(n)
             self.bmt_uno.finished = True
+            diferenciaPtsPrimero = self.ptsPrimero - self.ptsMejor
+            self.lbPrimera.set_text("%s (difference: %s pts)" % (self.texto_lbPrimera, "%+0.2f" % (diferenciaPtsPrimero / 100.0)))
             self.muestra(num)
             self.ponPuntos(0)
             bt = self.liBT[self.actualP]
@@ -638,6 +723,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
             txt += "  - " + mens
 
         self.lbCondiciones.set_text(mrm.name + txt)
+        self.lbPrimera.set_text(self.texto_lbPrimera)
 
         self.board.set_position(self.position)
 
@@ -812,9 +898,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
             return
 
         max_recursion = 9999
-        Analysis.show_analysis(
-            self.procesador, self.procesador.XTutor(), move, is_white, max_recursion, pos, main_window=self
-        )
+        Analysis.show_analysis(self.procesador, self.procesador.XTutor(), move, is_white, max_recursion, pos, main_window=self)
 
 
 class WBMT(QTVarios.WDialogo):
@@ -863,9 +947,7 @@ class WBMT(QTVarios.WDialogo):
         o_columns.nueva("REPETICIONES", _("Rep."), 50, centered=True)
         o_columns.nueva("ORDEN", _("Order"), 70, centered=True)
 
-        self.grid = grid = Grid.Grid(
-            self, o_columns, xid="P", siEditable=False, siSelecFilas=True, siSeleccionMultiple=True
-        )
+        self.grid = grid = Grid.Grid(self, o_columns, xid="P", siEditable=False, siSelecFilas=True, siSeleccionMultiple=True)
         self.register_grid(grid)
         tab.nuevaTab(grid, _("Pending"))
 
@@ -881,9 +963,7 @@ class WBMT(QTVarios.WDialogo):
         o_columns.nueva("REPETICIONES", _("Rep."), 50, centered=True)
         o_columns.nueva("ORDEN", _("Order"), 70, centered=True)
 
-        self.gridT = gridT = Grid.Grid(
-            self, o_columns, xid="T", siEditable=True, siSelecFilas=True, siSeleccionMultiple=True
-        )
+        self.gridT = gridT = Grid.Grid(self, o_columns, xid="T", siEditable=True, siSelecFilas=True, siSeleccionMultiple=True)
         self.register_grid(gridT)
         tab.nuevaTab(gridT, _("Finished"))
 
@@ -1165,9 +1245,7 @@ class WBMT(QTVarios.WDialogo):
 
         liGen.append((FormLayout.Spinbox(_("Block Size"), 1, mx - 1, 50), bl))
 
-        resultado = FormLayout.fedit(
-            liGen, title="%s %s" % (reg.NOMBRE, reg.EXTRA), parent=self, icon=Iconos.Opciones()
-        )
+        resultado = FormLayout.fedit(liGen, title="%s %s" % (reg.NOMBRE, reg.EXTRA), parent=self, icon=Iconos.Opciones())
 
         if resultado:
             accion, liGen = resultado
@@ -1210,10 +1288,7 @@ class WBMT(QTVarios.WDialogo):
             return
         reg = dbf.registroActual()  # Importante ya que dbf puede cambiarse mientras se edita
         liGen = [(None, None)]
-        config = FormLayout.Editbox(
-            '<div align="right">' + _("List of positions") + "<br>" + _("By example:") + " -5,7-9,14,19-",
-            rx=r"[0-9,\-,\,]*",
-        )
+        config = FormLayout.Editbox('<div align="right">' + _("List of positions") + "<br>" + _("By example:") + " -5,7-9,14,19-", rx=r"[0-9,\-,\,]*")
         liGen.append((config, ""))
 
         resultado = FormLayout.fedit(liGen, title=reg.NOMBRE, parent=self, anchoMinimo=200, icon=Iconos.Opciones())
@@ -1254,7 +1329,7 @@ class WBMT(QTVarios.WDialogo):
         # Lista de recnos
         li = grid.recnosSeleccionados()
 
-        if len(li) <= 1:
+        if len(li) < 1:
             return
 
         # Se pide name y extra
@@ -1267,6 +1342,10 @@ class WBMT(QTVarios.WDialogo):
 
         liGen.append((FormLayout.Editbox(_("Order"), tipo=int, ancho=50), orden))
 
+        liJ = [("--", 9), (_("Best move"), 8), (_("Excellent"), 7), (_("Very good"), 6), (_("Good"), 5), (_("Acceptable"), 4)]
+        config = FormLayout.Combobox(_("Drop answers with minimum score"), liJ)
+        liGen.append((config, 9))
+
         titulo = "%s (%d)" % (_("Joining selected training"), len(li))
         resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
         if not resultado:
@@ -1278,16 +1357,33 @@ class WBMT(QTVarios.WDialogo):
         name = liGen[0].strip()
         extra = liGen[1]
         orden = liGen[2]
+        eliminar_state_minimo = liGen[3]
 
         # Se crea una bmt_lista, suma de todas
         bmt_lista = BMT.BMTLista()
 
+        li_unos = []
+        dic_games = {}
         for recno in li:
             bmt_lista1 = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
-            for uno in bmt_lista1.li_bmt_uno:
+            li_unos.extend(bmt_lista1.li_bmt_uno)
+            dic_games.update(bmt_lista1.dic_games)
+
+        st_fen = set()
+        if eliminar_state_minimo < 9:
+            for uno in li_unos:
+                if uno.state >= eliminar_state_minimo:
+                    st_fen.add(uno.fen)
+
+        for uno in li_unos:
+            if uno.fen not in st_fen:
+                st_fen.add(uno.fen)
                 bmt_lista.nuevo(uno)
                 if uno.cl_game:
-                    bmt_lista.check_game(uno.cl_game, bmt_lista1.dic_games[uno.cl_game])
+                    bmt_lista.check_game(uno.cl_game, dic_games[uno.cl_game])
+
+        if len(bmt_lista) == 0:
+            return
 
         bmt_lista.reiniciar()
 
@@ -1316,13 +1412,7 @@ class WBMT(QTVarios.WDialogo):
         um.final()
 
     def cambiar(self):
-        fbmt = QTUtil2.salvaFichero(
-            self,
-            _("Select/create another file of training"),
-            self.configuration.ficheroBMT,
-            _("File") + " bmt (*.bmt)",
-            siConfirmarSobreescritura=False,
-        )
+        fbmt = QTUtil2.salvaFichero(self, _("Select/create another file of training"), self.configuration.ficheroBMT, _("File") + " bmt (*.bmt)", siConfirmarSobreescritura=False)
         if fbmt:
             fbmt = Util.relative_path(fbmt)
             abmt = self.bmt
@@ -1346,9 +1436,7 @@ class WBMT(QTVarios.WDialogo):
             regActual = dbf.registroActual()
             carpeta = os.path.dirname(self.configuration.ficheroBMT)
             filtro = _("File") + " bm1 (*.bm1)"
-            fbm1 = QTUtil2.salvaFichero(
-                self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True
-            )
+            fbm1 = QTUtil2.salvaFichero(self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True)
             if fbm1:
                 if siLimpiar:
                     regActual.ESTADO = "0"
@@ -1527,9 +1615,7 @@ class WBMT(QTVarios.WDialogo):
 
         # Elegimos el entrenamiento
         menu = QTVarios.LCMenu(self)
-        self.procesador.entrenamientos.menuFNS(
-            menu, _("Select the training positions you want to use as a base"), xopcion
-        )
+        self.procesador.entrenamientos.menuFNS(menu, _("Select the training positions you want to use as a base"), xopcion)
         resp = menu.lanza()
         if resp is None:
             return

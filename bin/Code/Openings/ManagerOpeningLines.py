@@ -306,7 +306,7 @@ class ManagerOpeningEngines(Manager.Manager):
                 if rm:
                     ok = True
             if not ok:
-                mrm, pos = self.xanalyzer.analyse_move(
+                mrm, pos = self.xanalyzer.analysis_move(
                     move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad
                 )
                 self.dbop.set_cache_engines(name, vtime, move.fenm2, mrm, depth)

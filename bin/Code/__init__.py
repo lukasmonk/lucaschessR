@@ -60,7 +60,7 @@ mate_en_dos = 175522
 runSound = None
 
 BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.16"
+VERSION = "R 1.17"
 DEBUG = False
 DEBUG_ENGINE = False
 
@@ -109,3 +109,5 @@ if DEBUG:
         xpr("", "Modo debug engine")
 
     builtins.__dict__["xpr"] = xpr
+
+

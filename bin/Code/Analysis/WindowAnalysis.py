@@ -1,21 +1,21 @@
 from PySide2 import QtCore, QtWidgets
 
 import Code
-from Code.Base import Game
-from Code import XRun
 from Code import Util
+from Code import XRun
+from Code.Analysis import WindowAnalysisParam
+from Code.Base import Game
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Delegados
 from Code.QT import Grid
+from Code.QT import Histogram
 from Code.QT import Iconos
-from Code.Analysis import WindowAnalysisParam
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code.QT import Histogram
 
 
 class WAnalisisGraph(QTVarios.WDialogo):
@@ -454,11 +454,10 @@ class WMuestra(QtWidgets.QWidget):
         menu.opcion(True, _("Complete variation"), Iconos.PuntoVerde())
         menu.separador()
         menu.opcion(False, _("Only the first move"), Iconos.PuntoRojo())
-        resp = menu.lanza()
-        if resp is None:
+        is_complete = menu.lanza()
+        if is_complete is None:
             return
-        self.um.save_base(self.um.game, self.um.rm)
-        # self.um.save_base(self.um.game, self.um.rm, resp)
+        self.um.save_base(self.um.game, self.um.rm, is_complete)
         self.um.put_view_manager()
 
     def grabarTodos(self):
@@ -466,14 +465,13 @@ class WMuestra(QtWidgets.QWidget):
         menu.opcion(True, _("Complete variations"), Iconos.PuntoVerde())
         menu.separador()
         menu.opcion(False, _("Only the first move of each variation"), Iconos.PuntoRojo())
-        resp = menu.lanza()
-        if resp:
+        is_complete = menu.lanza()
+        if is_complete:
             for pos, tp in enumerate(self.um.list_rm_name):
                 rm = tp[0]
                 game = Game.Game(self.um.move.position_before)
                 game.read_pv(rm.pv)
-                self.um.save_base(game, rm)
-                # self.um.save_base(game, rm, resp)
+                self.um.save_base(game, rm, is_complete)
             self.um.put_view_manager()
 
 

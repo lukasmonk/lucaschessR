@@ -99,9 +99,9 @@ class WJuicio(QTVarios.WDialogo):
             self.siMueveTiempo = False
             self.accept()
         elif accion == "MoverAdelante":
-            self.mueve(nSaltar=1)
+            self.mueve(n_saltar=1)
         elif accion == "MoverAtras":
-            self.mueve(nSaltar=-1)
+            self.mueve(n_saltar=-1)
         elif accion == "MoverInicio":
             self.mueve(is_base=True)
         elif accion == "MoverFinal":
@@ -186,18 +186,18 @@ class WJuicio(QTVarios.WDialogo):
         self.game = Game.Game(self.position)
         self.game.read_pv(self.list_rm[row].rm.pv)
         self.maxMoves = len(self.game)
-        self.mueve(siInicio=True)
+        self.mueve(si_inicio=True)
 
         self.grid.setFocus()
 
-    def mueve(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
-        if nSaltar:
-            pos = self.posMueve + nSaltar
+    def mueve(self, si_inicio=False, n_saltar=0, siFinal=False, is_base=False):
+        if n_saltar:
+            pos = self.posMueve + n_saltar
             if 0 <= pos < self.maxMoves:
                 self.posMueve = pos
             else:
                 return False
-        elif siInicio:
+        elif si_inicio:
             self.posMueve = 0
         elif is_base:
             self.posMueve = -1
@@ -222,7 +222,7 @@ class WJuicio(QTVarios.WDialogo):
 
     def mueveTiempoWork(self):
         if self.is_moving_time:
-            if not self.mueve(nSaltar=1):
+            if not self.mueve(n_saltar=1):
                 self.is_moving_time = False
                 return
             QtCore.QTimer.singleShot(1000, self.mueveTiempoWork)

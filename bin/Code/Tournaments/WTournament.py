@@ -6,6 +6,7 @@ from Code.Base.Constantes import FEN_INITIAL
 from Code.Base import Game, Position
 from Code.Polyglots import Books
 from Code.Engines import Engines, WEngines
+from Code.Databases import DBgames, WDB_Games
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -229,6 +230,8 @@ class WTournament(QTVarios.WDialogo):
             (_("Show"), Iconos.PGN(), self.gm_show_finished),
             None,
             (_("Save") + "(%s)" % _("PGN"), Iconos.GrabarComo(), self.gm_save_pgn),
+            None,
+            (_("Save") + "(%s)" % _("Database"), Iconos.GrabarComo(), self.gm_save_database),
             None,
         ]
         tbEnGt = Controles.TBrutina(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
@@ -812,7 +815,9 @@ class WTournament(QTVarios.WDialogo):
         li = self.gridGamesFinished.recnosSeleccionados()
         if li:
             pos = li[0]
+            um = QTUtil2.unMomento(self, _("Reading the game"))
             game = self.torneo.game_finished(pos).game()
+            um.final()
             game = Code.procesador.manager_game(self, game, True, False, None)
             if game is not None:
                 self.torneo.save_game_finished(pos, game)
@@ -835,3 +840,22 @@ class WTournament(QTVarios.WDialogo):
                         ws.write("\n\n\n")
                     ws.close()
                     ws.um_final()
+
+    def gm_save_database(self):
+        if self.torneo.num_games_finished() > 0:
+            dbpath = QTVarios.select_db(self, self.configuration, False, True, remove_autosave=True)
+            if dbpath is None:
+                return
+            if dbpath == ":n":
+                dbpath = WDB_Games.new_database(self, self.configuration)
+                if dbpath is None:
+                    return
+            um = QTUtil2.unMomento(self, _("Saving..."))
+            db = DBgames.DBgames(dbpath)
+            for gm in self.torneo.db_games_finished:
+                game = Game.Game()
+                game.restore(gm.game_save)
+                db.insert(game)
+            um.final()
+            db.close()
+            QTUtil2.mensajeTemporal(self, _("Saved"), 1.2)

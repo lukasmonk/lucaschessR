@@ -85,7 +85,7 @@ class Tutor:
         self.gameUsuario.add_move(self.move)
         self.gameUsuario.read_pv(self.rmUsuario.getPV())
         self.posUsuario = 0
-        self.maxUsuario = len(self.gameUsuario.li_moves)
+        self.max_user = len(self.gameUsuario.li_moves)
         self.boardUsuario.set_position(self.move.position)
         w.ponPuntuacionUsuario(self.rmUsuario.texto_tutor())
 
@@ -106,7 +106,7 @@ class Tutor:
                 if self.maxRival >= 0:
                     self.boardRival.set_position(self.gameRival.li_moves[0].position)
                     self.play_rival(True)
-                    w.ponPuntuacionRival(self.rm_rival.texto_tutor())
+                    w.ponPuntuacionRival(self.rm_rival.texto_rival())
 
         self.moving_tutor(True)
         self.moving_user(True)
@@ -181,9 +181,9 @@ class Tutor:
         funcion = eval("self.moving_" + quien)
 
         if que == "Adelante":
-            funcion(nSaltar=1)
+            funcion(n_saltar=1)
         elif que == "Atras":
-            funcion(nSaltar=-1)
+            funcion(n_saltar=-1)
         elif que == "Inicio":
             funcion(is_base=True)
         elif que == "Final":
@@ -192,7 +192,7 @@ class Tutor:
             self.analiza(quien)
         elif que == "Tiempo":
             tb = eval("self.w.tb" + quien)
-            posMax = eval("self.max" + quien)
+            posMax = eval("self.max_" + quien)
             self.move_timed(funcion, tb, posMax)
 
     def move_timed(self, funcion, tb, posMax):
@@ -224,23 +224,23 @@ class Tutor:
             self.w.stop_clock()
             return
         if self.time_pos == 0:
-            self.time_function(siInicio=True)
+            self.time_function(si_inicio=True)
         else:
-            self.time_function(nSaltar=1)
+            self.time_function(n_saltar=1)
 
-    def moving_user(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
-        if nSaltar:
-            pos = self.posUsuario + nSaltar
-            if 0 <= pos < self.maxUsuario:
+    def moving_user(self, si_inicio=False, n_saltar=0, siFinal=False, is_base=False):
+        if n_saltar:
+            pos = self.posUsuario + n_saltar
+            if 0 <= pos < self.max_user:
                 self.posUsuario = pos
             else:
                 return
-        elif siInicio:
+        elif si_inicio:
             self.posUsuario = 0
         elif is_base:
             self.posUsuario = -1
         else:
-            self.posUsuario = self.maxUsuario - 1
+            self.posUsuario = self.max_user - 1
 
         move = self.gameUsuario.move(self.posUsuario if self.posUsuario > -1 else 0)
         if is_base:
@@ -249,14 +249,14 @@ class Tutor:
             self.boardUsuario.set_position(move.position)
             self.boardUsuario.put_arrow_sc(move.from_sq, move.to_sq)
 
-    def moving_tutor(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
-        if nSaltar:
-            pos = self.pos_tutor + nSaltar
+    def moving_tutor(self, si_inicio=False, n_saltar=0, siFinal=False, is_base=False):
+        if n_saltar:
+            pos = self.pos_tutor + n_saltar
             if 0 <= pos < self.max_tutor:
                 self.pos_tutor = pos
             else:
                 return
-        elif siInicio:
+        elif si_inicio:
             self.pos_tutor = 0
         elif is_base:
             self.pos_tutor = -1
@@ -270,14 +270,14 @@ class Tutor:
             self.boardTutor.set_position(move.position)
             self.boardTutor.put_arrow_sc(move.from_sq, move.to_sq)
 
-    def play_rival(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
-        if nSaltar:
-            pos = self.posRival + nSaltar
+    def play_rival(self, si_inicio=False, n_saltar=0, siFinal=False, is_base=False):
+        if n_saltar:
+            pos = self.posRival + n_saltar
             if 0 <= pos < self.maxRival:
                 self.posRival = pos
             else:
                 return
-        elif siInicio:
+        elif si_inicio:
             self.posRival = 0
         elif is_base:
             self.posRival = -1
@@ -291,14 +291,14 @@ class Tutor:
             self.boardRival.set_position(move.position)
             self.boardRival.put_arrow_sc(move.from_sq, move.to_sq)
 
-    def mueveOpening(self, siInicio=False, nSaltar=0, siFinal=False, is_base=False):
-        if nSaltar:
-            pos = self.posOpening + nSaltar
+    def mueveOpening(self, si_inicio=False, n_saltar=0, siFinal=False, is_base=False):
+        if n_saltar:
+            pos = self.posOpening + n_saltar
             if 0 <= pos < self.maxOpening:
                 self.posOpening = pos
             else:
                 return
-        elif siInicio:
+        elif si_inicio:
             self.posOpening = 0
         elif is_base:
             self.posOpening = -1
@@ -325,7 +325,7 @@ class Tutor:
         self.gameOpenings.read_pv(self.liApPosibles[number].a1h8)
         self.boardOpenings.set_position(self.gameOpenings.move(0).position)
         self.maxOpening = len(self.gameOpenings)
-        self.mueveOpening(siInicio=True)
+        self.mueveOpening(si_inicio=True)
 
     def opcionesOpenings(self):
         return [(ap.trNombre, num) for num, ap in enumerate(self.liApPosibles)]

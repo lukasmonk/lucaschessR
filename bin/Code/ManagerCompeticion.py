@@ -111,7 +111,7 @@ class ManagerCompeticion(Manager.Manager):
             self.adjourn()
 
         else:
-            self.rutinaAccionDef(key)
+            Manager.Manager.rutinaAccionDef(self, key)
 
     def reiniciar(self):
         if len(self.game) and QTUtil2.pregunta(self.main_window, _("Restart the game?")):

@@ -249,19 +249,22 @@ class WInfomove(QtWidgets.QWidget):
 
     def MoverAtras(self):
         if self.usoNormal:
-            self.colocate(self.posHistoria - 1)
+            if not (self.posHistoria is None):
+                self.colocate(self.posHistoria - 1)
         else:
             self.colocatePartida(self.pos_move - 1)
 
     def MoverAdelante(self):
         if self.usoNormal:
-            self.colocate(self.posHistoria + 1)
+            if not (self.posHistoria is None):
+                self.colocate(self.posHistoria + 1)
         else:
             self.colocatePartida(self.pos_move + 1)
 
     def MoverFinal(self):
         if self.usoNormal:
-            self.colocate(len(self.historia) - 1)
+            if not (self.historia is None):
+                self.colocate(len(self.historia) - 1)
         else:
             self.colocatePartida(99999)
 

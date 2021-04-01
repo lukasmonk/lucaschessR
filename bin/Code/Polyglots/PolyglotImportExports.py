@@ -532,7 +532,6 @@ def import_polyglot_config(owner, configuration, titulo, with_collisions):
         return plies, st_side, st_results, ru, min_games, min_score, calc_weight, save_score
 
 
-
 def export_polyglot_config(owner, configuration, file_nom_def):
     dic = configuration.read_variables("POLYGLOT_EXPORT")
     form = FormLayout.FormLayout(owner, _("Export to"), Iconos.Export8(), anchoMinimo=440)
@@ -554,10 +553,17 @@ def export_polyglot_config(owner, configuration, file_nom_def):
     if not path_bin:
         return None
 
-    path_bin = os.path.realpath(path_bin)
     dic["FOLDER"] = os.path.dirname(path_bin)
     dic["UNIFORM"] = uniform
     configuration.write_variables("POLYGLOT_EXPORT", dic)
+
+    path_bin = os.path.realpath(path_bin)
+    if Util.exist_file(path_bin):
+        yn = QTUtil2.preguntaCancelar(owner, _X(_("The file %1 already exists, what do you want to do?"), os.path.basename(path_bin)), si=_("Overwrite"), no=_("Choose another"))
+        if yn is None:
+            return
+        if not yn:
+            return export_polyglot_config(owner, configuration, os.path.basename(path_bin))
 
     return path_bin, uniform
 

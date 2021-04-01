@@ -276,7 +276,7 @@ class Procesador:
 
     def creaXTutor(self):
         xtutor = EngineManager.EngineManager(self, self.configuration.tutor)
-        xtutor.name += "(%s)" % _("tutor")
+        xtutor.function = _("tutor")
         xtutor.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         if self.configuration.x_tutor_multipv == 0:
             xtutor.maximizaMultiPV()
@@ -298,7 +298,7 @@ class Procesador:
 
     def creaXAnalyzer(self):
         xanalyzer = EngineManager.EngineManager(self, self.configuration.tutor)
-        xanalyzer.name += "(%s)" % _("analyzer")
+        xanalyzer.function = _("analyzer")
         xanalyzer.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         if self.configuration.x_tutor_multipv == 0:
             xanalyzer.maximizaMultiPV()

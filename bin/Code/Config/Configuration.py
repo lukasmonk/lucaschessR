@@ -269,8 +269,6 @@ class Configuration:
 
         self.x_check_for_update = False
 
-        self.x_log_engines = False
-
         self.x_carpeta_gaviota = self.carpeta_gaviota_defecto()
 
         # Editable directamente en su código
@@ -435,6 +433,9 @@ class Configuration:
 
     def file_param_analysis(self):
         return self.opj_config("paranalisis.pkd")
+
+    def file_analysis(self):
+        return self.opj_config("analisis.db")
 
     def file_play_game(self):
         return "%s/PlayGame.db" % self.carpeta_results

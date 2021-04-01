@@ -602,7 +602,7 @@ class ManagerWashingCreate(Manager.Manager):
             self.utilidades()
 
         else:
-            self.rutinaAccionDef(key)
+            Manager.Manager.rutinaAccionDef(self, key)
 
     def analizaInicio(self):
         self.siAnalizando = False

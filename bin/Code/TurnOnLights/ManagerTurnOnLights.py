@@ -130,6 +130,9 @@ class ManagerTurnOnLights(Manager.Manager):
         elif key == TB_NEXT:
             self.next_line_run()
 
+        else:
+            Manager.Manager.rutinaAccionDef(self, key)
+
     def reiniciar(self):
         if self.state == ST_PLAYING:
             if self.ini_time:

@@ -310,11 +310,12 @@ class InfoMove(QtWidgets.QWidget):
         pass
 
     def ponValores(self):
-        position, from_sq, to_sq = self.movActual.damePosicion()
-        self.board.set_position(position)
+        if self.movActual:
+            position, from_sq, to_sq = self.movActual.damePosicion()
+            self.board.set_position(position)
 
-        if from_sq:
-            self.board.put_arrow_sc(from_sq, to_sq)
+            if from_sq:
+                self.board.put_arrow_sc(from_sq, to_sq)
 
     def ponTituloLibro(self, titulo):
         self.lbTituloLibro.set_text("<h2>" + titulo + "</h2>")
@@ -326,7 +327,7 @@ class InfoMove(QtWidgets.QWidget):
 
     def atras(self):
         if self.movActual:
-            self.movActual.takeback()
+            self.movActual.atras()
         self.ponValores()
 
     def adelante(self):
@@ -397,15 +398,18 @@ class WindowArbolBook(QTVarios.WDialogo):
     def aceptar(self):
         if self.siEnviar:
             mov = self.wmoves.tree.currentMov()
-            li = []
-            while True:
-                nv = mov.listaMovesPadre.nivel
-                li.append((mov.from_sq, mov.to_sq, mov.promotion))
-                if nv == 0:
-                    break
-                mov = mov.listaMovesPadre.moveOwner
-            self.resultado = li
-            self.accept()
+            if mov:
+                li = []
+                while True:
+                    nv = mov.listaMovesPadre.nivel
+                    li.append((mov.from_sq, mov.to_sq, mov.promotion))
+                    if nv == 0:
+                        break
+                    mov = mov.listaMovesPadre.moveOwner
+                self.resultado = li
+                self.accept()
+            else:
+                self.reject()
         else:
             self.reject()
         self.save_video()

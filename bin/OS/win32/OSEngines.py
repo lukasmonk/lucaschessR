@@ -1,7 +1,6 @@
 import os
 import platform
 
-import Code
 import FasterCode
 
 from Code.Engines import Engines
@@ -157,7 +156,8 @@ def read_engines(folder_engines):
     cm = mas("zappa", "Anthony Cozzie", "1.1", "http://www.acoz.net/zappa/", "zappa.exe", 2581)
     cm.removeLog("zappa_log.txt")
 
-    mas("houdini", "Robert Houdart", "1.5a", "http://www.cruxis.com/chess/houdini.htm", "Houdini_15a_w32.exe", 3093)
+    cm = mas("houdini", "Robert Houdart", "1.5a", "http://www.cruxis.com/chess/houdini.htm", "Houdini_15a_w32.exe", 3093)
+    cm.ponMultiPV(5, 16)
 
     cm = mas("hannibal", "Samuel N. Hamilton and Edsel G. Apostol", "1.4b", "http://sites.google.com/site/edapostol/hannibal", "Hannibal1.4bx32.exe", 3000)
     cm.removeLog("logfile.txt")

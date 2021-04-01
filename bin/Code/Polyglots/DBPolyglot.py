@@ -132,16 +132,23 @@ class DBPolyglot:
         return li_resp
 
     def get_all(self):
-        sql = "SELECT CKEY, MOVE, WEIGHT, SCORE, DEPTH, LEARN FROM BOOK ORDER BY CKEY"
+        sql = "SELECT DISTINCT length(CKEY) FROM BOOK"
         cursor = self.conexion.execute(sql)
-        while True:
-            row = cursor.fetchone()
-            if not row:
-                break
-            entry = FasterCode.Entry()
-            ckey, entry.move, entry.weight, entry.score, entry.depth, entry.learn = row
-            entry.key = FasterCode.str_int(ckey)
-            yield entry
+        li_length = [ int(x[0]) for x in cursor.fetchall()]
+        li_length.sort()
+
+        sql = "SELECT CKEY, MOVE, WEIGHT, SCORE, DEPTH, LEARN FROM BOOK WHERE LENGTH(CKEY) = ? ORDER BY CKEY"
+
+        for length in li_length:
+            cursor = self.conexion.execute(sql, (length,))
+            while True:
+                row = cursor.fetchone()
+                if not row:
+                    break
+                entry = FasterCode.Entry()
+                ckey, entry.move, entry.weight, entry.score, entry.depth, entry.learn = row
+                entry.key = FasterCode.str_int(ckey)
+                yield entry
 
         yield None
 

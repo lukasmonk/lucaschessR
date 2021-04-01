@@ -186,7 +186,7 @@ class WLines(QTVarios.WDialogo):
         liGen.append((config, dicVar.get("MULTIPV", self.configuration.x_tutor_multipv)))
 
         liGen.append(FormLayout.separador)
-        liGen.append((_("Redo any existing prior analyses (if they exist)") + ":", dicVar.get("REDO", False)))
+        liGen.append((_("Redo any existing prior analysis (if they exist)") + ":", dicVar.get("REDO", False)))
 
         resultado = FormLayout.fedit(liGen, title=_("Mass analysis"), parent=self, anchoMinimo=460, icon=Iconos.Analizar())
         if resultado is None:
