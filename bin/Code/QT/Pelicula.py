@@ -92,7 +92,7 @@ class Pelicula:
     def move_the_pieces(self, liMovs):
         cpu = self.procesador.cpu
         cpu.reset()
-        segundos = None
+        secs = None
 
         move = self.li_moves[self.current_position]
         num = self.current_position
@@ -105,24 +105,23 @@ class Pelicula:
         # primero los movimientos
         for movim in liMovs:
             if movim[0] == "m":
-                if segundos is None:
+                if secs is None:
                     from_sq, to_sq = movim[1], movim[2]
                     dc = ord(from_sq[0]) - ord(to_sq[0])
                     df = int(from_sq[1]) - int(to_sq[1])
                     # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 segundos
                     dist = (dc ** 2 + df ** 2) ** 0.5
                     rp = self.rapidez if self.rapidez > 1.0 else 1.0
-                    segundos = 4.0 * dist / (9.9 * rp)
+                    secs = 4.0 * dist / (9.9 * rp)
+                cpu.muevePieza(movim[1], movim[2], siExclusiva=False, segundos=secs)
 
-                cpu.muevePieza(movim[1], movim[2], siExclusiva=False, segundos=segundos)
-
-        if segundos is None:
-            segundos = 1.0
+        if secs is None:
+            secs = 1.0
 
         # segundo los borrados
         for movim in liMovs:
             if movim[0] == "b":
-                n = cpu.duerme(segundos * 0.80)
+                n = cpu.duerme(secs * 0.80)
                 cpu.borraPieza(movim[1], padre=n)
 
         # tercero los cambios
@@ -193,9 +192,11 @@ class Pelicula:
 
     def repetir(self):
         self.current_position = 0 if self.if_start else self.jugInicial
-        self.siStop = False
+        self.current_position -= 1
         self.muestraPausa(True)
-        self.muestraActual()
+        if self.siStop:
+            self.siStop = False
+            self.muestraActual()
 
     def skip(self):
         if self.siStop:

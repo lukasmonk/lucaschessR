@@ -371,9 +371,9 @@ class WPlayer(QtWidgets.QWidget):
         lp = self.listaPlayers()
         if len(lp) == 0:
             self.rereadPlayers()
-        lp = self.listaPlayers()
-        if len(lp) == 0:
-            return None
+            lp = self.listaPlayers()
+            if len(lp) == 0:
+                return None
 
         menu = QTVarios.LCMenu(self)
         menu.opcion("change", _("Change"), Iconos.ModificarP())

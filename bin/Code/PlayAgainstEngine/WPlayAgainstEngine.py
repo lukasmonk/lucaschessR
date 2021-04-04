@@ -202,23 +202,15 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         lbThoughtTt = Controles.LB(self, _("It is showed") + ":").ponFuente(font)
         self.cbThoughtTt = Controles.CB(self, liThinks, -1).ponFuente(font)
 
-        self.lbBoxHeight = Controles.LB2P(self, _("Box height")).ponFuente(font)
-        self.sbBoxHeight = Controles.SB(self, 7, 0, 999).tamMaximo(50).ponFuente(font)
-
-
-        self.chbContinueTt = Controles.CHB(self, _("The tutor thinks while you think"), True).ponFuente(font)
-
         lbArrows = Controles.LB2P(self, _("Arrows with the best moves")).ponFuente(font)
         self.sbArrowsTt = Controles.SB(self, 3, 0, 999).tamMaximo(50).ponFuente(font)
 
         lyT1 = Colocacion.H().control(lbAyudas).control(self.cbAyudas).relleno()
         lyT1.control(self.chbChance).relleno().control(btTutorChange)
-        lyT2 = Colocacion.H().control(self.chbContinueTt).relleno()
-        lyT2.control(self.lbBoxHeight).control(self.sbBoxHeight).relleno()
         lyT3 = Colocacion.H().control(lbThoughtTt).control(self.cbThoughtTt).relleno()
         lyT3.control(lbArrows).control(self.sbArrowsTt)
 
-        ly = Colocacion.V().otro(lyT1).espacio(16).otro(lyT2).otro(lyT3).relleno()
+        ly = Colocacion.V().otro(lyT1).espacio(16).otro(lyT3).relleno()
 
         self.gbTutor = Controles.GB(self, _("Activate the tutor's help"), ly)
         self.gbTutor.setCheckable(True)
@@ -233,8 +225,13 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         gbThoughtOp = Controles.GB(self, _("Opponent's thought information"), ly)
         gbThoughtOp.setStyleSheet(gb_style)
 
+        self.lbBoxHeight = Controles.LB2P(self, "%s (\"%s\")" %(_("Box height"), _("It is showed"))).ponFuente(font)
+        self.sbBoxHeight = Controles.SB(self, 7, 0, 999).tamMaximo(50).ponFuente(font)
+
+        lyBox = Colocacion.H().control(self.lbBoxHeight).control(self.sbBoxHeight).relleno()
+
         ly = Colocacion.V().espacio(16).control(self.gbTutor).control(gbThoughtOp)
-        ly.espacio(16).control(self.chbSummary).control(self.chbTakeback).margen(6)
+        ly.espacio(16).otro(lyBox).control(self.chbSummary).control(self.chbTakeback).margen(6)
 
         nueva_tab(ly, _("Help configuration"))
 
@@ -751,7 +748,6 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         dic["THOUGHTOP"] = self.cbThoughtOp.valor()
         dic["THOUGHTTT"] = self.cbThoughtTt.valor()
         dic["ARROWSTT"] = self.sbArrowsTt.valor()
-        dic["CONTINUETT"] = self.chbContinueTt.isChecked()
         dic["2CHANCE"] = self.chbChance.isChecked()
         dic["SUMMARY"] = self.chbSummary.isChecked()
         dic["TAKEBACK"] = self.chbTakeback.isChecked()
@@ -814,7 +810,6 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         self.cbThoughtOp.ponValor(dic.get("THOUGHTOP", -1))
         self.cbThoughtTt.ponValor(dic.get("THOUGHTTT", -1))
         self.sbArrowsTt.ponValor(dic.get("ARROWSTT", 0))
-        self.chbContinueTt.setChecked(dic.get("CONTINUETT", True))
         self.chbChance.setChecked(dic.get("2CHANCE", True))
         self.chbSummary.setChecked(dic.get("SUMMARY", False))
         self.chbTakeback.setChecked(dic.get("TAKEBACK", True))

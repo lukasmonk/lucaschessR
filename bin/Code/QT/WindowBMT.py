@@ -1006,7 +1006,7 @@ class WBMT(QTVarios.WDialogo):
     def historial(self):
         grid, dbf, recno = self.actual()
         if recno >= 0:
-            if dbf.REPE:
+            if dbf.REPE > 0:
                 w = WHistorialBMT(self, dbf)
                 w.exec_()
 
@@ -1434,7 +1434,7 @@ class WBMT(QTVarios.WDialogo):
 
         if recno >= 0:
             regActual = dbf.registroActual()
-            carpeta = os.path.dirname(self.configuration.ficheroBMT)
+            carpeta = os.path.join(os.path.dirname(self.configuration.ficheroBMT), dbf.NOMBRE)
             filtro = _("File") + " bm1 (*.bm1)"
             fbm1 = QTUtil2.salvaFichero(self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True)
             if fbm1:

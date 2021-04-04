@@ -1,17 +1,17 @@
 import FasterCode
 
-from Code.Base import Game, Position
 from Code import Manager
+from Code import TrListas
+from Code.Base import Game, Position
+from Code.Base.Constantes import *
+from Code.PlayAgainstEngine import WPlayAgainstEngine
 from Code.QT import Controles
 from Code.QT import Iconos
-from Code.PlayAgainstEngine import WPlayAgainstEngine
-from Code.QT import WindowPgnTags
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import TrListas
 from Code.QT import Voyager
-from Code.Base.Constantes import *
+from Code.QT import WindowPgnTags
 
 
 class ManagerGame(Manager.Manager):
@@ -19,7 +19,7 @@ class ManagerGame(Manager.Manager):
         self.game_type = GT_ALONE
 
         self.game = game
-        self.game.is_finished() # Necesario para que no haya cambios a posteriori y close pregunte si grabar
+        self.game.is_finished()  # Necesario para que no haya cambios a posteriori y close pregunte si grabar
         self.is_complete = is_complete
         self.only_consult = only_consult
         self.with_previous_next = with_previous_next
@@ -93,9 +93,7 @@ class ManagerGame(Manager.Manager):
                 black = valor
             elif key == "RESULT":
                 result = valor
-        self.set_label1(
-            "%s : <b>%s</b><br>%s : <b>%s</b>" % (_("White"), white, _("Black"), black) if white and black else ""
-        )
+        self.set_label1("%s : <b>%s</b><br>%s : <b>%s</b>" % (_("White"), white, _("Black"), black) if white and black else "")
         self.set_label2("%s : <b>%s</b>" % (_("Result"), result) if result else "")
 
     def reiniciar(self):
@@ -106,7 +104,6 @@ class ManagerGame(Manager.Manager):
         p.recno = getattr(self.game, "recno", None)
 
         self.start(p, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
-
 
     def run_action(self, key):
         if key == TB_REINIT:
@@ -128,9 +125,7 @@ class ManagerGame(Manager.Manager):
             self.configurarGS()
 
         elif key == TB_UTILITIES:
-            liMasOpciones = (
-                ("books", _("Consult a book"), Iconos.Libros()),
-            )
+            liMasOpciones = (("books", _("Consult a book"), Iconos.Libros()),)
 
             resp = self.utilidades(liMasOpciones)
             if resp == "books":
@@ -155,16 +150,19 @@ class ManagerGame(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-
     def end_game(self):
         ok = False
         if not self.only_consult:
             ok = self.ask_for_save_game()
+            if ok is None:
+                return None
 
         if ok:
             self.main_window.accept()
+
         else:
             self.main_window.reject()
+
         return ok
 
     def final_x(self):
@@ -362,9 +360,7 @@ class ManagerGame(Manager.Manager):
         if texto:
             ok, game = Game.pgn_game(texto)
             if not ok:
-                QTUtil2.message_error(
-                    self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
-                )
+                QTUtil2.message_error(self.main_window, _("The text from the clipboard does not contain a chess game in PGN format"))
                 return
             self.replace_game(game)
 
@@ -382,9 +378,7 @@ class ManagerGame(Manager.Manager):
         else:
             dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
-        dic = self.dicRival = WPlayAgainstEngine.cambioRival(
-            self.main_window, self.configuration, dicBase, siManagerSolo=True
-        )
+        dic = self.dicRival = WPlayAgainstEngine.cambioRival(self.main_window, self.configuration, dicBase, siManagerSolo=True)
 
         if dic:
             for k, v in dic.items():

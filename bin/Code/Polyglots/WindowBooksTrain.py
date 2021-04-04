@@ -134,16 +134,16 @@ class WBooksTrain(QTVarios.WDialogo):
             self.rehacer_cb(b)
 
     def borrar(self):
-        book = self.cb.valor()
+        book = self.cb_player.valor()
         if book:
-            if QTUtil2.pregunta(self, _X(_("Delete from list the book %1?"), book.nombre)):
+            if QTUtil2.pregunta(self, _X(_("Delete from list the book %1?"), book.name)):
                 self.list_books.borra(book)
                 self.rehacer_cb(None)
 
     def rehacer_cb(self, inicial):
         fvar = self.configuration.file_books
         self.list_books.save_pickle(fvar)
-        li = [(x.nombre, x) for x in self.list_books.lista]
+        li = [(x.name, x) for x in self.list_books.lista]
         if inicial is None:
             inicial = li[0][1] if li else None
         self.cb_player.rehacer(li, inicial)

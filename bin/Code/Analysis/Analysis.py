@@ -680,7 +680,8 @@ class TabAnalysis:
         self.move.add_variation(variation)
 
     def put_view_manager(self):
-        self.tb_analysis.procesador.manager.put_view()
+        if self.tb_analysis.procesador.manager:
+            self.tb_analysis.procesador.manager.put_view()
 
 
 class MuestraAnalisis:

@@ -153,7 +153,9 @@ class BlindfoldConfig:
                 self.dicPiezas[pieza] = HIDE
 
     def save(self):
-        Code.configuration.write_variables("BLINDFOLD", self.dicPiezas)
+        dic: dict = Code.configuration.read_variables("BLINDFOLD")
+        dic.update(self.dicPiezas)
+        Code.configuration.write_variables("BLINDFOLD", dic)
 
 
 class Blindfold(ConjuntoPiezas):

@@ -781,8 +781,6 @@ class Manager:
             return self.pgn.actual()
         elif tipo == "fen":
             return self.fenActivoConInicio()
-        elif tipo == "fns":
-            return self.game.fensActual()
 
     def jugadaActiva(self):
         row, column = self.main_window.pgnPosActual()
@@ -1340,15 +1338,9 @@ class Manager:
 
         menuSave.separador()
 
-        menuFEN = menuSave.submenu(_("FEN Format"), Iconos.Naranja())
-        menuFEN.opcion("fenfichero", trFichero, icoFichero)
-        menuFEN.opcion("fenportapapeles", trPortapapeles, icoClip)
-
-        menuSave.separador()
-
-        menuFNS = menuSave.submenu(_("List of FENs"), Iconos.InformacionPGNUno())
-        menuFNS.opcion("fnsfichero", trFichero, icoFichero)
-        menuFNS.opcion("fnsportapapeles", trPortapapeles, icoClip)
+        menu_fen = menuSave.submenu(_("FEN Format"), Iconos.Naranja())
+        menu_fen.opcion("fenfichero", trFichero, icoFichero)
+        menu_fen.opcion("fenportapapeles", trPortapapeles, icoClip)
 
         menuSave.separador()
 
@@ -1486,12 +1478,12 @@ class Manager:
             self.salvar_pgn()
 
         elif resp.startswith("dbf_"):
-            self.salvaDB(resp[4:])
+            self.save_db(resp[4:])
 
-        elif resp.startswith("fen") or resp.startswith("fns"):
+        elif resp.startswith("fen"):
             extension = resp[:3]
             si_fichero = resp.endswith("fichero")
-            self.salvaFEN_FNS(extension, si_fichero)
+            self.save_fen(si_fichero)
 
         return None
 
@@ -1513,7 +1505,7 @@ class Manager:
         um.final()
         WindowAnalysis.showGraph(self.main_window, self, alm, Analysis.show_analysis)
 
-    def salvaDB(self, database):
+    def save_db(self, database):
         pgn = self.listado("pgn")
         liTags = []
         for linea in pgn.split("\n"):
@@ -1572,10 +1564,10 @@ class Manager:
         w = WindowSavePGN.WSave(self.main_window, self.game, self.configuration)
         w.exec_()
 
-    def salvaFEN_FNS(self, extension, siFichero):
-        dato = self.listado(extension)
+    def save_fen(self, siFichero):
+        dato = self.listado("fen")
         if siFichero:
-
+            extension = "fns"
             resp = QTUtil2.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, _("File") + " %s (*.%s)" % (extension, extension), False)
             if resp:
                 try:

@@ -343,6 +343,8 @@ class DBgames:
                 li = cursor.fetchmany(chunk)
                 if li:
                     for pos, (XPV, RESULT) in enumerate(li):
+                        if XPV.startswith("|"):
+                            continue
                         pv = xpv_pv(XPV)
                         self.db_stat.append(pv, RESULT)
                         if (pos % (chunk // 20)) == 0:
@@ -421,13 +423,13 @@ class DBgames:
                 return
 
     def players(self):
-        sql = "SELECT DISTINCT WHITE FROM Games"
+        sql = 'SELECT DISTINCT WHITE FROM Games WHERE XPV NOT LIKE "|%"'
         cursor = self.conexion.execute(sql)
-        listaw = [raw[0] for raw in cursor.fetchall()]
+        listaw = [raw[0] for raw in cursor.fetchall() if raw[0]]
 
-        sql = "SELECT DISTINCT BLACK FROM Games"
+        sql = 'SELECT DISTINCT BLACK FROM Games WHERE XPV NOT LIKE "|%"'
         cursor = self.conexion.execute(sql)
-        listab = [raw[0] for raw in cursor.fetchall()]
+        listab = [raw[0] for raw in cursor.fetchall() if raw[0]]
 
         listaw.extend(listab)
 

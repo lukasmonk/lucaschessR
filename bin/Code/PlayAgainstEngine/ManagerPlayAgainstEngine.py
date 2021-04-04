@@ -135,7 +135,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         n_box_height = dic_var.get("BOXHEIGHT", 24)
         self.thoughtOp = dic_var.get("THOUGHTOP", -1)
         self.thoughtTt = dic_var.get("THOUGHTTT", -1)
-        self.continueTt = dic_var.get("CONTINUETT", False)
+        self.continueTt = not Code.configuration.x_engine_notbackground
         self.nArrowsTt = dic_var.get("ARROWSTT", 0)
         self.chance = dic_var.get("2CHANCE", True)
 
@@ -687,6 +687,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.summary[njug][key] = value
 
     def analizaInicio(self):
+        if not self.is_tutor_enabled:
+            return
         self.is_analyzing = False
         self.is_analyzed_by_tutor = False
         if not self.tutor_con_flechas:
@@ -699,7 +701,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
 
     def analiza_control_no_continuett(self):
-        if self.is_analyzed_by_tutor or not self.is_analyzing:
+        if not self.is_tutor_enabled or self.is_analyzed_by_tutor or not self.is_analyzing:
             return
 
         mrm = self.xtutor.ac_estado()
@@ -719,11 +721,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
 
     def analizaFinal(self, is_mate=False):
-        if is_mate:
+        if not self.is_tutor_enabled:
             if self.is_analyzing:
                 self.xtutor.stop()
+                self.is_analyzing = False
             return
-        if not self.is_tutor_enabled:
+        if is_mate:
             if self.is_analyzing:
                 self.xtutor.stop()
             return
@@ -1068,9 +1071,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                 menu = QTVarios.LCMenu(self.main_window)
                                 menu.opcion("None", _("There are %d best moves") % num, Iconos.Motor())
                                 menu.separador()
+                                resp = rmTutor.abrTextoBase()
+                                if not resp:
+                                    resp = _("Mate")
                                 menu.opcion(
                                     "tutor",
-                                    "&1. %s (%s)" % (_("Show tutor"), rmTutor.abrTextoBase()),
+                                    "&1. %s (%s)" % (_("Show tutor"), resp),
                                     Iconos.Tutor(),
                                 )
                                 menu.separador()

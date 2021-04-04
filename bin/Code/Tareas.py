@@ -138,6 +138,11 @@ class TareaMuevePieza(Tarea):
             self.pieza = self.board.damePiezaEn(self.from_a1h8)
             if self.pieza is None:
                 return True
+        npuntos = len(self.liPuntos)
+        if npuntos == 0:
+            return True
+        if self.nPaso >= npuntos:
+            self.nPaso = npuntos - 1
         p = self.liPuntos[self.nPaso]
         bp = self.pieza.bloquePieza
         bp.physical_pos.x = p.x()

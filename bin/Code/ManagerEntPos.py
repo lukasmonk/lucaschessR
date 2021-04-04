@@ -1,26 +1,27 @@
 import os
 
+from PySide2 import QtCore
 from PySide2.QtCore import Qt
 
-from Code import Manager
+import Code
 from Code import FNSLine
-from Code.Base import Game, Move
-from Code.QT import WCompetitionWithTutor
-from Code.QT import Iconos
-from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code import Manager
 from Code import TrListas
 from Code import Tutor
 from Code import Util
-from Code.SQL import UtilSQL
-import Code
+from Code.Base import Game, Move
 from Code.Base.Constantes import *
+from Code.QT import Iconos
+from Code.QT import QTUtil
+from Code.QT import QTUtil2
+from Code.QT import WCompetitionWithTutor
+from Code.SQL import UtilSQL
 
 
 class ManagerEntPos(Manager.Manager):
     line_fns: FNSLine.FNSLine
     pos_obj: int
-    game_obj: Game.Game
+    game_obj: [Game.Game, None]
 
     def set_training(self, entreno):
         # Guarda el ultimo entrenamiento en el db de entrenos
@@ -132,6 +133,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.reiniciando = False
         self.is_rival_thinking = False
+        self.is_analyzing = False
         self.play_next_move()
 
     def run_action(self, key):
@@ -296,29 +298,49 @@ class ManagerEntPos(Manager.Manager):
         self.play_next_move()
 
     def analizaInicio(self):
-        if not self.is_tutor_enabled:
-            return
-
         self.is_analyzing = False
         self.is_analyzed_by_tutor = False
-        if self.continueTt:
-            if not self.is_finished():
-                self.xtutor.ac_inicio(self.game)
-                self.is_analyzing = True
-        else:
-            mrm = self.analizaTutor()
+        if not self.is_tutor_enabled:
+            return
+        if self.is_playing_gameobj():
+            return
+
+        if not self.is_finished():
+            self.xtutor.ac_inicio(self.game)
+            self.is_analyzing = True
+
+        if not self.continueTt:
+            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
+
+    def analiza_control_no_continuett(self):
+        if not self.is_tutor_enabled or self.is_analyzed_by_tutor or not self.is_analyzing:
+            return
+
+        mrm = self.xtutor.ac_estado()
+        rm = mrm.mejorMov()
+        ok_end = False
+        if self.xtutor.motorTiempoJugada:
+            ok_end = rm.time >= self.xtutor.motorTiempoJugada
+        if not ok_end:
+            if self.xtutor.motorProfundidad:
+                ok_end = rm.depth >= self.xtutor.motorProfundidad
+        if ok_end:
+            self.xtutor.stop()
+            self.mrmTutor = mrm
             self.is_analyzed_by_tutor = True
+            self.is_analyzing = False
+        else:
+            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
 
     def analizaFinal(self, is_mate=False):
+        if self.is_playing_gameobj():
+            return
         if not self.is_tutor_enabled:
             if self.is_analyzing:
                 self.xtutor.stop()
+                self.is_analyzing = False
             return
         if is_mate:
-            if self.is_analyzing:
-                self.xtutor.stop()
-            return
-        if not self.is_tutor_enabled:
             if self.is_analyzing:
                 self.xtutor.stop()
             return
@@ -326,24 +348,20 @@ class ManagerEntPos(Manager.Manager):
         self.is_analyzing = False
         if self.is_analyzed_by_tutor:
             return
-        if self.continueTt and estado:
-            self.main_window.pensando_tutor(True)
-            self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
-            self.main_window.pensando_tutor(False)
-        else:
-            self.mrmTutor = self.analizaTutor()
-        self.is_analyzed_by_tutor = True
+        self.main_window.pensando_tutor(True)
+        self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+        self.main_window.pensando_tutor(False)
 
     def analiza_stop(self):
         if self.is_analyzing:
             self.xtutor.stop()
 
-
     def sigue(self):
         self.state = ST_PLAYING
         if TB_CONTINUE in self.li_options_toolbar:
-            del self.li_options_toolbar[self.li_options_toolbar.index(TB_CONTINUE)]
+            del self.li_options_toolbar[4]
             self.main_window.pon_toolbar(self.li_options_toolbar)
+        self.game_obj = None
         self.play_next_move()
 
     def lineaTerminadaOpciones(self):

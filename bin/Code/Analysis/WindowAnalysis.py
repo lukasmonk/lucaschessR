@@ -466,13 +466,14 @@ class WMuestra(QtWidgets.QWidget):
         menu.separador()
         menu.opcion(False, _("Only the first move of each variation"), Iconos.PuntoRojo())
         is_complete = menu.lanza()
-        if is_complete:
-            for pos, tp in enumerate(self.um.list_rm_name):
-                rm = tp[0]
-                game = Game.Game(self.um.move.position_before)
-                game.read_pv(rm.pv)
-                self.um.save_base(game, rm, is_complete)
-            self.um.put_view_manager()
+        if is_complete is None:
+            return
+        for pos, tp in enumerate(self.um.list_rm_name):
+            rm = tp[0]
+            game = Game.Game(self.um.move.position_before)
+            game.read_pv(rm.pv)
+            self.um.save_base(game, rm, is_complete)
+        self.um.put_view_manager()
 
 
 class WAnalisis(QTVarios.WDialogo):

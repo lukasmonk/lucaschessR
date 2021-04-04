@@ -942,6 +942,7 @@ class Procesador:
         db.close()
         dic = {"GAME": game.save()}
         manager = ManagerSolo.ManagerSolo(self)
+        self.manager = manager
         manager.start(dic)
 
     def polyglot_factory(self):
