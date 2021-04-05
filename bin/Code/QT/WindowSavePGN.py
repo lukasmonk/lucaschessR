@@ -417,10 +417,11 @@ class WSave(QTVarios.WDialogo):
         elif codec == "file":
             codec = "utf-8"
             if Util.exist_file(self.file):
-                with open(self.file) as f:
+                with open(self.file, "rb") as f:
                     u = chardet.universaldetector.UniversalDetector()
                     for n, x in enumerate(f):
-                        u.feed(x)
+                        if x.strip():
+                            u.feed(x)
                         if n == 1000:
                             break
                     u.close()
@@ -563,7 +564,7 @@ class FileSavePGN:
         elif self.codec == "file":
             self.codec = "utf-8"
             if Util.exist_file(self.file):
-                with open(self.file) as f:
+                with open(self.file, "rb") as f:
                     u = chardet.universaldetector.UniversalDetector()
                     for n, x in enumerate(f):
                         u.feed(x)

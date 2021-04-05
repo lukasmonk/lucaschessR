@@ -710,9 +710,9 @@ class OpenCodec:
         self.f.close()
 
 
-def txt_encoding(txt):
+def txt_encoding(btxt):
     u = chardet.universaldetector.UniversalDetector()
-    u.feed(txt)
+    u.feed(btxt)
     u.close()
     return u.result.get("encoding", "utf-8")
 

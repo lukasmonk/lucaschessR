@@ -39,7 +39,7 @@ class PolyglotExport:
     def export_create_polyglot(self, path_bin, uniform):
         total = len(self.db_entries)
 
-        bp = QTUtil2.BarraProgreso(self.wpolyglot, _("Create book"), os.path.basename(path_bin), total )
+        bp = QTUtil2.BarraProgreso(self.wpolyglot, _("Create book"), os.path.basename(path_bin), total)
         wpoly = FasterCode.PolyglotWriter(path_bin)
 
         bp.mostrar()
@@ -59,7 +59,7 @@ class PolyglotExport:
                     if uniform:
                         xentry.weight = 100
                     elif factor:
-                        xentry.weight = max(int(factor*xentry.weight), 1)
+                        xentry.weight = max(int(factor * xentry.weight), 1)
                     if xentry.score > 32767:
                         xentry.score = 32767
                     if xentry.depth > 255:
@@ -75,7 +75,7 @@ class PolyglotExport:
             if entry.key != key_current:
                 save()
                 key_current = entry.key
-                li_current = [entry,]
+                li_current = [entry]
             else:
                 li_current.append(entry)
         save()
@@ -140,7 +140,7 @@ class PolyglotImport:
             if not collisions:
                 return
 
-        bp = QTUtil2.BarraProgreso(self.wpolyglot, _("Import"), os.path.basename(path_bin), total )
+        bp = QTUtil2.BarraProgreso(self.wpolyglot, _("Import"), os.path.basename(path_bin), total)
 
         pol_import = FasterCode.Polyglot(path_bin)
         for entry in pol_import:
@@ -275,6 +275,7 @@ class PolyglotImport:
         return not cancelled
 
     def merge(self, db, min_games, min_score, calc_weight, save_score, collisions):
+        um = QTUtil2.unMomento(self.wpolyglot, _("Saving..."))
         g_nueva = iter(fuente_dbbig(db, min_games, min_score, calc_weight, save_score))
 
         for n_key, dic_data in g_nueva:
@@ -285,6 +286,7 @@ class PolyglotImport:
         db.close()
 
         self.wpolyglot.set_position(self.wpolyglot.position, False)
+        um.final()
 
 
 class ImportarPGNDB(QtWidgets.QDialog):
@@ -362,9 +364,7 @@ class ImportarPGNDB(QtWidgets.QDialog):
                 minutos = previsto // 60
                 segundos = previsto % 60
                 lb_min = _("minutes") if minutos > 1 else _("minute")
-                self.lb_previsto.set_text(
-                    "%s: %d %s %d %s" % (_("Pending time"), minutos, lb_min, segundos, _("seconds"))
-                )
+                self.lb_previsto.set_text("%s: %d %s %d %s" % (_("Pending time"), minutos, lb_min, segundos, _("seconds")))
 
         QTUtil.refresh_gui()
         return not self.is_canceled
@@ -474,15 +474,11 @@ def import_polyglot_config(owner, configuration, titulo, with_collisions):
     form.combobox("%s %s" % (_("Unknown result"), _("convert to")), li_options, dic.get("*", ""))
     form.separador()
 
-    form.spinbox(_("Minimum number of games"), 1, 999999, 50, dic.get("MINGAMES", 5))
+    form.spinbox(_("Minimum number of games"), 1, 999999, 50, dic.get("MINGAMES", 3))
     form.spinbox(_("Minimum score") + " (0-100)", 0, 100, 50, dic.get("MINSCORE", 0))
 
     form.separador()
-    li_options = (
-        (_("Number of games"), CALCWEIGHT_NUMGAMES),
-        (_("Number of games") + " * " + _("Score"), CALCWEIGHT_NUMGAMES_SCORE),
-        (_("Score") + "% * 100", CALCWEIGHT_SCORE),
-    )
+    li_options = ((_("Number of games"), CALCWEIGHT_NUMGAMES), (_("Number of games") + " * " + _("Score"), CALCWEIGHT_NUMGAMES_SCORE), (_("Score") + "% * 100", CALCWEIGHT_SCORE))
     form.combobox(_("Calculation of the weight"), li_options, dic.get("CALCWEIGHT", CALCWEIGHT_NUMGAMES))
     form.separador()
     form.checkbox(_("Save score"), dic.get("SAVESCORE", False))
