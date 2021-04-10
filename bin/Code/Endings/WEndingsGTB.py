@@ -31,9 +31,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.db = EndingsGTB.DBendings(self.configuration)
         self.t4 = LibChess.T4(self.configuration)
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, _("Endings with Gaviota Tablebases"), Iconos.Finales(), "endings_gtb"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Endings with Gaviota Tablebases"), Iconos.Finales(), "endings_gtb")
 
         self.game = Game.Game()
         self.act_recno = -1
@@ -48,12 +46,11 @@ class WEndingsGTB(QTVarios.WDialogo):
         )
         tb = QTVarios.LCTB(self, li_acciones)
 
-        ly_bt, self.bt_movs = QTVarios.lyBotonesMovimiento(
-            self, "", siTiempo=True, siLibre=False, rutina=self.run_botones, icon_size=24
-        )
+        ly_bt, self.bt_movs = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, rutina=self.run_botones, icon_size=24)
 
-        self.chb_help = Controles.CHB(self, _("Help mode"), False)
-        ly_bt.espacio(20).control(self.chb_help)
+        self.chb_help = Controles.CHB(self, _("Help mode"), False).capture_changes(self, self.help_changed)
+        self.bt_back = Controles.PB(self, _("TakeBack"), self.back_move, plano=False).ponIcono(Iconos.Atras())
+        ly_bt.espacio(20).control(self.bt_back).control(self.chb_help)
 
         self.wpzs = QtWidgets.QWidget(self)
         self.wpzs.li_labels = []
@@ -126,7 +123,19 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.play_next_type = dic.get("PLAY_NEXT", PLAY_STOP)
 
         self.grid.gotop()
+        self.pos_game = -1
+        self.help_changed()
         self.play()
+
+    def help_changed(self):
+        self.test_help()
+        self.bt_back.setVisible(self.chb_help.valor())
+
+    def back_move(self):
+        if len(self.game):
+            self.game.anulaSoloUltimoMovimiento()
+            self.game.anulaSoloUltimoMovimiento()
+            self.pon_position()
 
     def startup_control(self):
         if self.playing:
@@ -169,9 +178,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             self.db.register_empty_try(row)
             self.grid.refresh()
 
-        if (
-            self.t4.dtm(self.game.first_position.fen()) is None
-        ):  # En el caso de que se desinstale g5 y se trate de resolver un 5pzs
+        if self.t4.dtm(self.game.first_position.fen()) is None:  # En el caso de que se desinstale g5 y se trate de resolver un 5pzs
             QTUtil2.message_error(self, _("Invalid, this position is not evaluated by Gaviota Tablebases"))
             return
 
@@ -212,11 +219,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         form.combobox(_("Order of positions"), li_options, order)
         form.separador()
 
-        li_options = (
-            (_("Stop"), PLAY_STOP),
-            (_("Jump to the next"), PLAY_NEXT_SOLVED),
-            (_("Jump to the next if minimum moves done"), PLAY_NEXT_BESTMOVES),
-        )
+        li_options = ((_("Stop"), PLAY_STOP), (_("Jump to the next"), PLAY_NEXT_SOLVED), (_("Jump to the next if minimum moves done"), PLAY_NEXT_BESTMOVES))
         play_next = dic_vars.get("PLAY_NEXT", PLAY_STOP)
         form.combobox(_("What to do after solving"), li_options, play_next)
         form.separador()
@@ -446,6 +449,8 @@ class WEndingsGTB(QTVarios.WDialogo):
             return False
 
     def test_help(self):
+        QTUtil.refresh_gui()
+        self.board.remove_arrows()
         if not self.chb_help.valor():
             return
         self.is_helped = True
@@ -530,9 +535,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         submenu.separador()
         submenusubmenu2 = submenu.submenu(_("Results"), Iconos.Reciclar())
         submenusubmenu2.opcion("remr_all", _("Remove results of all positions"), Iconos.PuntoNaranja())
-        submenusubmenu2.opcion(
-            "remr_all_group", _("Remove results of all positions of current group"), Iconos.PuntoNaranja()
-        )
+        submenusubmenu2.opcion("remr_all_group", _("Remove results of all positions of current group"), Iconos.PuntoNaranja())
         menu.separador()
         resp = menu.lanza()
         if resp is None:

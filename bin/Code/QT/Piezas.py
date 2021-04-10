@@ -157,6 +157,21 @@ class BlindfoldConfig:
         dic.update(self.dicPiezas)
         Code.configuration.write_variables("BLINDFOLD", dic)
 
+    def list_saved(self):
+        return [k[1:] for k in self.dicPiezas if k.startswith("_")]
+
+    def remove(self, name):
+        del self.dicPiezas["_" + name]
+        Code.configuration.write_variables("BLINDFOLD", self.dicPiezas)
+
+    def add_current(self, name):
+        kdic = {k:v for k, v in self.dicPiezas.items() if not k.startswith("_")}
+        self.dicPiezas["_" + name] = kdic
+        Code.configuration.write_variables("BLINDFOLD", self.dicPiezas)
+
+    def saved(self, name):
+        return self.dicPiezas["_"+name]
+
 
 class Blindfold(ConjuntoPiezas):
     def __init__(self, nom_pieces_ori, tipo=BLINDFOLD_CONFIG):
@@ -294,6 +309,55 @@ class WBlindfold(QTVarios.WDialogo):
         self.reject()
 
     def configurations(self):
+        menu = QTVarios.LCMenu(self)
+        li_saved = self.config.list_saved()
+        for name in li_saved:
+            menu.opcion((True, name), name, Iconos.PuntoAzul())
+        menu.separador()
+        menu.opcion((True, None), _("Save current configuration"), Iconos.PuntoVerde())
+        if li_saved:
+            menu.separador()
+            menudel = menu.submenu(_("Remove"), Iconos.Delete())
+            for name in li_saved:
+                menudel.opcion((False, name), name, Iconos.PuntoNegro())
+
+        resp = menu.lanza()
+        if resp is None:
+            return
+
+        si, cual = resp
+
+        if si:
+            if cual:
+                dpz = self.config.saved(cual)
+                for pz in "kqrbnp":
+                    lbPZw, cbPZw, lbPZ, lbPZb, cbPZb, tipoW, tipoB = self.dicWidgets[pz]
+                    cbPZw.ponValor(dpz[pz.upper()])
+                    cbPZb.ponValor(dpz[pz])
+                self.reset()
+            else:
+                liGen = [(None, None)]
+                liGen.append((_("Name") + ":", ""))
+
+                resultado = FormLayout.fedit(
+                    liGen,
+                    title=_("Save current configuration"),
+                    parent=self,
+                    anchoMinimo=460,
+                    icon=Iconos.TutorialesCrear(),
+                )
+                if resultado is None:
+                    return None
+
+                accion, liResp = resultado
+                name = liResp[0].strip()
+                if not name:
+                    return None
+                self.config.add_current(name)
+        else:
+            self.config.remove(cual)
+
+    def configurations1(self):
         dic = Code.configuration.read_variables("BLINDFOLD")
         dicConf = collections.OrderedDict()
         for k in dic:

@@ -358,6 +358,11 @@ class EngineManager:
         self.testEngine()
         self.engine.ac_inicio(game)
 
+    def ac_inicio_limit(self, game):
+        # tutor cuando no se quiere que trabaje en background
+        self.testEngine()
+        self.engine.ac_inicio_limit(game, self.motorTiempoJugada, self.motorProfundidad)
+
     def ac_minimo(self, minTiempo, lockAC):
         self.testEngine()
         return self.engine.ac_minimo(minTiempo, lockAC)
@@ -373,6 +378,10 @@ class EngineManager:
     def ac_final(self, minTiempo):
         self.testEngine()
         return self.engine.ac_final(minTiempo)
+
+    def ac_final_limit(self):
+        self.testEngine()
+        return self.engine.ac_final_limit(self.motorTiempoJugada)
 
     def set_option(self, name, value):
         self.testEngine()

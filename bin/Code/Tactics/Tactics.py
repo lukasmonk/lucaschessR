@@ -633,7 +633,8 @@ class Tactic:
             pos = self.reinforcement.get_working_position()
         else:
             pos = self.current_position()
-        txt = self.liFNS[pos]
+        posfen = self.liOrder[pos]
+        txt = self.liFNS[posfen]
         li = txt.split("|")
 
         fen = li[0]

@@ -1,11 +1,11 @@
-from Code.QT import QTVarios
+from Code import SingularMoves
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
-from Code import SingularMoves
+from Code.QT import QTVarios
 
 
 class WSingularM(QTVarios.WDialogo):

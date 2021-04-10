@@ -1,8 +1,10 @@
 from PySide2 import QtWidgets, QtSvg, QtGui
 
+from Code import TrListas
+from Code import WorkMap
 from Code.Analysis import Analysis
 from Code.Base import Game, Move, Position
-from Code import TrListas
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -12,8 +14,6 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import WorkMap
 
 
 class WMap(QTVarios.WDialogo):
@@ -43,7 +43,7 @@ class WMap(QTVarios.WDialogo):
             (_("Play"), Iconos.Empezar(), self.play),
             None,
         )
-        tbWork = QTVarios.LCTB(self, li_acciones, icon_size=24)
+        tb_work = QTVarios.LCTB(self, li_acciones, icon_size=24)
 
         self.lbInfo = Controles.LB(self)
 
@@ -52,7 +52,7 @@ class WMap(QTVarios.WDialogo):
         p.setColor(wsvg.backgroundRole(), QtGui.QColor("#F5F5F5"))
         wsvg.setPalette(p)
 
-        ly = Colocacion.V().control(tbWork).control(self.lbInfo).control(self.grid)
+        ly = Colocacion.V().control(tb_work).control(self.lbInfo).control(self.grid)
         w = QtWidgets.QWidget()
         w.setLayout(ly)
 

@@ -1224,6 +1224,7 @@ class Board(QtWidgets.QGraphicsView):
         self.dbVisual.showAllways(alm.dbVisual_showAllways)
 
     def set_last_position(self, position):
+        self.init_kb_buffer()
         self.cierraGuion()
         self.last_position = position
         if self.siDirectorIcon or self.dbVisual.showAllways():

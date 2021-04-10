@@ -422,11 +422,26 @@ class RunEngine:
         self.put_line("go infinite")
         self.lockAC = False
 
+    def ac_inicio_limit(self, game, max_time, max_depth):
+        self.lockAC = True
+        self.best_move_done = False
+        self.set_game_position(game)
+        self.reset()
+        env = "go"
+        if max_depth:
+            env += " depth %d" % max_depth
+        elif max_time:
+            env += " movetime %d" % max_time
+        self.put_line(env)
+        self.lockAC = False
+
     def ac_lee(self):
         if self.lockAC:
             return True
         nlines = 0
         for line in self.get_lines():
+            if "bestmove" in line:
+                self.best_move_done = True
             self.mrm.dispatch(line)
             nlines += 1
         return nlines
@@ -467,6 +482,17 @@ class RunEngine:
         self.ac_minimo(minimo_ms_time, True)
         self.put_line("stop")
         time.sleep(0.1)
+        return self.ac_estado()
+
+    def ac_final_limit(self, minTime):
+        if not self.best_move_done:
+            self.ac_lee()
+            self.mrm.ordena()
+            rm = self.mrm.mejorMov()
+            while rm.time < minTime and not self.best_move_done:
+                time.sleep(0.1)
+                self.ac_lee()
+                rm = self.mrm.mejorMov()
         return self.ac_estado()
 
     def analysis_stable(self, game, njg, ktime, kdepth, is_savelines, st_centipawns, st_depths, st_timelimit):

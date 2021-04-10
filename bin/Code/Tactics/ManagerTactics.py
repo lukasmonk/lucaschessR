@@ -184,7 +184,7 @@ class ManagerTactics(Manager.Manager):
         if self.with_automatic_jump and not self.tactic.w_error:
             self.ent_siguiente()
         else:
-            QTUtil2.mensajeTemporal(self.main_window, _("This line training is completed."), 0.7)
+            QTUtil2.mensajeTemporal(self.main_window, _("Line completed"), 0.7)
             li_opciones = [TB_CLOSE, TB_CONFIG, TB_UTILITIES, TB_NEXT]
             if not self.tactic.reinforcement.is_working():
                 li_opciones.insert(1, TB_CHANGE)

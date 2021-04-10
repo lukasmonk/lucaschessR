@@ -285,13 +285,12 @@ class ManagerCompeticion(Manager.Manager):
         self.is_analyzed_by_tutor = False
         if self.is_tutor_enabled:
             self.is_analyzed_by_tutor = False
-            if self.continueTt:
-                if not self.is_finished():
-                    self.siAnalizando = True
+            if not self.is_finished():
+                self.siAnalizando = True
+                if self.continueTt:
                     self.xtutor.ac_inicio(self.game)
-            else:
-                self.mrmTutor = self.analizaTutor()
-                self.is_analyzed_by_tutor = True
+                else:
+                    self.xtutor.ac_inicio_limit(self.game)
 
     def analizaFinal(self):
         if self.siAnalizando:

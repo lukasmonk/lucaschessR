@@ -321,19 +321,21 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             return
 
         if self.human_is_playing:
-            if self.thoughtTt > -1 and self.is_analyzing:
+            if self.is_analyzing:
                 mrm = self.xtutor.ac_estado()
                 if mrm:
                     rm = mrm.mejorMov()
                     if self.nArrowsTt > 0:
                         self.showPV(rm.pv, self.nArrowsTt)
-                    self.show_dispatch(self.thoughtTt, rm)
-        elif self.thoughtOp > -1:
+                    if self.thoughtTt > -1:
+                        self.show_dispatch(self.thoughtTt, rm)
+        elif self.thoughtOp > -1 or self.nArrows > 0:
             rm = self.xrival.current_rm()
             if rm:
                 if self.nArrows:
                     self.showPV(rm.pv, self.nArrows)
-                self.show_dispatch(self.thoughtOp, rm)
+                if self.thoughtOp > -1:
+                    self.show_dispatch(self.thoughtOp, rm)
 
         if not self.siTiempo:
             return
@@ -492,6 +494,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.ponRutinaAccionDef(self.close_position)
         self.base_inicio(dic)
         self.game.restore(restore_game)
+        player = self.configuration.nom_player()
+        other = self.xrival.name
+        w, b = (player, other) if self.human_side else (other, player)
+        self.game.set_tag("White", w)
+        self.game.set_tag("Black", b)
         self.goto_end()
         self.play_next_move()
 
@@ -588,7 +595,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.stop_engine()
             self.main_window.activaJuego(False, False)
             self.quitaCapturas()
-            self.procesador.start()
+            if self.xRutinaAccionDef:
+                self.xRutinaAccionDef(TB_CLOSE)
+            else:
+                self.procesador.start()
 
         return False
 
@@ -695,30 +705,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.aperturaObl or not self.is_tutor_enabled or self.ayudas_iniciales <= 0:
                 return
         if not self.is_finished():
-            self.xtutor.ac_inicio(self.game)
+            if self.continueTt:
+                self.xtutor.ac_inicio(self.game)
+            else:
+                self.xtutor.ac_inicio_limit(self.game)
             self.is_analyzing = True
-        if not self.continueTt:
-            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
-
-    def analiza_control_no_continuett(self):
-        if not self.is_tutor_enabled or self.is_analyzed_by_tutor or not self.is_analyzing:
-            return
-
-        mrm = self.xtutor.ac_estado()
-        rm = mrm.mejorMov()
-        ok_end = False
-        if self.xtutor.motorTiempoJugada:
-            ok_end = rm.time >= self.xtutor.motorTiempoJugada
-        if not ok_end:
-            if self.xtutor.motorProfundidad:
-                ok_end = rm.depth >= self.xtutor.motorProfundidad
-        if ok_end:
-            self.xtutor.stop()
-            self.mrmTutor = mrm
-            self.is_analyzed_by_tutor = True
-            self.is_analyzing = False
-        else:
-            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
 
     def analizaFinal(self, is_mate=False):
         if not self.is_tutor_enabled:
@@ -740,7 +731,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.is_analyzed_by_tutor:
             return
         self.main_window.pensando_tutor(True)
-        self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+        if self.continueTt:
+            self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+        else:
+            self.mrmTutor = self.xtutor.ac_final_limit()
         self.main_window.pensando_tutor(False)
         self.is_analyzed_by_tutor = True
 

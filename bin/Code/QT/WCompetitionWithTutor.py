@@ -7,7 +7,7 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.QT import About
+from Code.About import About
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios

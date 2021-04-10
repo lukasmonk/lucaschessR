@@ -38,6 +38,8 @@ class WBase(QtWidgets.QWidget):
         self.si_tutor = False
         self.num_hints = 0
 
+        self.li_hide_replay = []
+
         ly_ai = Colocacion.H().relleno(1).otroi(ly_t).otroi(ly_bi).relleno(1).margen(0)
         ly = Colocacion.V().control(self.tb).relleno().otro(ly_ai).relleno().margen(2)
 
@@ -90,13 +92,16 @@ class WBase(QtWidgets.QWidget):
             TB_MY_GAMES: (_("My games"), Iconos.NuestroFichero()),
             TB_DRAW: (_("Draw"), Iconos.Tablas()),
             TB_BOXROOMS_PGN: (_("Boxrooms PGN"), Iconos.BoxRooms()),
-            TB_END: (_("End"), Iconos.MainMenu()),
-            TB_SLOW: (_("Slow"), Iconos.Pelicula_Lento()),
+            TB_END_REPLAY: (_("End"), Iconos.MainMenu()),
+            TB_SLOW_REPLAY: (_("Slow"), Iconos.Pelicula_Lento()),
             TB_PAUSE: (_("Pause"), Iconos.Pelicula_Pausa()),
+            TB_PAUSE_REPLAY: (_("Pause"), Iconos.Pelicula_Pausa()),
             TB_CONTINUE: (_("Continue"), Iconos.Pelicula_Seguir()),
-            TB_FAST: (_("Fast"), Iconos.Pelicula_Rapido()),
+            TB_CONTINUE_REPLAY: (_("Continue"), Iconos.Pelicula_Seguir()),
+            TB_FAST_REPLAY: (_("Fast"), Iconos.Pelicula_Rapido()),
             TB_REPEAT: (_("Repeat"), Iconos.Pelicula_Repetir()),
-            TB_PGN: (_("PGN"), Iconos.Pelicula_PGN()),
+            TB_REPEAT_REPLAY: (_("Repeat"), Iconos.Pelicula_Repetir()),
+            TB_PGN_REPLAY: (_("PGN"), Iconos.Pelicula_PGN()),
             TB_HELP: (_("Help"), Iconos.AyudaGR()),
             TB_LEVEL: (_("Level"), Iconos.Jugar()),
             TB_ACCEPT: (_("Accept"), Iconos.Aceptar()),
@@ -481,6 +486,19 @@ class WBase(QtWidgets.QWidget):
         self.lb_player_black.setVisible(siReloj)
         self.lb_clock_white.setVisible(siReloj)
         self.lb_clock_black.setVisible(siReloj)
+
+    def hide_replay(self):
+        self.li_hide_replay = []
+        for control in (self.pgn, self.bt_active_tutor, self.lbRotulo1, self.lbRotulo2, self.lbRotulo3,
+                        self.lb_capt_white, self.lb_capt_black, self.lb_player_white, self.lb_player_black,
+                        self.lb_clock_white, self.lb_clock_black):
+            if control.isVisible():
+                self.li_hide_replay.append(control)
+                control.hide()
+
+    def show_replay(self):
+        for control in self.li_hide_replay:
+            control.show()
 
     def nonDistractMode(self, nonDistract):
         if nonDistract:

@@ -203,7 +203,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         self.cbThoughtTt = Controles.CB(self, liThinks, -1).ponFuente(font)
 
         lbArrows = Controles.LB2P(self, _("Arrows with the best moves")).ponFuente(font)
-        self.sbArrowsTt = Controles.SB(self, 3, 0, 999).tamMaximo(50).ponFuente(font)
+        self.sbArrowsTt = Controles.SB(self, 0, 0, 999).tamMaximo(50).ponFuente(font)
 
         lyT1 = Colocacion.H().control(lbAyudas).control(self.cbAyudas).relleno()
         lyT1.control(self.chbChance).relleno().control(btTutorChange)
@@ -219,14 +219,14 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         lb = Controles.LB(self, _("It is showed") + ":").ponFuente(font)
         self.cbThoughtOp = Controles.CB(self, liThinks, -1).ponFuente(font)
         lbArrows = Controles.LB2P(self, _("Arrows to show")).ponFuente(font)
-        self.sbArrows = Controles.SB(self, 7, 0, 999).tamMaximo(50).ponFuente(font)
+        self.sbArrows = Controles.SB(self, 0, 0, 999).tamMaximo(50).ponFuente(font)
         ly = Colocacion.H().control(lb).control(self.cbThoughtOp).relleno()
-        ly.control(lbArrows).control(self.sbArrows).relleno()
+        ly.control(lbArrows).control(self.sbArrows)
         gbThoughtOp = Controles.GB(self, _("Opponent's thought information"), ly)
         gbThoughtOp.setStyleSheet(gb_style)
 
         self.lbBoxHeight = Controles.LB2P(self, "%s (\"%s\")" %(_("Box height"), _("It is showed"))).ponFuente(font)
-        self.sbBoxHeight = Controles.SB(self, 7, 0, 999).tamMaximo(50).ponFuente(font)
+        self.sbBoxHeight = Controles.SB(self, 0, 0, 999).tamMaximo(50).ponFuente(font)
 
         lyBox = Colocacion.H().control(self.lbBoxHeight).control(self.sbBoxHeight).relleno()
 
@@ -805,7 +805,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         self.gbTutor.setChecked(hints > 0)
         self.cbAyudas.ponValor(hints)
-        self.sbArrows.ponValor(dic.get("ARROWS", 7))
+        self.sbArrows.ponValor(dic.get("ARROWS", 0))
         self.sbBoxHeight.ponValor(dic.get("BOXHEIGHT", 64))
         self.cbThoughtOp.ponValor(dic.get("THOUGHTOP", -1))
         self.cbThoughtTt.ponValor(dic.get("THOUGHTTT", -1))

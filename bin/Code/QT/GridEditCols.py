@@ -117,7 +117,7 @@ class EditCols(QtWidgets.QDialog):
 
         elif resp == "reinit":
             dic_current = self.o_columnas_base.save_dic(self.grid_owner)
-            self.o_columnas.restore_dic(dic_current)
+            self.o_columnas.restore_dic(dic_current, self.grid_owner)
             self.o_columnas.li_columns.sort(key=lambda x: x.position)
             self.grid.refresh()
 

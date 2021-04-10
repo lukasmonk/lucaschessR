@@ -1,5 +1,8 @@
 from PySide2 import QtCore
 
+import Code
+from Code.Base.Constantes import *
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
@@ -7,9 +10,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-import Code
-from Code.Base.Constantes import *
 
 
 class WindowTutor(QTVarios.WDialogo):

@@ -220,7 +220,10 @@ class ManagerFideFics(Manager.Manager):
 
     def analizaInicio(self):
         if not self.is_finished():
-            self.xtutor.ac_inicio(self.game)
+            if self.continueTt:
+                self.xtutor.ac_inicio(self.game)
+            else:
+                self.xtutor.ac_inicio_limit(self.game)
             self.siAnalizando = True
 
     def analizaEstado(self):
@@ -269,8 +272,7 @@ class ManagerFideFics(Manager.Manager):
 
             self.human_is_playing = True
             self.thinking(True)
-            if self.continueTt:
-                self.analizaInicio()
+            self.analizaInicio()
             self.activate_side(is_white)
             self.thinking(False)
 

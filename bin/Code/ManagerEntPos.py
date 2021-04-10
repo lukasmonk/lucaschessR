@@ -306,31 +306,11 @@ class ManagerEntPos(Manager.Manager):
             return
 
         if not self.is_finished():
-            self.xtutor.ac_inicio(self.game)
             self.is_analyzing = True
-
-        if not self.continueTt:
-            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
-
-    def analiza_control_no_continuett(self):
-        if not self.is_tutor_enabled or self.is_analyzed_by_tutor or not self.is_analyzing:
-            return
-
-        mrm = self.xtutor.ac_estado()
-        rm = mrm.mejorMov()
-        ok_end = False
-        if self.xtutor.motorTiempoJugada:
-            ok_end = rm.time >= self.xtutor.motorTiempoJugada
-        if not ok_end:
-            if self.xtutor.motorProfundidad:
-                ok_end = rm.depth >= self.xtutor.motorProfundidad
-        if ok_end:
-            self.xtutor.stop()
-            self.mrmTutor = mrm
-            self.is_analyzed_by_tutor = True
-            self.is_analyzing = False
-        else:
-            QtCore.QTimer.singleShot(1000, self.analiza_control_no_continuett)
+            if self.continueTt:
+                self.xtutor.ac_inicio(self.game)
+            else:
+                self.xtutor.ac_inicio_limit(self.game)
 
     def analizaFinal(self, is_mate=False):
         if self.is_playing_gameobj():
@@ -370,7 +350,7 @@ class ManagerEntPos(Manager.Manager):
             self.ent_siguiente(TB_NEXT)
             return False
         else:
-            QTUtil2.mensajeTemporal(self.main_window, _("This line training is completed."), 0.9, fixedSize=None)
+            QTUtil2.mensajeTemporal(self.main_window, _("Line completed"), 0.9, fixedSize=None)
             if not self.is_finished():
                 if not (TB_CONTINUE in self.li_options_toolbar):
                     self.li_options_toolbar.insert(4, TB_CONTINUE)

@@ -2,16 +2,16 @@ import os
 import shutil
 
 import Code
+from Code import Usuarios
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Delegados
+from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import Usuarios
-from Code.QT import FormLayout
 
 
 class WUsuarios(QTVarios.WDialogo):

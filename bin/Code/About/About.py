@@ -1,10 +1,10 @@
 from PySide2 import QtCore, QtWidgets
-import Code
 
+import Code
+from Code.About import AboutBase
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
-from Code.QT import AboutBase
 from Code.QT import QTUtil
 
 
@@ -162,7 +162,7 @@ class WAbout(QtWidgets.QDialog):
 #         li.append("{% endblock contenido %}")
 #
 #         q.write("\n".join(li))
-#
+
 
 class WInfo(QtWidgets.QDialog):
     def __init__(self, wparent, titulo, head, txt, min_tam, pm_icon):

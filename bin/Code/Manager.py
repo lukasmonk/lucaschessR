@@ -23,7 +23,7 @@ from Code.QT import WindowArbol
 from Code.QT import WindowArbolBook
 from Code.QT import WindowSavePGN
 from Code.QT import WindowTutor
-from Code.QT import Pelicula
+from Code.QT import Replay
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -950,13 +950,13 @@ class Manager:
             self.refresh()
 
     def replay(self):
-        resp = Pelicula.paramPelicula(self.configuration, self.main_window)
+        resp = Replay.param_replay(self.configuration, self.main_window)
         if resp is None:
             return
 
         segundos, if_start, if_pgn, if_beep = resp
 
-        self.xpelicula = Pelicula.Pelicula(self, segundos, if_start, if_pgn, if_beep)
+        self.xpelicula = Replay.Replay(self, segundos, if_start, if_pgn, if_beep)
 
     def ponRutinaAccionDef(self, rutina):
         self.xRutinaAccionDef = rutina
@@ -1754,7 +1754,7 @@ class Manager:
         if not pv:
             return True
         self.board.remove_arrows()
-        tipo = "mt"
+        tipo = "ms"
         opacity = 100
         pv = pv.strip()
         while "  " in pv:

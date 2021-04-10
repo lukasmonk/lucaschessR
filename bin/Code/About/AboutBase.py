@@ -1,8 +1,8 @@
 import os
 import random
 
-from Code import Util
 import Code
+from Code import Util
 
 
 class ThanksTo:
@@ -76,7 +76,7 @@ class ThanksTo:
 
     @staticmethod
     def dl_end():
-        return "</dl>"
+        return "</dl></blockquote>"
 
     def contributors(self):
         txt = self.dl_ini()
@@ -228,7 +228,7 @@ class ThanksTo:
         txt += self.dl_end()
         txt += "</td></tr>"
         txt += self.table_end()
-        txt += '<br><big><bold><center>%s: <a href="https://poeditor.com">https://poeditor.com</a></center>' % _("Web")
+        txt += '<br><big><bold><center>%s: <a href="https://poeditor.com">https://poeditor.com</a></center></bold></big>' % _("Web")
         return txt
 
     def images(self):
@@ -236,6 +236,12 @@ class ThanksTo:
 
         li = [
             ("Nuvola", "David Vignoni", "http://www.icon-king.com/projects/nuvola/", "LGPL"),
+            (
+                "Icons for Windows8",
+                "Icons8",
+                "https://icons8.com",
+                "Creative Commons Attribution-NoDerivs 3.0 Unported",
+            ),
             ("Gnome", "Gnome", "https://github.com/GNOME/gnome-icon-theme", "GPL"),
             (
                 "Silk icon set 1.3",
@@ -264,12 +270,6 @@ class ThanksTo:
                 "Icons-Land Demo License Agreement",
             ),
             ("Figurines", "Armando H. Marroquín", "http://www.enpassant.dk/chess/fonteng.htm", _("Freeware")),
-            (
-                "Icons for Windows8",
-                "Icons8",
-                "https://icons8.com",
-                "Creative Commons Attribution-NoDerivs 3.0 Unported",
-            ),
             (
                 "Transsiberian map",
                 "Stefan Ertmann & Lokal Profil",

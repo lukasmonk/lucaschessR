@@ -38,7 +38,7 @@ from Code import ManagerAnotar
 from Code import Adjournments
 from Code.QT import WCompetitionWithTutor, BasicMenus
 from Code.QT import Iconos
-from Code.QT import About
+from Code.About import About
 from Code.MainWindow import MainWindow
 from Code.QT import WindowAlbumes
 from Code.QT import WindowAnotar

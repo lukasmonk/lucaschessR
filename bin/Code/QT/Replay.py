@@ -1,10 +1,11 @@
 import Code
+from Code.Base.Constantes import *
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.Base.Constantes import *
+from Code.QT import QTUtil
 
 
-def paramPelicula(configuration, parent):
+def param_replay(configuration, parent):
 
     nomVar = "PARAMPELICULA"
     dicVar = configuration.read_variables(nomVar)
@@ -41,7 +42,7 @@ def paramPelicula(configuration, parent):
         return None
 
 
-class Pelicula:
+class Replay:
     def __init__(self, manager, segundos, if_start, siPGN, if_beep):
         self.manager = manager
         self.procesador = manager.procesador
@@ -53,19 +54,19 @@ class Pelicula:
         self.if_beep = if_beep
         self.rapidez = 1.0
 
-        self.w_pgn = self.main_window.base.pgn
-        self.siPGN = siPGN
-        if not siPGN:
-            self.w_pgn.hide()
+        self.previous_visible_capturas = self.main_window.siCapturas
+        self.previous_visible_information = self.main_window.siInformacionPGN
 
-        li_acciones = (TB_END, TB_SLOW, TB_PAUSE, TB_CONTINUE, TB_FAST, TB_REPEAT, TB_PGN)
+        self.siPGN = siPGN
+
+        li_acciones = (TB_END_REPLAY, TB_SLOW_REPLAY, TB_PAUSE_REPLAY, TB_CONTINUE_REPLAY, TB_FAST_REPLAY, TB_REPEAT_REPLAY, TB_PGN_REPLAY)
 
         self.antAcciones = self.main_window.get_toolbar()
-        self.main_window.pon_toolbar(li_acciones)
+        self.main_window.pon_toolbar(li_acciones, separator=False)
 
         self.manager.ponRutinaAccionDef(self.process_toolbar)
 
-        self.muestraPausa(True)
+        self.muestraPausa(True, False)
 
         self.num_moves, self.jugInicial, self.filaInicial, self.is_white = self.manager.jugadaActual()
 
@@ -74,9 +75,26 @@ class Pelicula:
 
         self.siStop = False
 
-        self.muestraActual()
+        self.show_information()
 
-    def muestraActual(self):
+        self.show_current()
+
+    def show_information(self):
+        if self.siPGN:
+            if self.previous_visible_information:
+                self.main_window.activaInformacionPGN(True)
+            if self.previous_visible_capturas:
+                self.main_window.siCapturas = True
+            self.main_window.base.show_replay()
+        else:
+            if self.previous_visible_information:
+                self.main_window.activaInformacionPGN(False)
+            if self.previous_visible_capturas:
+                self.main_window.siCapturas = False
+            self.main_window.base.hide_replay()
+        QTUtil.refresh_gui()
+
+    def show_current(self):
         if self.siStop:
             return
 
@@ -142,37 +160,37 @@ class Pelicula:
         cpu.duerme(self.segundos / self.rapidez)
         cpu.runLineal()
 
-    def muestraPausa(self, siPausa):
-        self.main_window.show_option_toolbar(TB_PAUSE, siPausa)
-        self.main_window.show_option_toolbar(TB_CONTINUE, not siPausa)
+    def muestraPausa(self, si_pausa, si_continue):
+        self.main_window.show_option_toolbar(TB_PAUSE_REPLAY, si_pausa)
+        self.main_window.show_option_toolbar(TB_CONTINUE_REPLAY, si_continue)
 
     def process_toolbar(self, key):
-        if key == TB_END:
+        if key == TB_END_REPLAY:
             self.terminar()
-        elif key == TB_SLOW:
+        elif key == TB_SLOW_REPLAY:
             self.lento()
-        elif key == TB_PAUSE:
+        elif key == TB_PAUSE_REPLAY:
             self.pausa()
-        elif key == TB_CONTINUE:
+        elif key == TB_CONTINUE_REPLAY:
             self.seguir()
-        elif key == TB_FAST:
+        elif key == TB_FAST_REPLAY:
             self.rapido()
-        elif key == TB_REPEAT:
+        elif key == TB_REPEAT_REPLAY:
             self.repetir()
-        elif key == TB_PGN:
+        elif key == TB_PGN_REPLAY:
             self.siPGN = not self.siPGN
-            if self.siPGN:
-                self.w_pgn.show()
-            else:
-                self.w_pgn.hide()
+            self.show_information()
 
     def terminar(self):
         self.siStop = True
         self.main_window.pon_toolbar(self.antAcciones)
         self.manager.ponRutinaAccionDef(None)
         self.manager.xpelicula = None
+        if self.previous_visible_capturas:
+            self.main_window.siCapturas = True
         if not self.siPGN:
-            self.w_pgn.show()
+            self.siPGN = True
+            self.show_information()
 
     def lento(self):
         self.rapidez /= 1.2
@@ -182,27 +200,28 @@ class Pelicula:
 
     def pausa(self):
         self.siStop = True
-        self.muestraPausa(False)
+        self.muestraPausa(False, True)
 
     def seguir(self):
         num_moves, self.current_position, filaInicial, is_white = self.manager.jugadaActual()
+        self.current_position += 1
         self.siStop = False
-        self.muestraPausa(True)
-        self.muestraActual()
+        self.muestraPausa(True, False)
+        self.show_current()
 
     def repetir(self):
         self.current_position = 0 if self.if_start else self.jugInicial
-        self.current_position -= 1
-        self.muestraPausa(True)
+        self.muestraPausa(True, False)
         if self.siStop:
             self.siStop = False
-            self.muestraActual()
+            self.show_current()
 
     def skip(self):
         if self.siStop:
             return
         self.current_position += 1
         if self.current_position == self.num_moves:
-            self.pausa()
+            self.siStop = True
+            self.muestraPausa(False, False)
         else:
-            self.muestraActual()
+            self.show_current()

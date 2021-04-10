@@ -4,21 +4,21 @@ import time
 
 from PySide2 import QtWidgets, QtCore
 
+import Code
+from Code import STS
+from Code import Util
 from Code.Base import Position
+from Code.Board import Board
+from Code.Engines import WEngines
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.Engines import WEngines
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import STS
-from Code import Util
-import Code
 
 
 class WRun(QTVarios.WDialogo):
