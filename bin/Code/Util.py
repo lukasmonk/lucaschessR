@@ -39,15 +39,16 @@ def remove_file(file: str) -> bool:
     return not os.path.isfile(file)
 
 
-def same_path(path1: str, path2: str) -> bool:
-    return os.path.realpath(path1) == os.path.realpath(path2)
-
-
 def create_folder(carpeta: str):
     try:
         os.mkdir(carpeta)
+        return True
     except:
-        pass
+        return False
+
+
+def same_path(path1: str, path2: str) -> bool:
+    return os.path.realpath(path1) == os.path.realpath(path2)
 
 
 def filesize(file: str) -> int:
@@ -135,7 +136,7 @@ def ini_dic(file: str) -> dict:
                     n = line.find("=")
                     if n:
                         key = line[:n].strip()
-                        value = line[n + 1 :].strip()
+                        value = line[n + 1:].strip()
                         dic[key] = value
     return dic
 
@@ -147,18 +148,14 @@ def today():
 def new_id() -> int:
     d = datetime.datetime.now()
     r = random.randint
-    t = (
-        ((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second
-    ) * 1000 + r(1, d.microsecond + 737) // 1000
+    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(1, d.microsecond + 737) // 1000
     return t
 
 
 def str_id() -> str:
     d = datetime.datetime.now()
     r = random.randint
-    t = (
-        ((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second
-    ) * 1000 + r(1, d.microsecond + 737) // 1000
+    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(1, d.microsecond + 737) // 1000
     return str(t)
 
 
@@ -244,9 +241,7 @@ def dtostr_hm(f):
 
 def stodext(txt):
     if txt and len(txt) == 14 and txt.isdigit():
-        return datetime.datetime(
-            int(txt[:4]), int(txt[4:6]), int(txt[6:8]), int(txt[8:10]), int(txt[10:12]), int(txt[12:])
-        )
+        return datetime.datetime(int(txt[:4]), int(txt[4:6]), int(txt[6:8]), int(txt[8:10]), int(txt[10:12]), int(txt[12:]))
     return None
 
 
@@ -256,9 +251,7 @@ def primera_mayuscula(txt):
 
 def microsegundos_rnd():
     d = datetime.datetime.now()
-    return random.randint(0, 1000) + 1000 * (
-        d.microsecond + 1000000 * (d.second + 60 * (d.minute + 60 * (d.hour + 24 * d.toordinal())))
-    )
+    return random.randint(0, 1000) + 1000 * (d.microsecond + 1000000 * (d.second + 60 * (d.minute + 60 * (d.hour + 24 * d.toordinal()))))
 
 
 def ini2dic(file):
@@ -266,7 +259,7 @@ def ini2dic(file):
 
     if os.path.isfile(file):
 
-        with open(file, "rt") as f:
+        with open(file, "rt", encoding="utf-8", errors="ignore") as f:
             for linea in f:
                 linea = linea.strip()
                 if linea and not linea.startswith("#"):
@@ -278,14 +271,14 @@ def ini2dic(file):
                         n = linea.find("=")
                         if n > 0:
                             clave1 = linea[:n].strip()
-                            valor = linea[n + 1 :].strip()
+                            valor = linea[n + 1:].strip()
                             dic[clave1] = valor
 
     return dic_base
 
 
 def dic2ini(file, dic):
-    with open(file, "wt") as f:
+    with open(file, "wt", encoding="utf-8", errors="ignore") as f:
         for k in dic:
             f.write("[%s]\n" % k)
             for key in dic[k]:
@@ -306,10 +299,20 @@ def ini_base2dic(file):
                     n = linea.find("=")
                     if n:
                         key = linea[:n].strip()
-                        valor = linea[n + 1 :].strip()
+                        valor = linea[n + 1:].strip()
                         dic[key] = valor
 
     return dic
+
+
+def dic2ini_base(file, dic):
+    with open(file, "wt", encoding="utf-8", errors="ignore") as f:
+        for k in dic:
+            f.write("[%s]\n" % k)
+            for key in dic[k]:
+                f.write("%s=%s\n" % (key, dic[k][key]))
+
+
 
 
 def secs2str(s):
@@ -780,6 +783,26 @@ def relative_path(*args):
     return path
 
 
+def filename_unique(destination: str):
+    if os.path.isfile(destination):
+        n = destination.rfind(".")
+        if n == -1:
+            ext = ""
+        else:
+            ext = destination[n:]
+            destination = destination[:n]
+        n = 1
+        if destination.endswith("-1"):
+            destination = destination[:-2]
+            n = 2
+        while True:
+            fich = destination + "-%d%s" % (n, ext)
+            n += 1
+            if not os.path.isfile(fich):
+                return fich
+    return destination
+
+
 def memory_python():
     process = psutil.Process(os.getpid())
     return process.memory_info().rss
@@ -800,6 +823,6 @@ def div_list(list, max_group):
     xfrom = 0
     li_groups = []
     while xfrom < nlist:
-        li_groups.append(list[xfrom:xfrom+max_group])
+        li_groups.append(list[xfrom:xfrom + max_group])
         xfrom += max_group
     return li_groups

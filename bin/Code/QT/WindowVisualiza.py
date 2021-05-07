@@ -143,7 +143,7 @@ class WControl(QTVarios.WDialogo):
             colorPre = False
 
         # Datos
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         # # Site
         f = open(self.path_bloque)
@@ -161,31 +161,31 @@ class WControl(QTVarios.WDialogo):
         config = FormLayout.Combobox(_("Site"), liSites)
         if sitePreNum == -1:
             sitePreNum = liSites[0][0]
-        liGen.append((config, sitePreNum))
+        li_gen.append((config, sitePreNum))
 
-        liGen.append((None, None))
+        li_gen.append((None, None))
 
         # # Intervals
-        liGen.append((None, _("Seconds of every glance") + ":"))
-        liGen.append((FormLayout.Spinbox(_("Seconds"), 1, 100, 50), intervaloPre))
+        li_gen.append((None, _("Seconds of every glance") + ":"))
+        li_gen.append((FormLayout.Spinbox(_("Seconds"), 1, 100, 50), intervaloPre))
 
         liTypes = ((_("By piece"), True), (_("Fixed"), False))
         config = FormLayout.Combobox(_("Type"), liTypes)
-        liGen.append((config, intervaloPorPiezaPre))
+        li_gen.append((config, intervaloPorPiezaPre))
 
-        liGen.append((None, None))
+        li_gen.append((None, None))
 
-        liGen.append((None, _("Ask for") + ":"))
-        liGen.append((_("Position") + ":", posicionPre))
-        liGen.append((_("Square color") + ":", colorPre))
-        liGen.append((_("Is attacked?") + ":", esatacadaPre))
-        liGen.append((_("Is attacking?") + ":", esatacantePre))
+        li_gen.append((None, _("Ask for") + ":"))
+        li_gen.append((_("Position") + ":", posicionPre))
+        li_gen.append((_("Square color") + ":", colorPre))
+        li_gen.append((_("Is attacked?") + ":", esatacadaPre))
+        li_gen.append((_("Is attacking?") + ":", esatacantePre))
 
-        resultado = FormLayout.fedit(liGen, title=_("Configuration"), parent=self, icon=Iconos.Gafas(), anchoMinimo=360)
+        resultado = FormLayout.fedit(li_gen, title=_("Configuration"), parent=self, icon=Iconos.Gafas(), anchoMinimo=360)
         if resultado:
-            accion, liGen = resultado
+            accion, li_gen = resultado
 
-            siteNum, intervalo, intervaloPorPieza, position, color, esatacada, esatacante = liGen
+            siteNum, intervalo, intervaloPorPieza, position, color, esatacada, esatacante = li_gen
 
             dicdatos = {}
             f = dicdatos["DATE"] = Util.today()

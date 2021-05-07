@@ -282,17 +282,29 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
     def opciones(self):
         # Se pide name y extra
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         # # Nombre del entrenamiento
-        liGen.append((FormLayout.Editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50), self.pts_tolerance))
+        li_gen.append((FormLayout.Editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50), self.pts_tolerance))
 
         titulo = "Training settings"
-        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
         if not resultado:
             return
-        accion, liGen = resultado
-        self.pts_tolerance = liGen[0]
+        accion, li_gen = resultado
+        self.pts_tolerance = li_gen[0]
+
+    def abandonar(self):
+        self.bmt_uno.puntos = 0
+        self.activaJugada(0)
+        self.ponPuntos(0)
+        self.pon_toolbar()
+
+    def borrar(self):
+        if QTUtil2.pregunta(self, _("Do you want to delete this position?")):
+            self.borrar_fen_lista.add(self.bmt_uno.fen)
+            QTUtil2.message(self, _("This position will be deleted on exit."))
+            self.seguir()
 
     def process_toolbar(self):
         accion = self.sender().key
@@ -302,15 +314,9 @@ class WEntrenarBMT(QTVarios.WDialogo):
         elif accion == "seguir":
             self.seguir()
         elif accion == "abandonar":
-            self.bmt_uno.puntos = 0
-            self.activaJugada(0)
-            self.ponPuntos(0)
-            self.pon_toolbar()
+            self.abandonar()
         elif accion == "borrar":
-            if QTUtil2.pregunta(self, _("Do you want to delete this position?")):
-                self.borrar_fen_lista.add(self.bmt_uno.fen)
-                QTUtil2.message(self, _("This position will be deleted on exit."))
-                self.seguir()
+            self.borrar()
         elif accion == "repetir":
             self.muestraControles(True)
             self.repetir()
@@ -385,7 +391,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         num_pos_estate[9] = nposic
         labels_score = {9: "Repeat all", 8: "Best move", 7: "Excellent", 6: "Very good", 5: "Good", 4: "Acceptable"}
 
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
         liJ = []
 
         for x in reversed(range(5, 10)):
@@ -394,15 +400,15 @@ class WEntrenarBMT(QTVarios.WDialogo):
                 liJ.append((label, x))
 
         config = FormLayout.Combobox(_("Repeat only below score"), liJ)
-        liGen.append((config, 9))
+        li_gen.append((config, 9))
 
         titulo = "%s" % (_("Do you want to repeat this training?"))
-        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
         if not resultado:
             return
 
-        accion, liGen = resultado
-        reiniciar_debajo_state = liGen[0]
+        accion, li_gen = resultado
+        reiniciar_debajo_state = li_gen[0]
 
         self.quitaReloj()
 
@@ -506,6 +512,12 @@ class WEntrenarBMT(QTVarios.WDialogo):
             dic = QTUtil2.dicTeclas()
             if tecla in dic:
                 self.mueveJugada(dic[tecla])
+        if tecla == 82 and tipo == "V":  # R = resign
+            self.abandonar()
+        elif tecla == 78 and tipo == "V":  # N = next
+            self.seguir()
+        elif tecla == 16777223:  # Del
+            self.borrar()
 
     def mueveJugada(self, tipo):
         game = self.game
@@ -973,7 +985,7 @@ class WBMT(QTVarios.WDialogo):
         layout = Colocacion.V().control(tb).control(tab).margen(8)
         self.setLayout(layout)
 
-        self.restore_video(siTam=True, anchoDefecto=760)
+        self.restore_video(siTam=True, anchoDefecto=760, altoDefecto=500)
 
         self.grid.gotop()
         self.gridT.gotop()
@@ -1077,31 +1089,31 @@ class WBMT(QTVarios.WDialogo):
             vtime = self.configuration.x_tutor_mstime
 
         # Bucle para control de errores
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         # # Nombre del entrenamiento
-        liGen.append((_("Name") + ":", name))
-        liGen.append((_("Extra info.") + ":", extra))
+        li_gen.append((_("Name") + ":", name))
+        li_gen.append((_("Extra info.") + ":", extra))
 
         # # Tutor
         li = self.configuration.ayudaCambioTutor()
         li[0] = engine
-        liGen.append((_("Engine") + ":", li))
+        li_gen.append((_("Engine") + ":", li))
 
         # Decimas de segundo a pensar el tutor
-        liGen.append((_("Duration of engine analysis (secs)") + ":", vtime / 1000.0))
+        li_gen.append((_("Duration of engine analysis (secs)") + ":", vtime / 1000.0))
 
-        liGen.append((None, None))
+        li_gen.append((None, None))
 
-        resultado = FormLayout.fedit(liGen, title=name, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title=name, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
         if not resultado:
             return
-        accion, liGen = resultado
+        accion, li_gen = resultado
 
-        name = liGen[0]
-        extra = liGen[1]
-        engine = liGen[2]
-        vtime = int(liGen[3] * 1000)
+        name = li_gen[0]
+        extra = li_gen[1]
+        engine = li_gen[2]
+        vtime = int(li_gen[3] * 1000)
 
         if not vtime or not name:
             return
@@ -1236,20 +1248,20 @@ class WBMT(QTVarios.WDialogo):
             return
         reg = dbf.registroActual()  # Importante ya que dbf puede cambiarse mientras se edita
 
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         mx = dbf.TOTAL
         if mx <= 1:
             return
         bl = mx / 2
 
-        liGen.append((FormLayout.Spinbox(_("Block Size"), 1, mx - 1, 50), bl))
+        li_gen.append((FormLayout.Spinbox(_("Block Size"), 1, mx - 1, 50), bl))
 
-        resultado = FormLayout.fedit(liGen, title="%s %s" % (reg.NOMBRE, reg.EXTRA), parent=self, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title="%s %s" % (reg.NOMBRE, reg.EXTRA), parent=self, icon=Iconos.Opciones())
 
         if resultado:
-            accion, liGen = resultado
-            bl = liGen[0]
+            accion, li_gen = resultado
+            bl = li_gen[0]
 
             um = QTUtil2.unMomento(self)
             bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
@@ -1287,17 +1299,17 @@ class WBMT(QTVarios.WDialogo):
         if recno < 0:
             return
         reg = dbf.registroActual()  # Importante ya que dbf puede cambiarse mientras se edita
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
         config = FormLayout.Editbox('<div align="right">' + _("List of positions") + "<br>" + _("By example:") + " -5,7-9,14,19-", rx=r"[0-9,\-,\,]*")
-        liGen.append((config, ""))
+        li_gen.append((config, ""))
 
-        resultado = FormLayout.fedit(liGen, title=reg.NOMBRE, parent=self, anchoMinimo=200, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title=reg.NOMBRE, parent=self, anchoMinimo=200, icon=Iconos.Opciones())
 
         if resultado:
-            accion, liGen = resultado
+            accion, li_gen = resultado
 
             bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
-            clista = liGen[0]
+            clista = li_gen[0]
             if clista:
                 lni = Util.ListaNumerosImpresion(clista)
                 bmt_listaNV = bmt_lista.extrae_lista(lni)
@@ -1333,31 +1345,31 @@ class WBMT(QTVarios.WDialogo):
             return
 
         # Se pide name y extra
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         # # Nombre del entrenamiento
-        liGen.append((_("Name") + ":", name))
+        li_gen.append((_("Name") + ":", name))
 
-        liGen.append((_("Extra info.") + ":", extra))
+        li_gen.append((_("Extra info.") + ":", extra))
 
-        liGen.append((FormLayout.Editbox(_("Order"), tipo=int, ancho=50), orden))
+        li_gen.append((FormLayout.Editbox(_("Order"), tipo=int, ancho=50), orden))
 
         liJ = [("--", 9), (_("Best move"), 8), (_("Excellent"), 7), (_("Very good"), 6), (_("Good"), 5), (_("Acceptable"), 4)]
         config = FormLayout.Combobox(_("Drop answers with minimum score"), liJ)
-        liGen.append((config, 9))
+        li_gen.append((config, 9))
 
         titulo = "%s (%d)" % (_("Joining selected training"), len(li))
-        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
         if not resultado:
             return
 
         um = QTUtil2.unMomento(self)
 
-        accion, liGen = resultado
-        name = liGen[0].strip()
-        extra = liGen[1]
-        orden = liGen[2]
-        eliminar_state_minimo = liGen[3]
+        accion, li_gen = resultado
+        name = li_gen[0].strip()
+        extra = li_gen[1]
+        orden = li_gen[2]
+        eliminar_state_minimo = li_gen[3]
 
         # Se crea una bmt_lista, suma de todas
         bmt_lista = BMT.BMTLista()
@@ -1434,7 +1446,7 @@ class WBMT(QTVarios.WDialogo):
 
         if recno >= 0:
             regActual = dbf.registroActual()
-            carpeta = os.path.join(os.path.dirname(self.configuration.ficheroBMT), dbf.NOMBRE)
+            carpeta = "%s/%s.bm1" % (os.path.dirname(self.configuration.ficheroBMT), dbf.NOMBRE)  # @Lucas: ya tienes este cambio
             filtro = _("File") + " bm1 (*.bm1)"
             fbm1 = QTUtil2.salvaFichero(self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True)
             if fbm1:
@@ -1465,20 +1477,20 @@ class WBMT(QTVarios.WDialogo):
             extra = dbf.EXTRA
             orden = dbf.ORDEN
 
-            liGen = [(None, None)]
+            li_gen = [(None, None)]
 
             # # Nombre del entrenamiento
-            liGen.append((_("Name") + ":", name))
+            li_gen.append((_("Name") + ":", name))
 
-            liGen.append((_("Extra info.") + ":", extra))
+            li_gen.append((_("Extra info.") + ":", extra))
 
-            liGen.append((FormLayout.Editbox(_("Order"), tipo=int, ancho=50), orden))
+            li_gen.append((FormLayout.Editbox(_("Order"), tipo=int, ancho=50), orden))
 
-            resultado = FormLayout.fedit(liGen, title=name, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+            resultado = FormLayout.fedit(li_gen, title=name, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
 
             if resultado:
-                accion, liGen = resultado
-                li_fieldsValor = (("NOMBRE", liGen[0].strip()), ("EXTRA", liGen[1]), ("ORDEN", liGen[2]))
+                accion, li_gen = resultado
+                li_fieldsValor = (("NOMBRE", li_gen[0].strip()), ("EXTRA", li_gen[1]), ("ORDEN", li_gen[2]))
                 self.grabaCampos(grid, recno, li_fieldsValor)
 
     def releer(self):
@@ -1651,32 +1663,32 @@ class WBMT(QTVarios.WDialogo):
         # Bucle para control de errores
         while True:
             # Datos
-            liGen = [(None, None)]
+            li_gen = [(None, None)]
 
             # # Nombre del entrenamiento
-            liGen.append((_("Name") + ":", name))
+            li_gen.append((_("Name") + ":", name))
 
             # # Tutor
             li = self.configuration.ayudaCambioTutor()
             li[0] = engine
-            liGen.append((_("Engine") + ":", li))
+            li_gen.append((_("Engine") + ":", li))
 
             # Decimas de segundo a pensar el tutor
-            liGen.append((_("Duration of engine analysis (secs)") + ":", vtime / 1000.0))
+            li_gen.append((_("Duration of engine analysis (secs)") + ":", vtime / 1000.0))
 
-            liGen.append((None, None))
+            li_gen.append((None, None))
 
-            liGen.append((FormLayout.Spinbox(_("From number"), 1, nFEN, 50), 1))
-            liGen.append((FormLayout.Spinbox(_("To number"), 1, nFEN, 50), nFEN if nFEN < 20 else 20))
+            li_gen.append((FormLayout.Spinbox(_("From number"), 1, nFEN, 50), 1))
+            li_gen.append((FormLayout.Spinbox(_("To number"), 1, nFEN, 50), nFEN if nFEN < 20 else 20))
 
-            resultado = FormLayout.fedit(liGen, title=name, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+            resultado = FormLayout.fedit(li_gen, title=name, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
 
             if resultado:
-                accion, liGen = resultado
+                accion, li_gen = resultado
 
-                name = liGen[0]
-                engine = liGen[1]
-                vtime = int(liGen[2] * 1000)
+                name = li_gen[0]
+                engine = li_gen[1]
+                vtime = int(li_gen[2] * 1000)
 
                 if not vtime or not name:
                     return
@@ -1684,8 +1696,8 @@ class WBMT(QTVarios.WDialogo):
                 dic = {"ENGINE": engine, "TIME": vtime}
                 Util.save_pickle(file, dic)
 
-                from_sq = liGen[3]
-                to_sq = liGen[4]
+                from_sq = li_gen[3]
+                to_sq = li_gen[4]
                 nDH = to_sq - from_sq + 1
                 if nDH <= 0:
                     return

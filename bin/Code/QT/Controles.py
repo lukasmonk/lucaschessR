@@ -660,7 +660,7 @@ class Menu(QtWidgets.QMenu):
         self.setFont(f)
         return self
 
-    def opcion(self, key, label, icono=None, is_disabled=False, tipoLetra=None, siChecked=False):
+    def opcion(self, key, label, icono=None, is_disabled=False, tipoLetra=None, siChecked=False, toolTip: str = ""):
         if icono:
             accion = QtWidgets.QAction(icono, label, self)
         else:
@@ -673,6 +673,8 @@ class Menu(QtWidgets.QMenu):
         if siChecked is not None:
             accion.setCheckable(True)
             accion.setChecked(siChecked)
+        if toolTip != "":
+            accion.setToolTip(toolTip)
 
         self.addAction(accion)
         return accion

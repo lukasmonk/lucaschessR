@@ -23,7 +23,8 @@ class WBDatabase(QTVarios.WDialogo):
 
         self.dbGames = DBgames.DBgames(file_database)
 
-        dicVideo = self.restore_dicvideo()
+        self.dicvideo = self.restore_dicvideo()
+        dicVideo = self.dicvideo
 
         siSummary = not si_select
 
@@ -83,7 +84,7 @@ class WBDatabase(QTVarios.WDialogo):
             sz = dicVideo["SPLITTER"]
         self.splitter.setSizes(sz)
 
-        dic_grid = self.dbGames.recuperaConfig("dic_grid")
+        dic_grid = self.dbGames.read_config("dic_grid")
         if not dic_grid:
             key = "databases_columns_default"
             dic_grid = self.configuration.read_variables(key)

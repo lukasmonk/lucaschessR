@@ -271,14 +271,14 @@ class WSummary(QtWidgets.QWidget):
                 return
 
             # Select depth
-            liGen = [(None, None)]
-            liGen.append((None, _("Select the number of moves <br> for each game to be considered")))
-            liGen.append((None, None))
+            li_gen = [(None, None)]
+            li_gen.append((None, _("Select the number of moves <br> for each game to be considered")))
+            li_gen.append((None, None))
 
             config = FormLayout.Spinbox(_("Depth"), 0, 255, 50)
-            liGen.append((config, self.dbGames.depth_stat()))
+            li_gen.append((config, self.dbGames.depth_stat()))
 
-            resultado = FormLayout.fedit(liGen, title=_("Rebuild"), parent=self, icon=Iconos.Reindexar())
+            resultado = FormLayout.fedit(li_gen, title=_("Rebuild"), parent=self, icon=Iconos.Reindexar())
             if resultado is None:
                 return None
 

@@ -149,8 +149,8 @@ class AnalyzeGame:
             return
 
         # Esta creado el folder
-        before = "AvoidBlunders.fns"
-        after = "ExploitBlunders.fns"
+        before = "%s.fns" % _("Avoid the blunder")
+        after = "%s.fns" % _("Take advantage of blunder")
         if not os.path.isdir(self.tacticblunders):
             dtactics = os.path.join(self.configuration.personal_training_folder, "../Tactics")
             if not os.path.isdir(dtactics):
@@ -159,16 +159,16 @@ class AnalyzeGame:
             with open(os.path.join(self.tacticblunders, "Config.ini"), "wt", encoding="utf-8", errors="ignore") as f:
                 f.write(
                     """[COMMON]
-    ed_reference=20
-    REPEAT=0
-    SHOWTEXT=1
-    [TACTIC1]
-    MENU=%s
-    FILESW=%s:100
-    [TACTIC2]
-    MENU=%s
-    FILESW=%s:100
-    """
+ed_reference=20
+REPEAT=0
+SHOWTEXT=1
+[TACTIC1]
+MENU=%s
+FILESW=%s:100
+[TACTIC2]
+MENU=%s
+FILESW=%s:100
+"""
                     % (_("Avoid the blunder"), before, _("Take advantage of blunder"), after)
                 )
 
@@ -482,7 +482,7 @@ class AnalyzeGame:
                         if not (self.alm.best_variation and dif == 0):
                             move.analisis2variantes(self.alm, self.delete_previous)
 
-                if dif >= self.kblunders:
+                if dif > self.kblunders:
                     rm.ponBlunder(dif)
 
                     self.graba_tactic(game, njg, mrm, pos_act)

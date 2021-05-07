@@ -22,8 +22,8 @@ class WStEval(WKibCommon.WKibCommon):
             (_("Continue"), Iconos.Kibitzer_Play(), self.play),
             (_("Pause"), Iconos.Kibitzer_Pause(), self.pause),
             (_("Show/hide board"), Iconos.Kibitzer_Board(), self.config_board),
-            ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
-            ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
+            ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Kibitzer_Up(), self.windowTop),
+            ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Kibitzer_Down(), self.windowBottom),
         )
         self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=24)
         self.tb.setAccionVisible(self.play, False)

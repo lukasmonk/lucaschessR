@@ -21,7 +21,7 @@ class ListaOpenings:
     def __init__(self, configuration):
         self.folder = configuration.folder_openings()
         if not self.folder or not os.path.isdir(self.folder):
-            self.folder = configuration.folderBaseOpenings
+            self.folder = configuration.folder_base_openings
 
         self.file = os.path.join(self.folder, "openinglines.pk")
 

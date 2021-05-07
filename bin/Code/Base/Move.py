@@ -14,12 +14,6 @@ def creaDicHTML():
 dicHTMLFigs = creaDicHTML()
 
 
-def html_nag(nag):
-    return dicHTMLnags.get(nag, "$%d" % nag)
-
-def html_nag_txt(nag):
-    return dicHTMLnagsTxt.get(nag, "$%d" % nag)
-
 class Move:
     def __init__(self, game, position_before=None, position=None, from_sq=None, to_sq=None, promotion=""):
         self.game = game
@@ -33,6 +27,7 @@ class Move:
 
         self.variations = Variations(self)
         self.comment = ""
+        self.li_themes = []
 
         self.li_nags = []
         self.time_ms = 0
@@ -44,6 +39,28 @@ class Move:
 
     def only_has_move(self) -> bool:
         return not (self.variations or self.comment or len(self.li_nags) > 0 or self.analysis)
+
+    @property
+    def get_themes(self) -> []:
+        return self.li_themes
+
+    def has_themes(self) -> bool:
+        return len(self.get_themes) > 0
+
+    def add_theme(self, theme):
+        if theme not in self.get_themes:
+            self.li_themes.append(theme)
+
+    def clear_themes(self):
+        self.li_themes = []
+
+    def get_points_lost(self):
+        if self.analysis is None:
+            return None
+        mrm, pos = self.analysis
+        pts = mrm.li_rm[pos].centipawns_abs()
+        pts0 = mrm.li_rm[0].centipawns_abs()
+        return pts0 - pts
 
     @property
     def liMovs(self):
@@ -240,10 +257,7 @@ class Move:
         return Position.distancia(self.from_sq, self.to_sq)
 
     def save(self):
-        dic = {
-            "move": self.movimiento(),
-            "in_the_opening": self.in_the_opening,
-        }
+        dic = {"move": self.movimiento(), "in_the_opening": self.in_the_opening}
         if len(self.variations):
             dic["variations"] = self.variations.save()
         if self.comment:
@@ -252,6 +266,8 @@ class Move:
             dic["time_ms"] = self.time_ms
         if self.li_nags:
             dic["li_nags"] = self.li_nags
+        if self.li_themes:
+            dic["li_themes"] = self.li_themes
         if self.analysis:
             mrm, pos = self.analysis
             save_mrm = mrm.save()
@@ -278,6 +294,8 @@ class Move:
             self.time_ms = dic["time_ms"]
         if "li_nags" in dic:
             self.li_nags = dic["li_nags"]
+        if "li_themes" in dic:
+            self.li_themes = dic["li_themes"]
         if "analysis" in dic:
             save_mrm, pos = dic["analysis"]
             mrm = EngineResponse.MultiEngineResponse("", True)

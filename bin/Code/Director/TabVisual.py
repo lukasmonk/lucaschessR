@@ -697,10 +697,11 @@ class Guion:
         stPrevios = self.recuperaMoviblesBoard()
         if lista is not None:
             for reg in lista:
-                bd = reg["_bloqueDatos"]
-                buscar = (bd.tpid[0], bd.tpid[1], bd.a1h8)
-                if not (buscar in stPrevios):
-                    self.recuperaReg(reg)
+                if "_bloqueDatos" in reg:
+                    bd = reg["_bloqueDatos"]
+                    buscar = (bd.tpid[0], bd.tpid[1], bd.a1h8)
+                    if not (buscar in stPrevios):
+                        self.recuperaReg(reg)
 
         if self.winDirector:
             for tarea in self.liGTareas:

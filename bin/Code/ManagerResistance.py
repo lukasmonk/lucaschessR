@@ -34,6 +34,7 @@ class ManagerResistance(Manager.Manager):
         self.opening = Opening.OpeningPol(5)  # lee las aperturas
 
         # debe hacerse antes que rival
+        self.procesador.stop_engines()
         self.xarbitro = self.procesador.creaManagerMotor(self.configuration.tutor, self.segundos * 1000, None)
         self.xarbitro.anulaMultiPV()
 
@@ -139,14 +140,12 @@ class ManagerResistance(Manager.Manager):
             if self.game.is_mate():
                 si_ganado = self.human_side != is_white
                 if si_ganado:
-                    self.movimientos += 2001
+                    self.movimientos += 2000
                 self.finJuego(True)
-                self.guardarGanados(si_ganado)
                 return
             if self.game.is_draw():
-                self.movimientos += 1001
+                self.movimientos += 1000
                 self.finJuego(True)
-                self.guardarGanados(False)
                 return
 
         siRival = is_white == self.is_engine_side_white
@@ -233,7 +232,7 @@ class ManagerResistance(Manager.Manager):
                     txt = "<h2>%s<h2>" % (_("Game ended"))
                     txt += "<h3>%s<h3>" % (self.resistance.dameEti(Util.today(), self.movimientos))
                 else:
-                    txt = "<h3>%s</h3>" % (_X(_("You have lost %1 points."), str(-self.puntosRival)))
+                    txt = "<h3>%s</h3>" % (_X(_("You have lost %1 centipawns."), str(-self.puntosRival)))
 
             if siFinPartida:
                 self.mensajeEnPGN(txt)

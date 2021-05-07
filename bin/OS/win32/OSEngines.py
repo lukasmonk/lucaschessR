@@ -14,8 +14,12 @@ def read_engines(folder_engines):
             folder = alias
 
         path_exe = os.path.join(folder_engines, folder, exe)
-        engine = Engines.Engine(alias, autor, version, url, path_exe)
+        engine = Engines.Engine(alias.lower(), autor, version, url, path_exe)
         engine.elo = elo
+        engine.ordenUCI("Log", "false")
+        engine.ordenUCI("Ponder", "false")
+        engine.ordenUCI("Hash", "16")
+        engine.ordenUCI("Threads", "1")
         dic_engines[alias] = engine
         return engine
 
@@ -157,7 +161,8 @@ def read_engines(folder_engines):
     cm.removeLog("zappa_log.txt")
 
     cm = mas("houdini", "Robert Houdart", "1.5a", "http://www.cruxis.com/chess/houdini.htm", "Houdini_15a_w32.exe", 3093)
-    cm.ponMultiPV(5, 16)
+    cm.ordenUCI("Threads", "1")
+    cm.ponMultiPV(10, 16)
 
     cm = mas("hannibal", "Samuel N. Hamilton and Edsel G. Apostol", "1.4b", "http://sites.google.com/site/edapostol/hannibal", "Hannibal1.4bx32.exe", 3000)
     cm.removeLog("logfile.txt")

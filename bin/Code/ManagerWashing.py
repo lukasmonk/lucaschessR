@@ -781,7 +781,6 @@ class ManagerWashingCreate(Manager.Manager):
         mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
-        self.guardarGanados(player_win)
         QTUtil.refresh_gui()
 
         QTUtil2.message(self.main_window, mensaje)

@@ -46,12 +46,12 @@ class WTV_Flecha(QtWidgets.QDialog):
         self.board.copiaPosicionDe(owner.board)
 
         # Datos generales
-        liGen = []
+        li_gen = []
 
         if siNombre:
             # name de la arrow que se usara en los menus del tutorial
             config = FormLayout.Editbox(_("Name"), ancho=120)
-            liGen.append((config, regFlecha.name))
+            li_gen.append((config, regFlecha.name))
 
         # ( "forma", "t", "a" ), # a = abierta -> , c = cerrada la cabeza, p = poligono cuadrado,
         liFormas = (
@@ -62,66 +62,66 @@ class WTV_Flecha(QtWidgets.QDialog):
             (_("Polygon  3"), "3"),
         )
         config = FormLayout.Combobox(_("Form"), liFormas)
-        liGen.append((config, regFlecha.forma))
+        li_gen.append((config, regFlecha.forma))
 
         # ( "tipo", "n", Qt.SolidLine ), #1=SolidLine, 2=DashLine, 3=DotLine, 4=DashDotLine, 5=DashDotDotLine
         config = FormLayout.Combobox(_("Line Type"), QTUtil2.tiposDeLineas())
-        liGen.append((config, regFlecha.tipo))
+        li_gen.append((config, regFlecha.tipo))
 
-        # liGen.append( (None,None) )
+        # li_gen.append( (None,None) )
 
         # ( "color", "n", 0 ),
         config = FormLayout.Colorbox(_("Color"), 80, 20)
-        liGen.append((config, regFlecha.color))
+        li_gen.append((config, regFlecha.color))
 
         # ( "colorinterior", "n", -1 ), # si es cerrada
         config = FormLayout.Colorbox(_("Internal color"), 80, 20, siChecked=True)
-        liGen.append((config, regFlecha.colorinterior))
+        li_gen.append((config, regFlecha.colorinterior))
 
         # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regFlecha.opacity * 100)))
+        li_gen.append((config, 100 - int(regFlecha.opacity * 100)))
 
-        # liGen.append( (None,None) )
+        # li_gen.append( (None,None) )
 
         # ( "redondeos", "l", False ),
-        liGen.append((_("Rounded edges"), regFlecha.redondeos))
+        li_gen.append((_("Rounded edges"), regFlecha.redondeos))
 
         # ( "grosor", "n", 1 ), # ancho del trazo
         config = FormLayout.Spinbox(_("Thickness"), 1, 20, 50)
-        liGen.append((config, regFlecha.grosor))
+        li_gen.append((config, regFlecha.grosor))
 
-        # liGen.append( (None,None) )
+        # li_gen.append( (None,None) )
 
         # ( "altocabeza", "n", 1 ), # altura de la cabeza
         config = FormLayout.Spinbox(_("Head height"), 0, 100, 50)
-        liGen.append((config, regFlecha.altocabeza))
+        li_gen.append((config, regFlecha.altocabeza))
 
         # ( "ancho", "n", 10 ), # ancho de la base de la arrow si es un poligono
         config = FormLayout.Spinbox(_("Base width"), 1, 100, 50)
-        liGen.append((config, regFlecha.ancho))
+        li_gen.append((config, regFlecha.ancho))
 
         # ( "vuelo", "n", 5 ), # vuelo de la arrow respecto al ancho de la base
         config = FormLayout.Spinbox(_("Additional width of the base of the head"), 1, 100, 50)
-        liGen.append((config, regFlecha.vuelo))
+        li_gen.append((config, regFlecha.vuelo))
 
         # ( "descuelgue", "n", 2 ), # vuelo hacia arriba
         config = FormLayout.Spinbox(_("Height of the base angle of the head"), -100, 100, 50)
-        liGen.append((config, regFlecha.descuelgue))
+        li_gen.append((config, regFlecha.descuelgue))
 
-        # liGen.append( (None,None) )
+        # li_gen.append( (None,None) )
 
         # ( "destino", "t", "c" ), # c = centro, m = minimo
         config = FormLayout.Combobox(_("Target position"), tiposDestino())
-        liGen.append((config, regFlecha.destino))
+        li_gen.append((config, regFlecha.destino))
 
-        # liGen.append( (None,None) )
+        # li_gen.append( (None,None) )
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        liGen.append((config, regFlecha.physical_pos.orden))
+        li_gen.append((config, regFlecha.physical_pos.orden))
 
-        self.form = FormLayout.FormWidget(liGen, dispatch=self.cambios)
+        self.form = FormLayout.FormWidget(li_gen, dispatch=self.cambios)
 
         # Layout
         layout = Colocacion.H().control(self.form).relleno().control(self.board)

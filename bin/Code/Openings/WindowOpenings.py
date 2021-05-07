@@ -510,14 +510,14 @@ class OpeningsPersonales(QTVarios.WDialogo):
             titulo = name
 
         # Datos
-        liGen = [(None, None)]
-        liGen.append((_("Name") + ":", name))
+        li_gen = [(None, None)]
+        li_gen.append((_("Name") + ":", name))
         config = FormLayout.Editbox("ECO", ancho=30, rx="[A-Z, a-z][0-9][0-9]")
-        liGen.append((config, eco))
-        liGen.append((_("Add to standard list") + ":", estandar))
+        li_gen.append((config, eco))
+        li_gen.append((_("Add to standard list") + ":", estandar))
 
         # Editamos
-        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=460, icon=Iconos.Opening())
+        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=460, icon=Iconos.Opening())
         if resultado is None:
             return
 

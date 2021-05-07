@@ -103,7 +103,7 @@ class ThanksTo:
         # Version R
         li_base = ["Alfonso Solbes", "Alan Lee", '<a href="https://goneill.co.nz/index.php">Graham O\'Neill</a>', "Eric", "Laudecir Daniel", "Nambi", "Johannes Bolzano"]
         li_resto = []
-        txt += version("R0", li_base, li_resto, False)
+        txt += version("R", li_base, li_resto, False)
 
         # Version 11
         li_base = [

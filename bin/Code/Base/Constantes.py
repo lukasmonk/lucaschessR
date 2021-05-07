@@ -31,7 +31,7 @@ ST_PLAYING, ST_ENDGAME, ST_WAITING, ST_PAUSE = range(4)
     GT_WASHING_REPLAY,
     GT_SINGULAR_MOVES,
     GT_NOTE_DOWN,
-    GT_BMT
+    GT_BMT,
 ) = range(28)
 
 OUT_NORMAL, OUT_REINIT = range(2)
@@ -167,17 +167,11 @@ KIB_POLYGLOT = "B"
 KIB_GAVIOTA = "G"
 KIB_THREATS = "C"
 
+KIB_BEFORE_MOVE, KIB_AFTER_MOVE = True, False
+
 FEN_INITIAL = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-NAG_0, NAG_1, NAG_2, NAG_3, NAG_4, NAG_5, NAG_6 = (
-    NO_RATING,
-    GOOD_MOVE,
-    BAD_MOVE,
-    VERY_GOOD_MOVE,
-    VERY_POOR_MOVE,
-    SPECULATIVE_MOVE,
-    QUESTIONABLE_MOVE,
-) = range(7)
+NAG_0, NAG_1, NAG_2, NAG_3, NAG_4, NAG_5, NAG_6 = (NO_RATING, GOOD_MOVE, BAD_MOVE, VERY_GOOD_MOVE, VERY_POOR_MOVE, SPECULATIVE_MOVE, QUESTIONABLE_MOVE) = range(7)
 
 
 dicHTMLnags = {
@@ -216,16 +210,11 @@ dicHTMLnags = {
     245: "⊥",
 }
 
-dicHTMLnagsTxt = {
-    NAG_1: "!",
-    NAG_2: "?",
-    NAG_3: "!!",
-    NAG_4: "??",
-    NAG_5: "!?",
-    NAG_6: "?!",
-}
+dicHTMLnagsTxt = {NAG_1: "!", NAG_2: "?", NAG_3: "!!", NAG_4: "??", NAG_5: "!?", NAG_6: "?!"}
 
 
+def html_nag_txt(nag):
+    return dicHTMLnagsTxt.get(nag, "$%d" % nag)
 
 
 OPENING, MIDDLEGAME, ENDGAME, ALLGAME = range(4)

@@ -49,19 +49,19 @@ class WTV_Marker(QtWidgets.QDialog):
         self.board.copiaPosicionDe(owner.board)
 
         # Datos generales
-        liGen = []
+        li_gen = []
 
         # name del svg que se usara en los menus del tutorial
         config = FormLayout.Editbox(_("Name"), ancho=120)
-        liGen.append((config, regMarker.name))
+        li_gen.append((config, regMarker.name))
 
         # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regMarker.opacity * 100)))
+        li_gen.append((config, 100 - int(regMarker.opacity * 100)))
 
         # ( "psize", "n", 100 ),
         config = FormLayout.Spinbox(_("Size") + " %", 1, 1600, 50)
-        liGen.append((config, regMarker.psize))
+        li_gen.append((config, regMarker.psize))
 
         # ( "poscelda", "n", 1 ),
         li = (
@@ -71,13 +71,13 @@ class WTV_Marker(QtWidgets.QDialog):
             ("%s-%s" % (_("Bottom"), _("Right")), 3),
         )
         config = FormLayout.Combobox(_("Position in the square"), li)
-        liGen.append((config, regMarker.poscelda))
+        li_gen.append((config, regMarker.poscelda))
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        liGen.append((config, regMarker.position.orden))
+        li_gen.append((config, regMarker.position.orden))
 
-        self.form = FormLayout.FormWidget(liGen, dispatch=self.cambios)
+        self.form = FormLayout.FormWidget(li_gen, dispatch=self.cambios)
 
         # Layout
         layout = Colocacion.H().control(self.form).relleno().control(self.board)

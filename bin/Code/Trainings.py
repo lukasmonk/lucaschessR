@@ -446,20 +446,21 @@ class Entrenamientos:
                         posUltimo = data.get("POSULTIMO", 1)
                         jump = data.get("SALTA", False)
                         tipo = data.get("TYPE", "s")
+                        attempts = data.get("ATTEMPTS", 1)
                         resp = WCompetitionWithTutor.numPosicion(
-                            self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo
+                            self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo, attempts
                         )
                         if resp is None:
                             db.close()
                             return
-                        pos, tipo, jump = resp
-                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TYPE": tipo}
+                        pos, tipo, jump, attempts = resp
+                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TYPE": tipo, "ATTEMPTS": attempts}
                         db.close()
                         if tipo.startswith("r"):
                             if tipo == "rk":
                                 random.seed(pos)
                             random.shuffle(liEntrenamientos)
-                    self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump)
+                    self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump, attempts)
 
                 elif resp == "learnPGN":
                     self.learnPGN()

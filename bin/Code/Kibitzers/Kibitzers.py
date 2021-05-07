@@ -9,6 +9,14 @@ from Code.QT import Iconos
 from Code.Base.Constantes import *
 
 
+def cb_pointofview_options():
+    li_options = [
+        (_("Before current move"), KIB_BEFORE_MOVE),
+        (_("After current move"), KIB_AFTER_MOVE),
+    ]
+    return li_options
+
+
 class Tipos:
     def __init__(self):
         self.li_tipos = (
@@ -51,6 +59,7 @@ class Kibitzer(Engines.Engine):
         self.prioridad = Priorities.priorities.normal
         self.visible = True
         self.name = None
+        self.pointofview = KIB_AFTER_MOVE
 
     def pon_huella(self, liEngines):
         liHuellas = [en.huella for en in liEngines if en != self]
@@ -66,6 +75,7 @@ class Kibitzer(Engines.Engine):
         otro.prioridad = self.prioridad
         otro.name = self.name
         otro.visible = True
+        otro.pointofview = self.pointofview
         otro.pon_huella(liEngines)
         lista = [en.name for en in liEngines]
         d = 0
@@ -79,6 +89,11 @@ class Kibitzer(Engines.Engine):
 
     def cpriority(self):
         return Priorities.priorities.texto(self.prioridad)
+
+    def cpointofview(self):
+        for txt, key in cb_pointofview_options():
+            if self.pointofview == key:
+                return txt
 
 
 class Kibitzers:
@@ -101,11 +116,18 @@ class Kibitzers:
                     lista.append(kib)
         return lista, lastfolder
 
+    def number(self, huella):
+        for num, kib in enumerate(self.lista):
+            if kib.huella == huella:
+                return num
+
+
+
     def save(self):
         dic = {"LISTA": [en.save() for en in self.lista], "LASTFOLDER": self.lastfolder}
         Util.save_pickle(self.file, dic)
 
-    def nuevo_engine(self, name, engine, tipo, prioridad):
+    def nuevo_engine(self, name, engine, tipo, prioridad, pointofview):
         kib = Kibitzer()
         kib.pon_huella(self.lista)
         eng = Code.configuration.buscaRival(engine)
@@ -114,6 +136,7 @@ class Kibitzers:
         kib.name = name
         kib.tipo = tipo
         kib.prioridad = prioridad
+        kib.pointofview = pointofview
         self.lista.append(kib)
         self.save()
         return len(self.lista) - 1
@@ -191,4 +214,4 @@ class Kibitzers:
 
     def lista_menu(self):
         dIco = Tipos().dicIconos()
-        return [(kib.name, dIco[kib.tipo]) for kib in self.lista if kib.visible]
+        return [(kib.huella, kib.name,  dIco[kib.tipo]) for kib in self.lista if kib.visible]

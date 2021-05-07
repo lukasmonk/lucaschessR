@@ -37,14 +37,9 @@ class ManagerGame(Manager.Manager):
         self.main_window.set_label1(None)
         self.main_window.set_label2(None)
         self.set_dispatcher(self.player_has_moved)
-        self.set_position(self.game.first_position)
         self.show_side_indicator(True)
         self.put_pieces_bottom(game.iswhite())
-        self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
-        # if self.game.siFenInicial():
-        #     self.goto_end()
-        # else:
         self.ponteAlPrincipio()
 
         self.check_boards_setposition()
@@ -52,11 +47,10 @@ class ManagerGame(Manager.Manager):
         self.put_information()
         self.put_toolbar()
 
-        self.refresh()
-
         self.reinicio = self.game.save()
 
-        self.play_next_move()
+        if len(self.game) == 0:
+            self.play_next_move()
 
     def is_changed(self):
         return self.changed or self.game.save() != self.reinicio
@@ -154,15 +148,14 @@ class ManagerGame(Manager.Manager):
         ok = False
         if not self.only_consult:
             ok = self.ask_for_save_game()
-            if ok is None:
-                return None
+
+        if ok is None:
+            return ok
 
         if ok:
             self.main_window.accept()
-
         else:
             self.main_window.reject()
-
         return ok
 
     def final_x(self):
@@ -274,16 +267,16 @@ class ManagerGame(Manager.Manager):
     def configurarGS(self):
         sep = (None, None, None)
 
-        liMasOpciones = [
+        li_mas_opciones = [
             ("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion()),
             sep,
-            ("leerpgn", _("Read PGN"), Iconos.PGN_Importar()),
+            ("leerpgn", _("Read PGN file"), Iconos.PGN_Importar()),
             sep,
             ("pastepgn", _("Paste PGN"), Iconos.Pegar16()),
             sep,
         ]
         if not self.is_complete:
-            liMasOpciones.extend(
+            li_mas_opciones.extend(
                 [
                     ("position", _("Edit start position"), Iconos.Datos()),
                     sep,
@@ -293,7 +286,7 @@ class ManagerGame(Manager.Manager):
                 ]
             )
 
-        resp = self.configurar(liMasOpciones, siCambioTutor=True, siSonidos=True)
+        resp = self.configurar(li_mas_opciones, siCambioTutor=True, siSonidos=True)
 
         if resp == "rotacion":
             self.auto_rotate = not self.auto_rotate

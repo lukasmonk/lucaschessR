@@ -55,6 +55,7 @@ class RunEngine:
         self.working = True
         self.liBuffer = []
         self.starting = True
+        self.best_move_done = True
         self.args = ["./%s" % os.path.basename(self.exe)]
         if args:
             self.args.extend(args)
@@ -87,7 +88,7 @@ class RunEngine:
         self.nMultiPV = nMultiPV
         if nMultiPV:
             self.ponMultiPV(nMultiPV)
-            if not uci_analysismode:
+            if not uci_analysismode and nMultiPV > 1:
                 for line in self.uci_lines:
                     if "UCI_AnalyseMode" in line:
                         self.set_option("UCI_AnalyseMode", "true")
@@ -352,7 +353,9 @@ class RunEngine:
         if max_time:
             ms_time = max_time + 3000
         elif max_depth:
-            ms_time = int(max_depth * ms_time / 3.0)
+            ms_time = 1000 * 1000  # 1000 secs, el tiempo calculado abajo no es bastante para mi ordenador - se pone un limite invisible y no me parece correcto
+            #ms_time = int(max_depth * ms_time / 3.0) * 100
+
 
         self.reset()
         if is_savelines:
@@ -669,10 +672,11 @@ class MaiaEngine(RunEngine):
         #     prin t(lv, self.book_select)
         #
     def simulate_time(self, ms_time):
-        tini = time.time()
-        while not (self.stopping or (time.time()-tini)*1000 > ms_time):
-            QtCore.QCoreApplication.processEvents()
-            time.sleep(0.1)
+        if ms_time:
+            tini = time.time()
+            while not (self.stopping or (time.time()-tini)*1000 > ms_time):
+                QtCore.QCoreApplication.processEvents()
+                time.sleep(0.1)
         self.stopping = False
 
     def seek_bestmove(self, max_time, max_depth, is_savelines):
@@ -734,7 +738,8 @@ class MaiaEngine(RunEngine):
     def play_with_return_maia(self, play_return, game, line, max_time, max_depth, time_simulate):
         self.reset()
         if self.test_book(game):
-            time_simulate /= 3
+            if time_simulate:
+                time_simulate /= 3
         else:
             self.mrm.setTimeDepth(max_time, max_depth)
             self.set_game_position(game)

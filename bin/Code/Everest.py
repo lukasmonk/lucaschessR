@@ -152,7 +152,7 @@ class Expedition:
             self.max_tries,
             _("Tolerance"),
             self.tolerance,
-            _("points"),
+            _("centipawns"),
         )
 
     def add_try(self, ok, seconds, points):

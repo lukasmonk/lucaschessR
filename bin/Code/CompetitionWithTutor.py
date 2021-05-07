@@ -30,7 +30,8 @@ class Grupos:
         self.liGrupos = []
         li = []
         for key, cm in Code.configuration.dic_engines.items():
-            li.append((cm.elo, key, cm))
+            if cm.elo > 0:
+                li.append((cm.elo, key, cm))
 
         self.li_rivales = sorted(li, key=operator.itemgetter(0))
 

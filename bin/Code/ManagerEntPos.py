@@ -36,7 +36,7 @@ class ManagerEntPos(Manager.Manager):
         db[self.entreno] = data
         db.close()
 
-    def start(self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False):
+    def start(self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False, attempts=1):
         if hasattr(self, "reiniciando"):
             if self.reiniciando:
                 return
@@ -55,6 +55,7 @@ class ManagerEntPos(Manager.Manager):
         self.li_histo = [self.pos_training]
 
         self.hints = 99999
+        self.attempts = attempts
 
         self.line_fns = FNSLine.FNSLine(self.li_trainings[self.pos_training - 1])
 
@@ -193,7 +194,7 @@ class ManagerEntPos(Manager.Manager):
         elif pos == 0:
             pos = self.num_trainings
         self.analiza_stop()
-        self.start(pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump)
+        self.start(pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump, self.attempts)
 
     def control_teclado(self, nkey):
         if nkey in (Qt.Key_Plus, Qt.Key_PageDown):
@@ -235,6 +236,7 @@ class ManagerEntPos(Manager.Manager):
         self.state = ST_PLAYING
 
         self.human_is_playing = False
+        self.current_attempts = 0
         self.put_view()
 
         is_white = self.game.last_position.is_white
@@ -339,7 +341,7 @@ class ManagerEntPos(Manager.Manager):
     def sigue(self):
         self.state = ST_PLAYING
         if TB_CONTINUE in self.li_options_toolbar:
-            del self.li_options_toolbar[4]
+            self.li_options_toolbar.remove(TB_CONTINUE)
             self.main_window.pon_toolbar(self.li_options_toolbar)
         self.game_obj = None
         self.play_next_move()
@@ -372,6 +374,7 @@ class ManagerEntPos(Manager.Manager):
         a1h8 = move.movimiento()
         ok = False
         if self.is_playing_gameobj():
+            self.current_attempts += 1
             move_obj = self.game_obj.move(self.pos_obj)
             is_main, is_var = move_obj.test_a1h8(a1h8)
             if is_main:
@@ -384,9 +387,11 @@ class ManagerEntPos(Manager.Manager):
                 self.board.ponFlechasTmp(li_movs)
             else:
                 if a1h8[:2] != move_obj.from_sq:
-                    self.board.markPosition(move_obj.from_sq)
+                    if self.current_attempts >= self.attempts:
+                        self.board.markPosition(move_obj.from_sq)
                 else:
-                    self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
+                    if self.current_attempts >= self.attempts:
+                        self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
             if not ok:
                 self.sigueHumano()
                 return False
@@ -522,7 +527,7 @@ class ManagerEntPos(Manager.Manager):
 
         nom_dir = Util.relative_path(os.path.realpath(nom_dir))
 
-        Util.dic2ini(nom_ini, dicIni)
+        Util.dic2ini_base(nom_ini, dicIni)
 
         name = os.path.basename(nom_dir)
 

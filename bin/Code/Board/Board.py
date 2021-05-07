@@ -470,7 +470,7 @@ class Board(QtWidgets.QGraphicsView):
         base_casillas_f.physical_pos.orden = 3
         base_casillas_f.colorRelleno = -1
         base_casillas_f.color = self.colorFrontera
-        base_casillas_f.redEsquina = 0#self.tamFrontera
+        base_casillas_f.redEsquina = 0  # self.tamFrontera
         base_casillas_f.tipo = 1
 
         if base_casillas_f.grosor > 0:
@@ -1063,13 +1063,11 @@ class Board(QtWidgets.QGraphicsView):
         if siRight and a1h8:
             return self.mousePressGraphLive(event, a1h8)
 
-        QtWidgets.QGraphicsView.mousePressEvent(self, event)
-
         self.blindfoldPosicion(False, None, None)
         if a1h8 is None:
             if self.atajosRaton:
                 self.atajosRaton(None)
-            # QtWidgets.QGraphicsView.mousePressEvent(self,event)
+            QtWidgets.QGraphicsView.mousePressEvent(self,event)
             return
 
         if self.atajosRaton:
@@ -1081,6 +1079,8 @@ class Board(QtWidgets.QGraphicsView):
                 liC = self.main_window.manager.colect_candidates(a1h8)
                 if liC:
                     self.show_candidates(liC)
+
+        QtWidgets.QGraphicsView.mousePressEvent(self, event)
 
     def checkLEDS(self):
         if not hasattr(self, "dicXML"):

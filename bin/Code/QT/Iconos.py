@@ -3596,3 +3596,19 @@ def Connected():
     return QtGui.QIcon(pmConnected())
 
 
+def pmThemes():
+    return PM(943916,944485)
+
+
+def Themes():
+    return QtGui.QIcon(pmThemes())
+
+
+def pmReset():
+    return PM(944485,946104)
+
+
+def Reset():
+    return QtGui.QIcon(pmReset())
+
+

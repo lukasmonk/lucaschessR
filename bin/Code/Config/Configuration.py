@@ -241,13 +241,6 @@ class Configuration:
 
         self.x_cursor_thinking = True
 
-        self.x_save_won = False
-        self.x_save_lost = False
-        self.x_save_unfinished = False
-
-        self.x_save_csv = ""
-        self.x_save_pgn = ""
-
         self.x_rival_inicial = "rocinante" if Code.is_linux else "irina"
 
         self.tutor_inicial = "stockfish"
@@ -274,6 +267,8 @@ class Configuration:
         # Editable directamente en su código
         self.x_captures_showall = True
         self.x_counts_showall = True
+
+        self.x_show_version11 = False
 
         self.palette = {}
 
@@ -365,8 +360,8 @@ class Configuration:
 
     def folder_openings(self):
         dic = self.read_variables("OPENING_LINES")
-        folder = dic.get("FOLDER", self.folderBaseOpenings)
-        return folder if os.path.isdir(folder) else self.folderBaseOpenings
+        folder = dic.get("FOLDER", self.folder_base_openings)
+        return folder if os.path.isdir(folder) else self.folder_base_openings
 
     def set_folder_openings(self, new_folder):
         new_folder = Util.relative_path(os.path.realpath(new_folder))
@@ -506,8 +501,8 @@ class Configuration:
         if not Util.exist_file(self.file_sounds()):
             Util.file_copy(Code.path_resource("IntFiles", "sounds.pkd"), self.file_sounds())
 
-        self.folderBaseOpenings = os.path.join(self.carpeta, "OpeningLines")
-        Util.create_folder(self.folderBaseOpenings)
+        self.folder_base_openings = os.path.join(self.carpeta, "OpeningLines")
+        Util.create_folder(self.folder_base_openings)
 
     def compruebaBMT(self):
         if not Util.exist_file(self.ficheroBMT):
@@ -524,16 +519,10 @@ class Configuration:
         self.x_save_pgn_folder = ""
         self.x_save_lcsb = ""
 
-        self.x_save_won = False
-        self.x_save_lost = False
-        self.x_save_unfinished = False
-
         self.x_captures_activate = False
         self.x_info_activate = False
         self.x_mouse_shortcuts = False
         self.x_show_candidates = False
-
-        self.x_save_csv = ""
 
         self.rival = self.buscaRival(self.x_rival_inicial)
 
@@ -580,7 +569,7 @@ class Configuration:
     def comboMotoresMultiPV10(self, minimo=10):  # %#
         liMotores = []
         for key, cm in self.dic_engines.items():
-            if cm.multiPV >= minimo:
+            if cm.maxMultiPV >= minimo:
                 liMotores.append((cm.nombre_ext(), key))
 
         li = sorted(liMotores, key=operator.itemgetter(0))

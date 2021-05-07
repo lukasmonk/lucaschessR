@@ -58,10 +58,10 @@ class WRunMate15(QTVarios.WDialogo):
             (_("Close"), Iconos.MainMenu(), self.terminar),
             None,
             (_("Begin"), Iconos.Empezar(), self.begin),
+            (_("Restart"), Iconos.Reset(), self.restart),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
         self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, icon_size=32)
-        # self.tb = QTVarios.LCTB(self, li_acciones)
         self.show_tb(self.terminar, self.begin)
 
         ly_left = Colocacion.V().control(self.tb).control(self.board)
@@ -84,6 +84,7 @@ class WRunMate15(QTVarios.WDialogo):
         self.ultimaCelda = None
 
     def set_position(self):
+        self.show_tb(self.terminar, self.restart)
         self.lb_info.set_text("[%d] %s" % (self.mate15.pos + 1, self.mate15.info))
 
         fen = self.mate15.fen
@@ -165,6 +166,9 @@ class WRunMate15(QTVarios.WDialogo):
         QTUtil.refresh_gui()
 
     def begin(self):
+        self.set_position()
+
+    def restart(self):
         self.set_position()
 
     def seguir(self):

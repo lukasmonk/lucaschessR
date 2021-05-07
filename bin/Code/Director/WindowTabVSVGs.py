@@ -81,25 +81,25 @@ class WTV_SVG(QtWidgets.QDialog):
         self.board.copiaPosicionDe(owner.board)
 
         # Datos generales
-        liGen = []
+        li_gen = []
 
         # name del svg que se usara en los menus del tutorial
         config = FormLayout.Editbox(_("Name"), ancho=120)
-        liGen.append((config, regSVG.name))
+        li_gen.append((config, regSVG.name))
 
         # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regSVG.opacity * 100)))
+        li_gen.append((config, 100 - int(regSVG.opacity * 100)))
 
         # ( "psize", "n", 100 ),
         config = FormLayout.Spinbox(_("Size") + " %", 1, 1600, 50)
-        liGen.append((config, regSVG.psize))
+        li_gen.append((config, regSVG.psize))
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        liGen.append((config, regSVG.physical_pos.orden))
+        li_gen.append((config, regSVG.physical_pos.orden))
 
-        self.form = FormLayout.FormWidget(liGen, dispatch=self.cambios)
+        self.form = FormLayout.FormWidget(li_gen, dispatch=self.cambios)
 
         # Layout
         layout = Colocacion.H().control(self.form).relleno().control(self.board)
@@ -259,7 +259,7 @@ class WTV_SVGs(QTVarios.WDialogo):
 
         menu = QTVarios.LCMenu(self)
 
-        def miraDir(submenu, base, dr):
+        def look_folder(submenu, base, dr):
             if base:
                 pathCarpeta = base + dr + "/"
                 smenu = submenu.submenu(dr, Iconos.Carpeta())
@@ -270,7 +270,7 @@ class WTV_SVGs(QTVarios.WDialogo):
             for fich in os.listdir(pathCarpeta):
                 pathFich = pathCarpeta + fich
                 if os.path.isdir(pathFich):
-                    miraDir(smenu, pathCarpeta, fich)
+                    look_folder(smenu, pathCarpeta, fich)
                 elif pathFich.lower().endswith(".svg"):
                     li.append((pathFich, fich))
 
@@ -279,7 +279,7 @@ class WTV_SVGs(QTVarios.WDialogo):
                 if ico:
                     smenu.opcion(pathFich, fich[:-4], ico)
 
-        miraDir(menu, "", "imgs")
+        look_folder(menu, Code.folder_resources + "/", "imgs")
 
         menu.separador()
 

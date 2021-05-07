@@ -202,11 +202,11 @@ class WWashing(QTVarios.WDialogo):
         if resp is None:
             return
         if resp == "saveas":
-            liGen = [(None, None)]
+            li_gen = [(None, None)]
             config = FormLayout.Editbox(_("Name"), ancho=160)
-            liGen.append((config, ""))
+            li_gen.append((config, ""))
 
-            resultado = FormLayout.fedit(liGen, title=_("Name"), parent=self, icon=Iconos.GrabarComo())
+            resultado = FormLayout.fedit(li_gen, title=_("Name"), parent=self, icon=Iconos.GrabarComo())
             if resultado:
                 accion, liResp = resultado
                 fich = name = liResp[0]

@@ -20,6 +20,7 @@ class ListEngineManagers:
     def close_all(self):
         for engine_manager in self.lista:
             engine_manager.terminar()
+        self.lista = []
 
 
 class EngineManager:
@@ -96,7 +97,7 @@ class EngineManager:
 
     def actMultiPV(self, xMultiPV):
         self.confMotor.actMultiPV(xMultiPV)
-        self.testEngine()
+        self.check_engine()
         self.engine.ponMultiPV(self.confMotor.multiPV)
 
     def anulaMultiPV(self):
@@ -112,7 +113,7 @@ class EngineManager:
         if self.engine:
             self.engine.gui_dispatch = None
 
-    def testEngine(self, nMultiPV=0):
+    def check_engine(self, nMultiPV=0):
         if self.engine is not None:
             return False
         if self.nMultiPV:
@@ -142,7 +143,7 @@ class EngineManager:
         return True
 
     def juegaSegundos(self, segundos):
-        self.testEngine()
+        self.check_engine()
         game = self.procesador.manager.game
         if self.siInfinito:  # problema tarrasch
             mrm = self.engine.bestmove_infinite(game, segundos * 1000)
@@ -154,7 +155,7 @@ class EngineManager:
         return self.juegaPartida(self.procesador.manager.game, nAjustado)
 
     def juegaPartida(self, game, nAjustado=0):
-        self.testEngine()
+        self.check_engine()
 
         if self.siInfinito:  # problema tarrasch
             if self.motorProfundidad:
@@ -175,7 +176,7 @@ class EngineManager:
             return mrm.mejorMov()
 
     def juegaTiempo(self, tiempoBlancas, tiempoNegras, tiempoJugada, nAjustado=0):
-        self.testEngine()
+        self.check_engine()
         if self.motorTiempoJugada or self.motorProfundidad:
             return self.juega(nAjustado)
         tiempoBlancas = int(tiempoBlancas * 1000)
@@ -196,7 +197,7 @@ class EngineManager:
             return mrm.mejorMov()
 
     def juegaTiempoTorneo(self, game, tiempoBlancas, tiempoNegras, tiempoJugada):
-        self.testEngine()
+        self.check_engine()
         if self.engine.pondering:
             self.engine.stop_ponder()
         if self.motorTiempoJugada or self.motorProfundidad:
@@ -211,11 +212,11 @@ class EngineManager:
         return mrm
 
     def analiza(self, fen):
-        self.testEngine()
+        self.check_engine()
         return self.engine.bestmove_fen(fen, self.motorTiempoJugada, self.motorProfundidad)
 
     def valora(self, position, from_sq, to_sq, promotion):
-        self.testEngine()
+        self.check_engine()
 
         posicionNueva = position.copia()
         posicionNueva.mover(from_sq, to_sq, promotion)
@@ -243,7 +244,7 @@ class EngineManager:
         return rm
 
     def control(self, fen, profundidad):
-        self.testEngine()
+        self.check_engine()
         return self.engine.bestmove_fen(fen, 0, profundidad)
 
     def terminar(self):
@@ -253,7 +254,7 @@ class EngineManager:
             self.activo = False
 
     def analysis_move(self, move, vtime, depth=0, brDepth=5, brPuntos=50):
-        self.testEngine()
+        self.check_engine()
 
         mrm = self.engine.bestmove_fen(move.position_before.fen(), vtime, depth, is_savelines=True)
         mv = move.movimiento()
@@ -304,7 +305,7 @@ class EngineManager:
         st_depths=0,
         st_timelimit=0,
     ):
-        self.testEngine()
+        self.check_engine()
         if stability:
             mrm = self.engine.analysis_stable(game, njg, vtime, depth, True, st_centipawns, st_depths, st_timelimit)
         else:
@@ -342,7 +343,7 @@ class EngineManager:
         return mrm, pos
 
     def analizaVariation(self, move, vtime, is_white):
-        self.testEngine()
+        self.check_engine()
 
         mrm = self.engine.bestmove_fen(move.position.fen(), vtime, None)
         if mrm.li_rm:
@@ -355,36 +356,36 @@ class EngineManager:
         return rm
 
     def ac_inicio(self, game):
-        self.testEngine()
+        self.check_engine()
         self.engine.ac_inicio(game)
 
     def ac_inicio_limit(self, game):
         # tutor cuando no se quiere que trabaje en background
-        self.testEngine()
+        self.check_engine()
         self.engine.ac_inicio_limit(game, self.motorTiempoJugada, self.motorProfundidad)
 
     def ac_minimo(self, minTiempo, lockAC):
-        self.testEngine()
+        self.check_engine()
         return self.engine.ac_minimo(minTiempo, lockAC)
 
     def ac_minimoTD(self, minTiempo, minDepth, lockAC):
-        self.testEngine()
+        self.check_engine()
         return self.engine.ac_minimoTD(minTiempo, minDepth, lockAC)
 
     def ac_estado(self):
-        self.testEngine()
+        self.check_engine()
         return self.engine.ac_estado()
 
     def ac_final(self, minTiempo):
-        self.testEngine()
+        self.check_engine()
         return self.engine.ac_final(minTiempo)
 
     def ac_final_limit(self):
-        self.testEngine()
+        self.check_engine()
         return self.engine.ac_final_limit(self.motorTiempoJugada)
 
     def set_option(self, name, value):
-        self.testEngine()
+        self.check_engine()
         self.engine.set_option(name, value)
 
     def miraListaPV(self, fen, siUna):  #
@@ -394,7 +395,7 @@ class EngineManager:
         return lipv[0] if siUna else lipv
 
     def busca_mate(self, game, mate):
-        self.testEngine()
+        self.check_engine()
         return self.engine.busca_mate(game, mate)
 
     def stop(self):
@@ -410,7 +411,7 @@ class EngineManager:
         return mrm.mejorMov()
 
     def play_time(self, routine_return, tiempoBlancas, tiempoNegras, tiempoJugada, nAjustado=0):
-        self.testEngine()
+        self.check_engine()
         game = self.procesador.manager.game
 
         def play_return(mrm):

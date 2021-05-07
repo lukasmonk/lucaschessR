@@ -4,6 +4,7 @@ import FasterCode
 from PySide2 import QtWidgets, QtCore
 
 import Code
+import Code.Nags.Nags
 from Code import TrListas
 from Code.Analysis import WindowAnalysisParam
 from Code.Base import Game, Position
@@ -205,15 +206,7 @@ class ListaMoves:
 
     def reordenaSegunValoracion(self):
         li = []
-        dnum = {
-            VERY_GOOD_MOVE: 0,
-            GOOD_MOVE: 1000,
-            SPECULATIVE_MOVE: 1300,
-            QUESTIONABLE_MOVE: 1700,
-            BAD_MOVE: 2000,
-            VERY_POOR_MOVE: 3000,
-            NO_RATING: 4000,
-        }
+        dnum = {VERY_GOOD_MOVE: 0, GOOD_MOVE: 1000, SPECULATIVE_MOVE: 1300, QUESTIONABLE_MOVE: 1700, BAD_MOVE: 2000, VERY_POOR_MOVE: 3000, NO_RATING: 4000}
         for mov in self.liMovesInicial:
             v = mov.valoracion
             num = dnum[v]
@@ -291,7 +284,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.setHeaderLabels((_("Moves"), _("Score"), _("Comments")))
         self.setColumnHidden(4, True)
 
-        dic_nags = TrListas.dic_nags()
+        dic_nags = Code.Nags.Nags.dic_nags()
         self.dicValoracion = collections.OrderedDict()
         self.dicValoracion["1"] = (VERY_GOOD_MOVE, dic_nags[3])
         self.dicValoracion["2"] = (GOOD_MOVE, dic_nags[1])
@@ -332,7 +325,6 @@ class TreeMoves(QtWidgets.QTreeWidget):
             self.ordenaMoves(lm)
 
     def ponMoves(self, listaMoves):
-
         liMoves = listaMoves.liMoves
         if liMoves:
             moveOwner = listaMoves.moveOwner
@@ -384,14 +376,12 @@ class TreeMoves(QtWidgets.QTreeWidget):
 
     def editComentario(self, item, mov):
 
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         config = FormLayout.Editbox(_("Comments"), ancho=230)
-        liGen.append((config, mov.comment))
+        li_gen.append((config, mov.comment))
 
-        resultado = FormLayout.fedit(
-            liGen, title=_("Comments") + " " + mov.titulo, parent=self, anchoMinimo=200, icon=Iconos.ComentarioEditar()
-        )
+        resultado = FormLayout.fedit(li_gen, title=_("Comments") + " " + mov.titulo, parent=self, anchoMinimo=200, icon=Iconos.ComentarioEditar())
         if resultado is None:
             return
 
@@ -415,7 +405,6 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.ponIconoValoracion(item, resp)
 
     def editAnalisis(self, item, mov):
-
         # Hay un analysis -> se muestra en variantes
         # Analisis.show_analysis( self.procesador, self.xtutor, move, is_white, max_recursion, pos )
         fen = mov.game.last_position.fen()
@@ -431,17 +420,9 @@ class TreeMoves(QtWidgets.QTreeWidget):
         board = wowner.infoMove.board
         import Code.Variations as Variations
 
-        Variations.edit_variation_moves(
-            self.procesador,
-            wowner,
-            board.is_white_bottom,
-            fen,
-            lineaPGN,
-            titulo=mov.titulo + " - " + mov.etiPuntos(True),
-        )
+        Variations.edit_variation_moves(self.procesador, wowner, board.is_white_bottom, fen, lineaPGN, titulo=mov.titulo + " - " + mov.etiPuntos(True))
 
     def mostrarOcultar(self, item, mov):
-
         lm = mov.listaMovesPadre
         nVisibles, nOcultos = lm.numVisiblesOcultos()
         if nVisibles <= 1 and nOcultos == 0:
@@ -503,15 +484,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
     def iconoValoracion(self, valoracion):
         cnf = Code.configuration
 
-        dic = {
-            0: "lightgray",
-            1: cnf.x_color_nag1,
-            2: cnf.x_color_nag2,
-            3: cnf.x_color_nag3,
-            4: cnf.x_color_nag4,
-            5: cnf.x_color_nag5,
-            6: cnf.x_color_nag6,
-        }
+        dic = {0: "lightgray", 1: cnf.x_color_nag1, 2: cnf.x_color_nag2, 3: cnf.x_color_nag3, 4: cnf.x_color_nag4, 5: cnf.x_color_nag5, 6: cnf.x_color_nag6}
         return QTUtil.colorIcon(dic[valoracion], 8, 8)
 
     def ponIconoValoracion(self, item, valoracion):
@@ -753,13 +726,7 @@ class WindowArbol(QTVarios.WDialogo):
 
         self.restore_video(anchoDefecto=869 - 242 + anchoBoard)
         if not dicVideo:
-            dicVideo = {
-                "TREE_3": 27,
-                "SPLITTER": [260 - 242 + anchoBoard, 617],
-                "TREE_1": 49,
-                "TREE_2": 383,
-                "TREE_4": 25,
-            }
+            dicVideo = {"TREE_3": 27, "SPLITTER": [260 - 242 + anchoBoard, 617], "TREE_1": 49, "TREE_2": 383, "TREE_4": 25}
         sz = dicVideo.get("SPLITTER", None)
         if sz:
             self.splitter.setSizes(sz)
@@ -878,7 +845,7 @@ class WindowArbol(QTVarios.WDialogo):
 
         self.wmoves.tree.ordenaMoves(lm)
         self.wmoves.tree.goto(lm.liMoves[0])
-
+        #
         # self.infoMove.ponValores()
 
     def quitaAnalisis(self, lm, num):

@@ -542,17 +542,17 @@ class WPosicion(QtWidgets.QWidget):
     def scanner_more(self):
         name = ""
         while True:
-            liGen = []
+            li_gen = []
 
             config = FormLayout.Editbox(_("Name"), ancho=120)
-            liGen.append((config, name))
+            li_gen.append((config, name))
 
             resultado = FormLayout.fedit(
-                liGen, title=_("New scanner"), parent=self, anchoMinimo=200, icon=Iconos.Scanner()
+                li_gen, title=_("New scanner"), parent=self, anchoMinimo=200, icon=Iconos.Scanner()
             )
             if resultado:
-                accion, liGen = resultado
-                name = liGen[0].strip()
+                accion, li_gen = resultado
+                name = li_gen[0].strip()
                 if name:
                     fich = os.path.join(self.configuration.carpetaScanners, "%s.scn" % name)
                     if Util.exist_file(fich):

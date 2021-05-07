@@ -3,6 +3,7 @@ import os
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+import Code.Nags.Nags
 from Code.Base import Position
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -909,7 +910,7 @@ def cambiaColores(parent, configuration):
     liPGN.append((_("Reset to default") + ":", False))
     liPGN.append(separador)
 
-    dic_nags = TrListas.dic_nags()
+    dic_nags = Code.Nags.Nags.dic_nags()
     config = FormLayout.Colorbox(dic_nags[1], 40, 20, siSTR=True)
     liPGN.append((config, configuration.x_color_nag1))
 

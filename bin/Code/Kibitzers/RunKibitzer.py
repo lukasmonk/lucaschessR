@@ -70,8 +70,9 @@ class CPU:
             self.configuration.leeConfBoards()
             Code.configuration = self.configuration
             OpeningsStd.reset()
-            self.numkibitzer = orden.dv["NUMKIBITZER"]
+
             kibitzers = Kibitzers.Kibitzers()
+            self.numkibitzer = kibitzers.number(orden.dv["HUELLA"])
             self.kibitzer = kibitzers.kibitzer(self.numkibitzer)
             prioridad = self.kibitzer.prioridad
 
@@ -93,6 +94,8 @@ class CPU:
         elif key == KIBRUN_GAME:
             game = Game.Game()
             game.restore(orden.dv["GAME"])
+            if self.kibitzer.pointofview == KIB_BEFORE_MOVE:
+                game.anulaSoloUltimoMovimiento()
             if self.tipo == KIB_THREATS:
                 last_position = game.last_position
                 last_position.is_white = not last_position.is_white

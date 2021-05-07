@@ -1,6 +1,7 @@
 import time
 import random
 
+import Code.Nags.Nags
 from Code import Manager
 from Code.Polyglots import Books
 from Code import TrListas
@@ -669,7 +670,7 @@ class ManagerOpeningLines(Manager.Manager):
         self.set_label2(mens)
 
         if self.siAyuda:
-            dic_nags = TrListas.dic_nags()
+            dic_nags = Code.Nags.Nags.dic_nags()
             mens3 = ""
             fenm2 = self.game.last_position.fenm2()
             reg = self.dbop.getfenvalue(fenm2)

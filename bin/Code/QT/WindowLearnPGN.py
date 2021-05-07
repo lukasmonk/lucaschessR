@@ -250,18 +250,18 @@ class WLearn1(QTVarios.WDialogo):
     def empezar(self):
         regBase = self.liIntentos[0] if self.liIntentos else {}
 
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
-        liGen.append((FormLayout.Spinbox(_("Level"), 0, len(self.game), 40), regBase.get("LEVEL", 0)))
-        liGen.append((None, None))
-        liGen.append((None, _("User play with") + ":"))
-        liGen.append((_("White"), "w" in regBase.get("COLOR", "bw")))
-        liGen.append((_("Black"), "b" in regBase.get("COLOR", "bw")))
-        liGen.append((None, None))
-        liGen.append((_("Show clock"), True))
+        li_gen.append((FormLayout.Spinbox(_("Level"), 0, len(self.game), 40), regBase.get("LEVEL", 0)))
+        li_gen.append((None, None))
+        li_gen.append((None, _("User play with") + ":"))
+        li_gen.append((_("White"), "w" in regBase.get("COLOR", "bw")))
+        li_gen.append((_("Black"), "b" in regBase.get("COLOR", "bw")))
+        li_gen.append((None, None))
+        li_gen.append((_("Show clock"), True))
 
         resultado = FormLayout.fedit(
-            liGen, title=_("New try"), anchoMinimo=200, parent=self, icon=Iconos.TutorialesCrear()
+            li_gen, title=_("New try"), anchoMinimo=200, parent=self, icon=Iconos.TutorialesCrear()
         )
         if resultado is None:
             return

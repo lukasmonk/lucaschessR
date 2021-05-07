@@ -14,7 +14,7 @@ Extract the content of the archive to your home folder (for instance).
 2. Update your system
 ---------------------
 ```bash
-    sudo apt-get update  
+    sudo apt-get update
     sudo apt-get upgrade
 ```
 
@@ -23,7 +23,7 @@ Extract the content of the archive to your home folder (for instance).
 
 Current requirements are:
 
-* Python 3.7
+* Python 3.7 | Python 3.8
 * PySide2
 * PyAudio
 * psutil
@@ -37,24 +37,20 @@ Current requirements are:
 
 So our task is to install them:
 ```bash
-    sudo add-apt-repository universe  
-    sudo apt-get install python3.7  
-    sudo apt-get install python3-pip  
-    sudo apt-get install python3-dev  
-    sudo apt-get install python3-pyqt5  
-    sudo apt-get install python3-pyaudio  
+    sudo add-apt-repository universe
+    sudo apt-get install python3.7
+    sudo apt-get install python3-pip
+    sudo apt-get install python3-dev
+    sudo apt-get install python3-pyaudio
 ```
 ```bash
-    sudo pip3 install pyside2  
-    sudo pip3 install psutil  
-    sudo pip3 install chardet  
-    sudo pip3 install python-chess  
-    sudo pip3 install Pillow  
-    sudo pip3 install PhotoHash  
-    sudo pip3 install Cython  
-    sudo pip3 install sortedcontainers  
-    sudo pip3 install scandir  
-    sudo pip3 install pygal
+    sudo pip3 install pyside2
+    sudo pip3 install psutil
+    sudo pip3 install chardet
+    sudo pip3 install python-chess
+    sudo pip3 install Pillow
+    sudo pip3 install Cython
+    sudo pip3 install sortedcontainers
 ```
 
 4. Compile FasterCode

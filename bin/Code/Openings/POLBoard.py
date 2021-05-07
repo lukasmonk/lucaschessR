@@ -2,6 +2,7 @@ import collections
 
 from PySide2 import QtWidgets, QtCore, QtGui
 
+import Code.Nags.Nags
 from Code.Base import Game, Move
 from Code import TrListas
 from Code.QT import Colocacion
@@ -91,7 +92,7 @@ class BoardLines(QtWidgets.QWidget):
 
         self.with_figurines = configuration.x_pgn_withfigurines
 
-        dic_nags = TrListas.dic_nags()
+        dic_nags = Code.Nags.Nags.dic_nags()
         self.dicValoracion = collections.OrderedDict()
         self.dicValoracion[GOOD_MOVE] = (dic_nags[1], WindowColors.nag2ico(1, 16))
         self.dicValoracion[BAD_MOVE] = (dic_nags[2], WindowColors.nag2ico(2, 16))

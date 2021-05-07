@@ -34,7 +34,7 @@ class WDailyTestBase(QTVarios.WDialogo):
         # Historico
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("FECHA", _("Date"), 120, centered=True)
-        o_columns.nueva("MPUNTOS", _("Points lost"), 100, centered=True)
+        o_columns.nueva("MPUNTOS", _("Centipawns lost"), 100, centered=True)
         o_columns.nueva("MTIEMPOS", _("Time"), 80, centered=True)
         o_columns.nueva("ENGINE", _("Engine"), 120, centered=True)
         o_columns.nueva("SEGUNDOS", _("Second(s)"), 80, centered=True)
@@ -382,7 +382,7 @@ class WDailyTest(QTVarios.WDialogo):
         self.lbColor.set_text("")
         self.lbJuego.set_text("")
 
-        mens = "<h3>%s : %0.2f</h3><h3>%s : %0.2f</h3>" % (_("Points lost"), mpuntos, _("Time in seconds"), mtiempos)
+        mens = "<h3>%s : %0.2f</h3><h3>%s : %0.2f</h3>" % (_("Centipawns lost"), mpuntos, _("Time in seconds"), mtiempos)
         QTUtil2.message(self, mens, titulo=_("Result"))
 
         self.accept()

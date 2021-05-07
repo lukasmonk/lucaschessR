@@ -105,24 +105,24 @@ class WResistance(QTVarios.WDialogo):
 
         separador = FormLayout.separador
 
-        liGen = [separador]
+        li_gen = [separador]
 
         config = FormLayout.Spinbox(_("Time in seconds"), 1, 99999, 80)
-        liGen.append((config, segundos))
+        li_gen.append((config, segundos))
 
-        liGen.append(separador)
+        li_gen.append(separador)
 
-        config = FormLayout.Spinbox(_("Max lost points in total"), 10, 99999, 80)
-        liGen.append((config, puntos))
+        config = FormLayout.Spinbox(_("Max lost centipawns in total"), 10, 99999, 80)
+        li_gen.append((config, puntos))
 
-        liGen.append(separador)
+        li_gen.append(separador)
 
         config = FormLayout.Spinbox(
-            _("Max lost points in a single move") + ":\n" + _("0 = not consider this limit"), 0, 1000, 80
+            _("Max lost centipawns in a single move") + ":\n" + _("0 = not consider this limit"), 0, 1000, 80
         )
-        liGen.append((config, maxerror))
+        li_gen.append((config, maxerror))
 
-        resultado = FormLayout.fedit(liGen, title=_("Config"), parent=self, icon=Iconos.Configurar())
+        resultado = FormLayout.fedit(li_gen, title=_("Config"), parent=self, icon=Iconos.Configurar())
         if resultado:
             accion, liResp = resultado
             segundos, puntos, maxerror = liResp

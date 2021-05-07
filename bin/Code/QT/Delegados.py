@@ -28,6 +28,7 @@ def generaPM(piezas):
     dicPM["OV"] = Iconos.pmOpeningVariation()
     dicPM["VC"] = Iconos.pmVariationComment()
     dicPM["OVC"] = Iconos.pmOpeningVariationComment()
+    dicPM["T"] = Iconos.pmThemes()
 
     for k in "KQRNBkqrnb":
         dicPZ[k] = piezas.render(k)
@@ -284,8 +285,10 @@ class PmIconosBMT(QtWidgets.QStyledItemDelegate):
     Delegado para la muestra con html
     """
 
-    def __init__(self, parent=None, dicIconos=None):
+    def __init__(self, parent=None, dicIconos=None, x=4):
         QtWidgets.QStyledItemDelegate.__init__(self, parent)
+
+        self.pos_x = x
 
         if dicIconos:
             self.dicIconos = dicIconos
@@ -308,7 +311,7 @@ class PmIconosBMT(QtWidgets.QStyledItemDelegate):
             return
         painter.save()
         painter.translate(option.rect.x(), option.rect.y())
-        painter.drawPixmap(4, 1, self.dicIconos[pos])
+        painter.drawPixmap(self.pos_x, 1, self.dicIconos[pos])
         painter.restore()
 
 

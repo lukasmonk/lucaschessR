@@ -14,7 +14,6 @@ class WAbout(QtWidgets.QDialog):
 
         # gen_web_bootstrap()
 
-
         self.setWindowTitle(_("About"))
         self.setWindowIcon(Iconos.Aplicacion64())
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
@@ -63,7 +62,7 @@ class WAbout(QtWidgets.QDialog):
 
         self.setLayout(layout)
 
-#
+
 # def gen_web_bootstrap():
 #     """
 #     <nav>
@@ -132,21 +131,44 @@ class WAbout(QtWidgets.QDialog):
 #                 li_eng_txt = []
 #                 li_eng_txt.append('<table class="table table-bordered">')
 #                 li_eng_txt.append('<tr>')
-#                 li_eng_txt.append('<th></th>')
 #                 li_eng_txt.append('<th>{{_("Engine")}}</th>')
+#                 li_eng_txt.append('<th>OS</th>')
 #                 li_eng_txt.append('<th>{{_("Author")}}</th>')
 #                 li_eng_txt.append('<th>{{_("Web")}}</th>')
 #                 li_eng_txt.append('</tr>')
 #
 #                 li_eng = Code.configuration.list_engines(si_externos=False)
-#                 li_eng.sort(key=lambda xt: xt[0])
-#                 # for n, x in enumerate(li_eng, 1):
-#                 #     x[0] = "%d. %s" % (n, x[0])
 #
-#                 for pos, (name, autor, url) in enumerate(li_eng, 1):
+#                 lix = []
+#                 so = "Windows"
+#                 for (name, autor, url) in li_eng:
+#                     if name == "Maia-1100":
+#                         name = "Maia-1100/1900"
+#                     elif name.startswith("Maia"):
+#                         continue
+#                     if "-bmi2" in name:
+#                         name = name.replace("-bmi2", "")
+#                     if name.endswith("64"):
+#                         name = name.replace("64", "")
+#                     lix.append((name, autor, url, so))
+#                 li_eng = lix
+#                 with open(r".\OS\linux\OSEngines.py", "rt", encoding="utf-8") as flnx:
+#                     for linea in flnx:
+#                         linea = linea.strip()
+#                         if linea.startswith("cm = mas("):
+#                             lir = linea.split('"')
+#                             x, alias, x, autor, x, version, x, url, x, nombre, x = lir
+#                             if alias == "Maia-%d":
+#                                 nombre = "Maia-1100/1900"
+#                             if "{bmi2}" in nombre:
+#                                 nombre = nombre.replace("{bmi2}", "")
+#                             li_eng.append((nombre, autor, url, "Linux"))
+#                 li_eng.sort(key=lambda xt: xt[0])
+#
+#                 for pos, (name, autor, url, so) in enumerate(li_eng, 1):
 #                     li_eng_txt.append("<tr>")
-#                     li_eng_txt.append("<td>%02d</td>" % pos)
 #                     li_eng_txt.append("<td>%s</td>" % name)
+#                     li_eng_txt.append("<td>%s</td>" % so)
 #                     li_eng_txt.append("<td>%s</td>" % autor)
 #                     li_eng_txt.append('<td><a href="%s">%s</a></td>' % (url, url))
 #                     li_eng_txt.append("</tr>")
@@ -154,6 +176,8 @@ class WAbout(QtWidgets.QDialog):
 #                 txt = "\n".join(li_eng_txt)
 #             else:
 #                 txt = ib.texto(clave)
+#                 if clave == "contributors":
+#                     txt = txt.replace("<br>", "")
 #
 #             html = '<div class="tab-pane fade%s" id="nav-%s" role="tabpanel" aria-labelledby="nav-%s-tab">%s</div>' % (active, clave, clave, txt)
 #             li.append(html)

@@ -317,7 +317,6 @@ class ManagerRoutesPlay(ManagerRoutes):
 
         self.beepResultado(beep)
 
-        self.guardarGanados(siwin)
         self.autosave()
 
         if siwin:

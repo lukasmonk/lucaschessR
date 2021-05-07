@@ -99,7 +99,7 @@ class Resistance:
             txt = _X(
                 _(
                     "Target %1/%2/%3: withstand maximum moves against an engine,"
-                    "<br>        that thinks %1 second(s), without losing more than %2 points in total or %3 points in a single move."
+                    "<br>        that thinks %1 second(s), without losing more than %2 centipawns in total or %3 centipawns in a single move."
                 ),
                 str(segundos),
                 str(puntos),
@@ -108,7 +108,7 @@ class Resistance:
         else:
             txt = _X(
                 _(
-                    "Target %1/%2: withstand maximum moves against an engine,<br>        that thinks %1 second(s), without losing more than %2 points."
+                    "Target %1/%2: withstand maximum moves against an engine,<br>        that thinks %1 second(s), without losing more than %2 centipawns."
                 ),
                 str(segundos),
                 str(puntos),

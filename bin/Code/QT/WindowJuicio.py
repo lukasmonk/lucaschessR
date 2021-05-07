@@ -82,10 +82,10 @@ class WJuicio(QTVarios.WDialogo):
     def ponPuntos(self):
         pts = self.difPuntos()
         if pts > 0:
-            txt = _("Points won %d") % pts
+            txt = _("Centipawns won %d") % pts
             color = "green"
         elif pts < 0:
-            txt = _("Lost points %d") % (-pts,)
+            txt = _("Lost centipawns %d") % (-pts,)
             color = "red"
         else:
             txt = ""

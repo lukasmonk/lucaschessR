@@ -16,6 +16,7 @@ from Code.QT import Delegados
 from Code.QT import FormLayout
 
 
+
 class WKibitzers(QTVarios.WDialogo):
     def __init__(self, w_parent, kibitzers_manager):
         titulo = _("Kibitzers")
@@ -105,6 +106,10 @@ class WKibitzers(QTVarios.WDialogo):
             control = "cb"
             lista = Priorities.priorities.combo()
             valor = kibitzer.prioridad
+        elif key == "pointofview":
+            control = "cb"
+            lista = Kibitzers.cb_pointofview_options()
+            valor = kibitzer.pointofview
         elif key == "visible":
             kibitzer.visible = not kibitzer.visible
             self.kibitzers.save()
@@ -164,6 +169,8 @@ class WKibitzers(QTVarios.WDialogo):
             kibitzer.tipo = valor
         elif self.me_key == "prioridad":
             kibitzer.prioridad = valor
+        elif self.me_key == "pointofview":
+            kibitzer.pointofview = valor
         elif self.me_key == "info":
             kibitzer.id_info = valor.strip()
         elif self.me_key.startswith("opcion"):
@@ -257,12 +264,15 @@ class WKibitzers(QTVarios.WDialogo):
         form.combobox(_("Process priority"), Priorities.priorities.combo(), Priorities.priorities.normal)
         form.separador()
 
+        form.combobox(_("Point of view"), Kibitzers.cb_pointofview_options(), Kibitzers.KIB_BEFORE_MOVE)
+        form.separador()
+
         resultado = form.run()
 
         if resultado:
             accion, resp = resultado
 
-            name, engine, tipo, prioridad = resp
+            name, engine, tipo, prioridad, pointofview = resp
 
             # Indexes only with Rodent II
             if tipo == "I":
@@ -275,7 +285,7 @@ class WKibitzers(QTVarios.WDialogo):
                 for label, key in liTipos:
                     if key == tipo:
                         name = "%s: %s" % (label, engine)
-            num = self.kibitzers.nuevo_engine(name, engine, tipo, prioridad)
+            num = self.kibitzers.nuevo_engine(name, engine, tipo, prioridad, pointofview)
             self.goto(num)
 
     def remove(self):
@@ -352,8 +362,8 @@ class WKibitzers(QTVarios.WDialogo):
     def grid_doble_click(self, grid, row, column):
         if grid.id == "kib":
             self.terminar()
-
-            self.kibitzers_manager.run_new(row)
+            kibitzer = self.kibitzers.kibitzer(row)
+            self.kibitzers_manager.run_new(kibitzer.huella)
 
     def actKibitzer(self):
         self.liKibActual = []
@@ -370,6 +380,7 @@ class WKibitzers(QTVarios.WDialogo):
             self.liKibActual.append((_("Priority"), me.cpriority(), "prioridad"))
 
         self.liKibActual.append((_("Visible in menu"), str(me.visible), "visible"))
+        self.liKibActual.append((_("Point of view"), me.cpointofview(), "pointofview"))
 
         if not (tipo in (Kibitzers.KIB_POLYGLOT, Kibitzers.KIB_GAVIOTA, Kibitzers.KIB_INDEXES)):
             self.liKibActual.append((_("Engine"), me.name, None))
@@ -433,6 +444,7 @@ class WKibitzerLive(QTVarios.WDialogo):
     def leeOpciones(self):
         li = []
         li.append([_("Priority"), self.kibitzer.cpriority(), "prioridad"])
+        li.append([_("Point of view"), self.kibitzer.cpointofview(), "pointofview"])
         for num, opcion in enumerate(self.kibitzer.li_uci_options_editable()):
             default = opcion.label_default()
             label_default = " (%s)" % default if default else ""
@@ -447,6 +459,7 @@ class WKibitzerLive(QTVarios.WDialogo):
         lidif_opciones = []
         xprioridad = None
         xposicionBase = None
+        xpointofview = None
         for x in range(len(self.li_options)):
             if self.li_options[x][1] != self.liOriginal[x][1]:
                 key = self.li_options[x][2]
@@ -454,11 +467,14 @@ class WKibitzerLive(QTVarios.WDialogo):
                     prioridad = self.kibitzer.prioridad
                     priorities = Priorities.priorities
                     xprioridad = priorities.value(prioridad)
+                elif key == "pointofview":
+                    xpointofview = self.kibitzer.pointofview
                 else:
                     opcion = self.kibitzer.li_uci_options_editable()[int(key)]
                     lidif_opciones.append((opcion.name, opcion.valor))
 
         self.result_xprioridad = xprioridad
+        self.result_xpointofview = xpointofview
         self.result_opciones = lidif_opciones
         self.result_posicionBase = xposicionBase
         self.save_video()
@@ -472,6 +488,10 @@ class WKibitzerLive(QTVarios.WDialogo):
             control = "cb"
             lista = Priorities.priorities.combo()
             valor = self.kibitzer.prioridad
+        elif key == "pointofview":
+            control = "cb"
+            lista = Kibitzers.cb_pointofview_options()
+            valor = self.kibitzer.pointofview
         else:
             opcion = self.kibitzer.li_uci_options_editable()[int(key)]
             tipo = opcion.tipo
@@ -516,11 +536,15 @@ class WKibitzerLive(QTVarios.WDialogo):
     def grid_setvalue(self, grid, nfila, column, valor):
         if self.me_key == "prioridad":
             self.kibitzer.prioridad = valor
+            self.li_options[0][1] = self.kibitzer.cpriority()
+        elif self.me_key == "pointofview":
+            self.kibitzer.pointofview = valor
+            self.li_options[1][1] = self.kibitzer.cpointofview()
         else:
             nopcion = int(self.me_key)
             opcion = self.kibitzer.li_uci_options_editable()[nopcion]
             opcion.valor = valor
-            self.li_options[nopcion + 1][1] = valor
+            self.li_options[nopcion + 2][1] = valor
             self.kibitzer.ordenUCI(opcion.name, valor)
 
     def grid_num_datos(self, grid):

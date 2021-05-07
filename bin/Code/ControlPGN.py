@@ -89,7 +89,11 @@ class ControlPGN:
             if is_last:
                 self.manager.set_position(move.position)
                 if self.manager.human_is_playing and self.manager.state == ST_PLAYING:
-                    self.manager.activate_side(self.manager.human_side)
+                    if self.manager.game_type == GT_ALONE:
+                        side = move.position.is_white
+                    else:
+                        side = self.manager.human_side
+                    self.manager.activate_side(side)
             else:
                 if self.variations_mode:
                     self.manager.set_position(move.position, variation_history=str(pos))

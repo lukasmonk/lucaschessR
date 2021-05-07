@@ -1,6 +1,8 @@
 from PySide2 import QtCore, QtWidgets
 
 import Code
+from Code.Base.Constantes import *
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -9,8 +11,6 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.Board import Board
-from Code.Base.Constantes import *
 
 
 class WBase(QtWidgets.QWidget):
@@ -86,7 +86,7 @@ class WBase(QtWidgets.QWidget):
             TB_NEXT: (_("Next"), Iconos.Siguiente()),
             TB_QUIT: (_("Quit"), Iconos.FinPartida()),
             TB_PASTE_PGN: (_("Paste PGN"), Iconos.Pegar()),
-            TB_READ_PGN: (_("Read PGN"), Iconos.Fichero()),
+            TB_READ_PGN: (_("Read PGN file"), Iconos.Fichero()),
             TB_PGN_LABELS: (_("PGN Labels"), Iconos.InformacionPGN()),
             TB_OTHER_GAME: (_("Other game"), Iconos.FicheroRepite()),
             TB_MY_GAMES: (_("My games"), Iconos.NuestroFichero()),
@@ -430,6 +430,9 @@ class WBase(QtWidgets.QWidget):
                 NAG_6: c.x_color_nag6,
             }[color_nag]
 
+        if move.has_themes():
+            indicadorInicial = "T"
+
         return pgn, color, info, indicadorInicial, st_nags
 
     def grid_setvalue(self, grid, row, o_column, valor):
@@ -612,6 +615,11 @@ class WBase(QtWidgets.QWidget):
         else:
             self.lbRotulo3.hide()
         return self.lbRotulo3
+
+    def get_labels(self):
+        def get(lb):
+            return lb.texto() if lb.isVisible() else None
+        return get(self.lbRotulo1), get(self.lbRotulo2), get(self.lbRotulo3)
 
     def ponRelojBlancas(self, tm, tm2):
         if tm2 is not None:

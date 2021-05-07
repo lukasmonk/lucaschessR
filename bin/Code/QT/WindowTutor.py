@@ -194,33 +194,33 @@ class WindowTutor(QTVarios.WDialogo):
 
 
 def cambioTutor(parent, configuration):
-    liGen = [(None, None)]
+    li_gen = [(None, None)]
 
     # # Tutor
-    liGen.append((_("Engine") + ":", configuration.ayudaCambioTutor()))
+    li_gen.append((_("Engine") + ":", configuration.ayudaCambioTutor()))
 
     # # Decimas de segundo a pensar el tutor
-    liGen.append((_("Duration of engine analysis (secs)") + ":", float(configuration.x_tutor_mstime / 1000.0)))
+    li_gen.append((_("Duration of engine analysis (secs)") + ":", float(configuration.x_tutor_mstime / 1000.0)))
     liDepths = [("--", 0)]
     for x in range(1, 51):
         liDepths.append((str(x), x))
     config = FormLayout.Combobox(_("Depth"), liDepths)
-    liGen.append((config, configuration.x_tutor_depth))
+    li_gen.append((config, configuration.x_tutor_depth))
 
     li = [(_("Maximum"), 0)]
     for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), x))
     config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
-    liGen.append((config, configuration.x_tutor_multipv))
+    li_gen.append((config, configuration.x_tutor_multipv))
 
-    liGen.append((None, _("Sensitivity")))
-    liGen.append(
+    li_gen.append((None, _("Sensitivity")))
+    li_gen.append(
         (FormLayout.Spinbox(_("Minimum difference in centipawns"), 0, 1000, 70), configuration.x_tutor_difpoints)
     )
-    liGen.append((FormLayout.Spinbox(_("Minimum difference in %"), 0, 1000, 70), configuration.x_tutor_difporc))
+    li_gen.append((FormLayout.Spinbox(_("Minimum difference in %"), 0, 1000, 70), configuration.x_tutor_difporc))
 
     # Editamos
-    resultado = FormLayout.fedit(liGen, title=_("Tutor change"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones())
+    resultado = FormLayout.fedit(li_gen, title=_("Tutor change"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones())
 
     if resultado:
         claveMotor, vtime, depth, multiPV, difpts, difporc = resultado[1]

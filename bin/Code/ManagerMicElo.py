@@ -104,9 +104,7 @@ class ManagerMicElo(Manager.Manager):
 
     def start(self, engine_rival, minutos, segundos):
         self.base_inicio(engine_rival, minutos, segundos)
-        if not self.human_side:
-            mensaje = _("Press the continue button to start.")
-            self.mensajeEnPGN(mensaje)
+        self.start_message()
         self.play_next_move()
 
     def base_inicio(self, engine_rival, minutos, segundos):
@@ -156,6 +154,7 @@ class ManagerMicElo(Manager.Manager):
         self.blackElo = eloplayer if not is_white else eloengine
 
         self.xrival = self.procesador.creaManagerMotor(self.engine_rival, None, None, siMultiPV=self.engine_rival.multiPV > 0)
+        self.xrival.check_engine()
 
         self.pte_tool_resigndraw = False
         if self.human_side:
@@ -181,18 +180,23 @@ class ManagerMicElo(Manager.Manager):
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
-        self.made_the_first_move = False
-
         tpBL = self.vtime[True].etiqueta()
         tpNG = self.vtime[False].etiqueta()
-        self.rival = rival = self.engine_rival.alias + " (%d)" % self.engine_rival.elo
+        self.rival = self.engine_rival.alias + " (%d)" % self.engine_rival.elo
         player = self.configuration.x_player + " (%d)" % self.configuration.miceloActivo()
-        white_player, black_player = player, rival
+        white_name, black_name = self.configuration.nom_player(), self.engine_rival.alias
+        white_elo, black_elo = self.configuration.miceloActivo(), self.engine_rival.elo
         if self.is_engine_side_white:
-            white_player, black_player = black_player, white_player
+            white_name, black_name = black_name, white_name
+            white_elo, black_elo = black_elo, white_elo
 
-        self.game.set_tag("White", white_player)
-        self.game.set_tag("Black", black_player)
+        self.game.set_tag("White", white_name)
+        self.game.set_tag("Black", black_name)
+        self.game.set_tag("WhiteElo", str(white_elo))
+        self.game.set_tag("BlackElo", str(black_elo))
+
+        white_player = white_name + " (%d)" % white_elo
+        black_player = black_name + " (%d)" % black_elo
 
         self.main_window.ponDatosReloj(white_player, tpBL, black_player, tpNG)
         self.refresh()
@@ -289,8 +293,8 @@ class ManagerMicElo(Manager.Manager):
     def run_adjourn(self, dic):
         self.restore_state(dic)
         self.check_boards_setposition()
+        self.start_message()
         self.show_clocks()
-        self.made_the_first_move = True
         self.play_next_move()
 
     def final_x(self):
@@ -396,9 +400,6 @@ class ManagerMicElo(Manager.Manager):
 
     def add_move(self, move, siNuestra):
 
-        if not self.made_the_first_move:
-            self.made_the_first_move = True
-
         self.game.li_moves.append(move)
         self.game.check()
 
@@ -444,7 +445,6 @@ class ManagerMicElo(Manager.Manager):
         mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
-        self.guardarGanados(player_win)
         self.autosave()
         QTUtil.refresh_gui()
 
@@ -506,7 +506,7 @@ class ManagerMicElo(Manager.Manager):
         return not previo
 
     def set_clock(self):
-        if (not self.made_the_first_move) or self.state != ST_PLAYING:
+        if self.state != ST_PLAYING:
             return
 
         def mira(is_white):
@@ -536,16 +536,14 @@ class ManagerMicElo(Manager.Manager):
         return mira(is_white)
 
     def reloj_start(self, siUsuario):
-        if self.made_the_first_move:
-            self.vtime[siUsuario == self.human_side].iniciaMarcador()
-            self.main_window.start_clock(self.set_clock, transicion=200)
+        self.vtime[siUsuario == self.human_side].iniciaMarcador()
+        self.main_window.start_clock(self.set_clock, transicion=200)
 
     def reloj_stop(self, siUsuario):
-        if self.made_the_first_move:
-            self.vtime[siUsuario == self.human_side].paraMarcador(self.segundosJugada)
-            self.set_clock()
-            self.main_window.stop_clock()
-            self.refresh()
+        self.vtime[siUsuario == self.human_side].paraMarcador(self.segundosJugada)
+        self.set_clock()
+        self.main_window.stop_clock()
+        self.refresh()
 
     def show_clocks(self):
         if Code.dgt:

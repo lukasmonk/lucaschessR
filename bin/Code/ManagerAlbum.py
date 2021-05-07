@@ -131,7 +131,6 @@ class ManagerAlbum(Manager.Manager):
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
             self.game.resign(self.human_side)
-            self.guardarGanados(False)
             self.ponFinJuego()
             self.xrival.cerrar()
             self.main_window.pon_toolbar((TB_CLOSE, TB_CONFIG, TB_UTILITIES))
@@ -225,8 +224,6 @@ class ManagerAlbum(Manager.Manager):
         mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.beepResultado(beep)
-        self.guardarGanados(player_win)
-
 
         if player_win:
             mensaje = _X(_("Congratulations you have a new sticker %1."), self.cromo.name)

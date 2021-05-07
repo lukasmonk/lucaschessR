@@ -54,6 +54,7 @@ class PolyglotExport:
                 weight_max = max(xentry.weight for xentry in li_current)
                 if weight_max >= 32767:
                     factor = 32767 / weight_max
+                li_current.sort(key = lambda x: x.weight, reverse=True)
             for xentry in li_current:
                 if xentry.weight > 0:
                     if uniform:

@@ -4,7 +4,7 @@ import Code
 from Code import Util
 from Code import Procesador
 from Code.Sound import Sound
-from Code.QT import Gui
+from Code.MainWindow import Gui
 
 from Code.Base.Constantes import *
 

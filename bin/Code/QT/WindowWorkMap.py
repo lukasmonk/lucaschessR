@@ -122,12 +122,12 @@ class WMap(QTVarios.WDialogo):
         if resp:
             tipo, model = resp.split("_")
             if tipo == "sts":
-                liGen = [(None, None)]
+                li_gen = [(None, None)]
                 liR = [(str(x), x) for x in range(1, 100)]
                 config = FormLayout.Combobox(_("Model"), liR)
-                liGen.append((config, "1"))
+                li_gen.append((config, "1"))
                 resultado = FormLayout.fedit(
-                    liGen, title=_("STS: Strategic Test Suite"), parent=self, anchoMinimo=160, icon=Iconos.Maps()
+                    li_gen, title=_("STS: Strategic Test Suite"), parent=self, anchoMinimo=160, icon=Iconos.Maps()
                 )
                 if resultado is None:
                     return

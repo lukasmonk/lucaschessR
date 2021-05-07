@@ -9,7 +9,7 @@ from Code import Util
 from Code import Routes
 from Code import Update
 from Code.Engines import EngineManager, WEngines
-from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine
+from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson
 from Code.Base.Constantes import *
 from Code import Albums
 from Code import CPU
@@ -26,7 +26,6 @@ from Code import ManagerFideFics
 from Code import ManagerMateMap
 from Code import ManagerMicElo
 from Code import ManagerCompeticion
-from Code import ManagerPerson
 from Code import ManagerRoutes
 from Code import ManagerSingularM
 from Code import ManagerSolo
@@ -64,7 +63,7 @@ from Code.Kibitzers import KibitzersManager
 from Code.Tournaments import WTournaments
 from Code.Polyglots import WFactory, WPolyglot, Books, WindowBooksTrain, ManagerTrainBooks
 from Code.Endings import WEndingsGTB
-from Code.Bridge11 import Bridge11
+from Code.Version11 import Version11
 
 
 class Procesador:
@@ -408,8 +407,8 @@ class Procesador:
         self.manager = ManagerAlbum.ManagerAlbum(self)
         self.manager.start(album, cromo)
 
-    def menucompete(self):
-        resp = BasicMenus.menucompete(self)
+    def menu_compete(self):
+        resp = BasicMenus.menu_compete(self)
         if resp:
             self.menucompete_run(resp)
 
@@ -455,9 +454,19 @@ class Procesador:
         self.manager = ManagerMicElo.ManagerMicElo(self)
         resp = WEngines.select_engine_micelo(self.manager, self.configuration.miceloActivo())
         if resp:
-            respT = QTVarios.vtime(self.main_window, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999)
+            key = "MICELO_TIME"
+            dic = self.configuration.read_variables(key)
+            default_minutes = dic.get("MINUTES", 10)
+            default_seconds = dic.get("SECONDS", 0)
+            respT = QTVarios.vtime(self.main_window, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999,
+                                   default_minutes=default_minutes, default_seconds=default_seconds)
             if respT:
                 minutos, segundos = respT
+                dic = {
+                    "MINUTES": minutos,
+                    "SECONDS": segundos
+                }
+                self.configuration.write_variables(key, dic)
                 self.manager.start(resp, minutos, segundos)
 
     def ficselo(self, nivel):
@@ -493,7 +502,7 @@ class Procesador:
             self.menuplay()
 
         elif key == TB_COMPETE:
-            self.menucompete()
+            self.menu_compete()
 
         elif key == TB_TRAIN:
             self.entrenamientos.lanza()
@@ -560,7 +569,7 @@ class Procesador:
         BasicMenus.atajos(self)
 
     def lanzaAtajosALT(self, key):
-        BasicMenus.atajosALT(self, key)
+        BasicMenus.atajos_alt(self, key)
 
     def atajos_edit(self):
         BasicMenus.atajos_edit(self)
@@ -713,12 +722,12 @@ class Procesador:
         elif resp == "openings":
             self.openings()
 
-        elif resp == "bridge11":
-            self.bridge11()
+        elif resp.startswith("version11"):
+            self.version11(resp[10:])
 
-    def bridge11(self):
-        b = Bridge11.Bridge11(self)
-        b.run()
+    def version11(self, tipo):
+        b = Version11.Version11(self)
+        b.run(tipo)
 
 
     def openings(self):
@@ -858,8 +867,8 @@ class Procesador:
         if Util.exist_file(file_db):
             create = False
             db = DBgames.DBgames(file_db)
-            cfecha_pgn_ant = db.recuperaConfig("PGN_DATE")
-            fichero_pgn_ant = db.recuperaConfig("PGN_FILE")
+            cfecha_pgn_ant = db.read_config("PGN_DATE")
+            fichero_pgn_ant = db.read_config("PGN_FILE")
             db.close()
             if cfecha_pgn != cfecha_pgn_ant or fichero_pgn_ant != fichero_pgn:
                 create = True
@@ -897,8 +906,8 @@ class Procesador:
             if Util.exist_file(file_db):
                 create = False
                 db = DBgames.DBgames(file_db)
-                cfecha_pgn_ant = db.recuperaConfig("PGN_DATE")
-                fichero_pgn_ant = db.recuperaConfig("PGN_FILE")
+                cfecha_pgn_ant = db.read_config("PGN_DATE")
+                fichero_pgn_ant = db.read_config("PGN_FILE")
                 db.close()
                 if cfecha_pgn != cfecha_pgn_ant or fichero_pgn_ant != fichero_pgn:
                     create = True
@@ -995,12 +1004,12 @@ class Procesador:
         self.manager = ManagerSolo.ManagerSolo(self)
         self.manager.start()
 
-    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump):
+    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump, attempts):
         # self.game_type = GT_POSITIONS
         # self.state = ST_PLAYING
         self.manager = ManagerEntPos.ManagerEntPos(self)
         self.manager.set_training(entreno)
-        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump)
+        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump, attempts=attempts)
 
     def playRoute(self, route):
         if route.state == Routes.BETWEEN:
@@ -1062,7 +1071,7 @@ class Procesador:
             self.playWashing()
 
     def informacion(self):
-        resp = BasicMenus.menuInformacion(self)
+        resp = BasicMenus.menu_information(self)
         if resp:
             self.informacion_run(resp)
 

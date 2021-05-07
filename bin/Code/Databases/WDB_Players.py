@@ -320,7 +320,7 @@ class WPlayer(QtWidgets.QWidget):
         return self.qtColor[color] if color is not None else None
 
     def leeVariable(self, var, default=None):
-        return self.dbGames.recuperaConfig(var, default)
+        return self.dbGames.read_config(var, default)
 
     def escVariable(self, var, valor):
         self.dbGames.save_config(var, valor)
@@ -335,23 +335,23 @@ class WPlayer(QtWidgets.QWidget):
         um.final()
 
     def changePlayer(self, lp):
-        liGen = []
+        li_gen = []
         lista = [(player, player) for player in lp]
         config = FormLayout.Combobox(_("Name"), lista)
-        liGen.append((config, self.leeVariable("PLAYER", "")))
+        li_gen.append((config, self.leeVariable("PLAYER", "")))
 
         listaAlias = lista[:]
         listaAlias.insert(0, ("--", ""))
         for nalias in range(1, 4):
-            liGen.append(FormLayout.separador)
+            li_gen.append(FormLayout.separador)
             config = FormLayout.Combobox("%s %d" % (_("Alias"), nalias), listaAlias)
-            liGen.append((config, self.leeVariable("ALIAS%d" % nalias, "")))
+            li_gen.append((config, self.leeVariable("ALIAS%d" % nalias, "")))
 
-        resultado = FormLayout.fedit(liGen, title=_("Player"), parent=self, anchoMinimo=200, icon=Iconos.Player())
+        resultado = FormLayout.fedit(li_gen, title=_("Player"), parent=self, anchoMinimo=200, icon=Iconos.Player())
         if resultado is None:
             return
-        accion, liGen = resultado
-        name, alias1, alias2, alias3 = liGen
+        accion, li_gen = resultado
+        name, alias1, alias2, alias3 = li_gen
         self.escVariable("PLAYER", name)
         self.escVariable("ALIAS1", alias1)
         self.escVariable("ALIAS2", alias2)

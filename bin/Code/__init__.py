@@ -59,8 +59,21 @@ mate_en_dos = 175522
 
 runSound = None
 
+
+def relative_root(path):
+    try:
+        path = os.path.abspath(path)
+        rel = os.path.relpath(path, folder_root)
+        if not rel.startswith(".."):
+            path = rel
+    except ValueError:
+        pass
+
+    return path
+
+
 BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.19"
+VERSION = "R 1.20"
 DEBUG = False
 DEBUG_ENGINE = False
 
@@ -109,5 +122,3 @@ if DEBUG:
         xpr("", "Modo debug engine")
 
     builtins.__dict__["xpr"] = xpr
-
-

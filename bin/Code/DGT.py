@@ -105,12 +105,12 @@ def registerBlackTakeBackFunc():
 def activar():
     dgt = None
     for path in (
-        "",
-        os.path.join(Code.folder_OS, "DigitalBoards"),
         "C:/Program Files (x86)/DGT Projects/",
         "C:/Program Files (x86)/Common Files/DGT Projects/",
         "C:/Program Files/DGT Projects/",
         "C:/Program Files/Common Files/DGT Projects/",
+        os.path.join(Code.folder_OS, "DigitalBoards"),
+        "",
     ):
         try:
             if Code.configuration.x_digital_board == "DGT":
@@ -171,32 +171,31 @@ def activar():
     dgt._DGTDLL_WriteDebug.argtype = [ctypes.c_bool]
     dgt._DGTDLL_WriteDebug.restype = ctypes.c_int
 
+    dgt._DGTDLL_SetNRun.argtype = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int]
+    dgt._DGTDLL_SetNRun.restype = ctypes.c_int
+
     # Added by GON
     if Code.configuration.x_digital_board != "DGT":
         dgt._DGTDLL_GetVersion.argtype = []
         dgt._DGTDLL_GetVersion.restype = ctypes.c_int
         Code.configuration.x_digital_board_version = dgt._DGTDLL_GetVersion()
-
-    try:
-        dgt._DGTDLL_AllowTakebacks.argtype = [ctypes.c_bool]
-        dgt._DGTDLL_AllowTakebacks.restype = ctypes.c_int
-        dgt._DGTDLL_AllowTakebacks(ctypes.c_bool(True))
-        cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int)
-        st = cmpfunc(registerWhiteTakeBackFunc)
-        dgt._DGTDLL_RegisterWhiteTakebackFunc.argtype = [st]
-        dgt._DGTDLL_RegisterWhiteTakebackFunc.restype = ctypes.c_int
-        dgt._DGTDLL_RegisterWhiteTakebackFunc(st)
-        cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int)
-        st = cmpfunc(registerBlackTakeBackFunc)
-        dgt._DGTDLL_RegisterBlackTakebackFunc.argtype = [st]
-        dgt._DGTDLL_RegisterBlackTakebackFunc.restype = ctypes.c_int
-        dgt._DGTDLL_RegisterBlackTakebackFunc(st)
-    except:
-        pass
+        try:
+            dgt._DGTDLL_AllowTakebacks.argtype = [ctypes.c_bool]
+            dgt._DGTDLL_AllowTakebacks.restype = ctypes.c_int
+            dgt._DGTDLL_AllowTakebacks(ctypes.c_bool(True))
+            cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int)
+            st = cmpfunc(registerWhiteTakeBackFunc)
+            dgt._DGTDLL_RegisterWhiteTakebackFunc.argtype = [st]
+            dgt._DGTDLL_RegisterWhiteTakebackFunc.restype = ctypes.c_int
+            dgt._DGTDLL_RegisterWhiteTakebackFunc(st)
+            cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int)
+            st = cmpfunc(registerBlackTakeBackFunc)
+            dgt._DGTDLL_RegisterBlackTakebackFunc.argtype = [st]
+            dgt._DGTDLL_RegisterBlackTakebackFunc.restype = ctypes.c_int
+            dgt._DGTDLL_RegisterBlackTakebackFunc(st)
+        except:
+            pass
     # ------------
-
-    dgt._DGTDLL_SetNRun.argtype = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_int]
-    dgt._DGTDLL_SetNRun.restype = ctypes.c_int
 
     return True
 
@@ -240,8 +239,10 @@ def writePosition(cposicion):
 
 def writeClocks(wclock, bclock):
     if Code.dgt:
-        dgt = Code.dgt
-        dgt._DGTDLL_SetNRun(wclock, bclock, 0)
+        if Code.configuration.x_digital_board == "DGT":
+            # log( "WriteClocks: W-%s B-%s"%(str(wclock), str(bclock)) )
+            dgt = Code.dgt
+            dgt._DGTDLL_SetNRun(wclock, bclock, 0)
 
 
 # Utilidades para la trasferencia de datos

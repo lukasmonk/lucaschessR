@@ -98,7 +98,7 @@ class WOpeningLines(QTVarios.WDialogo):
         self.glista.gotop()
 
     def getTitulo(self):
-        return "%s [%s]" % (_("Opening lines"), Util.relative_path(self.listaOpenings.folder))
+        return "%s [%s]" % (_("Opening lines"), Code.relative_root(self.listaOpenings.folder))
 
     def tr_(self, tipo):
         recno = self.glista.recno()
@@ -128,7 +128,7 @@ class WOpeningLines(QTVarios.WDialogo):
 
     def changeFolder(self):
         nof = _("New opening folder")
-        base = self.configuration.folderBaseOpenings
+        base = self.configuration.folder_base_openings
         li = [x for x in os.listdir(base) if os.path.isdir(os.path.join(base, x))]
         menu = QTVarios.LCMenu(self)
         rondo = QTVarios.rondoPuntos()
@@ -152,14 +152,14 @@ class WOpeningLines(QTVarios.WDialogo):
                 name = ""
                 error = ""
                 while True:
-                    liGen = [FormLayout.separador]
-                    liGen.append((nof + ":", name))
+                    li_gen = [FormLayout.separador]
+                    li_gen.append((nof + ":", name))
                     if error:
-                        liGen.append(FormLayout.separador)
-                        liGen.append((None, error))
+                        li_gen.append(FormLayout.separador)
+                        li_gen.append((None, error))
 
                     resultado = FormLayout.fedit(
-                        liGen, title=nof, parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460
+                        li_gen, title=nof, parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460
                     )
                     if resultado:
                         accion, liResp = resultado
@@ -245,10 +245,10 @@ class WOpeningLines(QTVarios.WDialogo):
             self.glista.refresh()
 
     def get_nombre(self, name):
-        liGen = [(None, None)]
-        liGen.append((_("Opening studio name") + ":", name))
+        li_gen = [(None, None)]
+        li_gen.append((_("Opening studio name") + ":", name))
         resultado = FormLayout.fedit(
-            liGen, title=_("Opening studio name"), parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460
+            li_gen, title=_("Opening studio name"), parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460
         )
         if resultado:
             accion, liResp = resultado

@@ -5,7 +5,7 @@ from Code.QT import Colocacion
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.MainWindow import WInformacion, WBase
+from Code.MainWindow import WInformation, WBase
 
 
 class EstadoWindow:
@@ -32,13 +32,10 @@ class MainWindow(QTVarios.WDialogo):
 
         self.owner = owner
 
-        # self.setBackgroundRole(QtGui.QPalette.Midlight)
-        # self.setStyleSheet( "QToolButton { padding: 2px;}" )
-        # self.setStyleSheet( "QWidget { background-color: yellow; }")
         self.base = WBase.WBase(self, manager)
 
         self.siCapturas = False
-        self.informacionPGN = WInformacion.InformacionPGN(self)
+        self.informacionPGN = WInformation.Information(self)
         self.siInformacionPGN = False
         self.informacionPGN.hide()
         self.register_splitter(self.informacionPGN.splitter, "InformacionPGN")
@@ -147,7 +144,6 @@ class MainWindow(QTVarios.WDialogo):
 
     def procesosFinales(self):
         self.board.cierraGuion()
-        self.save_video()
         self.board.terminar()
 
     def closeEvent(self, event):  # Cierre con X
@@ -169,7 +165,7 @@ class MainWindow(QTVarios.WDialogo):
         if self.board.siMaximizado():
             self.showMaximized()
         else:
-            self.restore_video(siTam=False)
+            self.restore_video()
             self.ajustaTam()
             self.show()
 
@@ -214,18 +210,13 @@ class MainWindow(QTVarios.WDialogo):
                 # self.ajustaTam()
 
     def show_variations(self, titulo):
-        flags = (
-            QtCore.Qt.Dialog
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.WindowMinimizeButtonHint
-            | QtCore.Qt.WindowMaximizeButtonHint
-        )
+        flags = QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint | QtCore.Qt.WindowMaximizeButtonHint
 
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | flags)
 
         self.setWindowTitle(titulo if titulo else "-")
 
-        self.restore_video(siTam=False)
+        # self.restore_main_window()
         self.ajustaTam()
 
         resp = self.exec_()
@@ -267,6 +258,9 @@ class MainWindow(QTVarios.WDialogo):
 
     def set_hight_label3(self, px):
         return self.base.set_hight_label3(px)
+
+    def get_labels(self):
+        return self.base.get_labels()
 
     def ponWhiteBlack(self, white=None, black=None):
         self.base.ponWhiteBlack(white, black)
@@ -422,3 +416,32 @@ class MainWindow(QTVarios.WDialogo):
                 QtWidgets.QApplication.restoreOverrideCursor()
         self.cursor_pensado = si_pensando
         self.refresh()
+
+    def save_video(self, dic_extended=None):
+        dic = {} if dic_extended is None else dic_extended
+
+        pos = self.pos()
+        dic["_POSICION_"] = "%d,%d" % (pos.x(), pos.y())
+
+        tam = self.size()
+        dic["_SIZE_"] = "%d,%d" % (tam.width(), tam.height())
+
+        for grid in self.liGrids:
+            grid.save_video(dic)
+
+        for sp, name in self.liSplitters:
+            sps = sp.sizes()
+            key = "SP_%s" % name
+            if name == "InformacionPGN" and sps[1] == 0:
+                sps = self.informacionPGN.sp_sizes
+                if sps is None or sps[1] == 0:
+                    dr = self.restore_dicvideo()
+                    if key in dr:
+                        dic[key] = dr
+                        continue
+                    sps = [1, 1]
+            dic["SP_%s" % name] = sps
+
+        Code.configuration.save_video(self.key_video, dic)
+        return dic
+

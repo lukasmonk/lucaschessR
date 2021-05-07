@@ -169,7 +169,7 @@ class EngineResponse:
             if not self.is_white:
                 pt = -pt
             cp = "%+0.2f" % (pt / 100.0)
-            return "%s %s" % (cp, _("points"))
+            return "%s %s" % (cp, _("centipawns"))
 
     def abrTexto(self):
         c = self.abrTextoBase()
@@ -661,7 +661,7 @@ class MultiEngineResponse:
             )  # son puntos ganados por el engine y perdidos por el player
             if difpuntos > mindifpuntos:
                 if fdbg:
-                    fdbg.write("1. %s : %s %d > %d\n" % (rm0.pv, _("Points lost"), difpuntos, mindifpuntos))
+                    fdbg.write("1. %s : %s %d > %d\n" % (rm0.pv, _("Centipawns lost"), difpuntos, mindifpuntos))
                 return True
         return False
 

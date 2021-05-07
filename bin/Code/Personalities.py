@@ -46,31 +46,31 @@ class Personalities:
             una = {}
 
         # Datos basicos
-        liGen = [(None, None)]
-        liGen.append((FormLayout.Editbox(_("Name")), una.get("NOMBRE", "")))
+        li_gen = [(None, None)]
+        li_gen.append((FormLayout.Editbox(_("Name")), una.get("NOMBRE", "")))
 
-        liGen.append((None, None))
+        li_gen.append((None, None))
 
         config = FormLayout.Fichero(_("Debug file"), "txt", True)
-        liGen.append((config, una.get("DEBUG", "")))
+        li_gen.append((config, una.get("DEBUG", "")))
 
-        liGen.append((None, None))
+        li_gen.append((None, None))
 
-        liGen.append((None, _("Serious errors, select the best move if:")))
-        liGen.append(
+        li_gen.append((None, _("Serious errors, select the best move if:")))
+        li_gen.append(
             (FormLayout.Editbox(_("Mate is less than or equal to"), tipo=int, ancho=50), una.get("MAXMATE", 0))
         )
-        liGen.append(
+        li_gen.append(
             (
-                FormLayout.Editbox(_("The loss of points is greater than"), tipo=int, ancho=50),
+                FormLayout.Editbox(_("The loss of centipawns is greater than"), tipo=int, ancho=50),
                 una.get("MINDIFPUNTOS", 0),
             )
         )
-        liGen.append((None, None))
-        liGen.append(
+        li_gen.append((None, None))
+        li_gen.append(
             (
                 FormLayout.Editbox(
-                    _("Max. loss of points per move by the <br> engine to reach a leveled evaluation"),
+                    _("Max. loss of centipawns per move by the <br> engine to reach a leveled evaluation"),
                     tipo=int,
                     ancho=50,
                 ),
@@ -128,7 +128,7 @@ class Personalities:
 
         while True:
             lista = []
-            lista.append((liGen, _("Basic data"), ""))
+            lista.append((li_gen, _("Basic data"), ""))
             lista.append((liA, _("Opening"), ""))
             lista.append((liMJ, _("Middlegame"), ""))
             lista.append((liF, _("Endgame"), ""))

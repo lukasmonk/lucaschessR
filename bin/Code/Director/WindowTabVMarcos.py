@@ -39,41 +39,41 @@ class WTV_Marco(QtWidgets.QDialog):
         self.board.copiaPosicionDe(owner.board)
 
         # Datos generales
-        liGen = []
+        li_gen = []
 
         # name del box que se usara en los menus del tutorial
         config = FormLayout.Editbox(_("Name"), ancho=120)
-        liGen.append((config, regMarco.name))
+        li_gen.append((config, regMarco.name))
 
         # ( "tipo", "n", Qt.SolidLine ), #1=SolidLine, 2=DashLine, 3=DotLine, 4=DashDotLine, 5=DashDotDotLine
         config = FormLayout.Combobox(_("Line Type"), QTUtil2.tiposDeLineas())
-        liGen.append((config, regMarco.tipo))
+        li_gen.append((config, regMarco.tipo))
 
         # ( "color", "n", 0 ),
         config = FormLayout.Colorbox(_("Color"), 80, 20)
-        liGen.append((config, regMarco.color))
+        li_gen.append((config, regMarco.color))
 
         # ( "colorinterior", "n", -1 ),
         config = FormLayout.Colorbox(_("Internal color"), 80, 20, siChecked=True)
-        liGen.append((config, regMarco.colorinterior))
+        li_gen.append((config, regMarco.colorinterior))
 
         # ( "opacity", "n", 1.0 ),
         config = FormLayout.Dial(_("Degree of transparency"), 0, 99)
-        liGen.append((config, 100 - int(regMarco.opacity * 100)))
+        li_gen.append((config, 100 - int(regMarco.opacity * 100)))
 
         # ( "grosor", "n", 1 ), # ancho del trazo
         config = FormLayout.Spinbox(_("Thickness"), 1, 20, 50)
-        liGen.append((config, regMarco.grosor))
+        li_gen.append((config, regMarco.grosor))
 
         # ( "redEsquina", "n", 0 ),
         config = FormLayout.Spinbox(_("Rounded corners"), 0, 100, 50)
-        liGen.append((config, regMarco.redEsquina))
+        li_gen.append((config, regMarco.redEsquina))
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        liGen.append((config, regMarco.physical_pos.orden))
+        li_gen.append((config, regMarco.physical_pos.orden))
 
-        self.form = FormLayout.FormWidget(liGen, dispatch=self.cambios)
+        self.form = FormLayout.FormWidget(li_gen, dispatch=self.cambios)
 
         # Layout
         layout = Colocacion.H().control(self.form).relleno().control(self.board)

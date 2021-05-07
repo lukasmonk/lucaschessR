@@ -9,23 +9,14 @@ from Code.Base.Constantes import *
 
 
 def dicTeclas():
-    dic = {
-        16777234: GO_BACK,
-        16777236: GO_FORWARD,
-        16777235: GO_BACK,
-        16777237: GO_FORWARD,
-        16777232: GO_START,
-        16777233: GO_END,
-    }
+    dic = {16777234: GO_BACK, 16777236: GO_FORWARD, 16777235: GO_BACK, 16777237: GO_FORWARD, 16777232: GO_START, 16777233: GO_END}
     return dic
 
 
 def leeCarpeta(owner, carpeta, titulo=None):
     if titulo is None:
         titulo = _("Open Directory")
-    return QtWidgets.QFileDialog.getExistingDirectory(
-        owner, titulo, carpeta, QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks
-    )
+    return QtWidgets.QFileDialog.getExistingDirectory(owner, titulo, carpeta, QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks)
 
 
 def _lfTituloFiltro(extension, titulo):
@@ -61,9 +52,7 @@ def creaFichero(owner, carpeta, extension, titulo=None):
 
 def leeCreaFichero(owner, carpeta, extension, titulo=None):
     titulo, filtro = _lfTituloFiltro(extension, titulo)
-    resp = QtWidgets.QFileDialog.getSaveFileName(
-        owner, titulo, carpeta, filtro, options=QtWidgets.QFileDialog.DontConfirmOverwrite
-    )
+    resp = QtWidgets.QFileDialog.getSaveFileName(owner, titulo, carpeta, filtro, options=QtWidgets.QFileDialog.DontConfirmOverwrite)
     return resp[0] if resp else None
 
 
@@ -71,28 +60,12 @@ def salvaFichero(main_window, titulo, carpeta, filtro, siConfirmarSobreescritura
     if siConfirmarSobreescritura:
         resp = QtWidgets.QFileDialog.getSaveFileName(main_window, titulo, carpeta, filtro)
     else:
-        resp = QtWidgets.QFileDialog.getSaveFileName(
-            main_window, titulo, carpeta, filtro, options=QtWidgets.QFileDialog.DontConfirmOverwrite
-        )
+        resp = QtWidgets.QFileDialog.getSaveFileName(main_window, titulo, carpeta, filtro, options=QtWidgets.QFileDialog.DontConfirmOverwrite)
     return resp[0] if resp else resp
 
 
 class MensEspera(QtWidgets.QWidget):
-    def __init__(
-        self,
-        parent,
-        mensaje,
-        siCancelar,
-        siMuestraYa,
-        opacity,
-        physical_pos,
-        fixedSize,
-        titCancelar,
-        background,
-        pmImagen=None,
-        puntos=12,
-        conImagen=True,
-    ):
+    def __init__(self, parent, mensaje, siCancelar, siMuestraYa, opacity, physical_pos, fixedSize, titCancelar, background, pmImagen=None, puntos=12, conImagen=True):
 
         assert parent is not None
 
@@ -112,20 +85,14 @@ class MensEspera(QtWidgets.QWidget):
         if physical_pos == "tb":
             fixedSize = parent.width()
 
-        self.lb = lb = (
-            Controles.LB(parent, resalta(mensaje)).ponFuente(Controles.TipoLetra(puntos=puntos)).align_center()
-        )
+        self.lb = lb = Controles.LB(parent, resalta(mensaje)).ponFuente(Controles.TipoLetra(puntos=puntos)).align_center()
         if fixedSize is not None:
             lb.set_wrap().anchoFijo(fixedSize - 60)
 
         if siCancelar:
             if not titCancelar:
                 titCancelar = _("Cancel")
-            self.btCancelar = (
-                Controles.PB(self, titCancelar, rutina=self.cancelar, plano=False)
-                .ponIcono(Iconos.Cancelar())
-                .anchoFijo(100)
-            )
+            self.btCancelar = Controles.PB(self, titCancelar, rutina=self.cancelar, plano=False).ponIcono(Iconos.Cancelar()).anchoFijo(100)
 
         ly = Colocacion.G()
         if conImagen:
@@ -184,7 +151,7 @@ class MensEspera(QtWidgets.QWidget):
             y = v.y() + (v.height() - s.height()) // 2
 
         # p = self.parent().mapToGlobal(QtCore.QPoint(x,y))
-        p = QtCore.QPoint(x,y)
+        p = QtCore.QPoint(x, y)
         self.move(p)
         QTUtil.refresh_gui()
         return self
@@ -221,20 +188,7 @@ class ControlMensEspera:
             self.final()
         if background is None:
             background = "#D3E3EC"
-        self.me = MensEspera(
-            parent,
-            mensaje,
-            siCancelar,
-            siMuestraYa,
-            opacity,
-            physical_pos,
-            fixedSize,
-            titCancelar,
-            background,
-            pmImagen,
-            puntos,
-            conImagen,
-        )
+        self.me = MensEspera(parent, mensaje, siCancelar, siMuestraYa, opacity, physical_pos, fixedSize, titCancelar, background, pmImagen, puntos, conImagen)
         QTUtil.refresh_gui()
         return self
 
@@ -280,30 +234,13 @@ class ControlMensEspera:
 mensEspera = ControlMensEspera()
 
 
-def mensajeTemporal(
-    main_window,
-    mensaje,
-    segundos,
-    background=None,
-    pmImagen=None,
-    physical_pos="c",
-    fixedSize=None,
-    siCancelar=None,
-    titCancelar=None,
-):
+def mensajeTemporal(main_window, mensaje, segundos, background=None, pmImagen=None, physical_pos="c", fixedSize=None, siCancelar=None, titCancelar=None):
     if siCancelar is None:
         siCancelar = segundos > 3.0
     if titCancelar is None:
         titCancelar = _("Continue")
     me = mensEspera.start(
-        main_window,
-        mensaje,
-        background=background,
-        pmImagen=pmImagen,
-        siCancelar=siCancelar,
-        titCancelar=titCancelar,
-        physical_pos=physical_pos,
-        fixedSize=fixedSize,
+        main_window, mensaje, background=background, pmImagen=pmImagen, siCancelar=siCancelar, titCancelar=titCancelar, physical_pos=physical_pos, fixedSize=fixedSize
     )
     if segundos:
         me.time(segundos)
@@ -311,9 +248,7 @@ def mensajeTemporal(
 
 
 def mensajeTemporalSinImagen(main_window, mensaje, segundos, background=None, puntos=12, physical_pos="c"):
-    me = mensEspera.start(
-        main_window, mensaje, physical_pos=physical_pos, conImagen=False, puntos=puntos, fixedSize=None, background=background
-    )
+    me = mensEspera.start(main_window, mensaje, physical_pos=physical_pos, conImagen=False, puntos=puntos, fixedSize=None, background=background)
     if segundos:
         me.time(segundos)
     return me
@@ -348,17 +283,14 @@ class BarraProgreso2(QtWidgets.QDialog):
         layout = Colocacion.V().control(self.gb1).control(self.gb2).otro(lyBT)
 
         self.setLayout(layout)
-        self._siCancelado = False
+        self._is_canceled = False
 
     def closeEvent(self, event):
-        self._siCancelado = True
+        self._is_canceled = True
         self.cerrar()
 
     def mostrar(self):
-        self.move(
-            self.owner.x() + (self.owner.width() - self.width()) / 2,
-            self.owner.y() + (self.owner.height() - self.height()) / 2,
-        )
+        self.move(self.owner.x() + (self.owner.width() - self.width()) / 2, self.owner.y() + (self.owner.height() - self.height()) / 2)
         self.show()
         return self
 
@@ -372,7 +304,7 @@ class BarraProgreso2(QtWidgets.QDialog):
         QTUtil.refresh_gui()
 
     def cancelar(self):
-        self._siCancelado = True
+        self._is_canceled = True
         self.cerrar()
 
     def ponRotulo(self, cual, texto):
@@ -389,7 +321,7 @@ class BarraProgreso2(QtWidgets.QDialog):
 
     def is_canceled(self):
         QTUtil.refresh_gui()
-        return self._siCancelado
+        return self._is_canceled
 
 
 class BarraProgreso1(QtWidgets.QDialog):
@@ -414,17 +346,14 @@ class BarraProgreso1(QtWidgets.QDialog):
         layout = Colocacion.V().control(self.gb1).otro(lyBT)
 
         self.setLayout(layout)
-        self._siCancelado = False
+        self._is_canceled = False
 
     def closeEvent(self, event):
-        self._siCancelado = True
+        self._is_canceled = True
         self.cerrar()
 
     def mostrar(self):
-        self.move(
-            self.owner.x() + (self.owner.width() - self.width()) / 2,
-            self.owner.y() + (self.owner.height() - self.height()) / 2,
-        )
+        self.move(self.owner.x() + (self.owner.width() - self.width()) / 2, self.owner.y() + (self.owner.height() - self.height()) / 2)
         self.show()
         return self
 
@@ -439,7 +368,7 @@ class BarraProgreso1(QtWidgets.QDialog):
         QTUtil.refresh_gui()
 
     def cancelar(self):
-        self._siCancelado = True
+        self._is_canceled = True
         self.cerrar()
 
     def ponRotulo(self, texto):
@@ -454,7 +383,7 @@ class BarraProgreso1(QtWidgets.QDialog):
 
     def is_canceled(self):
         QTUtil.refresh_gui()
-        return self._siCancelado
+        return self._is_canceled
 
 
 class BarraProgreso(QtWidgets.QProgressDialog):
@@ -473,12 +402,7 @@ class BarraProgreso(QtWidgets.QProgressDialog):
         self.total = total
         self.actual = 0
         self.setWindowModality(QtCore.Qt.WindowModal)
-        self.setWindowFlags(
-            QtCore.Qt.WindowCloseButtonHint
-            | QtCore.Qt.Dialog
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.WindowMinimizeButtonHint
-        )
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint)
         self.setWindowTitle(titulo)
         self.owner = owner
         self.setAutoClose(False)
@@ -486,10 +410,7 @@ class BarraProgreso(QtWidgets.QProgressDialog):
 
     def mostrar(self):
         if self.owner:
-            self.move(
-                self.owner.x() + (self.owner.width() - self.width()) / 2,
-                self.owner.y() + (self.owner.height() - self.height()) / 2,
-            )
+            self.move(self.owner.x() + (self.owner.width() - self.width()) / 2, self.owner.y() + (self.owner.height() - self.height()) / 2)
         self.show()
         return self
 
@@ -527,11 +448,7 @@ def resalta(mens, tipo=4):
 
 
 def tbAcceptCancel(parent, if_default=False, siReject=True):
-    li_acciones = [
-        (_("Accept"), Iconos.Aceptar(), parent.aceptar),
-        None,
-        (_("Cancel"), Iconos.Cancelar(), parent.reject if siReject else parent.cancelar),
-    ]
+    li_acciones = [(_("Accept"), Iconos.Aceptar(), parent.aceptar), None, (_("Cancel"), Iconos.Cancelar(), parent.reject if siReject else parent.cancelar)]
     if if_default:
         li_acciones.append(None)
         li_acciones.append((_("Default"), Iconos.Defecto(), parent.defecto))
@@ -541,14 +458,7 @@ def tbAcceptCancel(parent, if_default=False, siReject=True):
 
 
 def tiposDeLineas():
-    li = (
-        (_("No pen"), 0),
-        (_("Solid line"), 1),
-        (_("Dash line"), 2),
-        (_("Dot line"), 3),
-        (_("Dash dot line"), 4),
-        (_("Dash dot dot line"), 5),
-    )
+    li = ((_("No pen"), 0), (_("Solid line"), 1), (_("Dash line"), 2), (_("Dot line"), 3), (_("Dash dot line"), 4), (_("Dash dot dot line"), 5))
     return li
 
 

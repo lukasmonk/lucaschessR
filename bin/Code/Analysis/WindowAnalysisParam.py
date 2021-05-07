@@ -1,3 +1,4 @@
+import Code
 from Code.Polyglots import Books
 from Code.QT import FormLayout
 from Code.QT import Iconos
@@ -9,7 +10,8 @@ from Code.Engines import Priorities
 SEPARADOR = FormLayout.separador
 
 
-def read_dic_params(configuration):
+def read_dic_params():
+    configuration = Code.configuration
     file = configuration.file_param_analysis()
     dic = Util.restore_pickle(file)
     if not dic:
@@ -49,10 +51,18 @@ def read_dic_params(configuration):
     return alm
 
 
+def save_dic_params(dic):
+    configuration = Code.configuration
+    file = configuration.file_param_analysis()
+    dic1 = Util.restore_pickle(file)
+    dic1.update(dic)
+    Util.save_pickle(file, dic1)
+
+
 def form_blunders_brilliancies(alm, configuration):
     li_blunders = [SEPARADOR]
 
-    li_blunders.append((FormLayout.Editbox(_("Is considered wrong move when the loss of points is greater than"), tipo=int, ancho=50), alm.kblunders))
+    li_blunders.append((FormLayout.Editbox(_("Is considered wrong move when the loss of centipawns is greater than"), tipo=int, ancho=50), alm.kblunders))
     li_blunders.append(SEPARADOR)
 
     def file_next(base, ext):
@@ -79,7 +89,7 @@ def form_blunders_brilliancies(alm, configuration):
 
     li_brilliancies.append((FormLayout.Spinbox(_("Minimum depth"), 3, 30, 50), alm.dpbrilliancies))
 
-    li_brilliancies.append((FormLayout.Spinbox(_("Minimum gain points"), 30, 30000, 50), alm.ptbrilliancies))
+    li_brilliancies.append((FormLayout.Spinbox(_("Minimum gain centipawns"), 30, 30000, 50), alm.ptbrilliancies))
     li_brilliancies.append(SEPARADOR)
 
     path_fns = file_next("Brilliancies", "fns")
@@ -108,7 +118,7 @@ def form_variations(alm):
     li_var.append((_("Add analysis to variations") + ":", alm.include_variations))
     li_var.append(SEPARADOR)
 
-    li_var.append((FormLayout.Spinbox(_("Minimum points lost"), 0, 1000, 60), alm.limit_include_variations))
+    li_var.append((FormLayout.Spinbox(_("Minimum centipawns lost"), 0, 1000, 60), alm.limit_include_variations))
     li_var.append(SEPARADOR)
 
     li_var.append((_("Only add better variation") + ":", alm.best_variation))
@@ -125,7 +135,7 @@ def form_variations(alm):
 
 
 def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=False):
-    alm = read_dic_params(configuration)
+    alm = read_dic_params()
 
     # Datos
     li_gen = [SEPARADOR]
@@ -303,7 +313,7 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         for x in dir(alm):
             if not x.startswith("__"):
                 dic[x] = getattr(alm, x)
-        Util.save_pickle(configuration.file_param_analysis(), dic)
+        save_dic_params(dic)
 
         return alm
     else:
@@ -311,40 +321,40 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
 
 
 def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, siDatabase=False):
-    alm = read_dic_params(configuration)
+    alm = read_dic_params()
 
     # Datos
-    liGen = [SEPARADOR]
+    li_gen = [SEPARADOR]
 
     # # Tutor
     li = configuration.ayudaCambioTutor()
     li[0] = alm.engine
-    liGen.append((_("Engine") + ":", li))
+    li_gen.append((_("Engine") + ":", li))
 
-    liGen.append(SEPARADOR)
+    li_gen.append(SEPARADOR)
 
     # # Time
     config = FormLayout.Editbox(_("Duration of engine analysis (secs)"), 40, tipo=float)
-    liGen.append((config, alm.vtime / 1000.0))
+    li_gen.append((config, alm.vtime / 1000.0))
 
     # Depth
     liDepths = [("--", 0)]
     for x in range(1, 100):
         liDepths.append((str(x), x))
     config = FormLayout.Combobox(_("Depth"), liDepths)
-    liGen.append((config, alm.depth))
+    li_gen.append((config, alm.depth))
 
     # Time+Depth
-    liGen.append(("%s+%s:" % (_("Time"), _("Depth")), alm.timedepth))
+    li_gen.append(("%s+%s:" % (_("Time"), _("Depth")), alm.timedepth))
 
     # MultiPV
-    liGen.append(SEPARADOR)
+    li_gen.append(SEPARADOR)
     li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
     for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), str(x)))
     config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
-    liGen.append((config, alm.multiPV))
-    liGen.append(SEPARADOR)
+    li_gen.append((config, alm.multiPV))
+    li_gen.append(SEPARADOR)
 
     liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK"), (_("White & Black"), "BOTH")]
     config = FormLayout.Combobox(_("Analyze only color"), liJ)
@@ -356,9 +366,9 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         color = "WHITE"
     else:
         color = "BOTH"
-    liGen.append((config, color))
+    li_gen.append((config, color))
 
-    liGen.append(('<div align="right">' + _("Only player moves") + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"), ""))
+    li_gen.append(('<div align="right">' + _("Only player moves") + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"), ""))
 
     fvar = configuration.file_books
     list_books = Books.ListBooks()
@@ -372,22 +382,22 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
             defecto = book
         li.append((book.name, book))
     config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
-    liGen.append((config, defecto))
+    li_gen.append((config, defecto))
 
-    liGen.append((_("Start from the end of the game") + ":", alm.from_last_move))
+    li_gen.append((_("Start from the end of the game") + ":", alm.from_last_move))
 
-    liGen.append(SEPARADOR)
-    liGen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
+    li_gen.append(SEPARADOR)
+    li_gen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
 
-    liGen.append(SEPARADOR)
-    liGen.append((_("Only selected games") + ":", siVariosSeleccionados))
+    li_gen.append(SEPARADOR)
+    li_gen.append((_("Only selected games") + ":", siVariosSeleccionados))
 
     liVar = form_variations(alm)
 
     liBlunders, liBrilliancies = form_blunders_brilliancies(alm, configuration)
 
     lista = []
-    lista.append((liGen, _("General options"), ""))
+    lista.append((li_gen, _("General options"), ""))
     lista.append((liVar, _("Variations"), ""))
     lista.append((liBlunders, _("Wrong moves"), ""))
     lista.append((liBrilliancies, _("Brilliancies"), ""))
@@ -429,9 +439,9 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
     if resultado:
         accion, liResp = resultado
 
-        liGen, liVar, liBlunders, liBrilliancies = liResp
+        li_gen, liVar, liBlunders, liBrilliancies = liResp
 
-        alm.engine, vtime, alm.depth, alm.timedepth, alm.multiPV, color, cjug, alm.book, alm.from_last_move, alm.delete_previous, alm.siVariosSeleccionados = liGen
+        alm.engine, vtime, alm.depth, alm.timedepth, alm.multiPV, color, cjug, alm.book, alm.from_last_move, alm.delete_previous, alm.siVariosSeleccionados = li_gen
 
         alm.vtime = int(vtime * 1000)
         alm.white = color != "BLACK"
@@ -449,8 +459,8 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         dic = {}
         for x in dir(alm):
             if not x.startswith("__"):
-                dic[x.upper()] = getattr(alm, x)
-        Util.save_pickle(configuration.file_param_analysis(), dic)
+                dic[x] = getattr(alm, x)
+        save_dic_params(dic)
 
         if not (alm.tacticblunders or alm.pgnblunders or alm.bmtblunders or alm.fnsbrilliancies or alm.pgnbrilliancies or alm.bmtbrilliancies or siDatabase):
             QTUtil2.message_error(parent, _("No file was specified where to save results"))

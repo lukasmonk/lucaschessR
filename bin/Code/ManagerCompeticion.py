@@ -63,7 +63,7 @@ class ManagerCompeticion(Manager.Manager):
         self.show_side_indicator(True)
         label = "%s: %s\n%s %s %d" % (_("Opponent"), self.xrival.name, categoria.name(), _("Level"), nivel)
         if self.puntos:
-            label += " (+%d %s)" % (self.puntos, _("points"))
+            label += " (+%d %s)" % (self.puntos, _("centipawns"))
         self.set_label1(label)
         self.xrotulo2()
 
@@ -164,7 +164,6 @@ class ManagerCompeticion(Manager.Manager):
         if siJugadas:
             if not QTUtil2.pregunta(self.main_window, _("End game?")):
                 return False  # no termina
-            self.guardarNoTerminados()
             self.ponFinJuego()
             self.autosave()
         else:
@@ -181,7 +180,6 @@ class ManagerCompeticion(Manager.Manager):
                 return False  # no abandona
             self.resultado = RS_WIN_OPPONENT
             self.game.resign(self.human_side)
-            self.guardarGanados(False)
             self.ponFinJuego()
             self.autosave()
         else:
@@ -275,7 +273,6 @@ class ManagerCompeticion(Manager.Manager):
                 mensaje += "\n\n%s: %d+%d = %d %s" % (_("Total score"), puntuacion - self.puntos, self.puntos, puntuacion, _("pts"))
                 self.xrotulo2()
 
-        self.guardarGanados(player_win)
         self.mensaje(mensaje)
         self.ponFinJuego()
         self.autosave()

@@ -53,10 +53,12 @@ class Game:
         self.termination = TERMINATION_WIN_ON_TIME
         # Pierde el que le toca jugar, que se indica en position resultado del ultimo movimiento
         self.result = RESULT_WIN_BLACK if self.last_position.is_white else RESULT_WIN_WHITE
+        self.set_extend_tags()
 
     def set_termination(self, termination, result):
         self.termination = termination
         self.result = result
+        self.set_extend_tags()
 
     def set_unknown(self):
         self.set_termination(TERMINATION_UNKNOWN, RESULT_UNKNOWN)
@@ -582,7 +584,7 @@ class Game:
 
     def resign(self, is_white):
         self.set_termination(TERMINATION_RESIGN, RESULT_WIN_BLACK if is_white else RESULT_WIN_WHITE)
-        self.test_tag_result()
+        self.set_extend_tags()
 
     def borraCV(self):
         self.first_comment = ""

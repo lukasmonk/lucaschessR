@@ -95,7 +95,7 @@ class Replay:
         QTUtil.refresh_gui()
 
     def show_current(self):
-        if self.siStop:
+        if self.siStop or self.current_position >= len(self.li_moves):
             return
 
         move = self.li_moves[self.current_position]
@@ -220,7 +220,7 @@ class Replay:
         if self.siStop:
             return
         self.current_position += 1
-        if self.current_position == self.num_moves:
+        if self.current_position >= self.num_moves:
             self.siStop = True
             self.muestraPausa(False, False)
         else:

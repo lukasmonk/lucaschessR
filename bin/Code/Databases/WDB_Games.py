@@ -151,7 +151,7 @@ class WGames(QtWidgets.QWidget):
             self.procesador.play_game_show(recplay)
 
     def lista_columnas(self):
-        dcabs = self.dbGames.recuperaConfig("dcabs", DBgames.drots.copy())
+        dcabs = self.dbGames.read_config("dcabs", DBgames.drots.copy())
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("__num__", _("N."), 60, centered=True)
         li_tags = self.dbGames.li_tags()
@@ -182,7 +182,7 @@ class WGames(QtWidgets.QWidget):
             for n in li_remove:
                 del o_columns.li_columns[n]
 
-        dcabs = self.dbGames.recuperaConfig("dcabs", DBgames.drots.copy())
+        dcabs = self.dbGames.read_config("dcabs", DBgames.drots.copy())
         st100 = {"Event", "Site", "White", "Black"}
         stActual = {col.key for col in self.grid.o_columns.li_columns}
         for tag in li_tags:
@@ -603,8 +603,8 @@ class WGames(QtWidgets.QWidget):
         submenu.opcion(self.tw_edit_columns, _("Configure the columns"), Iconos.EditColumns())
         submenu.separador()
 
-        si_show = self.dbGames.recuperaConfig("GRAPHICS_SHOW_ALLWAYS", False)
-        si_graphics_specific = self.dbGames.recuperaConfig("GRAPHICS_SPECIFIC", False)
+        si_show = self.dbGames.read_config("GRAPHICS_SHOW_ALLWAYS", False)
+        si_graphics_specific = self.dbGames.read_config("GRAPHICS_SPECIFIC", False)
         menu1 = submenu.submenu(_("Graphic elements (Director)"), Iconos.Script())
         menu2 = menu1.submenu(_("Show allways"), Iconos.PuntoAzul())
         menu2.opcion(self.tw_dir_show_yes, _("Yes"), dico[si_show])
@@ -649,7 +649,7 @@ class WGames(QtWidgets.QWidget):
         if w.exec_():
             dic_cambios = w.dic_cambios
 
-            dcabs = self.dbGames.recuperaConfig("dcabs", {})
+            dcabs = self.dbGames.read_config("dcabs", {})
             reinit = False
 
             # Primero CREATE
@@ -693,8 +693,8 @@ class WGames(QtWidgets.QWidget):
             self.grid.releerColumnas()
 
     def readVarsConfig(self):
-        showAllways = self.dbGames.recuperaConfig("GRAPHICS_SHOW_ALLWAYS")
-        specific = self.dbGames.recuperaConfig("GRAPHICS_SPECIFIC")
+        showAllways = self.dbGames.read_config("GRAPHICS_SHOW_ALLWAYS")
+        specific = self.dbGames.read_config("GRAPHICS_SPECIFIC")
         return showAllways, specific
 
     def graphicBoardReset(self):
@@ -786,8 +786,8 @@ class WGames(QtWidgets.QWidget):
             if resultado is None:
                 return
 
-            accion, liGen = resultado
-            name, player, selected, side, result = liGen
+            accion, li_gen = resultado
+            name, player, selected, side, result = li_gen
 
             if not name:
                 QTUtil2.message_error(self, _("Name is missing"))
@@ -1299,10 +1299,10 @@ def modify_database(owner, configuration, db):
         "FILEPATH": db.nom_fichero,
         "EXTERNAL_FOLDER": db.external_folder,
         "SUMMARY_DEPTH": db.depth_stat(),
-        "ALLOWS_DUPLICATES": db.recuperaConfig("ALLOWS_DUPLICATES", False),
-        "ALLOWS_POSITIONS": db.recuperaConfig("ALLOWS_POSITIONS", True),
-        "ALLOWS_COMPLETE_GAMES": db.recuperaConfig("ALLOWS_COMPLETE_GAMES", True),
-        "ALLOWS_ZERO_MOVES": db.recuperaConfig("ALLOWS_ZERO_MOVES", False),
+        "ALLOWS_DUPLICATES": db.read_config("ALLOWS_DUPLICATES", False),
+        "ALLOWS_POSITIONS": db.read_config("ALLOWS_POSITIONS", True),
+        "ALLOWS_COMPLETE_GAMES": db.read_config("ALLOWS_COMPLETE_GAMES", True),
+        "ALLOWS_ZERO_MOVES": db.read_config("ALLOWS_ZERO_MOVES", False),
     }
     w = WOptionsDatabase(owner, configuration, dic_data)
     if w.exec_():
@@ -1317,7 +1317,7 @@ class WTags(QTVarios.WDialogo):
         self.dbgames = dbgames
         self.dic_cambios = None
 
-        dcabs = dbgames.recuperaConfig("dcabs", {})
+        dcabs = dbgames.read_config("dcabs", {})
         li_basetags = dbgames.li_tags()
         if li_basetags[0] == "PLYCOUNT":
             del li_basetags[0]

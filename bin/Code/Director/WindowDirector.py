@@ -270,12 +270,12 @@ class WPanelDirector(QTVarios.WDialogo):
         return tarea, row
 
     def editaNombre(self, name):
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
         config = FormLayout.Editbox(_("Name"), ancho=160)
-        liGen.append((config, name))
+        li_gen.append((config, name))
         ico = Iconos.Grabar()
 
-        resultado = FormLayout.fedit(liGen, title=_("Name"), parent=self, icon=ico)
+        resultado = FormLayout.fedit(li_gen, title=_("Name"), parent=self, icon=ico)
         if resultado:
             self.ponSiGrabar()
             accion, liResp = resultado
@@ -314,15 +314,15 @@ class WPanelDirector(QTVarios.WDialogo):
                 self.refresh_guion()
 
     def desdeHasta(self, titulo, from_sq, to_sq):
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         config = FormLayout.Casillabox(_("From square"))
-        liGen.append((config, from_sq))
+        li_gen.append((config, from_sq))
 
         config = FormLayout.Casillabox(_("To square"))
-        liGen.append((config, to_sq))
+        li_gen.append((config, to_sq))
 
-        resultado = FormLayout.fedit(liGen, title=titulo, parent=self)
+        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self)
         if resultado:
             self.ponSiGrabar()
             resp = resultado[1]
@@ -334,18 +334,18 @@ class WPanelDirector(QTVarios.WDialogo):
 
     def datosSVG(self, tarea):
         col, fil, ancho, alto = tarea.get_datos()
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
         def xconfig(label, value):
             config = FormLayout.Editbox(label, 80, tipo=float, decimales=3)
-            liGen.append((config, value))
+            li_gen.append((config, value))
 
         xconfig(_("Column"), col)
         xconfig(_("Row"), fil)
         xconfig(_("Width"), ancho)
         xconfig(_("Height"), alto)
 
-        resultado = FormLayout.fedit(liGen, title=tarea.txt_tipo(), parent=self)
+        resultado = FormLayout.fedit(li_gen, title=tarea.txt_tipo(), parent=self)
         if resultado:
             col, fil, ancho, alto = resultado[1]
             tarea.set_datos(col, fil, ancho, alto)
@@ -416,12 +416,12 @@ class WPanelDirector(QTVarios.WDialogo):
         self.refresh_guion()
 
     # def creaConfiguration(self, txt, configuration, row):
-    #     liGen = [(None, None)]
+    #     li_gen = [(None, None)]
     #     config = FormLayout.Editbox(_("Time in milliseconds"), 80, tipo=int)
-    #     liGen.append((config, ""))
+    #     li_gen.append((config, ""))
     #     ico = Iconos.Configurar()
 
-    #     resultado = FormLayout.fedit(liGen, title=txt, parent=self, icon=ico)
+    #     resultado = FormLayout.fedit(li_gen, title=txt, parent=self, icon=ico)
     #     if resultado:
     #         accion, liResp = resultado
     #         value = liResp[0]
@@ -734,6 +734,8 @@ class WPanelDirector(QTVarios.WDialogo):
         dic = self.dbSVGs.as_dictionary()
         li = []
         for k, dicSVG in dic.items():
+            if type(dicSVG) != dict:
+                continue
             svg = BoardTypes.SVG(dic=dicSVG)
             svg.id = k
             li.append(svg)

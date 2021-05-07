@@ -103,15 +103,15 @@ class WEngines(QTVarios.WDialogo):
 
     def command(self):
         separador = FormLayout.separador
-        liGen = [separador]
-        liGen.append(separador)
+        li_gen = [separador]
+        li_gen.append(separador)
         config = FormLayout.Fichero(_("File"), "exe" if Code.is_windows else "*", False)
-        liGen.append((config, ""))
+        li_gen.append((config, ""))
 
         for num in range(1, 11):
-            liGen.append(("%s:" %(_("Argument %d") % num), ""))
-        liGen.append(separador)
-        resultado = FormLayout.fedit(liGen, title=_("Command"), parent=self, anchoMinimo=600, icon=Iconos.Terminal())
+            li_gen.append(("%s:" %(_("Argument %d") % num), ""))
+        li_gen.append(separador)
+        resultado = FormLayout.fedit(li_gen, title=_("Command"), parent=self, anchoMinimo=600, icon=Iconos.Terminal())
         if resultado:
             nada, resp = resultado
             command = resp[0]

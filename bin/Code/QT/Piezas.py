@@ -336,11 +336,11 @@ class WBlindfold(QTVarios.WDialogo):
                     cbPZb.ponValor(dpz[pz])
                 self.reset()
             else:
-                liGen = [(None, None)]
-                liGen.append((_("Name") + ":", ""))
+                li_gen = [(None, None)]
+                li_gen.append((_("Name") + ":", ""))
 
                 resultado = FormLayout.fedit(
-                    liGen,
+                    li_gen,
                     title=_("Save current configuration"),
                     parent=self,
                     anchoMinimo=460,
@@ -391,11 +391,11 @@ class WBlindfold(QTVarios.WDialogo):
                     cbPZb.ponValor(dpz[pz])
                 self.reset()
             else:
-                liGen = [(None, None)]
-                liGen.append((_("Name") + ":", ""))
+                li_gen = [(None, None)]
+                li_gen.append((_("Name") + ":", ""))
 
                 resultado = FormLayout.fedit(
-                    liGen,
+                    li_gen,
                     title=_("Save current configuration"),
                     parent=self,
                     anchoMinimo=460,

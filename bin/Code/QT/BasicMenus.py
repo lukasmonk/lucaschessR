@@ -68,7 +68,7 @@ def menu_tools_savemenu(procesador, dic_data=None):
     savemenu.separador()
 
     menu1 = savemenu.submenu(_("PGN"), Iconos.PGN())
-    menu1.opcion("pgn", _("Read PGN"), Iconos.Fichero())
+    menu1.opcion("pgn", _("Read PGN file"), Iconos.Fichero())
     menu1.separador()
     menu1.opcion("pgn_paste", _("Paste PGN"), Iconos.Pegar())
     menu1.separador()
@@ -98,8 +98,12 @@ def menu_tools_savemenu(procesador, dic_data=None):
     menu1.opcion("kibitzers", _("Kibitzers"), Iconos.Kibitzer())
     savemenu.separador()
 
-    # if Code.is_windows:
-    #     savemenu.opcion("bridge11", _("Data conversion from version 11"), Iconos.Bridge())
+    if Code.is_windows and Code.configuration.x_show_version11:
+        menu1 = savemenu.submenu(_("Conversion from version 11"), Iconos.Bridge())
+        menu1.opcion("version11_databases", _("Databases"), Iconos.Database())
+        menu1.separador()
+        menu1.opcion("version11_openinglines", _("Opening lines"), Iconos.OpeningLines())
+        menu1.separador()
 
     return savemenu
 
@@ -173,7 +177,7 @@ def menuplay(procesador, extended=False):
     return savemenu.lanza(procesador)
 
 
-def menucompete_savemenu(procesador, dic_data=None):
+def menu_compete_savemenu(procesador, dic_data=None):
     savemenu = SaveMenu(dic_data, procesador.menucompete_run)
     savemenu.opcion(("competition", None), _("Competition with tutor"), Iconos.NuevaPartida())
     savemenu.separador()
@@ -211,8 +215,8 @@ def menucompete_savemenu(procesador, dic_data=None):
     return savemenu
 
 
-def menucompete(procesador):
-    savemenu = menucompete_savemenu(procesador)
+def menu_compete(procesador):
+    savemenu = menu_compete_savemenu(procesador)
     return savemenu.lanza(procesador)
 
 
@@ -270,7 +274,7 @@ class WAtajos(QTVarios.WDialogo):
         self.nuevo(menuplay(self.procesador, extended=True))
 
     def mascompete(self):
-        self.nuevo(menucompete(self.procesador))
+        self.nuevo(menu_compete(self.procesador))
 
     def masentrenamiento(self):
         self.nuevo(self.entrenamientos.menu.lanza())
@@ -346,14 +350,14 @@ class WAtajos(QTVarios.WDialogo):
         if fila >= 0:
             self.save_video()
             self.accept()
-            atajosALT(self.procesador, fila+1)
+            atajos_alt(self.procesador, fila+1)
 
 
 def atajos(procesador):
     procesador.entrenamientos.check()
     dic_data = procesador.entrenamientos.dicMenu
     menuplay_savemenu(procesador, dic_data)
-    menucompete_savemenu(procesador, dic_data)
+    menu_compete_savemenu(procesador, dic_data)
     menu_tools_savemenu(procesador, dic_data)
     li_favoritos = procesador.configuration.get_favoritos()
 
@@ -384,17 +388,17 @@ def atajos_edit(procesador):
     procesador.entrenamientos.check()
     dic_data = procesador.entrenamientos.dicMenu
     menuplay_savemenu(procesador, dic_data)
-    menucompete_savemenu(procesador, dic_data)
+    menu_compete_savemenu(procesador, dic_data)
     menu_tools_savemenu(procesador, dic_data)
     w = WAtajos(procesador, dic_data)
     w.exec_()
 
 
-def atajosALT(procesador, num):
+def atajos_alt(procesador, num):
     procesador.entrenamientos.check()
     dic_data = procesador.entrenamientos.dicMenu
     menuplay_savemenu(procesador, dic_data)
-    menucompete_savemenu(procesador, dic_data)
+    menu_compete_savemenu(procesador, dic_data)
     menu_tools_savemenu(procesador, dic_data)
     li_favoritos = procesador.configuration.get_favoritos()
 
@@ -409,7 +413,7 @@ def atajosALT(procesador, num):
         nx += 1
 
 
-def menuInformacion(procesador):
+def menu_information(procesador):
     menu = QTVarios.LCMenu(procesador.main_window)
 
     menu.opcion("docs", _("Documents"), Iconos.Ayuda())
@@ -420,7 +424,7 @@ def menuInformacion(procesador):
     menu.separador()
     menu.opcion("mail", _("Contact") + " (%s)" % "lukasmonk@gmail.com", Iconos.Mail())
     menu.separador()
-    if procesador.configuration.is_main:
+    if procesador.configuration.is_main and Code.is_windows:
         menu.opcion("actualiza", _("Check for updates"), Iconos.Actualiza())
         menu.separador()
 

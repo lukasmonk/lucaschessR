@@ -48,8 +48,8 @@ class Manager:
                         kibitzer.close()
                         del self.li_activos[x]
 
-    def run_new(self, nkibitzer):
-        ipc_kibitzer = IPCKibitzer(nkibitzer)
+    def run_new(self, huella_kibitzer):
+        ipc_kibitzer = IPCKibitzer(huella_kibitzer)
         self.li_activos.append(ipc_kibitzer)
 
 
@@ -67,7 +67,7 @@ class Orden:
 
 
 class IPCKibitzer:
-    def __init__(self, numkibitzer):
+    def __init__(self, huella_kibitzer):
         configuration = Code.configuration
 
         fdb = configuration.ficheroTemporal("db")
@@ -77,7 +77,7 @@ class IPCKibitzer:
         orden = Orden()
         orden.key = KIBRUN_CONFIGURATION
         orden.dv["USER"] = configuration.user
-        orden.dv["NUMKIBITZER"] = numkibitzer
+        orden.dv["HUELLA"] = huella_kibitzer
 
         self.escribe(orden)
 

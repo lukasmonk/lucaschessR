@@ -179,19 +179,19 @@ def setPassword(procesador):
     usuario = liUsuarios[npos]
 
     while True:
-        liGen = [FormLayout.separador]
+        li_gen = [FormLayout.separador]
 
         config = FormLayout.Editbox(_("Current"), ancho=120, siPassword=True)
-        liGen.append((config, ""))
+        li_gen.append((config, ""))
 
         config = FormLayout.Editbox(_("New"), ancho=120, siPassword=True)
-        liGen.append((config, ""))
+        li_gen.append((config, ""))
 
         config = FormLayout.Editbox(_("Repeat"), ancho=120, siPassword=True)
-        liGen.append((config, ""))
+        li_gen.append((config, ""))
 
         resultado = FormLayout.fedit(
-            liGen, title=_("Set password"), parent=procesador.main_window, icon=Iconos.Password()
+            li_gen, title=_("Set password"), parent=procesador.main_window, icon=Iconos.Password()
         )
 
         if resultado:

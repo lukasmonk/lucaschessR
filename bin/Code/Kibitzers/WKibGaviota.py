@@ -29,8 +29,8 @@ class WGaviota(WKibCommon.WKibCommon):
             (_("Takeback"), Iconos.Kibitzer_Back(), self.takeback),
             (_("Manual position"), Iconos.Kibitzer_Voyager(), self.set_position),
             (_("Show/hide board"), Iconos.Kibitzer_Board(), self.config_board),
-            ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Top(), self.windowTop),
-            ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Bottom(), self.windowBottom),
+            ("%s: %s" % (_("Enable"), _("window on top")), Iconos.Kibitzer_Up(), self.windowTop),
+            ("%s: %s" % (_("Disable"), _("window on top")), Iconos.Kibitzer_Down(), self.windowBottom),
         )
         self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=24)
         self.tb.setAccionVisible(self.play, False)

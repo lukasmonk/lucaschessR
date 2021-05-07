@@ -129,7 +129,7 @@ class ManagerEverest(Manager.Manager):
         self.vtime = 0.0
         licoment = []
         if lost_points:
-            licoment.append(_("You have exceeded the limit of lost points."))
+            licoment.append(_("You have exceeded the limit of lost centipawns."))
 
         if change_game:
             licoment.append(_("You have exceeded the limit of tries, you will fall back to the previous."))

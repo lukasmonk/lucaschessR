@@ -528,15 +528,15 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
                 if QTUtil2.pregunta(self, _X(_("Delete %1 ?"), k)):
                     del dbc[k]
             elif op == AGREGA:
-                liGen = [(None, None)]
+                li_gen = [(None, None)]
 
-                liGen.append((_("Name") + ":", ""))
+                li_gen.append((_("Name") + ":", ""))
 
-                resultado = FormLayout.fedit(liGen, title=_("Name"), parent=self, icon=Iconos.Libre())
+                resultado = FormLayout.fedit(li_gen, title=_("Name"), parent=self, icon=Iconos.Libre())
                 if resultado:
-                    accion, liGen = resultado
+                    accion, li_gen = resultado
 
-                    name = liGen[0].strip()
+                    name = li_gen[0].strip()
                     if name:
                         dbc[name] = self.save_dic()
 
@@ -1134,12 +1134,12 @@ def cambioRival(parent, configuration, dic, siManagerSolo=False):
 
 
 def dameMinutosExtra(main_window):
-    liGen = [(None, None)]
+    li_gen = [(None, None)]
 
     config = FormLayout.Spinbox(_("Extra minutes for the player"), 1, 99, 50)
-    liGen.append((config, 5))
+    li_gen.append((config, 5))
 
-    resultado = FormLayout.fedit(liGen, title=_("Time"), parent=main_window, icon=Iconos.MoverTiempo())
+    resultado = FormLayout.fedit(li_gen, title=_("Time"), parent=main_window, icon=Iconos.MoverTiempo())
     if resultado:
         accion, liResp = resultado
         return liResp[0]

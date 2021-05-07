@@ -3,20 +3,20 @@ import time
 
 import FasterCode
 
-from Code.Base import Game, Move, Position
 from Code import Manager
-from Code.QT import Controles
-from Code.QT import Iconos
+from Code import TrListas
+from Code import Util
+from Code.Base import Game, Position
+from Code.Base.Constantes import *
 from Code.Openings import WindowOpenings
 from Code.PlayAgainstEngine import WPlayAgainstEngine
-from Code.QT import WindowPgnTags
+from Code.QT import Controles
+from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import TrListas
-from Code import Util
 from Code.QT import Voyager
-from Code.Base.Constantes import *
+from Code.QT import WindowPgnTags
 
 
 class ManagerSolo(Manager.Manager):
@@ -122,17 +122,7 @@ class ManagerSolo(Manager.Manager):
             self.configurarGS()
 
         elif key == TB_UTILITIES:
-            liMasOpciones = (
-                ("books", _("Consult a book"), Iconos.Libros()),
-            )
-
-            resp = self.utilidades(liMasOpciones)
-            if resp == "books":
-                liMovs = self.librosConsulta(True)
-                if liMovs:
-                    for x in range(len(liMovs) - 1, -1, -1):
-                        from_sq, to_sq, promotion = liMovs[x]
-                        self.player_has_moved(from_sq, to_sq, promotion)
+            self.utilities_gs()
 
         elif key == TB_PGN_LABELS:
             self.informacion()
@@ -158,9 +148,7 @@ class ManagerSolo(Manager.Manager):
 
         # Comprobamos que no haya habido cambios from_sq el ultimo grabado
         if self.is_changed() and len(self.game):
-            resp = QTUtil2.preguntaCancelar(
-                self.main_window, _("Do you want to save changes to a file?"), _("Yes"), _("No")
-            )
+            resp = QTUtil2.preguntaCancelar(self.main_window, _("Do you want to save changes to a file?"), _("Yes"), _("No"))
             if resp is None:
                 return
             elif resp:
@@ -467,23 +455,7 @@ class ManagerSolo(Manager.Manager):
 
         sep = (None, None, None)
 
-        liMasOpciones = [
-            ("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion()),
-            sep,
-            ("opening", _("Opening"), Iconos.Opening()),
-            sep,
-            ("position", _("Edit start position"), Iconos.Datos()),
-            sep,
-            ("pasteposicion", _("Paste FEN position"), Iconos.Pegar16()),
-            sep,
-            ("leerpgn", _("Read PGN"), Iconos.PGN_Importar()),
-            sep,
-            ("pastepgn", _("Paste PGN"), Iconos.Pegar16()),
-            sep,
-            ("engine", mt, Iconos.Motores()),
-            sep,
-            ("voyager", _("Voyager 2"), Iconos.Voyager()),
-        ]
+        liMasOpciones = [("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion())]
         resp = self.configurar(liMasOpciones, siCambioTutor=True, siSonidos=True)
 
         if resp == "rotacion":
@@ -492,6 +464,54 @@ class ManagerSolo(Manager.Manager):
             if self.auto_rotate:
                 if is_white != self.board.is_white_bottom:
                     self.board.rotaBoard()
+
+    def leerpgn(self, game=None):
+        if game is None:
+            game = self.procesador.select_1_pgn()
+        if game is not None:
+            dic = self.creaDic()
+            dic["GAME"] = game.save()
+            dic["WHITEBOTTOM"] = self.board.is_white_bottom
+            self.reiniciar(dic)
+
+    def utilities_gs(self):
+        mt = _("Engine").lower()
+        mt = _X(_("Disable %1"), mt) if self.play_against_engine else _X(_("Enable %1"), mt)
+        sep = (None, None, None)
+
+        liMasOpciones = (
+            ("books", _("Consult a book"), Iconos.Libros()),
+            sep,
+            ("engine", mt, Iconos.Motores()),
+            sep,
+            (None, _("Change the initial position"), Iconos.PGN()),
+            sep,
+            ("initial", _("Basic position") + " [B]", Iconos.Board()),
+            sep,
+            ("opening", _("Opening"), Iconos.Opening()),
+            sep,
+            ("position", _("Edit start position") + " [S]", Iconos.Datos()),
+            sep,
+            ("pasteposicion", _("Paste FEN position") + " [V]", Iconos.Pegar16()),
+            sep,
+            ("leerpgn", _("Read PGN file"), Iconos.PGN_Importar()),
+            sep,
+            ("pastepgn", _("Paste PGN") + " [V]", Iconos.Pegar16()),
+            sep,
+            ("voyager", _("Voyager 2"), Iconos.Voyager()),
+        )
+
+        resp = self.utilidades(liMasOpciones)
+        if resp == "books":
+            liMovs = self.librosConsulta(True)
+            if liMovs:
+                for x in range(len(liMovs) - 1, -1, -1):
+                    from_sq, to_sq, promotion = liMovs[x]
+                    self.player_has_moved(from_sq, to_sq, promotion)
+
+        elif resp == "initial":
+            self.basic_initial_position()
+
         elif resp == "opening":
             me = self.unMomento()
             w = WindowOpenings.WOpenings(self.main_window, self.configuration, self.opening_block)
@@ -530,9 +550,7 @@ class ManagerSolo(Manager.Manager):
             if texto:
                 ok, game = Game.pgn_game(texto)
                 if not ok:
-                    QTUtil2.message_error(
-                        self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
-                    )
+                    QTUtil2.message_error(self.main_window, _("The text from the clipboard does not contain a chess game in PGN format"))
                     return
                 self.xfichero = None
                 self.xpgn = None
@@ -564,14 +582,16 @@ class ManagerSolo(Manager.Manager):
                 dic["WHITEBOTTOM"] = self.board.is_white_bottom
                 self.reiniciar(dic)
 
-    def leerpgn(self, game=None):
-        if game is None:
-            game = self.procesador.select_1_pgn()
-        if game is not None:
-            dic = self.creaDic()
-            dic["GAME"] = game.save()
-            dic["WHITEBOTTOM"] = self.board.is_white_bottom
-            self.reiniciar(dic)
+    def basic_initial_position(self):
+        if len(self.game) > 0:
+            if not QTUtil2.pregunta(self.main_window, _("Dou you want to remove all moves?")):
+                return
+        self.xfichero = None
+        self.xpgn = None
+        self.xjugadaInicial = None
+        self.new_game()
+        self.opening_block = None
+        self.reiniciar()
 
     def control_teclado(self, nkey):
         if nkey == ord("V"):
@@ -581,12 +601,15 @@ class ManagerSolo(Manager.Manager):
             self.saveSelectedPosition("|".join(li))
         elif nkey == ord("S"):
             self.startPosition()
+        elif nkey == ord("B"):
+            self.basic_initial_position()
 
     def listHelpTeclado(self):
         return [
             ("V", _("Paste position")),
             ("T", _("Save position in 'Selected positions' file")),
             ("S", _("Set start position")),
+            ("B", _("Basic position")),
         ]
 
     def startPosition(self):
@@ -639,9 +662,7 @@ class ManagerSolo(Manager.Manager):
         else:
             dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
-        dic = self.dicRival = WPlayAgainstEngine.cambioRival(
-            self.main_window, self.configuration, dicBase, siManagerSolo=True
-        )
+        dic = self.dicRival = WPlayAgainstEngine.cambioRival(self.main_window, self.configuration, dicBase, siManagerSolo=True)
 
         if dic:
             for k, v in dic.items():
@@ -680,7 +701,7 @@ class ManagerSolo(Manager.Manager):
             self.game.anulaSoloUltimoMovimiento()
             if self.play_against_engine:
                 self.game.anulaSoloUltimoMovimiento()
-            self.game.assign_opening()   # aunque no sea fen inicial
+            self.game.assign_opening()  # aunque no sea fen inicial
             self.goto_end()
             self.state = ST_PLAYING
             self.refresh()

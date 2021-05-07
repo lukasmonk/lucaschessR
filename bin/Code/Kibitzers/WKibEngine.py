@@ -24,7 +24,7 @@ class WKibEngine(WKibCommon.WKibCommon):
     def __init__(self, cpu):
         WKibCommon.WKibCommon.__init__(self, cpu, Iconos.Kibitzer())
 
-        self.siCandidates = cpu.tipo == Kibitzers.KIB_CANDIDATES or Kibitzers.KIB_THREATS
+        self.is_candidates = cpu.tipo == Kibitzers.KIB_CANDIDATES or cpu.tipo == Kibitzers.KIB_THREATS
 
         if cpu.tipo == Kibitzers.KIB_BESTMOVE:
             rotulo = _("Best move")
@@ -36,7 +36,7 @@ class WKibEngine(WKibCommon.WKibCommon):
         delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.with_figurines else None
 
         o_columns = Columnas.ListaColumnas()
-        if not self.siCandidates:
+        if not self.is_candidates:
             o_columns.nueva("DEPTH", "^", 40, centered=True)
         o_columns.nueva("BESTMOVE", rotulo, 80, centered=True, edicion=delegado)
         o_columns.nueva("EVALUATION", _("Evaluation"), 85, centered=True)
@@ -96,7 +96,7 @@ class WKibEngine(WKibCommon.WKibCommon):
                 rm = mrm.rmBest()
                 if rm and rm.depth > self.depth:
                     self.depth = rm.depth
-                    if self.siCandidates:
+                    if self.is_candidates:
                         self.li_moves = mrm.li_rm
                         self.lbDepth.set_text("%s: %d" % (_("Depth"), rm.depth))
                     else:
@@ -139,6 +139,7 @@ class WKibEngine(WKibCommon.WKibCommon):
                     hp, ht, pid, dt = struct.unpack("PPII", pid.asstring(16))
                 p = psutil.Process(pid)
                 p.nice(xprioridad)
+            self.cpu.kibitzer.pointofview = w.result_xpointofview
             if w.result_opciones:
                 for opcion, valor in w.result_opciones:
                     if valor is None:
@@ -201,12 +202,12 @@ class WKibEngine(WKibCommon.WKibCommon):
         return o_column.key in ("EVALUATION", "BESTMOVE", "DEPTH")
 
     def lanzaMotor(self):
-        if self.siCandidates:
+        if self.is_candidates:
             self.numMultiPV = self.kibitzer.current_multipv()
             if self.numMultiPV <= 1:
                 self.numMultiPV = min(self.kibitzer.maxMultiPV, 20)
         else:
-            self.numMultiPV = 0
+            self.numMultiPV = 1
 
         self.nom_engine = self.kibitzer.name
         exe = self.kibitzer.path_exe
@@ -244,7 +245,7 @@ class WKibEngine(WKibCommon.WKibCommon):
             jg0 = p.move(0)
             jg0.comment = rm.abrTextoPDT() + " " + self.nom_engine
             pgn = p.pgnBaseRAW()
-            resp = '["FEN", "%s"]\n\n%s' % (fen, pgn)
+            resp = '[FEN "%s"]\n\n%s' % (fen, pgn)
             QTUtil.ponPortapapeles(resp)
             QTUtil2.mensajeTemporal(self, _("The line selected is saved to the clipboard"), 0.7)
 

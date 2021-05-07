@@ -43,7 +43,7 @@ class WNewExpedition(QTVarios.WDialogo):
         self.sbtolerance_min, lbtolerance_min = QTUtil2.spinBoxLB(self, 20, 0, 99999, _("From"))
         self.sbtolerance_min.capture_changes(self.tolerance_changed)
         self.sbtolerance_max, lbtolerance_max = QTUtil2.spinBoxLB(self, 1000, 0, 99999, _("To"))
-        lbexplanation = Controles.LB(self, _("Maximum lost points for having to repeat active game"))
+        lbexplanation = Controles.LB(self, _("Maximum lost centipawns for having to repeat active game"))
         ly = Colocacion.H().relleno(2).control(lbtolerance_min).control(self.sbtolerance_min).relleno(1)
         ly.control(lbtolerance_max).control(self.sbtolerance_max).relleno(2)
         layout = Colocacion.V().otro(ly).control(lbexplanation)
@@ -124,29 +124,29 @@ class WNewExpedition(QTVarios.WDialogo):
         max_moves = 0
         while True:
             sep = FormLayout.separador
-            liGen = []
-            liGen.append((None, "%s: %d" % (_("Total games"), nreccount)))
-            liGen.append(sep)
+            li_gen = []
+            li_gen.append((None, "%s: %d" % (_("Total games"), nreccount)))
+            li_gen.append(sep)
             config = FormLayout.Editbox(_("Select games") + "<br>" +
                                         _("By example:") + " -5,7-9,14,19-" + "<br>" +
                                         _("Empty means all games"),
                                         rx="[0-9,\-,\,]*")
-            liGen.append((config, plant))
+            li_gen.append((config, plant))
 
-            liGen.append(sep)
+            li_gen.append(sep)
 
-            liGen.append((_("Shuffle") + ":", shuffle))
+            li_gen.append((_("Shuffle") + ":", shuffle))
 
-            liGen.append(sep)
+            li_gen.append(sep)
 
-            liGen.append((_("Reverse") + ":", reverse))
+            li_gen.append((_("Reverse") + ":", reverse))
 
-            liGen.append(sep)
+            li_gen.append(sep)
 
             config = FormLayout.Spinbox(_("Max moves"), 0, 999, 50)
-            liGen.append((config, 0))
+            li_gen.append((config, 0))
 
-            resultado = FormLayout.fedit(liGen, title=_("Select games"), parent=self, anchoMinimo=200,
+            resultado = FormLayout.fedit(li_gen, title=_("Select games"), parent=self, anchoMinimo=200,
                                          icon=Iconos.Opciones())
             if resultado:
                 accion, liResp = resultado
@@ -238,7 +238,7 @@ class WExpedition(QTVarios.WDialogo):
         o_columns.nueva("DONE", _("Done"), 80, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         o_columns.nueva("MTIME", _("Average time"), 80, centered=True)
-        o_columns.nueva("MPOINTS", _("Av. lost points"), 80, centered=True)
+        o_columns.nueva("MPOINTS", _("Av. centipawns lost"), 80, centered=True)
         o_columns.nueva("TRIES", _("Max tries"), 80, centered=True)
         o_columns.nueva("TOLERANCE", _("Tolerance"), 80, centered=True)
         grid = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=False)

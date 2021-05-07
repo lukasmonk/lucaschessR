@@ -623,14 +623,14 @@ class WUnSTS(QTVarios.WDialogo):
             X = self.sts.X
             K = self.sts.K
             while True:
-                liGen = [(None, None)]
-                liGen.append((None, "X * %s + K" % _("Result")))
+                li_gen = [(None, None)]
+                li_gen.append((None, "X * %s + K" % _("Result")))
                 config = FormLayout.Editbox("X", 100, tipo=float, decimales=4)
-                liGen.append((config, X))
+                li_gen.append((config, X))
                 config = FormLayout.Editbox("K", 100, tipo=float, decimales=4)
-                liGen.append((config, K))
+                li_gen.append((config, K))
                 resultado = FormLayout.fedit(
-                    liGen, title=_("Formula to calculate elo"), parent=self, icon=Iconos.Elo(), if_default=True
+                    li_gen, title=_("Formula to calculate elo"), parent=self, icon=Iconos.Elo(), if_default=True
                 )
                 if resultado:
                     resp, valor = resultado
@@ -876,12 +876,12 @@ class WSTS(QTVarios.WDialogo):
 
     def editNombre(self, previo, siNuevo=False):
         while True:
-            liGen = [(None, None)]
-            liGen.append((_("Name") + ":", previo))
-            resultado = FormLayout.fedit(liGen, title=_("STS: Strategic Test Suite"), parent=self, icon=Iconos.STS())
+            li_gen = [(None, None)]
+            li_gen.append((_("Name") + ":", previo))
+            resultado = FormLayout.fedit(li_gen, title=_("STS: Strategic Test Suite"), parent=self, icon=Iconos.STS())
             if resultado:
-                accion, liGen = resultado
-                name = Util.valid_filename(liGen[0].strip())
+                accion, li_gen = resultado
+                name = Util.valid_filename(li_gen[0].strip())
                 if name:
                     if not siNuevo and previo == name:
                         return None

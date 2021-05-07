@@ -1,7 +1,6 @@
 import os
 
 import FasterCode
-from PySide2 import QtCore
 
 import Code
 from Code import Adjournments
@@ -69,6 +68,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def start(self, dic_var):
         self.base_inicio(dic_var)
+        if self.siTiempo:
+            if self.hints:
+                self.xtutor.check_engine()
+            self.xrival.check_engine()
+            self.start_message()
+
         self.play_next_move()
 
     def base_inicio(self, dic_var):
@@ -263,18 +268,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def pon_toolbar(self):
         if self.state == ST_PLAYING:
             if self.toolbar_state != self.state:
-                li = [
-                    TB_CANCEL,
-                    TB_RESIGN,
-                    TB_DRAW,
-                    TB_HELP_TO_MOVE,
-                    TB_REINIT,
-                    TB_PAUSE,
-                    TB_ADJOURN,
-                    TB_CONFIG,
-                    TB_UTILITIES,
-                    TB_STOP,
-                ]
+                li = [TB_CANCEL, TB_RESIGN, TB_DRAW, TB_HELP_TO_MOVE, TB_REINIT, TB_PAUSE, TB_ADJOURN, TB_CONFIG, TB_UTILITIES, TB_STOP]
                 if self.with_takeback:
                     li.insert(3, TB_TAKEBACK)
 
@@ -304,7 +298,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.set_label1(rotulo1)
 
     def show_time(self, siUsuario):
-        is_white = siUsuario and self.human_side
+        is_white = siUsuario == self.human_side
         ot = self.vtime[is_white]
         eti, eti2 = ot.etiquetaDif2()
         if eti:
@@ -352,10 +346,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
             siJugador = self.human_side == xis_white
             if ot.siAgotado():
-                if siJugador and QTUtil2.pregunta(
-                    self.main_window,
-                    _X(_("%1 has won on time."), self.xrival.name) + "\n\n" + _("Add time and keep playing?"),
-                ):
+                if siJugador and QTUtil2.pregunta(self.main_window, _X(_("%1 has won on time."), self.xrival.name) + "\n\n" + _("Add time and keep playing?")):
                     minX = WPlayAgainstEngine.dameMinutosExtra(self.main_window)
                     if minX:
                         ot.ponSegExtra(minX * 60)
@@ -539,7 +530,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.check_boards_setposition()
         if self.siTiempo:
             self.show_clocks()
-        self.made_the_first_move = True
+        if self.siTiempo:
+            if self.hints:
+                self.xtutor.check_engine()
+            self.xrival.check_engine()
+            self.start_message()
+
         self.play_next_move()
 
     def xpause(self):
@@ -582,7 +578,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.state = ST_ENDGAME
             self.stop_engine()
             self.game.set_unknown()
-            self.guardarNoTerminados()
             self.ponFinJuego(self.with_takeback)
             self.autosave()
         else:
@@ -611,7 +606,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
             self.game.set_termination(TERMINATION_RESIGN, self.human_side)
-            self.guardarGanados(False)
             self.saveSummary()
             self.ponFinJuego(self.with_takeback)
             self.autosave()
@@ -746,9 +740,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         li_options = []
         for rm in mrm.li_rm:
-            li_options.append(
-                (rm, "%s (%s)" % (position.pgn_translated(rm.from_sq, rm.to_sq, rm.promotion), rm.abrTexto()))
-            )
+            li_options.append((rm, "%s (%s)" % (position.pgn_translated(rm.from_sq, rm.to_sq, rm.promotion), rm.abrTexto())))
             mv = rm.movimiento()
             for x in range(len(li)):
                 if li[x].move() == mv:
@@ -822,9 +814,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.premove:
             from_sq, to_sq = self.premove
             promotion = "q" if self.game.last_position.siPeonCoronando(from_sq, to_sq) else None
-            ok, error, move = Move.get_game_move(
-                self.game, self.game.last_position, self.premove[0], self.premove[1], promotion
-            )
+            ok, error, move = Move.get_game_move(self.game, self.game.last_position, self.premove[0], self.premove[1], promotion)
             if ok:
                 self.player_has_moved(from_sq, to_sq, promotion)
                 return
@@ -837,6 +827,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def juegaRival(self, is_white):
         self.board.remove_arrows()
+        self.reloj_start(False)
+        self.timekeeper.start()
         self.human_is_playing = False
         self.rm_rival = None
         self.pon_toolbar()
@@ -885,14 +877,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.play_rival(rm_rival)
         else:
             self.thinking(True)
-            self.reloj_start(False)
-            self.timekeeper.start()
             if self.siTiempo:
                 tiempoBlancas = self.vtime[True].tiempoPendiente
                 tiempoNegras = self.vtime[False].tiempoPendiente
                 segundosJugada = self.segundosJugada
             else:
-                tiempoBlancas = tiempoNegras = 10*60*1000
+                tiempoBlancas = tiempoNegras = 10 * 60 * 1000
                 segundosJugada = 0
 
             self.xrival.play_time(self.main_window.notify, tiempoBlancas, tiempoNegras, segundosJugada, nAjustado=self.nAjustarFuerza)
@@ -920,9 +910,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.muestra_resultado()
             return True
 
-        ok, self.error, move = Move.get_game_move(
-            self.game, self.game.last_position, rm_rival.from_sq, rm_rival.to_sq, rm_rival.promotion
-        )
+        ok, self.error, move = Move.get_game_move(self.game, self.game.last_position, rm_rival.from_sq, rm_rival.to_sq, rm_rival.promotion)
         self.rm_rival = rm_rival
         if ok:
             fen_ultimo = self.last_fen()
@@ -956,9 +944,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.is_tutor_enabled:
                 self.analizaFinal()
                 move.analysis = self.mrmTutor, 0
-            Analysis.show_analysis(
-                self.procesador, self.xtutor, move, self.board.is_white_bottom, 999, 0, must_save=False
-            )
+            Analysis.show_analysis(self.procesador, self.xtutor, move, self.board.is_white_bottom, 999, 0, must_save=False)
 
     def juegaPorMi(self):
         if self.state != ST_PLAYING or self.is_finished():
@@ -1036,6 +1022,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 if not self.aperturaStd.is_active(fen_base):
                     self.aperturaStd = None
 
+        self.setSummary("TIMEUSER", self.timekeeper.stop())
+        self.reloj_stop(True)
+
         is_mate = move.is_mate
         self.analizaFinal(is_mate)  # tiene que acabar siempre
         if not is_mate and not is_selected and self.is_tutor_enabled:
@@ -1068,19 +1057,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                 resp = rmTutor.abrTextoBase()
                                 if not resp:
                                     resp = _("Mate")
-                                menu.opcion(
-                                    "tutor",
-                                    "&1. %s (%s)" % (_("Show tutor"), resp),
-                                    Iconos.Tutor(),
-                                )
+                                menu.opcion("tutor", "&1. %s (%s)" % (_("Show tutor"), resp), Iconos.Tutor())
                                 menu.separador()
                                 menu.opcion("try", "&2. %s" % _("Try again"), Iconos.Atras())
                                 menu.separador()
-                                menu.opcion(
-                                    "user",
-                                    "&3. %s (%s)" % (_("Select my move"), rmUser.abrTextoBase()),
-                                    Iconos.Player(),
-                                )
+                                menu.opcion("user", "&3. %s (%s)" % (_("Select my move"), rmUser.abrTextoBase()), Iconos.Player())
                                 self.main_window.cursorFueraBoard()
                                 resp = menu.lanza()
                                 if resp == "try":
@@ -1107,9 +1088,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                     from_sq = tutor.from_sq
                                     to_sq = tutor.to_sq
                                     promotion = tutor.promotion
-                                    ok, mens, jgTutor = Move.get_game_move(
-                                        self.game, self.game.last_position, from_sq, to_sq, promotion
-                                    )
+                                    ok, mens, jgTutor = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
                                     if ok:
                                         move = jgTutor
                                         self.setSummary("SELECTTUTOR", True)
@@ -1117,9 +1096,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                 tutor.ponVariations(move, 1 + len(self.game) / 2)
 
                             del tutor
-
-        self.setSummary("TIMEUSER", self.timekeeper.stop())
-        self.reloj_stop(True)
 
         self.move_the_pieces(move.liMovs)
 
@@ -1196,16 +1172,16 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             comment += _("Accepted") + ":%d (%0.2f%%) %s: %0.2f\n" % (
                 nt_accept,
                 nt_accept * 1.0 / j_num,
-                _("Average points lost"),
+                _("Average centipawns lost"),
                 st_accept * 1.0 / nt_accept if nt_accept else 0.0,
             )
             comment += _("Rejected") + ":%d (%0.2f%%) %s: %0.2f\n" % (
                 nt_reject,
                 nt_reject * 1.0 / j_num,
-                _("Average points lost"),
+                _("Average centipawns lost"),
                 st_reject * 1.0 / nt_reject if nt_reject else 0.0,
             )
-            comment += _("Total") + ":%d (100%%) %s: %0.2f\n" % (j_num, _("Average points lost"), j_sum * 1.0 / j_num)
+            comment += _("Total") + ":%d (100%%) %s: %0.2f\n" % (j_num, _("Average centipawns lost"), j_sum * 1.0 / j_num)
 
         if ntime_user or ntime_rival:
             comment += _("Average time (seconds)") + ":\n"
@@ -1227,7 +1203,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         self.beepResultado(beep)
         self.saveSummary()
-        self.guardarGanados(player_win)
         self.autosave()
         QTUtil.refresh_gui()
         if QTUtil2.pregunta(self.main_window, mensaje + "\n\n" + _("Do you want to play again?")):
@@ -1298,11 +1273,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             else:
                 nodes = ""
             seldepth = "/%d" % rm.seldepth if rm.seldepth else ""
-            li = [
-                '<span style="color:%s">%s' % (color_engine, rm.name),
-                '<b>%s</b> | <b>%d</b>%s | <b>%d"</b>%s'
-                % (rm.abrTextoBase(), rm.depth, seldepth, rm.time // 1000, nodes),
-            ]
+            li = ['<span style="color:%s">%s' % (color_engine, rm.name), '<b>%s</b> | <b>%d</b>%s | <b>%d"</b>%s' % (rm.abrTextoBase(), rm.depth, seldepth, rm.time // 1000, nodes)]
             pv = rm.pv
             if tp < 999:
                 li1 = pv.split(" ")
@@ -1326,9 +1297,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         if not (hasattr(move, "analysis") and move.analysis):
             me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad")
-            mrm, pos = self.xanalyzer.analysis_move(
-                move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad
-            )
+            mrm, pos = self.xanalyzer.analysis_move(move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad)
             move.analysis = mrm, pos
             me.final()
 
@@ -1348,3 +1317,4 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     self.main_window.ponRelojBlancas(eti, eti2)
                 else:
                     self.main_window.ponRelojNegras(eti, eti2)
+

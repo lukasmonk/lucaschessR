@@ -174,7 +174,7 @@ class WGM(QTVarios.WDialogo):
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("FECHA", _("Date"), 100, centered=True)
         o_columns.nueva("PACIERTOS", _("Hints"), 90, centered=True)
-        o_columns.nueva("PUNTOS", _("Points accumulated"), 140, centered=True)
+        o_columns.nueva("PUNTOS", _("Centipawns accumulated"), 140, centered=True)
         o_columns.nueva("ENGINE", _("Adjudicator"), 100, centered=True)
         o_columns.nueva("RESUMEN", _("Game played"), 280)
 

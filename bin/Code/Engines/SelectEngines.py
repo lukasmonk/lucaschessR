@@ -90,7 +90,7 @@ class SelectEngines:
         haz(2000, 2500, "2000 - 2500")
         haz(2500, 2750, "2500 - 2750")
         haz(2750, 3000, "2750 - 3000")
-        haz(3000, 3500, _("Above 3000"))
+        haz(3000, 5000, _("Above 3000"))
 
         menu.separador()
         submenu = menu.submenu(_("External engines"), self.dicIconos[EXTERNO])

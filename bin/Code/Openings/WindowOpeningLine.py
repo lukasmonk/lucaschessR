@@ -167,28 +167,28 @@ class WLines(QTVarios.WDialogo):
     def ta_massive(self):
         dicVar = self.configuration.read_variables("MASSIVE_OLINES")
 
-        liGen = [FormLayout.separador]
+        li_gen = [FormLayout.separador]
 
         config = FormLayout.Combobox(_("Engine"), self.configuration.comboMotoresMultiPV10(4))
-        liGen.append((config, dicVar.get("ENGINE", self.configuration.tutor)))
+        li_gen.append((config, dicVar.get("ENGINE", self.configuration.tutor)))
 
-        liGen.append((_("Duration of engine analysis (secs)") + ":", dicVar.get("SEGUNDOS", float(self.configuration.x_tutor_mstime / 1000.0))))
+        li_gen.append((_("Duration of engine analysis (secs)") + ":", dicVar.get("SEGUNDOS", float(self.configuration.x_tutor_mstime / 1000.0))))
         liDepths = [("--", 0)]
         for x in range(1, 51):
             liDepths.append((str(x), x))
         config = FormLayout.Combobox(_("Depth"), liDepths)
-        liGen.append((config, dicVar.get("DEPTH", self.configuration.x_tutor_depth)))
+        li_gen.append((config, dicVar.get("DEPTH", self.configuration.x_tutor_depth)))
 
         li = [(_("Maximum"), 0)]
         for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
             li.append((str(x), x))
         config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
-        liGen.append((config, dicVar.get("MULTIPV", self.configuration.x_tutor_multipv)))
+        li_gen.append((config, dicVar.get("MULTIPV", self.configuration.x_tutor_multipv)))
 
-        liGen.append(FormLayout.separador)
-        liGen.append((_("Redo any existing prior analysis (if they exist)") + ":", dicVar.get("REDO", False)))
+        li_gen.append(FormLayout.separador)
+        li_gen.append((_("Redo any existing prior analysis (if they exist)") + ":", dicVar.get("REDO", False)))
 
-        resultado = FormLayout.fedit(liGen, title=_("Mass analysis"), parent=self, anchoMinimo=460, icon=Iconos.Analizar())
+        resultado = FormLayout.fedit(li_gen, title=_("Mass analysis"), parent=self, anchoMinimo=460, icon=Iconos.Analizar())
         if resultado is None:
             return
 
@@ -304,19 +304,19 @@ class WLines(QTVarios.WDialogo):
             max_moves = training["MAXMOVES"]
 
         separador = FormLayout.separador
-        liGen = [separador]
+        li_gen = [separador]
 
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK")]
         config = FormLayout.Combobox(_("Play with"), liJ)
-        liGen.append((config, color))
+        li_gen.append((config, color))
 
-        liGen.append(separador)
-        liGen.append((_("Random order"), random_order))
+        li_gen.append(separador)
+        li_gen.append((_("Random order"), random_order))
 
-        liGen.append(separador)
-        liGen.append((_("Maximum number of moves (0=all)"), max_moves))
+        li_gen.append(separador)
+        li_gen.append((_("Maximum number of moves (0=all)"), max_moves))
 
-        resultado = FormLayout.fedit(liGen, title=_("New training"), parent=self, anchoMinimo=360, icon=Iconos.Study())
+        resultado = FormLayout.fedit(li_gen, title=_("New training"), parent=self, anchoMinimo=360, icon=Iconos.Study())
         if resultado is None:
             return
 
@@ -606,25 +606,25 @@ class WLines(QTVarios.WDialogo):
         dicData = self.dbop.getconfig("IMPORTAR_LEEPARAM")
         if not dicData:
             dicData = {}
-        liGen = [FormLayout.separador]
+        li_gen = [FormLayout.separador]
 
-        liGen.append((None, _("Select a maximum number of moves (plies)<br> to consider from each game")))
-        liGen.append((FormLayout.Spinbox(_("Depth"), 3, 99, 50), dicData.get("DEPTH", 30)))
-        liGen.append(FormLayout.separador)
+        li_gen.append((None, _("Select a maximum number of moves (plies)<br> to consider from each game")))
+        li_gen.append((FormLayout.Spinbox(_("Depth"), 3, 99, 50), dicData.get("DEPTH", 30)))
+        li_gen.append(FormLayout.separador)
 
         li = [(_("Only white best moves"), True), (_("Only black best moves"), False)]
         config = FormLayout.Combobox(_("Moves"), li)
-        liGen.append((config, dicData.get("SIWHITE", True)))
-        liGen.append(FormLayout.separador)
+        li_gen.append((config, dicData.get("SIWHITE", True)))
+        li_gen.append(FormLayout.separador)
 
         li = [(_("Only one best move"), True), (_("All best moves"), False)]
         config = FormLayout.Combobox(_("Best move"), li)
-        liGen.append((config, dicData.get("ONLYONE", True)))
-        liGen.append(FormLayout.separador)
+        li_gen.append((config, dicData.get("ONLYONE", True)))
+        li_gen.append(FormLayout.separador)
 
-        liGen.append((FormLayout.Spinbox(_("Minimum moves must have each line"), 0, 99, 50), dicData.get("MINMOVES", 0)))
+        li_gen.append((FormLayout.Spinbox(_("Minimum moves must have each line"), 0, 99, 50), dicData.get("MINMOVES", 0)))
 
-        resultado = FormLayout.fedit(liGen, title=titulo, parent=self, anchoMinimo=360, icon=Iconos.PuntoNaranja())
+        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=360, icon=Iconos.PuntoNaranja())
         if resultado:
             accion, liResp = resultado
             depth, siWhite, onlyone, minMoves = liResp
@@ -664,17 +664,17 @@ class WLines(QTVarios.WDialogo):
             if book:
                 bookB = book
 
-        liGen = [FormLayout.separador]
+        li_gen = [FormLayout.separador]
 
         li = [(bookx.name, bookx) for bookx in list_books.lista]
         config = FormLayout.Combobox(_("Book that plays white side"), li)
-        liGen.append((config, bookW))
-        liGen.append(FormLayout.separador)
+        li_gen.append((config, bookW))
+        li_gen.append(FormLayout.separador)
         config = FormLayout.Combobox(_("Book that plays black side"), li)
-        liGen.append((config, bookB))
-        liGen.append(FormLayout.separador)
+        li_gen.append((config, bookB))
+        li_gen.append(FormLayout.separador)
 
-        resultado = FormLayout.fedit(liGen, title=_("Polyglot book"), parent=self, anchoMinimo=360, icon=Iconos.Libros())
+        resultado = FormLayout.fedit(li_gen, title=_("Polyglot book"), parent=self, anchoMinimo=360, icon=Iconos.Libros())
         if resultado:
             accion, liResp = resultado
             bookW, bookB = liResp
@@ -703,19 +703,19 @@ class WLines(QTVarios.WDialogo):
             return
         previo["CARPETAPGN"] = os.path.dirname(ficheroPGN)
 
-        liGen = [(None, None)]
+        li_gen = [(None, None)]
 
-        liGen.append((None, _("Select a maximum number of moves (plies)<br> to consider from each game")))
+        li_gen.append((None, _("Select a maximum number of moves (plies)<br> to consider from each game")))
 
-        liGen.append((FormLayout.Spinbox(_("Depth"), 3, 999, 50), previo.get("IPGN_DEPTH", 30)))
-        liGen.append((None, None))
+        li_gen.append((FormLayout.Spinbox(_("Depth"), 3, 999, 50), previo.get("IPGN_DEPTH", 30)))
+        li_gen.append((None, None))
 
         liVariations = ((_("All"), ALL), (_("None"), NONE), (_("White"), ONLY_WHITE), (_("Black"), ONLY_BLACK))
         config = FormLayout.Combobox(_("Include variations"), liVariations)
-        liGen.append((config, previo.get("IPGN_VARIATIONSMODE", "A")))
-        liGen.append((None, None))
+        li_gen.append((config, previo.get("IPGN_VARIATIONSMODE", "A")))
+        li_gen.append((None, None))
 
-        resultado = FormLayout.fedit(liGen, title=os.path.basename(ficheroPGN), parent=self, anchoMinimo=460, icon=Iconos.PuntoNaranja())
+        resultado = FormLayout.fedit(li_gen, title=os.path.basename(ficheroPGN), parent=self, anchoMinimo=460, icon=Iconos.PuntoNaranja())
 
         if resultado:
             accion, liResp = resultado
@@ -917,10 +917,10 @@ class WLines(QTVarios.WDialogo):
             self.goto_inilinea()
 
         elif resp == "lines":
-            liGen = [FormLayout.separador]
+            li_gen = [FormLayout.separador]
             config = FormLayout.Editbox('<div align="right">' + _("Lines") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx=r"[0-9,\-,\,]*")
-            liGen.append((config, ""))
-            resultado = FormLayout.fedit(liGen, title=_("Remove a list of lines"), parent=self, anchoMinimo=460, icon=Iconos.OpeningLines())
+            li_gen.append((config, ""))
+            resultado = FormLayout.fedit(li_gen, title=_("Remove a list of lines"), parent=self, anchoMinimo=460, icon=Iconos.OpeningLines())
             if resultado:
                 accion, liResp = resultado
                 clista = liResp[0]
@@ -964,12 +964,12 @@ class WLines(QTVarios.WDialogo):
 
     def remove_worst(self):
         # color + time
-        liGen = [FormLayout.separador]
+        li_gen = [FormLayout.separador]
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK")]
         config = FormLayout.Combobox(_("Side"), liJ)
-        liGen.append((config, "WHITE"))
-        liGen.append((_("Duration of engine analysis (secs)") + ":", float(self.configuration.x_tutor_mstime / 1000.0)))
-        resultado = FormLayout.fedit(liGen, title=_("Remove worst lines"), parent=self, icon=Iconos.OpeningLines())
+        li_gen.append((config, "WHITE"))
+        li_gen.append((_("Duration of engine analysis (secs)") + ":", float(self.configuration.x_tutor_mstime / 1000.0)))
+        resultado = FormLayout.fedit(li_gen, title=_("Remove worst lines"), parent=self, icon=Iconos.OpeningLines())
         if resultado:
             color, segs = resultado[1]
             ms = int(segs * 1000)

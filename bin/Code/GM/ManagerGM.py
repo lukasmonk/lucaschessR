@@ -58,6 +58,7 @@ class ManagerGM(Manager.Manager):
             self.xtutor = self.procesador.creaManagerMotor(tutor, t_t, self.depth)
             self.xtutor.setMultiPV(self.multiPV)
             self.analysis = None
+            self.continueTt = not Code.configuration.x_engine_notbackground
 
         self.book = Opening.OpeningPol(999)
 
@@ -74,7 +75,6 @@ class ManagerGM(Manager.Manager):
         self.is_engine_side_white = not self.is_white
         self.thinking(False)
 
-        # self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_CONFIG, TB_UTILITIES))
         self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_ADJOURN, TB_CONFIG, TB_UTILITIES))
         self.main_window.activaJuego(True, False)
         self.set_dispatcher(self.player_has_moved)
@@ -148,7 +148,10 @@ class ManagerGM(Manager.Manager):
 
     def analizaInicio(self):
         if not self.is_finished():
-            self.xtutor.ac_inicio(self.game)
+            if self.continueTt:
+                self.xtutor.ac_inicio(self.game)
+            else:
+                self.xtutor.ac_inicio_limit(self.game)
             self.siAnalizando = True
 
     def analizaEstado(self):
@@ -163,7 +166,10 @@ class ManagerGM(Manager.Manager):
     def analizaFinal(self):
         if self.siAnalizando:
             self.siAnalizando = False
-            self.xtutor.ac_final(-1)
+            if self.continueTt:
+                self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+            else:
+                self.mrmTutor = self.xtutor.ac_final_limit()
 
     def play_next_move(self):
         self.analizaFinal()
@@ -261,10 +267,11 @@ class ManagerGM(Manager.Manager):
 
         else:
             self.human_is_playing = True
-            self.thinking(True)
-            self.analizaInicio()
+            if self.with_adjudicator:
+                self.thinking(True)
+                self.analizaInicio()
+                self.thinking(False)
             self.activate_side(is_white)
-            self.thinking(False)
 
     def analizaTerminar(self):
         if self.siAnalizando:
@@ -297,9 +304,7 @@ class ManagerGM(Manager.Manager):
                     else:
                         self.book = False
         else:
-            siAnalizaJuez = (
-                self.with_adjudicator and self.mostrar is None
-            )  # None es ver siempre False no ver nunca True ver si diferentes
+            siAnalizaJuez = self.with_adjudicator and self.mostrar is None  # None es ver siempre False no ver nunca True ver si diferentes
             if len(movimiento) == 5:
                 promotion = movimiento[4].lower()
             desdeGM, hastaGM, promotionGM = from_sq, to_sq, promotion
@@ -313,6 +318,7 @@ class ManagerGM(Manager.Manager):
             mrm = self.analizaMinimo(self.vtime * 100)
 
             import time
+
             t = time.time()
 
             rmUsu, nada = mrm.buscaRM(jgUsu.movimiento())
@@ -323,7 +329,6 @@ class ManagerGM(Manager.Manager):
                 mrm.agregaRM(rmUsu)
                 self.analizaInicio()
                 um.final()
-
 
             rmGM, pos_gm = mrm.buscaRM(jgGM.movimiento())
             if rmGM is None:
@@ -338,17 +343,7 @@ class ManagerGM(Manager.Manager):
             dpts = rmUsu.centipawns_abs() - rmGM.centipawns_abs()
 
             if self.mostrar is None or ((self.mostrar is True) and not isValid):
-                w = WindowJuicio.WJuicio(
-                    self,
-                    self.xtutor,
-                    self.nombreGM,
-                    position,
-                    mrm,
-                    rmGM,
-                    rmUsu,
-                    analysis,
-                    is_competitive=not self.show_evals,
-                )
+                w = WindowJuicio.WJuicio(self, self.xtutor, self.nombreGM, position, mrm, rmGM, rmUsu, analysis, is_competitive=not self.show_evals)
                 w.exec_()
 
                 rm, pos_gm = w.analysis[0].buscaRM(jgGM.movimiento())
@@ -361,17 +356,12 @@ class ManagerGM(Manager.Manager):
             comentario0 = "<b>%s</b> : %s = %s<br>" % (self.configuration.x_player, movUsu, rmUsu.texto())
             comentario0 += "<b>%s</b> : %s = %s<br>" % (self.nombreGM, movGM, rmGM.texto())
             comentario1 = "<br><b>%s</b> = %+d<br>" % (_("Difference"), dpts)
-            comentario2 = "<b>%s</b> = %+d<br>" % (_("Points accumulated"), self.puntos)
+            comentario2 = "<b>%s</b> = %+d<br>" % (_("Centipawns accumulated"), self.puntos)
             self.textoPuntuacion = comentario2
             self.ponRotuloSecundario()
 
             if not isValid:
-                jgGM.comment = (
-                    (comentario0 + comentario1 + comentario2)
-                    .replace("<b>", "")
-                    .replace("</b>", "")
-                    .replace("<br>", "\n")
-                )
+                jgGM.comment = (comentario0 + comentario1 + comentario2).replace("<b>", "").replace("</b>", "").replace("<br>", "\n")
 
         self.analizaFinal()
 
@@ -433,7 +423,7 @@ class ManagerGM(Manager.Manager):
         txt, porc, txtResumen = self.motorGM.resultado(self.game)
         mensaje += "<br><br>" + txt
         if self.with_adjudicator:
-            mensaje += "<br><br><b>%s</b> = %+d<br>" % (_("Points accumulated"), self.puntos)
+            mensaje += "<br><br><b>%s</b> = %+d<br>" % (_("Centipawns accumulated"), self.puntos)
 
         self.mensajeEnPGN(mensaje)
 
@@ -470,16 +460,29 @@ class ManagerGM(Manager.Manager):
                     dic[var] = xvar
         dic["record"] = self.record
         dic["game"] = self.game.save()
+        dic["labels"] = self.get_labels()
+        dic["motorgm"] = self.motorGM
         return dic
 
     def run_adjourn(self, dic):
+        labels = None, None, None
+        motorgm = None
         for k, v in dic.items():
             if k == "record":
                 self.base_inicio(v)
             elif k == "game":
                 self.game.restore(v)
+            elif k == "labels":
+                labels = v
+            elif k == "motorgm":
+                motorgm = v
             else:
                 setattr(self, k, v)
+        if motorgm:
+            self.motorGM = motorgm
+        self.restore_labels(labels)
+        self.pgnRefresh(True)
+        self.repiteUltimaJugada()
         self.play_next_move()
 
     def adjourn(self):

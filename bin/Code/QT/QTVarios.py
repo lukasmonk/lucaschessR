@@ -170,6 +170,7 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         icop = Code.todasPiezas.iconoDefecto("k")
         self.setWindowTitle(_("Choose Color"))
         self.setWindowIcon(icoP)
+        self.key_saved = "BLANCASNEGRASTIEMPO"
 
         btBlancas = Controles.PB(self, "", rutina=self.blancas, plano=False).ponIcono(icoP, icon_size=64)
         btNegras = Controles.PB(self, "", rutina=self.negras, plano=False).ponIcono(icop, icon_size=64)
@@ -194,7 +195,7 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         self.read_saved()
 
     def read_saved(self):
-        dic = Code.configuration.read_variables("BLANCASNEGRASTIEMPO")
+        dic = Code.configuration.read_variables(self.key_saved)
         with_time = dic.get("WITH_TIME", False)
         minutes = dic.get("MINUTES", 10)
         seconds = dic.get("SECONDS", 0)
@@ -202,7 +203,7 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         self.gbT.setChecked(with_time)
         if with_time:
             self.edMinutos.ponValor(minutes)
-            self.edSegundos.ponValor(minutes)
+            self.edSegundos.ponValor(seconds)
         self.chb_fastmoves.ponValor(fast_moves)
         self.muestra_tiempo(with_time)
 
@@ -213,7 +214,7 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
             "SECONDS": self.edSegundos.valor(),
             "FAST_MOVES": self.chb_fastmoves.valor()
         }
-        Code.configuration.write_variables("BLANCASNEGRASTIEMPO", dic)
+        Code.configuration.write_variables(self.key_saved, dic)
 
     def resultado(self):
         return (
@@ -250,7 +251,7 @@ def blancasNegrasTiempo(owner):
 
 
 class Tiempo(QtWidgets.QDialog):
-    def __init__(self, parent, minMinutos, minSegundos, maxMinutos, maxSegundos):
+    def __init__(self, parent, minMinutos, minSegundos, maxMinutos, maxSegundos, default_minutes=10, default_seconds=0):
         super(Tiempo, self).__init__(parent)
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
 
@@ -263,10 +264,10 @@ class Tiempo(QtWidgets.QDialog):
 
         # Tiempo
         self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(
-            self, 10, minMinutos, maxMinutos, maxTam=50, etiqueta=_("Total minutes"), fuente=f
+            self, default_minutes, minMinutos, maxMinutos, maxTam=50, etiqueta=_("Total minutes"), fuente=f
         )
         self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(
-            self, 0, minSegundos, maxSegundos, maxTam=50, etiqueta=_("Seconds added per move"), fuente=f
+            self, default_seconds, minSegundos, maxSegundos, maxTam=50, etiqueta=_("Seconds added per move"), fuente=f
         )
 
         # # Tiempo
@@ -287,8 +288,8 @@ class Tiempo(QtWidgets.QDialog):
         return minutos, segundos
 
 
-def vtime(owner, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999):
-    w = Tiempo(owner, minMinutos, minSegundos, maxMinutos, maxSegundos)
+def vtime(owner, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999, default_minutes=10, default_seconds=0):
+    w = Tiempo(owner, minMinutos, minSegundos, maxMinutos, maxSegundos, default_minutes=default_minutes, default_seconds=default_seconds)
     if w.exec_():
         return w.resultado()
     return None
@@ -338,11 +339,12 @@ def lyBotonesMovimiento(
         li_acciones.append(None)
     if siMas:
         x("MoverMas", _("New analysis"), Iconos.MoverMas())
+        li_acciones.append(None)
 
     if liMasAcciones:
         for trad, tit, icono in liMasAcciones:
-            li_acciones.append(None)
             li_acciones.append((trad, icono, key + tit))
+            li_acciones.append(None)
 
     tb = Controles.TB(owner, li_acciones, False, icon_size=icon_size, rutina=rutina)
     tb.setMinimumHeight(icon_size+4)

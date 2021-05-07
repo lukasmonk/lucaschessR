@@ -28,6 +28,7 @@ class WEndingsGTB(QTVarios.WDialogo):
     def __init__(self, procesador):
         self.procesador = procesador
         self.configuration = procesador.configuration
+        self.reinit = False
         self.db = EndingsGTB.DBendings(self.configuration)
         self.t4 = LibChess.T4(self.configuration)
 
@@ -49,7 +50,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         ly_bt, self.bt_movs = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, rutina=self.run_botones, icon_size=24)
 
         self.chb_help = Controles.CHB(self, _("Help mode"), False).capture_changes(self, self.help_changed)
-        self.bt_back = Controles.PB(self, _("TakeBack"), self.back_move, plano=False).ponIcono(Iconos.Atras())
+        self.bt_back = Controles.PB(self, _("Takeback"), self.takeback, plano=False).ponIcono(Iconos.Atras())
         ly_bt.espacio(20).control(self.bt_back).control(self.chb_help)
 
         self.wpzs = QtWidgets.QWidget(self)
@@ -66,7 +67,7 @@ class WEndingsGTB(QTVarios.WDialogo):
 
         li_acciones = (
             None,
-            (" " + _("Play"), Iconos.Play1(), self.play),
+            (" " + _("Restart"), Iconos.Reset(), self.restart),
             None,
             (" " + _("New"), Iconos.New1(), self.nuevo),
             None,
@@ -125,17 +126,19 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.grid.gotop()
         self.pos_game = -1
         self.help_changed()
-        self.play()
+        self.restart()
 
     def help_changed(self):
         self.test_help()
         self.bt_back.setVisible(self.chb_help.valor())
 
-    def back_move(self):
+    def takeback(self):
         if len(self.game):
             self.game.anulaSoloUltimoMovimiento()
             self.game.anulaSoloUltimoMovimiento()
-            self.pon_position()
+            self.pos_game = len(self.game) - 1
+            self.set_position()
+            self.sigueHumano()
 
     def startup_control(self):
         if self.playing:
@@ -169,7 +172,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             pos = self.db.pos_fen(fenm2)
             self.grid.goto(pos, 0)
 
-    def play(self):
+    def restart(self):
         row = self.grid.recno()
         if row < 0:
             return
@@ -198,7 +201,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         row = self.grid.recno()
         if 0 <= row < (self.db.current_num_fens() - 1):
             self.grid.goto(row + 1, 0)
-            self.play()
+            self.restart()
 
     def remove(self):
         row = self.grid.recno()
@@ -237,6 +240,8 @@ class WEndingsGTB(QTVarios.WDialogo):
             dic_vars["EXAMPLES_AUTO"] = examples_auto
             self.db.examples_auto = examples_auto
             self.configuration.write_variables("endingsGTB", dic_vars)
+            self.reinit = True
+            self.terminar()
 
     def set_key(self, key):
         self.key = self.db.test_tipo(key)
@@ -306,7 +311,7 @@ class WEndingsGTB(QTVarios.WDialogo):
     def grid_cambiado_registro(self, grid, row, column):
         if row >= 0:
             self.reset()
-            self.play()
+            self.restart()
 
     def grid_bold(self, grid, row, o_column):
         return row == self.act_recno
@@ -319,7 +324,7 @@ class WEndingsGTB(QTVarios.WDialogo):
                 return self.color_done
 
     def grid_doble_click(self, grid, row, o_column):
-        self.play()
+        self.restart()
 
     def grid_right_button(self, grid, row, o_column, modif):
         menu = QTVarios.LCMenu(self)
@@ -366,7 +371,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             if go_next:
                 self.play_next()
             return
-        self.board.activate_side(self.game.last_position.is_white)
+        self.board.activate_side(self.game.first_position.is_white)
         self.test_help()
 
     def test_final(self):
@@ -459,7 +464,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         if lif:
             self.board.put_arrow_scvar(lif, opacity=1.0)
 
-    def pon_position(self):
+    def set_position(self):
         if self.pos_game == -1:
             position = self.game.first_position
         elif self.pos_game >= len(self.game):
@@ -488,7 +493,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.pos_game += 1
         if self.pos_game == len(self.game):
             return
-        self.pon_position()
+        self.set_position()
         QtCore.QTimer.singleShot(self.configuration.x_interval_replay, self.mover_tiempo)
 
     def run_botones(self):
@@ -499,7 +504,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             else:
                 self.replaying = True
                 self.pos_game = -1
-                self.pon_position()
+                self.set_position()
                 QtCore.QTimer.singleShot(self.configuration.x_interval_replay, self.mover_tiempo)
             return
         elif key == "MoverInicio":
@@ -512,7 +517,7 @@ class WEndingsGTB(QTVarios.WDialogo):
                 self.pos_game += 1
         elif key == "MoverFinal":
             self.pos_game = len(self.game) - 1
-        self.pon_position()
+        self.set_position()
 
     def utilidades(self):
         menu = QTVarios.LCMenu(self)
@@ -646,7 +651,9 @@ class WEndingsGTB(QTVarios.WDialogo):
 
 def train_gtb(procesador):
     w = WEndingsGTB(procesador)
-    w.exec_()
+    if w.exec_():
+        if w.reinit:
+            train_gtb(procesador)
 
 
 class BoardEndings(Board.Board):

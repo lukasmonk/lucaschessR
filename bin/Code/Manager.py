@@ -5,29 +5,28 @@ import time
 import FasterCode
 
 import Code
-from Code import Util
-from Code import XRun
-from Code.Base.Constantes import *
-
-from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis
-from Code.Openings import OpeningsStd
 from Code import ControlPGN
 from Code import DGT
+from Code import Util
+from Code import XRun
+from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis
 from Code.Base import Game, Move, Position
+from Code.Base.Constantes import *
+from Code.Board import BoardTypes
 from Code.Databases import DBgames
 from Code.Kibitzers import Kibitzers
-from Code.QT import Histogram
+from Code.Openings import OpeningsStd
 from Code.QT import FormLayout
+from Code.QT import Histogram
 from Code.QT import Iconos
+from Code.QT import QTUtil
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
+from Code.QT import Replay
 from Code.QT import WindowArbol
 from Code.QT import WindowArbolBook
 from Code.QT import WindowSavePGN
 from Code.QT import WindowTutor
-from Code.QT import Replay
-from Code.QT import QTUtil
-from Code.QT import QTUtil2
-from Code.QT import QTVarios
-from Code.Board import BoardTypes
 
 
 class Manager:
@@ -519,6 +518,20 @@ class Manager:
     def set_hight_label3(self, px):
         return self.main_window.set_hight_label3(px)
 
+    def get_labels(self):
+        return self.main_window.get_labels()
+
+    def restore_labels(self, li_labels):
+        lb1, lb2, lb3 = li_labels
+
+        def pon(lb, rut):
+            if lb:
+                rut(lb)
+
+        pon(lb1, self.set_label1)
+        pon(lb2, self.set_label2)
+        pon(lb3, self.set_label3)
+
     def beepExtendido(self, siNuestro=False):
         if siNuestro:
             if not self.configuration.x_sound_our:
@@ -695,43 +708,14 @@ class Manager:
         self.main_window.activaInformacionPGN(False)
         self.informacionActivable = is_activatable
 
-    def save_to_pgn(self):
-        conf = self.configuration
-
-        if conf.x_save_pgn:
-
-            try:
-                with open(conf.x_save_pgn, "at", encoding="utf-8", errors="ignore") as q:
-                    dato = self.pgn.actual() + "\n\n"
-                    q.write(dato)
-            except:
-                QTUtil.ponPortapapeles(self.pgn.actual())
-                QTUtil2.message_error(self.main_window, "%s : %s\n\n%s" % (_("Unable to save"), conf.x_save_pgn, _("It is saved in the clipboard to paste it wherever you want.")))
-
-    def guardarGanados(self, siGanado):
-        conf = self.configuration
-
-        if siGanado:
-            siSalvar = conf.x_save_won
-        else:
-            siSalvar = conf.x_save_lost
-
-        if siSalvar:
-            self.save_to_pgn()
-
-    def guardarNoTerminados(self):
-        if len(self.game) < 2:
-            return
-
-        conf = self.configuration
-
-        if conf.x_save_unfinished:
-            if not QTUtil2.pregunta(self.main_window, _("Do you want to save this game?")):
-                return
-            self.save_to_pgn()
-
     def autosave(self):
         if len(self.game) > 1:
+            if self.ayudas_iniciales > 0:
+                if not (self.hints is None):
+                    usado = self.ayudas_iniciales - self.hints
+                    if usado:
+                        self.game.set_tag("HintsUsed", str(usado))
+
             self.game.tag_timeend()
             DBgames.autosave(self.game)
 
@@ -992,8 +976,8 @@ class Manager:
                     self.board.flechaSC.hide()
                 li = FasterCode.get_captures(fen, siMB)
                 for m in li:
-                    d = m.from_sq()
-                    h = m.to_sq()
+                    d = m.xfrom()
+                    h = m.xto()
                     self.board.creaFlechaMov(d, h, "c")
             else:
                 self.board.remove_arrows()
@@ -1046,10 +1030,9 @@ class Manager:
     def kibitzers(self, orden):
         if orden == "edit":
             self.kibitzers_manager.edit()
-
         else:
-            nkibitzer = int(orden)
-            self.kibitzers_manager.run_new(nkibitzer)
+            huella = orden
+            self.kibitzers_manager.run_new(huella)
             self.mira_kibitzers(False)
 
     def paraHumano(self):
@@ -1113,12 +1096,22 @@ class Manager:
                 QTUtil.ponPortapapeles(a1h8)
                 return 1
             elif quien == "whiteTakeBack":
-                if (self.game.last_position.is_white) and hasattr(self.main_window, "is_enabled_option_toolbar") and self.main_window.is_enabled_option_toolbar(TB_TAKEBACK) and hasattr(self, "takeback"):
+                if (
+                    (self.game.last_position.is_white)
+                    and hasattr(self.main_window, "is_enabled_option_toolbar")
+                    and self.main_window.is_enabled_option_toolbar(TB_TAKEBACK)
+                    and hasattr(self, "takeback")
+                ):
                     self.takeback()
                     return 1
                 return 0
             elif quien == "blackTakeBack":
-                if (not self.game.last_position.is_white) and hasattr(self.main_window, "is_enabled_option_toolbar") and self.main_window.is_enabled_option_toolbar(TB_TAKEBACK) and hasattr(self, "takeback"):
+                if (
+                    (not self.game.last_position.is_white)
+                    and hasattr(self.main_window, "is_enabled_option_toolbar")
+                    and self.main_window.is_enabled_option_toolbar(TB_TAKEBACK)
+                    and hasattr(self, "takeback")
+                ):
                     self.takeback()
                     return 1
                 return 0
@@ -1348,7 +1341,7 @@ class Manager:
 
         menuSave.separador()
 
-        menuDB = menuSave.submenu(_("Database"), Iconos.DatabaseMas())
+        menuDB = menuSave.submenu(_("Into a database"), Iconos.DatabaseMas())
         QTVarios.menuDB(menuDB, self.configuration, True, indicador_previo="dbf_")  # , remove_autosave=True)
         menuSave.separador()
 
@@ -1389,8 +1382,8 @@ class Manager:
             menuKibitzers = menu.submenu(_("Kibitzers"), Iconos.Kibitzer())
 
             kibitzers = Kibitzers.Kibitzers()
-            for num, (name, ico) in enumerate(kibitzers.lista_menu()):
-                menuKibitzers.opcion("kibitzer_%d" % num, name, ico)
+            for huella, name, ico in kibitzers.lista_menu():
+                menuKibitzers.opcion("kibitzer_%s" % huella, name, ico)
             menuKibitzers.separador()
             menuKibitzers.opcion("kibitzer_edit", _("Edition"), Iconos.ModificarP())
 
@@ -1400,7 +1393,7 @@ class Manager:
         # Juega por mi
         if self.plays_instead_of_me_option and self.state == ST_PLAYING and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS)):
             menu.separador()
-            menu.opcion("juegapormi", _("Plays instead of me") + "  [^1]", Iconos.JuegaPorMi()),
+            menu.opcion("juegapormi", _("Play instead of me") + "  [^1]", Iconos.JuegaPorMi()),
 
         # Arbol de movimientos
         if siArbol:
@@ -1791,6 +1784,10 @@ class Manager:
             self.board.creaFlechaTutor(rm.from_sq, rm.to_sq, factor)
             if n >= nArrows:
                 return
+
+    def start_message(self):
+        mensaje = _("Press the continue button to start.")
+        self.mensaje(mensaje)
 
     def player_has_moved_base(self, from_sq, to_sq, promotion=""):
         if self.board.variation_history is not None:

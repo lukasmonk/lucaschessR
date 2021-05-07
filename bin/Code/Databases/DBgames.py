@@ -58,7 +58,7 @@ class DBgames:
 
         self.li_order = []
 
-        summary_depth = self.recuperaConfig("SUMMARY_DEPTH", 0)
+        summary_depth = self.read_config("SUMMARY_DEPTH", 0)
         self.with_db_stat = summary_depth > 0
 
         self.db_stat = DBgamesST.TreeSTAT(self.nom_fichero + ".st1", summary_depth)
@@ -67,13 +67,13 @@ class DBgames:
 
         self.rowidReader = UtilSQL.RowidReader(self.nom_fichero, "Games")
 
-        self.with_plycount = "PLYCOUNT" in self.recuperaConfig("dcabs", {})
+        self.with_plycount = "PLYCOUNT" in self.read_config("dcabs", {})
 
     def read_options(self):
-        self.allows_duplicates = self.recuperaConfig("ALLOWS_DUPLICATES", True)
-        self.allows_positions = self.recuperaConfig("ALLOWS_POSITIONS", True)
-        self.allows_complete_game = self.recuperaConfig("ALLOWS_COMPLETE_GAMES", True)
-        self.allows_zero_moves = self.recuperaConfig("ALLOWS_ZERO_MOVES", True)
+        self.allows_duplicates = self.read_config("ALLOWS_DUPLICATES", True)
+        self.allows_positions = self.read_config("ALLOWS_POSITIONS", True)
+        self.allows_complete_game = self.read_config("ALLOWS_COMPLETE_GAMES", True)
+        self.allows_zero_moves = self.read_config("ALLOWS_ZERO_MOVES", True)
 
     def remove_columns(self, lista):
         self.rowidReader.stopnow()
@@ -140,9 +140,9 @@ class DBgames:
         with UtilSQL.DictRawSQL(self.nom_fichero, "Config") as dbconf:
             dbconf[key] = valor
             if key == "dcabs":
-                self.with_plycount = "PLYCOUNT" in self.recuperaConfig("dcabs", {})
+                self.with_plycount = "PLYCOUNT" in self.read_config("dcabs", {})
 
-    def recuperaConfig(self, key, default=None):
+    def read_config(self, key, default=None):
         with UtilSQL.DictRawSQL(self.nom_fichero, "Config") as dbconf:
             return dbconf.get(key, default)
 
@@ -488,7 +488,7 @@ class DBgames:
                     litags.append((drots.get(field, field), v if type(v) == str else str(v)))
                     if field == "RESULT":
                         result = v if type(v) == str else str(v)
-        dcabs = self.recuperaConfig("dcabs", {})
+        dcabs = self.read_config("dcabs", {})
         if "Plycount" in dcabs:
             litags.append(("PlyCount", str(raw["PLYCOUNT"])))
         xpgn = raw["_DATA_"]
@@ -582,7 +582,7 @@ class DBgames:
 
         conexion = self.conexion
 
-        dcabs = self.recuperaConfig("dcabs", drots.copy())
+        dcabs = self.read_config("dcabs", drots.copy())
 
         obj_decode = Util.Decode()
         decode = obj_decode.decode
@@ -917,7 +917,7 @@ class DBgames:
 
         return resp
 
-    def insert(self, game_new):
+    def insert(self, game_new, with_commit=True):
         resp = Util.Record()
         resp.ok = True
         resp.changed = False
@@ -929,9 +929,15 @@ class DBgames:
             return resp
 
         # Test si hay nuevos tags
+        dcabs_new = {}
         for tag, valor in game_new.li_tags:
             if not (tag.upper() in self.li_fields):
                 self.add_column(tag)
+                dcabs_new[tag.upper()] = tag
+        if dcabs_new:
+            dcabs = self.read_config("dcabs", drots)
+            dcabs.update(dcabs_new)
+            self.save_config("dcabs", dcabs)
 
         li_fields = []
         li_data = []
@@ -973,18 +979,25 @@ class DBgames:
         sql = "INSERT INTO Games (%s) VALUES (%s)" % (fields, values)
         cursor = self.conexion.cursor()
         cursor.execute(sql, li_data)
-        self.conexion.commit()
+        if with_commit:
+            self.conexion.commit()
         self.li_row_ids.append(cursor.lastrowid)
         cursor.close()
 
         if self.with_db_stat and not si_fen_nue and pv_nue:
             self.db_stat.append(pv_nue, result_nue, +1)
-            self.db_stat.commit()
+            if with_commit:
+                self.db_stat.commit()
             resp.summary_changed = True
 
         resp.changed = True
 
         return resp
+
+    def commit(self):
+        self.conexion.commit()
+        if self.with_db_stat:
+            self.db_stat.commit()
 
     def has_positions(self):
         return "FEN" in self.li_fields

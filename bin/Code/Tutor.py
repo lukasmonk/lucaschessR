@@ -30,8 +30,6 @@ class Tutor:
         self.siEntrenando = siEntrenando
         self.list_rm = None  # necesario
 
-        self.x_save_csv = manager.configuration.x_save_csv
-
         self.is_moving_time = False
 
     def elegir(self, siPuntos, liApPosibles=None):
@@ -58,8 +56,8 @@ class Tutor:
             me.final()
 
         # Estadisticas
-        if self.x_save_csv:
-            self.guardaEstadisticas()
+        # if self.x_save_csv:
+        #     self.guardaEstadisticas()
 
         # Comparamos la puntuacion del usuario con la del tutor
         if not self.mrmTutor.mejorRMQue(self.rmUsuario, self.difpts, self.difporc):
@@ -395,61 +393,61 @@ class Tutor:
                 if self.boardUsuario.flechaSC:
                     self.boardUsuario.flechaSC.show()
 
-    def guardaEstadisticas(self):
-        date = str(Util.today())
-        li = date.split(" ")
-        fecha = li[0]
-        hora = li[1].split(".")[0]
-        fen = self.move.position.fen()
-        rmTutor = self.mrmTutor.li_rm[0]
-        suggested_move = rmTutor.from_sq + rmTutor.to_sq + rmTutor.promotion
-        suggested_move_puntos = rmTutor.puntos
-        suggested_move_mate = rmTutor.mate
-        player_move = self.rmUsuario.from_sq + self.rmUsuario.to_sq + self.rmUsuario.promotion
-        player_move_puntos = self.rmUsuario.puntos
-        player_move_mate = self.rmUsuario.mate
-        tutor = self.managerTutor.name.replace('"', "").replace(";", "")
-        tutor_tiempo = self.managerTutor.motorTiempoJugada
-
-        try:
-            if not os.path.isfile(self.x_save_csv):
-                f = open(self.x_save_csv, "wt", encoding="utf-8", errors="ignore")
-                ntutor = _("Tutor").replace('"', "").replace(";", "")
-                player = _("Player").replace('"', "").replace(";", "")
-                puntos = _("points")
-                mate = _("Mate").lower()
-                txt = '"%s";"%s";"FEN";"%s";"%s";"%s";"%s";"%s";"%s";"%s";"%s"\n' % (
-                    _("Date"),
-                    _("Time"),
-                    ntutor,
-                    ntutor + "-" + puntos,
-                    ntutor + "-" + mate,
-                    player,
-                    player + "-" + puntos,
-                    player + "-" + mate,
-                    ntutor + "-" + _("Engine"),
-                    _("Time engine MS"),
-                )
-                f.write(txt)
-            else:
-                f = open(self.x_save_csv, "at", encoding="utf-8", errors="ignore")
-
-            f.write(
-                '%s;%s;"%s";"%s";%d;%d;"%s";%d;%d;"%s";%d\n'
-                % (
-                    fecha,
-                    hora,
-                    fen,
-                    suggested_move,
-                    suggested_move_puntos,
-                    suggested_move_mate,
-                    player_move,
-                    player_move_puntos,
-                    player_move_mate,
-                    tutor,
-                    tutor_tiempo,
-                )
-            )
-            f.close()
-        except:
-            pass
+    # def guardaEstadisticas(self):
+    #     date = str(Util.today())
+    #     li = date.split(" ")
+    #     fecha = li[0]
+    #     hora = li[1].split(".")[0]
+    #     fen = self.move.position.fen()
+    #     rmTutor = self.mrmTutor.li_rm[0]
+    #     suggested_move = rmTutor.from_sq + rmTutor.to_sq + rmTutor.promotion
+    #     suggested_move_puntos = rmTutor.puntos
+    #     suggested_move_mate = rmTutor.mate
+    #     player_move = self.rmUsuario.from_sq + self.rmUsuario.to_sq + self.rmUsuario.promotion
+    #     player_move_puntos = self.rmUsuario.puntos
+    #     player_move_mate = self.rmUsuario.mate
+    #     tutor = self.managerTutor.name.replace('"', "").replace(";", "")
+    #     tutor_tiempo = self.managerTutor.motorTiempoJugada
+    #
+    #     try:
+    #         if not os.path.isfile(self.x_save_csv):
+    #             f = open(self.x_save_csv, "wt", encoding="utf-8", errors="ignore")
+    #             ntutor = _("Tutor").replace('"', "").replace(";", "")
+    #             player = _("Player").replace('"', "").replace(";", "")
+    #             puntos = _("points")
+    #             mate = _("Mate").lower()
+    #             txt = '"%s";"%s";"FEN";"%s";"%s";"%s";"%s";"%s";"%s";"%s";"%s"\n' % (
+    #                 _("Date"),
+    #                 _("Time"),
+    #                 ntutor,
+    #                 ntutor + "-" + puntos,
+    #                 ntutor + "-" + mate,
+    #                 player,
+    #                 player + "-" + puntos,
+    #                 player + "-" + mate,
+    #                 ntutor + "-" + _("Engine"),
+    #                 _("Time engine MS"),
+    #             )
+    #             f.write(txt)
+    #         else:
+    #             f = open(self.x_save_csv, "at", encoding="utf-8", errors="ignore")
+    #
+    #         f.write(
+    #             '%s;%s;"%s";"%s";%d;%d;"%s";%d;%d;"%s";%d\n'
+    #             % (
+    #                 fecha,
+    #                 hora,
+    #                 fen,
+    #                 suggested_move,
+    #                 suggested_move_puntos,
+    #                 suggested_move_mate,
+    #                 player_move,
+    #                 player_move_puntos,
+    #                 player_move_mate,
+    #                 tutor,
+    #                 tutor_tiempo,
+    #             )
+    #         )
+    #         f.close()
+    #     except:
+    #         pass

@@ -155,9 +155,6 @@ class WTurnOnLights(QTVarios.WDialogo):
         menu.opcion(None, "%16s %15.02f  %s" % (_("Total time"), tt, time.strftime("%H:%M:%S", time.gmtime(tt))))
         menu.lanza()
 
-
-
-
     def right_button_block(self, num_theme, num_block):
         block = self.tol.get_block(num_theme, num_block)
         litimes = block.times
@@ -174,10 +171,7 @@ class WTurnOnLights(QTVarios.WDialogo):
             segs, fecha, time_used, errores, hints = dato
             txt, ico = TurnOnLights.qualification(segs, self.tol.is_calculation_mode())
             menu.opcion(
-                None,
-                "%d-%02d-%02d %02d:%02d %6.02f  %6.02f  %s"
-                % (fecha.year, fecha.month, fecha.day, fecha.hour, fecha.minute, segs, time_used, txt),
-                self.dicIconos[ico],
+                None, "%d-%02d-%02d %02d:%02d %6.02f  %6.02f  %s" % (fecha.year, fecha.month, fecha.day, fecha.hour, fecha.minute, segs, time_used, txt), self.dicIconos[ico]
             )
             tt += time_used
             te += errores
@@ -247,9 +241,7 @@ class WTurnOnLights(QTVarios.WDialogo):
                 self.cambiar_one_line()
 
     def rebuild(self):
-        if not QTUtil2.pregunta(
-            self, _("Are you sure you want to delete all results of all levels and start again from scratch?")
-        ):
+        if not QTUtil2.pregunta(self, _("Are you sure you want to delete all results of all levels and start again from scratch?")):
             return
         if self.one_line:
             self.tol.new()

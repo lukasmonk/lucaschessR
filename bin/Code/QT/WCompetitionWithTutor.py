@@ -253,7 +253,7 @@ class wDatos(QtWidgets.QDialog):
             color = "B" if self.rb_white.isChecked() else "N"
             if not (color in self.maxNivelHecho):
                 p = self.max_puntos
-        self.lbPuntos.setText("%d %s" % (p, _("points")))
+        self.lbPuntos.setText("%d %s" % (p, _("centipawns")))
         self.puntos = p
 
 
@@ -303,24 +303,29 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         self.accept()
 
 
-def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo):
-    liGen = [FormLayout.separador]
+def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo, attempts):
+    li_gen = [FormLayout.separador]
 
     label = "%s (1..%d)" % (_("Select position"), nFEN)
-    liGen.append((FormLayout.Spinbox(label, 1, nFEN, 50), pos))
+    li_gen.append((FormLayout.Spinbox(label, 1, nFEN, 50), pos))
 
-    liGen.append(FormLayout.separador)
+    li_gen.append(FormLayout.separador)
 
     li = [(_("Sequential"), "s"), (_("Random"), "r"), (_("Random with same sequence based on position"), "rk")]
-    liGen.append((FormLayout.Combobox(_("Type"), li), tipo))
+    li_gen.append((FormLayout.Combobox(_("Type"), li), tipo))
 
-    liGen.append(FormLayout.separador)
+    li_gen.append(FormLayout.separador)
 
-    liGen.append((_("Jump to the next after solving") + ":", salta))
+    li_gen.append((_("Jump to the next after solving") + ":", salta))
 
-    resultado = FormLayout.fedit(liGen, title=titulo, parent=w_parent, anchoMinimo=200, icon=Iconos.Entrenamiento())
+    li_gen.append(FormLayout.separador)
+
+    li_gen.append((FormLayout.Spinbox(_("Attempts before showing the solution"), 1, 99, 50), attempts))
+
+
+    resultado = FormLayout.fedit(li_gen, title=titulo, parent=w_parent, anchoMinimo=200, icon=Iconos.Entrenamiento())
     if resultado:
-        position, tipo, jump = resultado[1]
-        return position, tipo, jump
+        position, tipo, jump, attempts = resultado[1]
+        return position, tipo, jump, attempts
     else:
         return None

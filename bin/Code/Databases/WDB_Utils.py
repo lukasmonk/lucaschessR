@@ -147,14 +147,14 @@ class WFiltrar(QtWidgets.QDialog):
                 elif op == GRABA:
                     if self.lee_filtro_actual():
                         if name is None:
-                            liGen = [FormLayout.separador]
-                            liGen.append((_("Name") + ":", ""))
+                            li_gen = [FormLayout.separador]
+                            li_gen.append((_("Name") + ":", ""))
 
-                            resultado = FormLayout.fedit(liGen, title=_("Filter"), parent=self, icon=Iconos.Libre())
+                            resultado = FormLayout.fedit(li_gen, title=_("Filter"), parent=self, icon=Iconos.Libre())
                             if resultado:
-                                accion, liGen = resultado
+                                accion, li_gen = resultado
 
-                                name = liGen[0].strip()
+                                name = li_gen[0].strip()
                                 if name:
                                     dbc[name] = self.liFiltro
                         else:
@@ -462,7 +462,7 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
     d["FILESW"] = "%s:100" % os.path.basename(nom_fns)
     d["POINTVIEW"] = pointview
 
-    Util.dic2ini(nom_ini, dic_ini)
+    Util.dic2ini_base(nom_ini, dic_ini)
 
     QTUtil2.message_bold(
         wowner, ("%s<br>%s<br>  %s<br>    ➔%s<br>        ➔%s" % (
