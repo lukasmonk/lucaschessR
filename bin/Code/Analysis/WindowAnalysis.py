@@ -87,7 +87,7 @@ class WAnalisisGraph(QTVarios.WDialogo):
 
         self.rbShowValues = Controles.RB(self, _("Values"), rutina=self.cambiadoShow).activa(True)
         self.rbShowElo = Controles.RB(self, _("Elo performance"), rutina=self.cambiadoShow)
-        self.chbShowLostPoints = Controles.CHB(self, _("Show centipawns lost"), self.getShowLostPoints()).capture_changes(
+        self.chbShowLostPoints = Controles.CHB(self, _("Show pawns lost"), self.getShowLostPoints()).capture_changes(
             self, self.showLostPointsChanged
         )
         ly_rb = (

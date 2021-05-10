@@ -19,6 +19,7 @@ from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.Polyglots import PolyglotImportExports
+from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import WindowSavePGN
@@ -26,6 +27,7 @@ from Code.QT import GridEditCols
 from Code.QT import Delegados
 from Code.QT import WindowPlayGame
 from Code.QT import FormLayout
+from Code.Themes import WDB_Theme_Analysis
 
 import Code.Openings.WindowOpenings as WindowOpenings
 
@@ -733,6 +735,9 @@ class WGames(QtWidgets.QWidget):
             menu.separador()
             menu.opcion(self.tw_polyglot, _("Create a polyglot book"), Iconos.Book())
             menu.separador()
+            menu.opcion(self.tw_themes, _("Statistics on tactical themes"), Iconos.Tacticas())
+            menu.separador()
+
         menu.opcion(self.tw_pack, _("Pack database"), Iconos.Pack())
 
         resp = menu.lanza()
@@ -926,6 +931,18 @@ class WGames(QtWidgets.QWidget):
                 ap.terminar(False)
 
             tmpBP.cerrar()
+
+    def tw_themes(self):
+
+        um = QTUtil2.unMomento(self, _("Analyzing tactical themes"))
+        a = WDB_Theme_Analysis.SelectedGameThemeAnalyzer(self)
+
+        um.final()
+        if len(a.dic_themes) == 0:
+            QTUtil2.message(self, _("No themes were found in selected games!"))
+            return
+        wma = WDB_Theme_Analysis.WDBMoveAnalysis(self, a.li_output_dic, a.title, a.missing_tags_output)
+        wma.exec_()
 
     def tw_polyglot(self):
         titulo = self.dbGames.get_name() + ".bin"

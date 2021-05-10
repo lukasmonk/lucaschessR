@@ -169,12 +169,12 @@ class EngineResponse:
             if not self.is_white:
                 pt = -pt
             cp = "%+0.2f" % (pt / 100.0)
-            return "%s %s" % (cp, _("centipawns"))
+            return "%s %s" % (cp, _("pawns"))
 
     def abrTexto(self):
         c = self.abrTextoBase()
         if self.mate == 0:
-            c = "%s %s" % (c, _("pts"))
+            c = "%s %s" % (c, _("pws"))
         return c
 
     def abrTextoPDT(self):

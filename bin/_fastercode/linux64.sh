@@ -15,7 +15,7 @@ cat Faster_Irina.pyx Faster_Polyglot.pyx > FasterCode.pyx
 
 python3 setup_linux.py build_ext --inplace --verbose
 
-cp FasterCode.cpython-3?-x86_64-linux-gnu.so ../../OS/linux
+cp FasterCode.cpython-3* ../../OS/linux
 
 echo ""
 echo ":: Building Complete"

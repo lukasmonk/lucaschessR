@@ -471,7 +471,7 @@ class Configuration:
         self.ficheroFEN = self.ficheroRecursos
         self.ficheroConfBoards = "%s/confBoards.pk" % self.carpeta_config
         self.ficheroBoxing = "%s/boxing.pk" % self.carpeta_results
-        self.ficheroTrainings = "%s/trainings.pk" % self.carpeta_results
+        self.file_trainings = "%s/trainings.pk" % self.carpeta_results
         self.ficheroHorses = "%s/horses.db" % self.carpeta_results
         self.ficheroLearnPGN = "%s/LearnPGN.db" % self.carpeta_results
         self.ficheroAlbumes = "%s/albumes.pkd" % self.carpeta_results

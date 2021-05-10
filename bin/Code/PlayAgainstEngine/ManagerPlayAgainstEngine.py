@@ -281,6 +281,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.main_window.enable_option_toolbar(TB_CONFIG, hip)
             self.main_window.enable_option_toolbar(TB_UTILITIES, hip)
             self.main_window.enable_option_toolbar(TB_STOP, not hip)
+            self.main_window.enable_option_toolbar(TB_ADJOURN, hip)
 
         elif self.state == ST_PAUSE:
             li = [TB_CONTINUE]
@@ -605,6 +606,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if len(self.game) > 0:
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
+            self.analizaTerminar()
             self.game.set_termination(TERMINATION_RESIGN, self.human_side)
             self.saveSummary()
             self.ponFinJuego(self.with_takeback)

@@ -143,6 +143,12 @@ class Themes:
             if theme not in self.dic_standard and theme not in self.li_custom:
                 self.add_custom(theme)
 
+    def get_themes_labels(self, move):
+        output = []
+        for theme in move.li_themes:
+            output.append(self.name(theme))
+        return output
+
 
 
 

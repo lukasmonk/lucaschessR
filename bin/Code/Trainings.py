@@ -438,8 +438,14 @@ class Entrenamientos:
                     elif nPosiciones == 1:
                         pos = 1
                         jump = False
+                        db = UtilSQL.DictSQL(self.configuration.file_trainings)
+                        data = db[entreno]
+                        if type(data) != dict:
+                            data = {}
+                        attempts = data.get("ATTEMPTS", 1)
+                        db.close()
                     else:
-                        db = UtilSQL.DictSQL(self.configuration.ficheroTrainings)
+                        db = UtilSQL.DictSQL(self.configuration.file_trainings)
                         data = db[entreno]
                         if type(data) != dict:
                             data = {}

@@ -28,7 +28,7 @@ class ManagerEntPos(Manager.Manager):
         self.entreno = entreno
 
     def save_pos(self, pos_training):
-        db = UtilSQL.DictSQL(self.configuration.ficheroTrainings)
+        db = UtilSQL.DictSQL(self.configuration.file_trainings)
         data = db[self.entreno]
         if data is None:
             data = {}

@@ -264,7 +264,7 @@ class WKibitzers(QTVarios.WDialogo):
         form.combobox(_("Process priority"), Priorities.priorities.combo(), Priorities.priorities.normal)
         form.separador()
 
-        form.combobox(_("Point of view"), Kibitzers.cb_pointofview_options(), Kibitzers.KIB_BEFORE_MOVE)
+        form.combobox(_("Point of view"), Kibitzers.cb_pointofview_options(), Kibitzers.KIB_AFTER_MOVE)
         form.separador()
 
         resultado = form.run()

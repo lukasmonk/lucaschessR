@@ -283,14 +283,12 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         self.ed, lb = QTUtil2.spinBoxLB(self, pos, 1, to_sq, etiqueta=etiqueta, maxTam=60)
         lb1 = Controles.LB(self, "/ %d" % to_sq)
 
-        if mensAdicional:
-            lb2 = Controles.LB(self, mensAdicional)
-            lb2.set_wrap().anchoMinimo(250)
-
         lyH = Colocacion.H().relleno().control(lb).control(self.ed).control(lb1).relleno().margen(15)
 
         lyV = Colocacion.V().control(tb).otro(lyH)
         if mensAdicional:
+            lb2 = Controles.LB(self, mensAdicional)
+            lb2.set_wrap().anchoMinimo(250)
             lyV.control(lb2)
         lyV.margen(3)
 
