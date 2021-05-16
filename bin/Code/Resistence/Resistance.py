@@ -93,7 +93,7 @@ class Resistance:
     def actual(self):
         return self.conf["SEGUNDOS"], self.conf["PUNTOS"], self.conf.get("MAXERROR", 0)
 
-    def rotuloActual(self):
+    def rotuloActual(self, si_break):
         segundos, puntos, maxerror = self.actual()
         if maxerror:
             txt = _X(
@@ -113,7 +113,7 @@ class Resistance:
                 str(segundos),
                 str(puntos),
             )
-        return txt
+        return txt if si_break else txt.replace("<br>      ", "")
 
     def segundos(self):
         return self.conf["SEGUNDOS"]

@@ -1,6 +1,6 @@
 from Code.Openings import Opening
 from Code import Manager
-from Code.Base import Move
+from Code.Base import Move, Game
 from Code.QT import QTUtil2
 from Code import Util
 from Code.Engines import EngineResponse
@@ -75,7 +75,7 @@ class ManagerResistance(Manager.Manager):
         self.play_next_move()
 
     def ponRotuloObjetivo(self):
-        label = self.resistance.rotuloActual()
+        label = self.resistance.rotuloActual(False)
         label += "<br><br><b>%s</b>: %s" % (_("Opponent"), self.xrival.name)
         label += "<br><b>%s</b>: %s" % (_("Record"), self.resistance.dameEtiRecord(self.key, self.numEngine))
 
@@ -196,25 +196,26 @@ class ManagerResistance(Manager.Manager):
     def check(self):
         self.disable_all()
         if self.xrival.confMotor.key != self.xarbitro.confMotor.key:
-            if self.segundos > 10:
-                sc = 10
-            elif self.segundos < 3:
-                sc = 3
-            else:
-                sc = self.segundos
+            sc = min(max(3, self.segundos), 10)
 
             um = QTUtil2.mensEspera.start(self.main_window, _("Checking..."))
-
-            rm = self.xarbitro.juegaSegundos(sc)
-            um.final()
-            previoRival = self.puntosRival
-            self.puntosRival = -rm.centipawns_abs()
+            rm1 = self.xarbitro.juegaSegundos(sc)
+            self.puntosRival = -rm1.centipawns_abs()
             self.ponRotuloActual()
             if self.maxerror:
+                game1 = self.game
+                self.game = game1.copia()
+                self.game.anulaSoloUltimoMovimiento()
+                self.game.anulaSoloUltimoMovimiento()
+                rm0 = self.xarbitro.juegaSegundos(sc)
+                self.game = game1
+                previoRival = -rm0.centipawns_abs()
                 lostmovepoints = self.puntosRival - previoRival
                 if lostmovepoints > self.maxerror:
                     self.movimientos -= 1
+                    um.final()
                     return self.finJuego(False)
+            um.final()
 
         if self.puntosRival > self.puntos:
             self.movimientos -= 1

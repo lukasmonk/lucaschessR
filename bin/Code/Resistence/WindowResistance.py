@@ -65,7 +65,7 @@ class WResistance(QTVarios.WDialogo):
         self.resultado = None
 
     def set_textAyuda(self):
-        txt = self.resistance.rotuloActual()
+        txt = self.resistance.rotuloActual(True)
         self.lb.set_text(
             '<center><b>%s<br><font color="red">%s</red></b></center>'
             % (txt, _("Double click in any cell to begin to play"))

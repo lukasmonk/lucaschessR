@@ -1745,7 +1745,7 @@ class Manager:
             gm = self.game.copia(nj)
         gm.set_unknown()
         dic = {"GAME": gm.save(), "ISWHITE": gm.last_position.is_white}
-        fich = Util.relative_path(self.configuration.ficheroTemporal(".pkd"))
+        fich = Util.relative_path(self.configuration.ficheroTemporal("pkd"))
         Util.save_pickle(fich, dic)
 
         XRun.run_lucas("-play", fich)

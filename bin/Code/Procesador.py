@@ -95,7 +95,8 @@ class Procesador:
         Code.procesador = self
         OpeningsStd.reset()
 
-        self.configuration.limpiaTemporal()
+        if len(sys.argv) == 1: # si no nofuncionan los kibitzers en linux
+            self.configuration.limpiaTemporal()
 
         # Tras crear configuración miramos si hay Adjournments
         self.test_opcion_Adjournments()
@@ -989,6 +990,7 @@ class Procesador:
                     list_books.save_pickle(self.configuration.file_books)
 
     def juegaExterno(self, fich_tmp):
+        print(fich_tmp)
         dic_sended = Util.restore_pickle(fich_tmp)
         dic = WPlayAgainstEngine.play_position(self, _("Play a position"), dic_sended["ISWHITE"])
         if dic is None:

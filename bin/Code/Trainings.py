@@ -10,9 +10,8 @@ from Code import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 from Code.Base.Constantes import *
-from Code import Resistance
+from Code.Resistence import Resistance, ManagerResistance, WindowResistance
 from Code import ManagerFindAllMoves
-from Code import ManagerResistance
 from Code.TurnOnLights import ManagerTurnOnLights, WindowTurnOnLights
 from Code.GM import ManagerGM, WindowGM
 from Code import ManagerMate
@@ -22,7 +21,6 @@ from Code import CompetitionWithTutor
 from Code.QT import WCompetitionWithTutor
 from Code.QT import Iconos
 from Code.QT import WindowBMT
-from Code.QT import WindowResistance
 from Code.QT import WindowDailyTest
 from Code.QT import WindowEverest
 from Code.QT import WindowHorses
