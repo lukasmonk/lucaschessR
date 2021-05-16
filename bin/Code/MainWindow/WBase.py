@@ -225,7 +225,7 @@ class WBase(QtWidgets.QWidget):
 
         f = Controles.TipoLetra(puntos=12)
         # Boton de tutor activo
-        self.bt_active_tutor = Controles.PB(self, "", rutina=self.cambiaSiActivarTutor, plano=False).ponFuente(f)
+        self.bt_active_tutor = Controles.PB(self, "", rutina=self.change_tutor_active, plano=False).ponFuente(f)
 
         # Rotulos de informacion
         f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels)
@@ -317,8 +317,8 @@ class WBase(QtWidgets.QWidget):
             mens += " [%d]" % self.num_hints
         self.bt_active_tutor.setText(mens)
 
-    def cambiaSiActivarTutor(self):
-        self.manager.cambiaActivarTutor()
+    def change_tutor_active(self):
+        self.manager.change_tutor_active()
 
     def grid_num_datos(self, grid):
         return self.manager.num_rows()

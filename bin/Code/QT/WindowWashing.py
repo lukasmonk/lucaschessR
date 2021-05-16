@@ -277,7 +277,7 @@ class WWashing(QTVarios.WDialogo):
                         tags = [
                             ["Site", "Lucas Chess"],
                             ["Event", _("The Washing Machine")],
-                            ["Date", "%d-%d-%d" % (dt.year, dt.month, dt.day)],
+                            ["Date", "%d.%d.%d" % (dt.year, dt.month, dt.day)],
                             ["White", white],
                             ["Black", black],
                             ["WhiteElo", whiteelo],

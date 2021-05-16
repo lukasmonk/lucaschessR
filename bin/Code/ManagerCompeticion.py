@@ -295,7 +295,7 @@ class ManagerCompeticion(Manager.Manager):
             self.is_analyzed_by_tutor = True
             self.siAnalizando = False
 
-    def cambiaActivarTutor(self):
+    def change_tutor_active(self):
         self.is_tutor_enabled = not self.is_tutor_enabled
         self.set_activate_tutor(self.is_tutor_enabled)
         self.analizaFinal()

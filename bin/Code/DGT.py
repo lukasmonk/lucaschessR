@@ -103,31 +103,42 @@ def registerBlackTakeBackFunc():
 
 
 def activar():
+    is_linux = Code.is_linux
+
     dgt = None
-    for path in (
-        "C:/Program Files (x86)/DGT Projects/",
-        "C:/Program Files (x86)/Common Files/DGT Projects/",
-        "C:/Program Files/DGT Projects/",
-        "C:/Program Files/Common Files/DGT Projects/",
-        os.path.join(Code.folder_OS, "DigitalBoards"),
-        "",
-    ):
-        try:
-            if Code.configuration.x_digital_board == "DGT":
-                path_dll = os.path.join(path, "DGTEBDLL.dll")
-            elif Code.configuration.x_digital_board == "Certabo":
-                path_dll = os.path.join(path, "CER_DLL.dll")
-            elif Code.configuration.x_digital_board == "Millennium":
-                path_dll = os.path.join(path, "MCL_DLL.dll")
-            elif Code.configuration.x_digital_board == "Citrine":
-                path_dll = os.path.join(path, "CIT_DLL.dll")
-            else:
-                path_dll = os.path.join(path, "UCB_DLL.dll")
-            if os.path.isfile(path_dll):
-                dgt = ctypes.WinDLL(path_dll)
-                break
-        except:
-            pass
+    if is_linux:
+        functype = ctypes.CFUNCTYPE
+        path = os.path.join(Code.folder_OS, "DigitalBoards")
+        path_so = os.path.join(path, "libucb.so")
+        if os.path.isfile(path_so):
+            dgt = ctypes.CDLL(path_so)
+
+    else:
+        functype = ctypes.WINFUNCTYPE
+        for path in (
+            "C:/Program Files (x86)/DGT Projects/",
+            "C:/Program Files (x86)/Common Files/DGT Projects/",
+            "C:/Program Files/DGT Projects/",
+            "C:/Program Files/Common Files/DGT Projects/",
+            os.path.join(Code.folder_OS, "DigitalBoards"),
+            "",
+        ):
+            try:
+                if Code.configuration.x_digital_board == "DGT":
+                    path_dll = os.path.join(path, "DGTEBDLL.dll")
+                elif Code.configuration.x_digital_board == "Certabo":
+                    path_dll = os.path.join(path, "CER_DLL.dll")
+                elif Code.configuration.x_digital_board == "Millennium":
+                    path_dll = os.path.join(path, "MCL_DLL.dll")
+                elif Code.configuration.x_digital_board == "Citrine":
+                    path_dll = os.path.join(path, "CIT_DLL.dll")
+                else:
+                    path_dll = os.path.join(path, "UCB_DLL.dll")
+                if os.path.isfile(path_dll):
+                    dgt = ctypes.WinDLL(path_dll)
+                    break
+            except:
+                pass
     if dgt is None:
         return False
 
@@ -135,25 +146,25 @@ def activar():
 
     Code.dgt = dgt
 
-    cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
     st = cmpfunc(registerStatusFunc)
     dgt._DGTDLL_RegisterStatusFunc.argtype = [st]
     dgt._DGTDLL_RegisterStatusFunc.restype = ctypes.c_int
     dgt._DGTDLL_RegisterStatusFunc(st)
 
-    cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
     st = cmpfunc(registerScanFunc)
     dgt._DGTDLL_RegisterScanFunc.argtype = [st]
     dgt._DGTDLL_RegisterScanFunc.restype = ctypes.c_int
     dgt._DGTDLL_RegisterScanFunc(st)
 
-    cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
     st = cmpfunc(registerWhiteMoveInputFunc)
     dgt._DGTDLL_RegisterWhiteMoveInputFunc.argtype = [st]
     dgt._DGTDLL_RegisterWhiteMoveInputFunc.restype = ctypes.c_int
     dgt._DGTDLL_RegisterWhiteMoveInputFunc(st)
 
-    cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
     st = cmpfunc(registerBlackMoveInputFunc)
     dgt._DGTDLL_RegisterBlackMoveInputFunc.argtype = [st]
     dgt._DGTDLL_RegisterBlackMoveInputFunc.restype = ctypes.c_int
@@ -183,12 +194,12 @@ def activar():
             dgt._DGTDLL_AllowTakebacks.argtype = [ctypes.c_bool]
             dgt._DGTDLL_AllowTakebacks.restype = ctypes.c_int
             dgt._DGTDLL_AllowTakebacks(ctypes.c_bool(True))
-            cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int)
+            cmpfunc = functype(ctypes.c_int)
             st = cmpfunc(registerWhiteTakeBackFunc)
             dgt._DGTDLL_RegisterWhiteTakebackFunc.argtype = [st]
             dgt._DGTDLL_RegisterWhiteTakebackFunc.restype = ctypes.c_int
             dgt._DGTDLL_RegisterWhiteTakebackFunc(st)
-            cmpfunc = ctypes.WINFUNCTYPE(ctypes.c_int)
+            cmpfunc = functype(ctypes.c_int)
             st = cmpfunc(registerBlackTakeBackFunc)
             dgt._DGTDLL_RegisterBlackTakebackFunc.argtype = [st]
             dgt._DGTDLL_RegisterBlackTakebackFunc.restype = ctypes.c_int

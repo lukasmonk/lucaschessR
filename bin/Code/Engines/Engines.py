@@ -9,6 +9,7 @@ from Code.SQL import UtilSQL
 class Engine:
     def __init__(self, key="", autor="", version="", url="", path_exe="", args=None):
         self.key = key
+        self.alias = key
         self.autor = autor
         self.args = [] if args is None else args
         self.version = version

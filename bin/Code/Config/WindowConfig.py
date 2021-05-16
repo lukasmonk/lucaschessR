@@ -106,14 +106,21 @@ def options(parent, configuration):
     form.separador()
 
     x = " - %s Graham O'Neill (https://goneill.co.nz)" % _("developed by")
-    li_db = [
-        (_("None"), ""),
-        (_("DGT"), "DGT"),
-        (_("Certabo") + x, "Certabo"),
-        (_("Millennium") + x, "Millennium"),
-        (_("Novag Citrine") + x, "Citrine"),
-        (_("Novag UCB") + x, "Novag UCB"),
-    ]
+    if Code.is_windows:
+        li_db = [
+            (_("None"), ""),
+            (_("DGT"), "DGT"),
+            (_("Certabo") + x, "Certabo"),
+            (_("Millennium") + x, "Millennium"),
+            (_("Novag Citrine") + x, "Citrine"),
+            (_("Novag UCB") + x, "Novag UCB"),
+        ]
+    else:
+        li_db = [
+            (_("None"), ""),
+            (_("Novag UCB") + x, "Novag UCB"),
+        ]
+
     form.combobox(_("Digital board"), li_db, configuration.x_digital_board)
 
     form.separador()
@@ -187,7 +194,7 @@ def options(parent, configuration):
     form.separador()
     form.spinbox(_("Lucas-Elo"), 0, 3200, 70, configuration.x_elo)
     form.separador()
-    form.spinbox(_("Tourney-Elo"), 0, 3200, 70, configuration.x_michelo)
+    form.spinbox(_("Club players competition"), 0, 3200, 70, configuration.x_michelo)
     form.separador()
     form.spinbox(_("Fics-Elo"), 0, 3200, 70, configuration.x_fics)
     form.separador()

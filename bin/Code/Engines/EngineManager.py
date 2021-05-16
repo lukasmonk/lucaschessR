@@ -399,7 +399,8 @@ class EngineManager:
         return self.engine.busca_mate(game, mate)
 
     def stop(self):
-        self.engine.put_line("stop")
+        if self.engine:
+            self.engine.put_line("stop")
 
     def current_rm(self):
         if not self.engine:

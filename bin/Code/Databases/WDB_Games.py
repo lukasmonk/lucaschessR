@@ -4,32 +4,30 @@ import time
 
 from PySide2 import QtWidgets, QtCore
 
+import Code.Openings.WindowOpenings as WindowOpenings
+from Code import TrListas
+from Code import Util
 from Code.Analysis import Analysis, WindowAnalysisParam
 from Code.Base import Game
 from Code.Base.Constantes import *
-from Code.GM import GM
 from Code.Databases import DBgames, WDB_Utils
-from Code import TrListas
-from Code import Util
+from Code.GM import GM
 from Code.Openings import OpeningsStd
-from Code.SQL import UtilSQL
+from Code.Polyglots import PolyglotImportExports
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
+from Code.QT import Delegados
+from Code.QT import FormLayout
 from Code.QT import Grid
+from Code.QT import GridEditCols
 from Code.QT import Iconos
-from Code.Polyglots import PolyglotImportExports
-from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import WindowSavePGN
-from Code.QT import GridEditCols
-from Code.QT import Delegados
 from Code.QT import WindowPlayGame
-from Code.QT import FormLayout
+from Code.QT import WindowSavePGN
+from Code.SQL import UtilSQL
 from Code.Themes import WDB_Theme_Analysis
-
-import Code.Openings.WindowOpenings as WindowOpenings
 
 
 class WGames(QtWidgets.QWidget):
@@ -47,6 +45,9 @@ class WGames(QtWidgets.QWidget):
         self.numJugada = 0  # Se usa para indicarla al mostrar el pgn en infoMove
 
         self.si_select = si_select
+
+        self.temporary = wb_database.temporary
+        self.changes = False
 
         self.terminado = False  # singleShot
 
@@ -309,6 +310,9 @@ class WGames(QtWidgets.QWidget):
         self.tw_terminar()
 
     def tw_terminar(self):
+        if self.temporary and self.changes:
+            if QTUtil2.pregunta(self, _("Changes have been made, do you want to export them to a PGN file?")):
+                self.tw_exportar_pgn(False)
         self.terminado = True
         self.dbGames.close()
 
@@ -375,6 +379,7 @@ class WGames(QtWidgets.QWidget):
     def tw_up(self):
         row = self.grid.recno()
         filaNueva = self.dbGames.interchange(row, True)
+        self.changes = True
         if filaNueva is not None:
             self.grid.goto(filaNueva, 0)
             self.grid.refresh()
@@ -382,6 +387,7 @@ class WGames(QtWidgets.QWidget):
     def tw_down(self):
         row = self.grid.recno()
         filaNueva = self.dbGames.interchange(row, False)
+        self.changes = True
         if filaNueva is not None:
             self.grid.goto(filaNueva, 0)
             self.grid.refresh()
@@ -439,6 +445,7 @@ class WGames(QtWidgets.QWidget):
         game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board,
                                             with_previous_next=with_previous_next, save_routine=self.edit_save)
         if game:
+            self.changes = True
             self.edit_save(game.recno, game)
 
     def tw_nuevo(self):
@@ -535,7 +542,7 @@ class WGames(QtWidgets.QWidget):
                 return
 
             um = QTUtil2.unMomento(self)
-
+            self.changes = True
             self.dbGames.remove_list_recnos(li)
             self.summaryActivo["games"] -= len(li)
             self.grid.refresh()
@@ -679,6 +686,7 @@ class WGames(QtWidgets.QWidget):
                 um = QTUtil2.unMomento(self, _("Working..."))
                 lista = [x["KEY"] for x in lir]
                 self.dbGames.remove_columns(lista)
+                self.changes = True
                 reinit = True
                 um.final()
 
@@ -894,6 +902,7 @@ class WGames(QtWidgets.QWidget):
                 ap.xprocesa(game, tmpBP)
 
                 self.dbGames.save_game_recno(n, game)
+                self.changes = True
 
             if not tmpBP.is_canceled():
                 ap.terminar(True)
@@ -1026,6 +1035,7 @@ class WGames(QtWidgets.QWidget):
             dlTmp.hide_duplicates()
         dlTmp.show()
         self.dbGames.import_pgns(files, dlTmp)
+        self.changes = True
 
         self.rehaz_columnas()
         self.actualiza(True)
@@ -1044,6 +1054,7 @@ class WGames(QtWidgets.QWidget):
 
         dbn = DBgames.DBgames(path)
         self.dbGames.append_db(dbn, range(dbn.all_reccount()), dlTmp)
+        self.changes = True
 
         self.rehaz_columnas()
         self.actualiza(True)

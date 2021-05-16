@@ -119,7 +119,7 @@ class ManagerSolo(Manager.Manager):
             self.reiniciar(self.reinicio)
 
         elif key == TB_CONFIG:
-            self.configurarGS()
+            self.configure_gs()
 
         elif key == TB_UTILITIES:
             self.utilities_gs()
@@ -134,7 +134,7 @@ class ManagerSolo(Manager.Manager):
             self.grabarComo()
 
         elif key == TB_HELP_TO_MOVE:
-            self.ayudaMover()
+            self.help_to_move()
 
         else:
             Manager.Manager.rutinaAccionDef(self, key)
@@ -449,7 +449,7 @@ class ManagerSolo(Manager.Manager):
         if resp:
             self.editEtiquetasPGN()
 
-    def configurarGS(self):
+    def configure_gs(self):
         mt = _("Engine").lower()
         mt = _X(_("Disable %1"), mt) if self.play_against_engine else _X(_("Enable %1"), mt)
 
@@ -480,17 +480,13 @@ class ManagerSolo(Manager.Manager):
         sep = (None, None, None)
 
         liMasOpciones = (
-            ("books", _("Consult a book"), Iconos.Libros()),
-            sep,
-            ("engine", mt, Iconos.Motores()),
-            sep,
             (None, _("Change the initial position"), Iconos.PGN()),
+            sep,
+            ("position", _("Edit start position") + " [S]", Iconos.Datos()),
             sep,
             ("initial", _("Basic position") + " [B]", Iconos.Board()),
             sep,
             ("opening", _("Opening"), Iconos.Opening()),
-            sep,
-            ("position", _("Edit start position") + " [S]", Iconos.Datos()),
             sep,
             ("pasteposicion", _("Paste FEN position") + " [V]", Iconos.Pegar16()),
             sep,
@@ -499,6 +495,12 @@ class ManagerSolo(Manager.Manager):
             ("pastepgn", _("Paste PGN") + " [V]", Iconos.Pegar16()),
             sep,
             ("voyager", _("Voyager 2"), Iconos.Voyager()),
+            (None, None, True),
+            sep,
+            ("books", _("Consult a book"), Iconos.Libros()),
+            sep,
+            ("engine", mt, Iconos.Motores()),
+            sep,
         )
 
         resp = self.utilidades(liMasOpciones)

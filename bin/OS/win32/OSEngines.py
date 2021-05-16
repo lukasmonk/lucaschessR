@@ -182,10 +182,12 @@ def read_engines(folder_engines):
     cm = mas("komodo", "Don Dailey, Larry Kaufman, Mark Lefler", f"12.1.1 {t32_64}", "https://komodochess.com/", f"komodo-12.1.1-{t32_64}.exe", 3300)
     cm.ordenUCI("Ponder", "false")
     cm.ordenUCI("Hash", "64")
+    cm.ordenUCI("Threads", "2" if is64 else "1")
     cm.ponMultiPV(20, 218)
 
     if is64:
-        mas("lc0", "The LCZero Authors", "v0.27.0", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
+        cm = mas("lc0", "The LCZero Authors", "v0.27.0", "https://github.com/LeelaChessZero", "lc0.exe", 3300)
+        cm.ordenUCI("Threads", "2")
 
     cm = mas("stockfish", " T. Romstad, M. Costalba, J. Kiiski, G. Linscott", f"13 {t32_64}", "https://stockfishchess.org/",
              f"Stockfish-13_x{t32_64}.exe", 3500)

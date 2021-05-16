@@ -158,7 +158,7 @@ class SelectEngines:
 
         return menu.lanza()
 
-    def busca(self, tipo, key):
+    def busca(self, tipo, key, alias=None):
         if tipo is None:
             if key.startswith("*"):
                 key = key[1:]
@@ -190,8 +190,13 @@ class SelectEngines:
 
             for cm in liMotores:
                 if cm.key == key:
-                    rival = cm
-                    break
+                    if alias:
+                        if cm.alias == alias:
+                            rival = cm
+                            break
+                    else:
+                        rival = cm
+                        break
             if not rival:
                 tipo = INTERNO
                 key = self.configuration.x_rival_Inicial

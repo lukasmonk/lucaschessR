@@ -662,15 +662,7 @@ class MaiaEngine(RunEngine):
         self.book_select.extend(["mp"]*mp)
         self.book_select.extend(["ap"]*ap)
         self.book_select.extend(["au"]*au)
-        # random.shuffle(self.book_select)
 
-        # for lv in range(1100, 2000, 100):
-        #     self.book_select = {}
-        #     self.book_select["mp"] = (lv - 1100) // 10
-        #     self.book_select["ap"] = 40 - 20 * (lv - 1100) // 800
-        #     self.book_select["au"] = 100 - self.book_select["mp"] - self.book_select["ap"]
-        #     prin t(lv, self.book_select)
-        #
     def simulate_time(self, ms_time):
         if ms_time:
             tini = time.time()

@@ -116,18 +116,10 @@ class ManagerGame(Manager.Manager):
                 self.main_window.accept()
 
         elif key == TB_CONFIG:
-            self.configurarGS()
+            self.configure_gs()
 
         elif key == TB_UTILITIES:
-            liMasOpciones = (("books", _("Consult a book"), Iconos.Libros()),)
-
-            resp = self.utilidades(liMasOpciones)
-            if resp == "books":
-                liMovs = self.librosConsulta(True)
-                if liMovs:
-                    for x in range(len(liMovs) - 1, -1, -1):
-                        from_sq, to_sq, promotion = liMovs[x]
-                        self.player_has_moved(from_sq, to_sq, promotion)
+            self.utilities_gs()
 
         elif key == TB_PGN_LABELS:
             self.informacion()
@@ -264,11 +256,27 @@ class ManagerGame(Manager.Manager):
         if resp:
             self.editEtiquetasPGN()
 
-    def configurarGS(self):
+    def configure_gs(self):
         sep = (None, None, None)
 
         li_mas_opciones = [
             ("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion()),
+        ]
+
+        resp = self.configurar(li_mas_opciones, siCambioTutor=True, siSonidos=True)
+
+        if resp == "rotacion":
+            self.auto_rotate = not self.auto_rotate
+            is_white = self.game.last_position.is_white
+            if self.auto_rotate:
+                if is_white != self.board.is_white_bottom:
+                    self.board.rotaBoard()
+
+    def utilities_gs(self):
+        sep = (None, None, None)
+
+        li_mas_opciones = [
+            (None, _("Change the initial position"), Iconos.PGN()),
             sep,
             ("leerpgn", _("Read PGN file"), Iconos.PGN_Importar()),
             sep,
@@ -286,14 +294,22 @@ class ManagerGame(Manager.Manager):
                 ]
             )
 
-        resp = self.configurar(li_mas_opciones, siCambioTutor=True, siSonidos=True)
+        li_mas_opciones.extend(
+            [
+                (None, None, True),
+                sep,
+                ("books", _("Consult a book"), Iconos.Libros()),
+            ]
+        )
 
-        if resp == "rotacion":
-            self.auto_rotate = not self.auto_rotate
-            is_white = self.game.last_position.is_white
-            if self.auto_rotate:
-                if is_white != self.board.is_white_bottom:
-                    self.board.rotaBoard()
+        resp = self.utilidades(li_mas_opciones)
+
+        if resp == "books":
+            liMovs = self.librosConsulta(True)
+            if liMovs:
+                for x in range(len(liMovs) - 1, -1, -1):
+                    from_sq, to_sq, promotion = liMovs[x]
+                    self.player_has_moved(from_sq, to_sq, promotion)
 
         elif resp == "position":
             ini_position = self.game.first_position

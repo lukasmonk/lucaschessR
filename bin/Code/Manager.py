@@ -116,7 +116,7 @@ class Manager:
         self.game = Game.Game()
         self.game.set_tag("Site", Code.lucas_chess)
         hoy = Util.today()
-        self.game.set_tag("Date", "%d-%02d-%02d" % (hoy.year, hoy.month, hoy.day))
+        self.game.set_tag("Date", "%d.%02d.%02d" % (hoy.year, hoy.month, hoy.day))
 
     def ponFinJuego(self, with_takeback=False):
         self.runSound.close()
@@ -474,7 +474,7 @@ class Manager:
         self.main_window.set_activate_tutor(siActivar)
         self.is_tutor_enabled = siActivar
 
-    def cambiaActivarTutor(self):
+    def change_tutor_active(self):
         self.is_tutor_enabled = not self.is_tutor_enabled
         self.set_activate_tutor(self.is_tutor_enabled)
 
@@ -852,7 +852,7 @@ class Manager:
         move = self.game.move(pos)
         return move, is_white, siUltimo, tam_lj, pos
 
-    def ayudaMover(self):
+    def help_to_move(self):
         if not self.is_finished():
             move = Move.Move(self.game, position_before=self.game.last_position.copia())
             max_recursion = 999
@@ -1134,7 +1134,7 @@ class Manager:
     def juegaPorMi(self):
         if self.plays_instead_of_me_option and self.state == ST_PLAYING and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS)):
             if not self.is_finished():
-                mrm = self.analizaTutor()
+                mrm = self.analizaTutor(with_cursor=True)
                 rm = mrm.mejorMov()
                 if rm.from_sq:
                     self.is_analyzed_by_tutor = True
@@ -1316,6 +1316,27 @@ class Manager:
 
         siJugadas = len(self.game) > 0
 
+        # Mas Opciones
+        if liMasOpciones:
+            submenu = menu
+            for key, label, icono in liMasOpciones:
+                if label is None:
+                    if icono is None:
+                        # liMasOpciones.append((None, None, None))
+                        submenu.separador()
+                    else:
+                        # liMasOpciones.append((None, None, True))  # Para salir del submenu
+                        submenu = menu
+                elif key is None:
+                    # liMasOpciones.append((None, titulo, icono))
+                    submenu = menu.submenu(label, icono)
+
+                else:
+                    # liMasOpciones.append((key, titulo, icono))
+                    submenu.opcion(key, label, icono)
+            menu.separador()
+
+
         # Grabar
         icoGrabar = Iconos.Grabar()
         icoFichero = Iconos.GrabarFichero()
@@ -1400,26 +1421,6 @@ class Manager:
             menu.separador()
             menu.opcion("arbol", _("Moves tree"), Iconos.Arbol())
 
-        # Mas Opciones
-        if liMasOpciones:
-            menu.separador()
-            submenu = menu
-            for key, label, icono in liMasOpciones:
-                if label is None:
-                    if icono is None:
-                        # liMasOpciones.append((None, None, None))
-                        submenu.separador()
-                    else:
-                        # liMasOpciones.append((None, None, True))  # Para salir del submenu
-                        submenu = menu
-                elif key is None:
-                    # liMasOpciones.append((None, titulo, icono))
-                    submenu = menu.submenu(label, icono)
-
-                else:
-                    # liMasOpciones.append((key, titulo, icono))
-                    submenu.opcion(key, label, icono)
-
         resp = menu.lanza()
 
         if not resp:
@@ -1496,20 +1497,26 @@ class Manager:
         alm.indexesHTML, alm.indexesRAW, alm.eloW, alm.eloB, alm.eloT = AnalysisIndexes.gen_indexes(self.game, elos, elosFORM, alm)
         alm.is_white_bottom = self.board.is_white_bottom
         um.final()
-        WindowAnalysis.showGraph(self.main_window, self, alm, Analysis.show_analysis)
+        if len(alm.lijg) == 0:
+            QTUtil2.message(self.main_window, "There are no analyzed moves.")
+        else:
+            WindowAnalysis.showGraph(self.main_window, self, alm, Analysis.show_analysis)
 
     def save_db(self, database):
-        pgn = self.listado("pgn")
-        liTags = []
-        for linea in pgn.split("\n"):
-            if linea.startswith("["):
-                ti = linea.split('"')
-                if len(ti) == 3:
-                    key = ti[0][1:].strip()
-                    valor = ti[1].strip()
-                    liTags.append([key, valor])
-            else:
-                break
+        try:
+            pgn = self.listado("pgn")
+            liTags = []
+            for linea in pgn.split("\n"):
+                if linea.startswith("["):
+                    ti = linea.split('"')
+                    if len(ti) == 3:
+                        key = ti[0][1:].strip()
+                        valor = ti[1].strip()
+                        liTags.append([key, valor])
+                else:
+                    break
+        except AttributeError:
+            liTags = []
 
         pc = Game.Game(li_tags=liTags)
         pc.assign_other_game(self.game)

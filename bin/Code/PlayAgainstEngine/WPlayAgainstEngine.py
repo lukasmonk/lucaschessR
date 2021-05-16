@@ -736,6 +736,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         dr = dic["RIVAL"] = {}
         dr["ENGINE"] = self.rival.key
         dr["TYPE"] = self.rivalTipo
+        dr["ALIAS"] = self.rival.alias
         dr["LIUCI"] = self.rival.liUCI
 
         dr["ENGINE_TIME"] = int(self.edRtiempo.textoFloat() * 10)
@@ -791,7 +792,8 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         dr = dic.get("RIVAL", {})
         engine = dr.get("ENGINE", self.configuration.x_rival_inicial)
         tipo = dr.get("TYPE", SelectEngines.INTERNO)
-        self.rivalTipo, self.rival = self.motores.busca(tipo, engine)
+        alias = dr.get("ALIAS", None)
+        self.rivalTipo, self.rival = self.motores.busca(tipo, engine, alias=alias)
         if dr.get("LIUCI"):
             self.rival.liUCI = dr.get("LIUCI")
         self.ponRival()

@@ -57,7 +57,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     siTiempo = False
     maxSegundos = 0
     segundosJugada = 0
-    segExtra = 0
+    secs_extra = 0
     zeitnot = 0
     vtime = None
     is_analyzed_by_tutor = False
@@ -197,19 +197,19 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.siTiempo:
             self.maxSegundos = dic_var["MINUTES"] * 60.0
             self.segundosJugada = dic_var["SECONDS"]
-            self.segExtra = dic_var.get("MINEXTRA", 0) * 60.0
+            self.secs_extra = dic_var.get("MINEXTRA", 0) * 60.0
             self.zeitnot = dic_var.get("ZEITNOT", 0)
 
             self.vtime = {WHITE: Util.Timer(self.maxSegundos), BLACK: Util.Timer(self.maxSegundos)}
-            if self.segExtra:
-                self.vtime[self.human_side].ponSegExtra(self.segExtra)
+            if self.secs_extra:
+                self.vtime[self.human_side].ponSegExtra(self.secs_extra)
 
             time_control = "%d" % int(self.maxSegundos)
             if self.segundosJugada:
                 time_control += "+%d" % self.segundosJugada
             self.game.set_tag("TimeControl", time_control)
-            if self.segExtra:
-                self.game.set_tag("TimeExtra" + "White" if self.human_side else "Black", "%d" % self.segExtra)
+            if self.secs_extra:
+                self.game.set_tag("TimeExtra" + "White" if self.human_side else "Black", "%d" % self.secs_extra)
 
         self.pon_toolbar()
 
@@ -402,7 +402,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.xcontinue()
 
         elif key == TB_HELP_TO_MOVE:
-            self.ayudaMover()
+            self.help_to_move()
 
         elif key == TB_REINIT:
             self.reiniciar(True)
@@ -607,7 +607,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if not QTUtil2.pregunta(self.main_window, _("Do you want to resign?")):
                 return False  # no abandona
             self.analizaTerminar()
-            self.game.set_termination(TERMINATION_RESIGN, self.human_side)
+            self.game.set_termination(TERMINATION_RESIGN, RESULT_WIN_WHITE if self.is_engine_side_white else RESULT_WIN_BLACK)
             self.saveSummary()
             self.ponFinJuego(self.with_takeback)
             self.autosave()
@@ -751,8 +751,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         for mj in li:
             rm = EngineResponse.EngineResponse("", position.is_white)
-            rm.from_sq = mj.from_sq()
-            rm.to_sq = mj.to_sq()
+            rm.from_sq = mj.xfrom()
+            rm.to_sq = mj.xto()
             rm.promotion = mj.promotion()
             rm.puntos = None
             li_options.append((rm, position.pgn_translated(rm.from_sq, rm.to_sq, rm.promotion)))
@@ -904,7 +904,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         if self.state in (ST_ENDGAME, ST_PAUSE):
             return self.state == ST_ENDGAME
-        if self.nAjustarFuerza == ADJUST_SELECTED_BY_PLAYER:
+        if self.nAjustarFuerza == ADJUST_SELECTED_BY_PLAYER and hasattr(rm_rival, "li_rm"):
             rm_rival = self.ajustaPlayer(rm_rival)
 
         self.lirm_engine.append(rm_rival)
@@ -940,7 +940,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         return True
 
-    def ayudaMover(self):
+    def help_to_move(self):
         if not self.is_finished():
             move = Move.Move(self.game, position_before=self.game.last_position.copia())
             if self.is_tutor_enabled:
@@ -1024,9 +1024,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 if not self.aperturaStd.is_active(fen_base):
                     self.aperturaStd = None
 
-        self.setSummary("TIMEUSER", self.timekeeper.stop())
-        self.reloj_stop(True)
-
         is_mate = move.is_mate
         self.analizaFinal(is_mate)  # tiene que acabar siempre
         if not is_mate and not is_selected and self.is_tutor_enabled:
@@ -1098,6 +1095,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                 tutor.ponVariations(move, 1 + len(self.game) / 2)
 
                             del tutor
+
+        self.setSummary("TIMEUSER", self.timekeeper.stop())
+        self.reloj_stop(True)
 
         self.move_the_pieces(move.liMovs)
 
@@ -1319,4 +1319,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     self.main_window.ponRelojBlancas(eti, eti2)
                 else:
                     self.main_window.ponRelojNegras(eti, eti2)
+
+    def change_tutor_active(self):
+        self.is_tutor_enabled = not self.is_tutor_enabled
+        self.set_activate_tutor(self.is_tutor_enabled)
+        self.analizaFinal()
 

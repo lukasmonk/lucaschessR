@@ -95,6 +95,8 @@ class Procesador:
         Code.procesador = self
         OpeningsStd.reset()
 
+        self.configuration.limpiaTemporal()
+
         # Tras crear configuración miramos si hay Adjournments
         self.test_opcion_Adjournments()
 
@@ -207,7 +209,6 @@ class Procesador:
         if self.manager:
             del self.manager
             self.manager = None
-        self.configuration.limpiaTemporal()
         self.reset()
         if self.configuration.siPrimeraVez:
             self.cambiaconfigurationPrimeraVez()
@@ -1176,8 +1177,9 @@ class ProcesadorVariations(Procesador):
 
         self.siPresentacion = False
 
-        self.main_window = MainWindow.MainWindow(self, window)
+        self.main_window = MainWindow.MainWindow(self, window, extparam="mainv")
         self.main_window.set_manager_active(self)
+        self.main_window.restore_video()
 
         self.board = self.main_window.board
 

@@ -54,7 +54,7 @@ def read_dic_params():
 def save_dic_params(dic):
     configuration = Code.configuration
     file = configuration.file_param_analysis()
-    dic1 = Util.restore_pickle(file)
+    dic1 = Util.restore_pickle(file, {})
     dic1.update(dic)
     Util.save_pickle(file, dic1)
 

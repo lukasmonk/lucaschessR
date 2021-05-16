@@ -29,6 +29,7 @@ class ManagerResistance(Manager.Manager):
         self.siBoxing = True
 
         self.rm_rival = None
+        self.moves_rival = 0
 
         self.in_the_opening = False
         self.opening = Opening.OpeningPol(5)  # lee las aperturas
@@ -177,11 +178,12 @@ class ManagerResistance(Manager.Manager):
             self.thinking(False)
 
             if self.play_rival(self.rm_rival):
+                self.moves_rival += 1
                 lostmovepoints = self.puntosRival - puntosRivalPrevio
-                if self.siBoxing and self.puntosRival > self.puntos:
+                if self.siBoxing and self.puntosRival > self.puntos and self.moves_rival > 1:
                     if self.check():
                         return
-                if self.siBoxing and self.maxerror and lostmovepoints > self.maxerror:
+                if self.siBoxing and self.maxerror and lostmovepoints > self.maxerror and self.moves_rival > 1:
                     if self.check():
                         return
 

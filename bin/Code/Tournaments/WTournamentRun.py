@@ -332,7 +332,7 @@ class WTournamentRun(QtWidgets.QWidget):
         self.game.set_tag("Event", self.torneo.name())
 
         hoy = Util.today()
-        self.game.set_tag("Date", "%d-%02d-%02d" % (hoy.year, hoy.month, hoy.day))
+        self.game.set_tag("Date", "%d.%02d.%02d" % (hoy.year, hoy.month, hoy.day))
 
         motor_white = self.xengine[WHITE].confMotor
         motor_black = self.xengine[BLACK].confMotor

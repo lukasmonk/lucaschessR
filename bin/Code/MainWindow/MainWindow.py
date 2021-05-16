@@ -22,12 +22,12 @@ class MainWindow(QTVarios.WDialogo):
     signal_routine_connected = None
     dato_notify = None
 
-    def __init__(self, manager, owner=None):
+    def __init__(self, manager, owner=None, extparam=None):
         self.manager = manager
 
         titulo = ""
         icono = Iconos.Aplicacion64()
-        extparam = "maind"
+        extparam = extparam if extparam else "maind"
         QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
 
         self.owner = owner

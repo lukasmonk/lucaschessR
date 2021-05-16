@@ -39,7 +39,11 @@ class ListBooks:
         Util.save_pickle(file, dic)
 
     def alMenosUno(self):
-        if len(self.lista) == 0:
+        ok = False
+        for book in self.lista:
+            if Util.same_path(book.path, Code.tbook):
+                ok = True
+        if not ok:
             bookdef = Code.tbook
             b = Book("P", os.path.basename(bookdef)[:-4], bookdef, True)
             self.lista.append(b)

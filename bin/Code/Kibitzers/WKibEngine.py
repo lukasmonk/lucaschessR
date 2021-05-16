@@ -220,6 +220,8 @@ class WKibEngine(WKibCommon.WKibCommon):
         return EngineRun.RunEngine(self.nom_engine, exe, li_uci, self.numMultiPV, priority=self.cpu.prioridad, args=args)
 
     def valid_to_play(self):
+        if self.game is None:
+            return False
         siw = self.game.last_position.is_white
         if not self.siPlay or (siw and not self.is_white) or (not siw and not self.is_black):
             return False

@@ -70,9 +70,14 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         if self.siTiempo:
             self.maxSegundos = dic_var["MINUTOS"] * 60.0
             self.segundosJugada = dic_var["SEGUNDOS"]
-            self.segExtra = dic_var.get("MINEXTRA", 0) * 60.0
+            self.secs_extra = dic_var.get("MINEXTRA", 0) * 60.0
 
             self.vtime = {WHITE: Util.Timer(self.maxSegundos), BLACK: Util.Timer(self.maxSegundos)}
+
+            time_control = "%d" % int(self.maxSegundos)
+            if self.segundosJugada:
+                time_control += "+%d" % self.segundosJugada
+            self.game.set_tag("TimeControl", time_control)
 
         self.thinking(False)
 

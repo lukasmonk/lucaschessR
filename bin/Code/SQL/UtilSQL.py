@@ -333,34 +333,31 @@ class IPC(object):
         if si_push and os.path.isfile(nom_fichero):
             Util.remove_file(nom_fichero)
         self._conexion = sqlite3.connect(nom_fichero)
+        self.nom_fichero = nom_fichero
 
         if si_push:
             sql = "CREATE TABLE DATOS( DATO BLOB );"
-            self._conexion.cursor().execute(sql)
+            self._conexion.execute(sql)
             self._conexion.commit()
 
         self.key = 0
 
     def pop(self):
-        cursor = self._conexion.cursor()
         nk = self.key + 1
         sql = "SELECT dato FROM DATOS WHERE ROWID = %d" % nk
-        cursor.execute(sql)
+        cursor = self._conexion.execute(sql)
         reg = cursor.fetchone()
         if reg:
             valor = pickle.loads(reg[0])
             self.key = nk
         else:
             valor = None
-        cursor.close()
         return valor
 
     def push(self, valor):
-        cursor = self._conexion.cursor()
         dato = sqlite3.Binary(pickle.dumps(valor))
         sql = "INSERT INTO DATOS (dato) values(?)"
-        cursor.execute(sql, [dato])
-        cursor.close()
+        self._conexion.execute(sql, [dato])
         self._conexion.commit()
 
     def close(self):

@@ -325,6 +325,9 @@ class DBgames:
         return self.db_stat.get_summary(pvBase, dicAnalisis, si_figurines_pgn, allmoves)
 
     def rebuild_stat(self, dispatch, depth):
+        if not ("RESULT" in self.li_fields):
+            return
+
         self.save_config("SUMMARY_DEPTH", depth)
         self.db_stat.depth = depth
         self.db_stat.reset()

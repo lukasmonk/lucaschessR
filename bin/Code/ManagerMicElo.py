@@ -136,17 +136,18 @@ class ManagerMicElo(Manager.Manager):
 
         self.vtime = {}
         self.maxSegundos = minutos * 60
-        self.segundosJugada = segundos
+        self.secs_move = segundos
 
         self.vtime[True] = Util.Timer(self.maxSegundos)
         self.vtime[False] = Util.Timer(self.maxSegundos)
+        self.vtime = {WHITE: Util.Timer(self.maxSegundos), BLACK: Util.Timer(self.maxSegundos)}
 
         cbook = self.engine_rival.book if self.engine_rival.book else Code.tbook
         self.book = Books.Book("P", cbook, cbook, True)
         self.book.polyglot()
 
         elo = self.engine_rival.elo
-        self.maxMoveBook = elo / 200 if 0 <= elo <= 1700 else 9999
+        self.maxMoveBook = (elo // 200) if 0 <= elo <= 1700 else 9999
 
         eloengine = self.engine_rival.elo
         eloplayer = self.configuration.miceloActivo()
@@ -190,10 +191,17 @@ class ManagerMicElo(Manager.Manager):
             white_name, black_name = black_name, white_name
             white_elo, black_elo = black_elo, white_elo
 
+        self.game.set_tag("Event", _("Tourney-Elo"))
+
         self.game.set_tag("White", white_name)
         self.game.set_tag("Black", black_name)
         self.game.set_tag("WhiteElo", str(white_elo))
         self.game.set_tag("BlackElo", str(black_elo))
+
+        time_control = "%d" % int(self.maxSegundos)
+        if self.secs_move:
+            time_control += "+%d" % self.secs_move
+        self.game.set_tag("TimeControl", time_control)
 
         white_player = white_name + " (%d)" % white_elo
         black_player = black_name + " (%d)" % black_elo
@@ -202,6 +210,8 @@ class ManagerMicElo(Manager.Manager):
         self.refresh()
 
         self.check_boards_setposition()
+
+        self.game.tag_timestart()
 
     def pon_toolbar(self):
         if self.pte_tool_resigndraw:
@@ -347,7 +357,7 @@ class ManagerMicElo(Manager.Manager):
                     self.book = None
                 else:
                     fen = self.last_fen()
-                    pv = self.book.eligeJugadaTipo(fen, "ap")
+                    pv = self.book.eligeJugadaTipo(fen, "au" if len(self.game) > 2 else "ap")
                     if pv:
                         rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
                         rm_rival.from_sq = pv[:2]
@@ -359,7 +369,7 @@ class ManagerMicElo(Manager.Manager):
             if not siEncontrada:
                 tiempoBlancas = self.vtime[True].tiempoPendiente
                 tiempoNegras = self.vtime[False].tiempoPendiente
-                mrm = self.xrival.juegaTiempoTorneo(self.game, tiempoBlancas, tiempoNegras, self.segundosJugada)
+                mrm = self.xrival.juegaTiempoTorneo(self.game, tiempoBlancas, tiempoNegras, self.secs_move)
                 if mrm is None:
                     self.thinking(False)
                     return False
@@ -540,9 +550,10 @@ class ManagerMicElo(Manager.Manager):
         self.main_window.start_clock(self.set_clock, transicion=200)
 
     def reloj_stop(self, siUsuario):
-        self.vtime[siUsuario == self.human_side].paraMarcador(self.segundosJugada)
-        self.set_clock()
         self.main_window.stop_clock()
+        self.vtime[siUsuario == self.human_side].paraMarcador(self.secs_move)
+        self.set_clock()
+        self.show_clocks()
         self.refresh()
 
     def show_clocks(self):

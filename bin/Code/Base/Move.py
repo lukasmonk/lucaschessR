@@ -38,7 +38,7 @@ class Move:
         self.time_ms = ms
 
     def only_has_move(self) -> bool:
-        return not (self.variations or self.comment or len(self.li_nags) > 0 or self.analysis)
+        return not (self.variations or self.comment or len(self.li_nags) > 0 or self.analysis or len(self.li_themes) > 0)
 
     @property
     def get_themes(self) -> []:
