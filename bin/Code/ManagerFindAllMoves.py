@@ -7,7 +7,7 @@ import FasterCode
 import Code
 from Code.Base import Position
 from Code import Manager
-from Code.QT import WCompetitionWithTutor
+from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.QT import QTUtil2
 from Code import Util
 from Code.Base.Constantes import *

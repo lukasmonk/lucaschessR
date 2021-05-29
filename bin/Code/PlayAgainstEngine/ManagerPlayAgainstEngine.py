@@ -1,4 +1,5 @@
 import os
+import time
 
 import FasterCode
 
@@ -65,6 +66,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     maxMoveBook = 9999
     toolbar_state = None
     premove = None
+    last_time_show_arrows = None
 
     def start(self, dic_var):
         self.base_inicio(dic_var)
@@ -147,6 +149,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.nArrowsTt != 0 and self.hints == 0:
             self.nArrowsTt = 0
 
+        self.last_time_show_arrows = time.time()
+
         self.with_takeback = dic_var.get("TAKEBACK", True)
 
         self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
@@ -178,7 +182,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 r_t = 1000
             self.xrival = self.procesador.creaManagerMotor(rival, r_t, r_p, self.nAjustarFuerza != ADJUST_BETTER)
             if self.nAjustarFuerza != ADJUST_BETTER:
-                self.xrival.maximizaMultiPV()
+                self.xrival.maximize_multipv()
         self.resign_limit = dic_var["RESIGN"]
 
         self.game.set_tag("Event", _("Play against an engine"))
@@ -254,7 +258,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         else:
             self.main_window.base.change_player_labels(bl, ng)
 
-        if active_clock:
+        if active_clock or self.nArrowsTt > 0 or self.nArrows > 0 or self.thoughtOp > 0 or self.thoughtTt > 0:
             self.main_window.start_clock(self.set_clock, 400)
 
         self.main_window.set_notify(self.mueve_rival_base)
@@ -321,14 +325,18 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 if mrm:
                     rm = mrm.mejorMov()
                     if self.nArrowsTt > 0:
-                        self.showPV(rm.pv, self.nArrowsTt)
+                        if time.time() - self.last_time_show_arrows > 1.4:
+                            self.last_time_show_arrows = time.time()
+                            self.showPV(rm.pv, self.nArrowsTt)
                     if self.thoughtTt > -1:
                         self.show_dispatch(self.thoughtTt, rm)
         elif self.thoughtOp > -1 or self.nArrows > 0:
             rm = self.xrival.current_rm()
             if rm:
                 if self.nArrows:
-                    self.showPV(rm.pv, self.nArrows)
+                    if time.time() - self.last_time_show_arrows > 1.4:
+                        self.last_time_show_arrows = time.time()
+                        self.showPV(rm.pv, self.nArrows)
                 if self.thoughtOp > -1:
                     self.show_dispatch(self.thoughtOp, rm)
 
@@ -728,7 +736,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             return
         self.main_window.pensando_tutor(True)
         if self.continueTt:
-            self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+            self.mrmTutor = self.xtutor.ac_final(self.xtutor.ms_time_move)
         else:
             self.mrmTutor = self.xtutor.ac_final_limit()
         self.main_window.pensando_tutor(False)
@@ -887,7 +895,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 tiempoBlancas = tiempoNegras = 10 * 60 * 1000
                 segundosJugada = 0
 
-            self.xrival.play_time(self.main_window.notify, tiempoBlancas, tiempoNegras, segundosJugada, nAjustado=self.nAjustarFuerza)
+            self.xrival.play_time_routine(self.game, self.main_window.notify, tiempoBlancas, tiempoNegras, segundosJugada, nAjustado=self.nAjustarFuerza)
 
     def sigueHumanoAnalisis(self):
         self.analizaInicio()
@@ -1299,7 +1307,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         if not (hasattr(move, "analysis") and move.analysis):
             me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad")
-            mrm, pos = self.xanalyzer.analysis_move(move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad)
+            mrm, pos = self.xanalyzer.analysis_move(move, self.xanalyzer.ms_time_move, self.xanalyzer.depth_engine)
             move.analysis = mrm, pos
             me.final()
 
@@ -1321,7 +1329,11 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     self.main_window.ponRelojNegras(eti, eti2)
 
     def change_tutor_active(self):
-        self.is_tutor_enabled = not self.is_tutor_enabled
+        previous = self.is_tutor_enabled
+        self.is_tutor_enabled = not previous
         self.set_activate_tutor(self.is_tutor_enabled)
-        self.analizaFinal()
+        if previous:
+            self.analizaFinal()
+        elif self.human_is_playing:
+            self.analizaInicio()
 

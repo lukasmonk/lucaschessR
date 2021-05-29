@@ -105,13 +105,17 @@ class WRunCaptures(QTVarios.WDialogo):
 
     def set_position(self):
         self.move_base = self.capture.game.move(self.capture.current_posmove)
-        self.move_obj = self.capture.game.move(self.capture.current_posmove + self.capture.current_depth)
+        num_move = self.capture.current_posmove + self.capture.current_depth
+        if num_move >= len(self.capture.game):
+            self.position_obj = self.capture.game.move(-1).position
+        else:
+            self.position_obj = self.capture.game.move(self.capture.current_posmove + self.capture.current_depth).position_before
         self.board.set_position(self.move_base.position_before)
 
     def pon_info_posic(self):
         self.lb_info.set_text(
             "%d+%d / %d"
-            % (self.capture.current_posmove + 1, self.capture.current_depth, len(self.capture.game), )
+            % (self.capture.current_posmove, self.capture.current_depth, len(self.capture.game), )
         )
 
     def pulsada_celda(self, celda):
@@ -205,10 +209,8 @@ class WRunCaptures(QTVarios.WDialogo):
     def check(self):
         tiempo = time.time() - self.time_base
 
-        position_obj = self.move_obj.position_before
-
         def test(liwm, si_mb):
-            st_busca = {mv.xfrom() + mv.xto() for mv in FasterCode.get_captures(position_obj.fen(), si_mb)}
+            st_busca = {mv.xfrom() + mv.xto() for mv in FasterCode.get_captures(self.position_obj.fen(), si_mb)}
             st_sel = set()
             ok = True
             for wm in liwm:
@@ -236,9 +238,8 @@ class WRunCaptures(QTVarios.WDialogo):
 
         if ok:
             self.capture.current_depth += 1
-            if (self.capture.current_posmove + self.capture.current_depth) >= len(self.capture.game):
+            if (self.capture.current_posmove + self.capture.current_depth) >= (len(self.capture.game)+1):
                 QTUtil2.message(self, _("Training finished"))
-                self.capture.current_posmove = len(self.capture.game)-1
                 self.db_captures.change_count_capture(self.capture)
                 self.terminar()
                 return
@@ -258,7 +259,7 @@ class WRunCaptures(QTVarios.WDialogo):
             else:
                 self.lb_result.set_text(_("Wrong, you must repeat this position"))
                 self.lb_result.set_foreground("red")
-            self.board.set_position(position_obj)
+            self.board.set_position(self.position_obj)
 
         self.db_captures.change_count_capture(self.capture)
         self.pon_info_posic()

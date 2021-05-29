@@ -2,6 +2,7 @@ import time
 
 from PySide2 import QtGui
 
+import Code
 from Code.TurnOnLights import TurnOnLights
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -145,7 +146,7 @@ class WTurnOnLights(QTVarios.WDialogo):
                     te += errores
                     ta += hints
         menu = QTVarios.LCMenu(self)
-        menu.ponTipoLetra(name="Courier New", puntos=10)
+        menu.ponTipoLetra(name=Code.font_mono, puntos=10)
 
         menu.separador()
         menu.opcion(None, "%16s %6d" % (_("Errors"), te))
@@ -162,7 +163,7 @@ class WTurnOnLights(QTVarios.WDialogo):
         if not litimes and not block.reinits:
             return
         menu = QTVarios.LCMenu(self)
-        menu.ponTipoLetra(name="Courier New", puntos=10)
+        menu.ponTipoLetra(name=Code.font_mono, puntos=10)
         tt = 0
         te = 0
         ta = 0

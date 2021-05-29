@@ -205,6 +205,9 @@ class Book:
         self.orden = dic["orden"]
         self.extras = dic["extras"]
 
+    def __eq__(self, other):
+        return isinstance(other, Book) and self.igualque(other)
+
     def igualque(self, otro):
         return self.tipo == otro.tipo and self.name == otro.name and self.path == otro.path
 

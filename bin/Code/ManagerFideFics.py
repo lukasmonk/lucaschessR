@@ -123,7 +123,7 @@ class ManagerFideFics(Manager.Manager):
         self.hints = 0
         self.ayudas_iniciales = 0
 
-        self.xtutor.maximizaMultiPV()
+        self.xtutor.maximize_multipv()
 
         self.book = Opening.OpeningPol(999)
 

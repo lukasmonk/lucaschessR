@@ -29,7 +29,7 @@ class WDailyTestBase(QTVarios.WDialogo):
         self.historico = UtilSQL.DictSQL(self.configuration.ficheroDailyTest)
         self.calcListaHistorico()
 
-        self.engine, self.segundos, self.pruebas, self.fns = self.leeParametros()
+        self.engine, self.seconds, self.pruebas, self.fns = self.leeParametros()
 
         # Historico
         o_columns = Columnas.ListaColumnas()
@@ -67,12 +67,12 @@ class WDailyTestBase(QTVarios.WDialogo):
     def leeParametros(self):
         param = UtilSQL.DictSQL(self.configuration.ficheroDailyTest, tabla="parametros")
         engine = param.get("ENGINE", self.configuration.tutor_inicial)
-        segundos = param.get("SEGUNDOS", 7)
+        seconds = param.get("SEGUNDOS", 7)
         pruebas = param.get("PRUEBAS", 5)
         fns = param.get("FNS", "")
         param.close()
 
-        return engine, segundos, pruebas, fns
+        return engine, seconds, pruebas, fns
 
     def grid_num_datos(self, grid):
         return len(self.li_histo)
@@ -134,7 +134,7 @@ class WDailyTestBase(QTVarios.WDialogo):
 
         # # Segundos a pensar el tutor
         config = FormLayout.Spinbox(_("Duration of engine analysis (secs)"), 1, 99, 50)
-        li_gen.append((config, self.segundos))
+        li_gen.append((config, self.seconds))
 
         # Pruebas
         config = FormLayout.Spinbox(_("N. of tests"), 1, 40, 40)
@@ -151,13 +151,13 @@ class WDailyTestBase(QTVarios.WDialogo):
         if resultado:
             accion, li_resp = resultado
             self.engine = li_resp[0]
-            self.segundos = li_resp[1]
+            self.seconds = li_resp[1]
             self.pruebas = li_resp[2]
             self.fns = li_resp[3]
 
             param = UtilSQL.DictSQL(self.configuration.ficheroDailyTest, tabla="parametros")
             param["ENGINE"] = self.engine
-            param["SEGUNDOS"] = self.segundos
+            param["SEGUNDOS"] = self.seconds
             param["PRUEBAS"] = self.pruebas
             param["FNS"] = self.fns
             param.close()
@@ -205,14 +205,14 @@ class WDailyTestBase(QTVarios.WDialogo):
             liR = WindowPotencia.lee_varias_lineas_mfn(self.pruebas)
 
         # liR = liFens
-        w = WDailyTest(self, liR, self.engine, self.segundos, self.fns)
+        w = WDailyTest(self, liR, self.engine, self.seconds, self.fns)
         w.exec_()
         self.calcListaHistorico()
         self.ghistorico.refresh()
 
 
 class WDailyTest(QTVarios.WDialogo):
-    def __init__(self, owner, liFens, engine, segundos, fns):
+    def __init__(self, owner, liFens, engine, seconds, fns):
 
         super(WDailyTest, self).__init__(owner, _("Your daily test"), Iconos.DailyTest(), "nivel")
 
@@ -222,8 +222,8 @@ class WDailyTest(QTVarios.WDialogo):
         if engine.startswith("*"):
             engine = engine[1:]
         confMotor = self.configuration.buscaTutor(engine)
-        self.xtutor = self.procesador.creaManagerMotor(confMotor, segundos * 1000, None)
-        self.xtutor.maximizaMultiPV()
+        self.xtutor = self.procesador.creaManagerMotor(confMotor, seconds * 1000, None)
+        self.xtutor.maximize_multipv()
 
         self.historico = owner.historico
 
@@ -370,7 +370,7 @@ class WDailyTest(QTVarios.WDialogo):
         datos = {}
         datos["FECHA"] = hoy
         datos["ENGINE"] = self.xtutor.key
-        datos["TIEMPOJUGADA"] = self.xtutor.motorTiempoJugada
+        datos["TIEMPOJUGADA"] = self.xtutor.ms_time_move
         datos["LIFENS"] = self.liFens
         datos["LIPV"] = self.li_pv
         datos["MPUNTOS"] = mpuntos
@@ -421,7 +421,7 @@ class WDailyTest(QTVarios.WDialogo):
         vtime = time.time() - self.iniTiempo
 
         um = QTUtil2.analizando(self)
-        self.rmr, pos = self.xtutor.analysis_move(self.move, self.xtutor.motorTiempoJugada)
+        self.rmr, pos = self.xtutor.analysis_move(self.move, self.xtutor.ms_time_move)
         self.move.analysis = self.rmr, pos
         um.final()
         pv = self.move.movimiento()

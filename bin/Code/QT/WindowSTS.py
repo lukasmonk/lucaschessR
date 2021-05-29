@@ -112,7 +112,7 @@ class WRun(QTVarios.WDialogo):
         self.playing = True
 
         if self.run_test_close:
-            self.xengine.ponGuiDispatch(self.test_close)
+            self.xengine.set_gui_dispatch(self.test_close)
         while self.playing:
             self.siguiente()
 
@@ -337,7 +337,7 @@ class WRun2(QTVarios.WDialogo):
             cp = Position.Position()
             cp.read_fen(self.elem.fen)
             self.board.set_position(cp)
-            self.xengine.ponGuiDispatch(self.dispatch)
+            self.xengine.set_gui_dispatch(self.dispatch)
             xpt, xa1h8 = self.elem.bestA1H8()
             self.board.remove_arrows()
             self.board.put_arrow_sc(xa1h8[:2], xa1h8[2:4])

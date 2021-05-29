@@ -4,7 +4,7 @@ from PySide2.QtCore import Qt
 
 from Code.Tactics import Tactics
 from Code import Manager
-from Code.QT import WCompetitionWithTutor
+from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
@@ -59,8 +59,7 @@ class ManagerTactics(Manager.Manager):
         self.show_side_indicator(True)
         self.put_pieces_bottom(is_white)
 
-        li_opciones = [TB_CLOSE, TB_REINIT, TB_CONFIG]
-        self.main_window.pon_toolbar(li_opciones)
+        self.set_toolbar("init")
 
         titulo = self.tactic.work_info(False)
         self.set_label1(titulo)
@@ -78,6 +77,19 @@ class ManagerTactics(Manager.Manager):
 
         self.num_bad_tries = 0
         self.play_next_move()
+
+    def set_toolbar(self, modo):
+        li_opciones = [TB_CLOSE, TB_REINIT, TB_CONFIG]
+        if modo == "init":
+            if not self.tactic.reinforcement.is_working():
+                li_opciones.insert(1, TB_CHANGE)
+        elif modo == "end":
+            li_opciones = [TB_CLOSE, TB_CONFIG, TB_UTILITIES, TB_NEXT]
+            if not self.tactic.reinforcement.is_working():
+                li_opciones.insert(1, TB_CHANGE)
+        # elif modo == "first_move"
+
+        self.main_window.pon_toolbar(li_opciones)
 
     def show_label_positions(self):
         html = self.tactic.work_info_position()
@@ -185,17 +197,13 @@ class ManagerTactics(Manager.Manager):
             self.ent_siguiente()
         else:
             QTUtil2.mensajeTemporal(self.main_window, _("Line completed"), 0.7)
-            li_opciones = [TB_CLOSE, TB_CONFIG, TB_UTILITIES, TB_NEXT]
-            if not self.tactic.reinforcement.is_working():
-                li_opciones.insert(1, TB_CHANGE)
-
             self.set_label1(self.tactic.w_label)
-
-            self.main_window.pon_toolbar(li_opciones)
+            self.set_toolbar("end")
 
         return True
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
+        self.set_toolbar("first_move")
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
@@ -224,8 +232,8 @@ class ManagerTactics(Manager.Manager):
             self.sigueHumano()
             return False
 
-        segundos = time.time() - self.ini_clock
-        self.tactic.masSegundos(segundos)
+        seconds = time.time() - self.ini_clock
+        self.tactic.masSegundos(seconds)
 
         self.add_move(move, True)
         self.num_bad_tries = 0

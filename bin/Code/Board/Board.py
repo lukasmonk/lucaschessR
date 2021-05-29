@@ -972,6 +972,9 @@ class Board(QtWidgets.QGraphicsView):
             if a1 == h8 and not key.startswith("CTRL"):
                 self.remove_current_graphlive()
                 key += "MR1"
+                if key not in self.dic_graphlive:
+                    return
+
                 elem = self.dic_graphlive[key]
                 elem.a1h8 = a1 + a1
                 tp = elem.TP
@@ -2286,11 +2289,11 @@ class PosBoard(Board):
                     siEvent = False
             else:
                 if siDer:
-                    if hasattr(self, "mensCrear"):
+                    if hasattr(self, "mensCrear") and self.mensCrear:
                         self.mensCrear(a1h8)
                     siEvent = False
                 if siIzq:
-                    if hasattr(self, "mensRepetir"):
+                    if hasattr(self, "mensRepetir") and self.mensRepetir:
                         self.mensRepetir(a1h8)
                     siEvent = False
         else:

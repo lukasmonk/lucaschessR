@@ -350,31 +350,31 @@ class Manager:
             rapidez = self.configuration.x_pieces_speed * 1.0 / 100.0
             cpu = self.procesador.cpu
             cpu.reset()
-            segundos = None
+            seconds = None
 
             # primero los movimientos
             for movim in liMovs:
                 if movim[0] == "m":
-                    if segundos is None:
+                    if seconds is None:
                         from_sq, to_sq = movim[1], movim[2]
                         dc = ord(from_sq[0]) - ord(to_sq[0])
                         df = int(from_sq[1]) - int(to_sq[1])
-                        # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 segundos
+                        # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 seconds
                         dist = (dc ** 2 + df ** 2) ** 0.5
-                        segundos = 4.0 * dist / (9.9 * rapidez)
+                        seconds = 4.0 * dist / (9.9 * rapidez)
                     if self.procesador.manager:
-                        cpu.muevePieza(movim[1], movim[2], siExclusiva=False, segundos=segundos)
+                        cpu.muevePieza(movim[1], movim[2], siExclusiva=False, seconds=seconds)
                     else:
                         return
 
-            if segundos is None:
-                segundos = 1.0
+            if seconds is None:
+                seconds = 1.0
 
             # segundo los borrados
             for movim in liMovs:
                 if movim[0] == "b":
                     if self.procesador.manager:
-                        n = cpu.duerme(segundos * 0.80 / rapidez)
+                        n = cpu.duerme(seconds * 0.80 / rapidez)
                         cpu.borraPieza(movim[1], padre=n)
                     else:
                         return
@@ -880,15 +880,15 @@ class Manager:
             else:
                 max_recursion = 9999
         if move.analysis is None:
-            siCancelar = self.xtutor.motorTiempoJugada > 5000 or self.xtutor.motorProfundidad > 7
+            siCancelar = self.xtutor.ms_time_move > 5000 or self.xtutor.depth_engine > 7
             me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad", siCancelar=siCancelar)
             if siCancelar:
 
                 def test_me(txt):
                     return not me.cancelado()
 
-                self.xanalyzer.ponGuiDispatch(test_me)
-            mrm, pos = self.xanalyzer.analizaJugadaPartida(self.game, pos_jg, self.xtutor.motorTiempoJugada, self.xtutor.motorProfundidad)
+                self.xanalyzer.set_gui_dispatch(test_me)
+            mrm, pos = self.xanalyzer.analizaJugadaPartida(self.game, pos_jg, self.xtutor.ms_time_move, self.xtutor.depth_engine)
             if siCancelar:
                 if me.cancelado():
                     me.final()
@@ -938,9 +938,9 @@ class Manager:
         if resp is None:
             return
 
-        segundos, if_start, if_pgn, if_beep = resp
+        seconds, if_start, if_pgn, if_beep = resp
 
-        self.xpelicula = Replay.Replay(self, segundos, if_start, if_pgn, if_beep)
+        self.xpelicula = Replay.Replay(self, seconds, if_start, if_pgn, if_beep)
 
     def ponRutinaAccionDef(self, rutina):
         self.xRutinaAccionDef = rutina
@@ -1206,14 +1206,17 @@ class Manager:
         menu.opcion("mouseGraphics", "%s: %s" % (label, _("Live graphics with the right mouse button")), Iconos.RightMouse())
 
         # Logs of engines
-        listaGMotores = Code.list_engine_managers.listaActivos() if Code.list_engine_managers else []
         menu.separador()
-        smenu = menu.submenu(_("Save engines log"), Iconos.Grabar())
-        if len(listaGMotores) > 0:
-            for pos, gmotor in enumerate(listaGMotores):
-                ico = Iconos.Aceptar() if gmotor.ficheroLog else None
-                smenu.opcion("log_%d" % pos, gmotor.name + " (%s)" % gmotor.function, ico)
-
+        is_engines_log_active = Code.list_engine_managers.is_logs_active()
+        label = _("Save engines log")
+        if is_engines_log_active:
+            icono = Iconos.LogActive()
+            label += " ...%s..." % _("Working")
+            key = "log_close"
+        else:
+            icono = Iconos.LogInactive()
+            key = "log_open"
+        menu.opcion(key, label, icono)
         menu.separador()
 
         # Mas Opciones
@@ -1233,11 +1236,13 @@ class Manager:
                     if resp == key:
                         return resp
 
-            if resp.startswith("log_"):
-                resp = resp[4:]
-                self.log_engines(resp)
+            if resp == "log_open":
+                Code.list_engine_managers.active_logs(True)
 
-            if resp.startswith("vista_"):
+            elif resp == "log_close":
+                Code.list_engine_managers.active_logs(False)
+
+            elif resp.startswith("vista_"):
                 resp = resp[6:]
                 if resp == "pgn":
                     self.main_window.activaInformacionPGN()
@@ -1283,15 +1288,6 @@ class Manager:
                     self.board.blindfoldConfig()
 
         return None
-
-    def log_engines(self, resp):
-        if resp.isdigit():
-            resp = int(resp)
-            engine = Code.list_engine_managers.listaActivos()[resp]
-            if engine.ficheroLog:
-                engine.log_close()
-            else:
-                engine.log_open()
 
     def config_sonido(self):
         separador = FormLayout.separador
@@ -1372,9 +1368,24 @@ class Manager:
 
         menu.separador()
 
+        # Kibitzers
+        if self.si_mira_kibitzers():
+            menu.separador()
+            menuKibitzers = menu.submenu(_("Kibitzers"), Iconos.Kibitzer())
+
+            kibitzers = Kibitzers.Kibitzers()
+            for huella, name, ico in kibitzers.lista_menu():
+                menuKibitzers.opcion("kibitzer_%s" % huella, name, ico)
+            menuKibitzers.separador()
+            menuKibitzers.opcion("kibitzer_edit", _("Edition"), Iconos.ModificarP())
+
+            menu.separador()
+            menu.opcion("play", _("Play current position"), Iconos.MoverJugar())
+
         # Analizar
         if siJugadas:
             if not (self.game_type in (GT_ELO, GT_MICELO) and self.is_competitive and self.state == ST_PLAYING):
+                menu.separador()
                 nAnalisis = 0
                 for move in self.game.li_moves:
                     if move.analysis:
@@ -1396,20 +1407,6 @@ class Manager:
         if siJugadas:
             menu.opcion("replay", _("Replay game"), Iconos.Pelicula())
             menu.separador()
-
-        # Kibitzers
-        if self.si_mira_kibitzers():
-            menu.separador()
-            menuKibitzers = menu.submenu(_("Kibitzers"), Iconos.Kibitzer())
-
-            kibitzers = Kibitzers.Kibitzers()
-            for huella, name, ico in kibitzers.lista_menu():
-                menuKibitzers.opcion("kibitzer_%s" % huella, name, ico)
-            menuKibitzers.separador()
-            menuKibitzers.opcion("kibitzer_edit", _("Edition"), Iconos.ModificarP())
-
-            menu.separador()
-            menu.opcion("play", _("Play current position"), Iconos.MoverJugar())
 
         # Juega por mi
         if self.plays_instead_of_me_option and self.state == ST_PLAYING and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS)):

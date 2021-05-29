@@ -159,7 +159,7 @@ class RespuestaMotor:
         if self.depth:
             c += "/%d" % self.depth
         if self.time:
-            c += "/%0.02f\"" % (1.0 * self.time / 1000.0,)
+            c += '/%0.02f"' % (1.0 * self.time / 1000.0,)
         return c
 
     def abrTextoBase(self):
@@ -181,20 +181,21 @@ class RespuestaMotor:
 
     def base2texto(self):
         txt = ""
-        for clave, texto in (("NOMBRE", self.nombre),
-                             ("SININICIALIZAR", "S" if self.sinInicializar else "N"),
-                             ("MATE", str(self.mate)),
-                             ("PUNTOS", str(self.puntos)),
-                             ("SINMOVIMIENTOS", "S" if self.sinInicializar else "N"),
-                             ("PV", self.pv),
-                             ("DESDE", self.desde),
-                             ("HASTA", self.hasta),
-                             ("CORONACION", self.coronacion),
-                             ("DEPTH", str(self.depth)),
-                             ("NODES", str(self.nodes)),
-                             ("NPS", str(self.nps)),
-                             ("SELDEPTH", str(self.seldepth)),
-                             ):
+        for clave, texto in (
+            ("NOMBRE", self.nombre),
+            ("SININICIALIZAR", "S" if self.sinInicializar else "N"),
+            ("MATE", str(self.mate)),
+            ("PUNTOS", str(self.puntos)),
+            ("SINMOVIMIENTOS", "S" if self.sinInicializar else "N"),
+            ("PV", self.pv),
+            ("DESDE", self.desde),
+            ("HASTA", self.hasta),
+            ("CORONACION", self.coronacion),
+            ("DEPTH", str(self.depth)),
+            ("NODES", str(self.nodes)),
+            ("NPS", str(self.nps)),
+            ("SELDEPTH", str(self.seldepth)),
+        ):
             txt += "%s=%s\n" % (clave, texto)
         return txt
 
@@ -204,7 +205,7 @@ class RespuestaMotor:
             pos = linea.find("=")
             if pos > 0:
                 clave = linea[:pos]
-                eti = linea[pos + 1:].strip()
+                eti = linea[pos + 1 :].strip()
                 if clave == "NOMBRE":
                     self.nombre = eti
                 elif clave == "SININICIALIZAR":
@@ -231,13 +232,31 @@ class RespuestaMotor:
                     self.nps = int(eti)
                 elif clave == "SELDEPTH":
                     self.seldepth = int(eti)
+
     def copia(self):
         rm = RespuestaMotor(self.nombre, self.siBlancas)
         rm.texto2base(self.base2texto())
         return rm
 
-st_uci_claves = {"multipv", "depth", "seldepth", "score", "time", "nodes", "pv", "hashfull", "tbhits", "nps",
-                     "currmove", "currmovenumber", "cpuload", "string", "refutation", "currline"}
+
+st_uci_claves = {
+    "multipv",
+    "depth",
+    "seldepth",
+    "score",
+    "time",
+    "nodes",
+    "pv",
+    "hashfull",
+    "tbhits",
+    "nps",
+    "currmove",
+    "currmovenumber",
+    "cpuload",
+    "string",
+    "refutation",
+    "currline",
+}
 
 
 class MRespuestaMotor:
@@ -256,7 +275,7 @@ class MRespuestaMotor:
             "depth": self.depth,
             "max_time": self.maxTiempo,
             "max_depth": self.maxProfundidad,
-            "li_rm": [rm.save() for rm in self.liMultiPV]
+            "li_rm": [rm.save() for rm in self.liMultiPV],
         }
         return dic
 
@@ -308,7 +327,7 @@ class MRespuestaMotor:
         setYa = set()
         dic = self.dicMultiPV
         keys = dic.keys()
-        keys.sort(key= lambda k: int(k))
+        keys.sort(key=lambda k: int(k))
         for k in keys:
             rm = dic[k]
             mov = rm.movimiento()
@@ -340,9 +359,7 @@ class MRespuestaMotor:
                 return
 
         if "score" in dClaves:
-            if "mate 0 " in pvBase or \
-                    "mate -0 " in pvBase or \
-                    "mate +0 " in pvBase:
+            if "mate 0 " in pvBase or "mate -0 " in pvBase or "mate +0 " in pvBase:
                 return
 
         if "multipv" in dClaves:
@@ -474,7 +491,7 @@ class MRespuestaMotor:
         self.dicMultiPV = {"1": rm}
 
         rm.sinInicializar = False
-        dClaves = self.miraClaves(bestmove, {"bestmove", "ponder"} )
+        dClaves = self.miraClaves(bestmove, {"bestmove", "ponder"})
         rm.desde = ""
         rm.hasta = ""
         rm.coronacion = ""
@@ -484,6 +501,7 @@ class MRespuestaMotor:
             rm.sinMovimientos = True
             if bestmove:
                 if len(bestmove) >= 4:
+
                     def bien(a8):
                         return a8[0] in "abcdefgh" and a8[1] in "12345678"
 
@@ -532,7 +550,7 @@ class MRespuestaMotor:
             pmax = -999999
             for mov, pts in dic.iteritems():
                 if pts > pmax:
-                    li_best = [mov,]
+                    li_best = [mov]
                     pmax = pts
                 elif pts == pmax:
                     li_best.append(mov)
@@ -633,7 +651,7 @@ class MRespuestaMotor:
         rm0 = self.liMultiPV[0]
         li.append(rm0)
         if n > 1:
-            for n in range(1,n):
+            for n in range(1, n):
                 rm = self.liMultiPV[n]
                 if rm0.puntosABS() == rm.puntosABS():
                     li.append(rm)
@@ -675,7 +693,7 @@ class MRespuestaMotor:
 
         dbg = x("DEBUG")
         if dbg:
-            fdbg = codecs.open(dbg, "a", 'utf-8', 'ignore')
+            fdbg = codecs.open(dbg, "a", "utf-8", "ignore")
             fdbg.write("\n%s\n" % cp.tablero())
             dpr = _("In the expected moves")
         else:
@@ -784,8 +802,7 @@ class MRespuestaMotor:
                         if not cp.siBlancas:
                             p0 = -p0
                             pZ = -pZ
-                        fdbg.write(
-                                "    %s (%s) : %d -> %d [%d => %d]\n" % (_("Advance"), dpr, xAvPR, rm.puntos, p0, pZ))
+                        fdbg.write("    %s (%s) : %d -> %d [%d => %d]\n" % (_("Advance"), dpr, xAvPR, rm.puntos, p0, pZ))
 
             if xJPR:
                 n = True
@@ -843,16 +860,21 @@ class MRespuestaMotor:
             fdbg.write("\n")
             fdbg.close()
 
-        return una.get("AJUSTARFINAL" if tipo == "F" else "AJUSTAR",
-                       kAjustarMejor), mindifpuntos, maxmate, dbg, aterrizaje
+        return una.get("AJUSTARFINAL" if tipo == "F" else "AJUSTAR", kAjustarMejor), mindifpuntos, maxmate, dbg, aterrizaje
 
     def mejorMovAjustadoNivel(self, nTipo):
         if nTipo == kAjustarNivelAlto:
-            dic = {kAjustarMejor: 60, kAjustarSuperiorMM: 30, kAjustarSuperiorM: 15, kAjustarSuperior: 10,
-                   kAjustarSimilar: 5}
+            dic = {kAjustarMejor: 60, kAjustarSuperiorMM: 30, kAjustarSuperiorM: 15, kAjustarSuperior: 10, kAjustarSimilar: 5}
         elif nTipo == kAjustarNivelMedio:
-            dic = {kAjustarSuperiorMM: 5, kAjustarSuperiorM: 10, kAjustarSuperior: 25, kAjustarSimilar: 60,
-                   kAjustarInferior: 25, kAjustarInferiorM: 10, kAjustarInferiorMM: 5}
+            dic = {
+                kAjustarSuperiorMM: 5,
+                kAjustarSuperiorM: 10,
+                kAjustarSuperior: 25,
+                kAjustarSimilar: 60,
+                kAjustarInferior: 25,
+                kAjustarInferiorM: 10,
+                kAjustarInferiorMM: 5,
+            }
         elif nTipo == kAjustarNivelBajo:
             dic = {kAjustarSimilar: 25, kAjustarInferior: 60, kAjustarInferiorM: 25, kAjustarInferiorMM: 10}
         tp = 0
@@ -1092,7 +1114,7 @@ class MRespuestaMotor:
             return NORMAL, NORMAL
 
         # Si la mayoría son buenos movimientos
-        if len(libest)*1.0/len(self.liMultiPV) >= 0.8:
+        if len(libest) * 1.0 / len(self.liMultiPV) >= 0.8:
             return NORMAL, GOOD
 
         # Si en la depth que se encontró era menor que 4

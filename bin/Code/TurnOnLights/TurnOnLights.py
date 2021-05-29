@@ -418,7 +418,7 @@ def compruebaUweEasy(configuration, name):
         return
     folderDest = configuration.carpetaTemporal()
     configuration.limpiaTemporal()
-    folderOri = Code.path_resource("IntFiles", "Trainings", "Tactics by Uwe Auerswald")
+    folderOri = Code.path_resource("Trainings", "Tactics by Uwe Auerswald")
     for fich in os.listdir(folderOri):
         if fich.endswith(".fns"):
             with open(os.path.join(folderOri, fich)) as f, open(os.path.join(folderDest, fich), "w") as q:

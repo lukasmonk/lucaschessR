@@ -301,10 +301,6 @@ class WGames(QtWidgets.QWidget):
             self.tw_gotop()
         elif k == QtCore.Qt.Key_End:
             self.tw_gobottom()
-        elif k == QtCore.Qt.Key_Up:
-            self.tw_up()
-        elif k == QtCore.Qt.Key_Down:
-            self.tw_down()
 
     def closeEvent(self, event):
         self.tw_terminar()
@@ -1012,9 +1008,13 @@ class WGames(QtWidgets.QWidget):
                 pb.ponTotal(len(li_sel))
                 for n, recno in enumerate(li_sel):
                     pb.pon(n)
-                    pgn, result = self.dbGames.read_pgn_recno(recno)
+                    game = self.dbGames.read_game_recno(recno)
                     if pb.is_canceled():
                         break
+                    if not game:
+                        continue
+                    pgn = game.pgn()
+                    result = game.resultado()
                     if n > 0 or not ws.is_new:
                         ws.write("\n\n")
                     if result in ("*", "1-0", "0-1", "1/2-1/2"):

@@ -252,13 +252,15 @@ class WLearn1(QTVarios.WDialogo):
 
         li_gen = [(None, None)]
 
+        dic = self.configuration.read_variables("MEMORIZING_GAME")
+
         li_gen.append((FormLayout.Spinbox(_("Level"), 0, len(self.game), 40), regBase.get("LEVEL", 0)))
         li_gen.append((None, None))
         li_gen.append((None, _("User play with") + ":"))
         li_gen.append((_("White"), "w" in regBase.get("COLOR", "bw")))
         li_gen.append((_("Black"), "b" in regBase.get("COLOR", "bw")))
         li_gen.append((None, None))
-        li_gen.append((_("Show clock"), True))
+        li_gen.append((_("Show clock"), dic.get("CLOCK", True)))
 
         resultado = FormLayout.fedit(
             li_gen, title=_("New try"), anchoMinimo=200, parent=self, icon=Iconos.TutorialesCrear()
@@ -273,6 +275,9 @@ class WLearn1(QTVarios.WDialogo):
         if not (white or black):
             return
         siClock = liResp[3]
+
+        dic["CLOCK"] = siClock
+        self.configuration.write_variables("MEMORIZING_GAME", dic)
 
         w = WLearnPuente(self, self.game, level, white, black, siClock)
         w.exec_()
@@ -346,6 +351,7 @@ class WLearnPuente(QTVarios.WDialogo):
         self.restore_video()
         self.adjustSize()
 
+        self.working_clock = siClock
         if siClock:
             QtCore.QTimer.singleShot(500, self.ajustaReloj)
         else:
@@ -463,6 +469,15 @@ class WLearnPuente(QTVarios.WDialogo):
         self.errors = 0
         self.hints = 0
 
+        if self.siClock:
+            self.working_clock = True
+            QtCore.QTimer.singleShot(500, self.ajustaReloj)
+            self.lbReloj.show()
+        else:
+            self.lbReloj.hide()
+
+        self.pon_toolbar(self.INICIO)
+
         self.siguiente()
 
     def ponInfo(self):
@@ -555,7 +570,7 @@ class WLearnPuente(QTVarios.WDialogo):
         self.owner.guardar(dic)
 
     def finalJuego(self):
-        self.siClock = False
+        self.working_clock = False
         num_moves = len(self.game)
         self.lbIni.set_text("%d/%d" % (num_moves, num_moves))
         self.boardIni.set_position(self.game.last_position)
@@ -564,7 +579,7 @@ class WLearnPuente(QTVarios.WDialogo):
         self.pon_toolbar(self.FINAL_JUEGO)
 
     def final(self):
-        self.siClock = False
+        self.working_clock = False
         self.save_video()
         self.accept()
 
@@ -572,7 +587,7 @@ class WLearnPuente(QTVarios.WDialogo):
         self.final()
 
     def ajustaReloj(self):
-        if self.siClock:
+        if self.working_clock:
             s = int(time.time() - self.time_base)
 
             m = s // 60

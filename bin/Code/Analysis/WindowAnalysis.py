@@ -682,7 +682,7 @@ class WAnalisisVariations(QtWidgets.QDialog):
         )
         self.max_recursion = max_recursion - 1
 
-        self.segundos, lbSegundos = QTUtil2.spinBoxLB(
+        self.seconds, lbSegundos = QTUtil2.spinBoxLB(
             self, segundosPensando, 1, 999, maxTam=40, etiqueta=_("Second(s)")
         )
 
@@ -694,7 +694,7 @@ class WAnalisisVariations(QtWidgets.QDialog):
         lyTutor = Colocacion.V().control(self.lbPuntuacionNueva).control(self.boardT)
         gbTutor = Controles.GB(self, _("Tutor's prediction"), lyTutor).ponFuente(f).align_center()
 
-        lyBT = Colocacion.H().control(btTerminar).control(btReset).relleno().control(lbSegundos).control(self.segundos)
+        lyBT = Colocacion.H().control(btTerminar).control(btReset).relleno().control(lbSegundos).control(self.seconds)
 
         layout = Colocacion.G().control(gbVariacion, 0, 0).control(gbTutor, 0, 1)
         layout.otro(lyBT, 1, 0).otro(lytbTutor, 1, 1)
@@ -704,7 +704,7 @@ class WAnalisisVariations(QtWidgets.QDialog):
         self.move(ventana.x() + 20, ventana.y() + 20)
 
     def dameSegundos(self):
-        return int(self.segundos.value())
+        return int(self.seconds.value())
 
     def ponPuntuacion(self, pts):
         self.lbPuntuacionNueva.set_text(pts)

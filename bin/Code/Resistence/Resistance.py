@@ -25,8 +25,8 @@ class Resistance:
         mas = "M%d" % merr if merr else ""
         return "S%dP%d%s" % (self.conf["SEGUNDOS"], self.conf["PUNTOS"], mas)
 
-    def cambiaconfiguration(self, segundos, puntos, maxerror):
-        self.conf["SEGUNDOS"] = segundos
+    def cambiaconfiguration(self, seconds, puntos, maxerror):
+        self.conf["SEGUNDOS"] = seconds
         self.conf["PUNTOS"] = puntos
         self.conf["MAXERROR"] = maxerror
         self.db["CONFIG"] = self.conf
@@ -94,14 +94,14 @@ class Resistance:
         return self.conf["SEGUNDOS"], self.conf["PUNTOS"], self.conf.get("MAXERROR", 0)
 
     def rotuloActual(self, si_break):
-        segundos, puntos, maxerror = self.actual()
+        seconds, puntos, maxerror = self.actual()
         if maxerror:
             txt = _X(
                 _(
                     "Target %1/%2/%3: withstand maximum moves against an engine,"
                     "<br>        that thinks %1 second(s), without losing more than %2 centipawns in total or %3 centipawns in a single move."
                 ),
-                str(segundos),
+                str(seconds),
                 str(puntos),
                 str(maxerror),
             )
@@ -110,12 +110,12 @@ class Resistance:
                 _(
                     "Target %1/%2: withstand maximum moves against an engine,<br>        that thinks %1 second(s), without losing more than %2 centipawns."
                 ),
-                str(segundos),
+                str(seconds),
                 str(puntos),
             )
         return txt if si_break else txt.replace("<br>      ", "")
 
-    def segundos(self):
+    def seconds(self):
         return self.conf["SEGUNDOS"]
 
     def maxerror(self):

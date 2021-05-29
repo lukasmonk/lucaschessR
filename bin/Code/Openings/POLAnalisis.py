@@ -114,7 +114,7 @@ class TabEngine(QtWidgets.QWidget):
         self.sb_multipv.setDisabled(True)
         self.show_stop()
         multipv = self.sb_multipv.valor()
-        self.manager_motor.actMultiPV(multipv)
+        self.manager_motor.update_multipv(multipv)
         game = Game.Game(self.position)
         self.manager_motor.ac_inicio(game)
         QtCore.QTimer.singleShot(1000, self.lee_analisis)

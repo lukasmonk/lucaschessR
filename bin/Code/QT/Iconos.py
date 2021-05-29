@@ -3612,3 +3612,51 @@ def Reset():
     return QtGui.QIcon(pmReset())
 
 
+def pmInstall():
+    return PM(946104,948233)
+
+
+def Install():
+    return QtGui.QIcon(pmInstall())
+
+
+def pmUninstall():
+    return PM(948233,950259)
+
+
+def Uninstall():
+    return QtGui.QIcon(pmUninstall())
+
+
+def pmLive():
+    return PM(950259,953742)
+
+
+def Live():
+    return QtGui.QIcon(pmLive())
+
+
+def pmLauncher():
+    return PM(953742,958417)
+
+
+def Launcher():
+    return QtGui.QIcon(pmLauncher())
+
+
+def pmLogInactive():
+    return PM(958417,958948)
+
+
+def LogInactive():
+    return QtGui.QIcon(pmLogInactive())
+
+
+def pmLogActive():
+    return PM(958948,959512)
+
+
+def LogActive():
+    return QtGui.QIcon(pmLogActive())
+
+

@@ -98,10 +98,10 @@ class PuenteHistorico:
         fecha = datetime.datetime(year, month, day, hour, minute, second)
         return fecha
 
-    def append(self, fecha, segundos):
+    def append(self, fecha, seconds):
         br = self.dbf.baseRegistro()
         br.FECHA = self.fecha2txt(fecha)
-        br.SEGUNDOS = segundos
+        br.SEGUNDOS = seconds
         self.dbf.insertar(br)
         self.calculaMedia()
 
@@ -587,10 +587,10 @@ class WPuente(QTVarios.WDialogo):
         self.liwm[0].activa()
 
     def correcto(self):
-        segundos = float(time.time() - self.time_base)
-        self.lbTiempo.set_text("<h2>%s</h2>" % _X(_("Right, it took %1 seconds."), "%.02f" % segundos))
+        seconds = float(time.time() - self.time_base)
+        self.lbTiempo.set_text("<h2>%s</h2>" % _X(_("Right, it took %1 seconds."), "%.02f" % seconds))
 
-        self.historico.append(Util.today(), segundos)
+        self.historico.append(Util.today(), seconds)
 
         self.btComprobar.hide()
         self.btSeguir.show()

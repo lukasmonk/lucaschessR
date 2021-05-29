@@ -2,6 +2,7 @@ import os
 
 from PySide2 import QtCore, QtWidgets
 
+import Code
 from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -167,7 +168,7 @@ class WBooksTrain(QTVarios.WDialogo):
 def eligeJugadaBooks(pantalla, liJugadas, is_white, siSelectSiempre=True):
     pantalla.cursorFueraTablero()
     menu = QTVarios.LCMenu(pantalla)
-    f = Controles.TipoLetra(name="Courier New", puntos=10)
+    f = Controles.TipoLetra(name=Code.font_mono, puntos=10)
     menu.ponFuente(f)
 
     titulo = _("White") if is_white else _("Black")

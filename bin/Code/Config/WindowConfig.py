@@ -106,21 +106,14 @@ def options(parent, configuration):
     form.separador()
 
     x = " - %s Graham O'Neill (https://goneill.co.nz)" % _("developed by")
-    if Code.is_windows:
-        li_db = [
-            (_("None"), ""),
-            (_("DGT"), "DGT"),
-            (_("Certabo") + x, "Certabo"),
-            (_("Millennium") + x, "Millennium"),
-            (_("Novag Citrine") + x, "Citrine"),
-            (_("Novag UCB") + x, "Novag UCB"),
-        ]
-    else:
-        li_db = [
-            (_("None"), ""),
-            (_("Novag UCB") + x, "Novag UCB"),
-        ]
-
+    li_db = [
+        (_("None"), ""),
+        (_("DGT") + ("" if Code.is_windows else x), "DGT"),
+        (_("Certabo") + x, "Certabo"),
+        (_("Millennium") + x, "Millennium"),
+        (_("Novag Citrine") + x, "Citrine"),
+        (_("Novag UCB") + x, "Novag UCB"),
+    ]
     form.combobox(_("Digital board"), li_db, configuration.x_digital_board)
 
     form.separador()

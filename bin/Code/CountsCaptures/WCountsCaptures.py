@@ -14,12 +14,12 @@ class WCountsCaptures(QTVarios.WDialogo):
             path = self.configuration.file_captures()
             title = _("Captures and threats in a game")
             icon = Iconos.Captures()
-            extconfig = "captures"
+            extconfig = "captures1"
         else:
             path = self.configuration.file_counts()
             title = _("Count moves")
             icon = Iconos.Count()
-            extconfig = "counts"
+            extconfig = "counts1"
 
         self.db = CountsCaptures.DBCountCapture(path)
 
@@ -27,9 +27,10 @@ class WCountsCaptures(QTVarios.WDialogo):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 120, centered=True)
-        o_columns.nueva("GAME", _("Game"), 520, centered=True)
         o_columns.nueva("CURRENT_MOVE", _("Current move"), 96, centered=True)
         o_columns.nueva("%", _("Success"), 90, centered=True)
+        o_columns.nueva("TIME", _("Time"), 130, centered=True)
+        o_columns.nueva("GAME", _("Game"), 520)
         self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)
         f = Controles.TipoLetra(puntos=self.configuration.x_menu_points)
         self.glista.ponFuente(f)
@@ -55,7 +56,7 @@ class WCountsCaptures(QTVarios.WDialogo):
         self.setLayout(ly)
 
         self.register_grid(self.glista)
-        self.restore_video(anchoDefecto=self.glista.anchoColumnas() + 20)
+        self.restore_video(anchoDefecto=self.glista.anchoColumnas() + 32, altoDefecto=360)
         self.glista.gotop()
 
     def grid_doble_click(self, grid, row, o_column):
@@ -121,9 +122,11 @@ class WCountsCaptures(QTVarios.WDialogo):
         elif col == "CURRENT_MOVE":
             if count_capture.is_finished():
                 return "%s/%d" % (_("Ended"), len(count_capture.game))
-            return "%d/%d" % (count_capture.current_posmove+1, len(count_capture.game))
+            return "%d+%d/%d" % (count_capture.current_posmove, count_capture.current_depth, len(count_capture.game))
         elif col == "%":
-            return "%.01f%%" % (count_capture.success() * 100.0,)
+            return count_capture.label_success()
+        elif col == "TIME":
+            return count_capture.label_time()
         else:
             return col
 

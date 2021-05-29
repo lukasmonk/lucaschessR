@@ -84,8 +84,8 @@ class Engine:
         self.multiPV = num
         self.maxMultiPV = maximo
 
-    def actMultiPV(self, xMultiPV):
-        if xMultiPV == "PD":
+    def update_multipv(self, xmultipv):
+        if xmultipv == "PD":
             multiPV = min(self.maxMultiPV, 10)
             multiPV = max(multiPV, self.multiPV)
             for comando, valor in self.liUCI:
@@ -94,10 +94,10 @@ class Engine:
                     break
             self.multiPV = multiPV
 
-        elif xMultiPV == "MX":
+        elif xmultipv == "MX":
             self.multiPV = self.maxMultiPV
         else:
-            self.multiPV = int(xMultiPV)
+            self.multiPV = int(xmultipv)
             if self.multiPV > self.maxMultiPV:
                 self.multiPV = self.maxMultiPV
 

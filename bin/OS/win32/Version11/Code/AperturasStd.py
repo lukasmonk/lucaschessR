@@ -225,7 +225,7 @@ class ListaAperturasStd:
                         break
                 if siMas:
                     ap = self.dic[k]
-                    ap.liMovs = a1h8[len(k):].strip().split(" ")
+                    ap.liMovs = a1h8[len(k) :].strip().split(" ")
                     if siBasic and not ap.siBasic:
                         continue
                     li.append(ap)
@@ -251,6 +251,7 @@ class ListaAperturasStd:
     def XPV(self, xpv):
         last_ap = self.baseXPV(xpv)
         return last_ap.trNombre if last_ap else ""
+
 
 ap = ListaAperturasStd()
 apTrain = ListaAperturasStd()

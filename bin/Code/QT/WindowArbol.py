@@ -818,7 +818,7 @@ class WindowArbol(QTVarios.WDialogo):
         if alm is None:
             return
         confMotor = Code.configuration.buscaRival(alm.engine)
-        confMotor.actMultiPV(alm.multiPV)
+        confMotor.update_multipv(alm.multiPV)
         # confMotor.debug( "rival" )
 
         xengine = self.procesador.creaManagerMotor(confMotor, alm.vtime, alm.depth, siMultiPV=True)

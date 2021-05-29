@@ -43,6 +43,12 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         self.motores = SelectEngines.SelectEngines(self.configuration)
 
+        fvar = self.configuration.file_books
+        self.list_books = Books.ListBooks()
+        self.list_books.restore_pickle(fvar)
+        self.list_books.check()
+        li_books = [(x.name, x) for x in self.list_books.lista]
+
         # Toolbar
         li_acciones = [
             (_("Accept"), Iconos.Aceptar(), self.aceptar),
@@ -104,13 +110,13 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         # # Motores
 
         # ## Rival
-        self.rival = self.procesador.XTutor().confMotor
+        self.rival = self.configuration.x_rival_inicial
         self.rivalTipo = SelectEngines.INTERNO
         self.btRival = Controles.PB(self, "", self.cambiaRival, plano=False).ponFuente(font).altoFijo(48)
 
         lbTiempoSegundosR = Controles.LB2P(self, _("Fixed time in seconds")).ponFuente(font)
         self.edRtiempo = (
-            Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font).capture_changes(self.cambiadoTiempo)
+            Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font).capture_changes(self.change_time)
         )
         bt_cancelar_tiempo = Controles.PB(self, "", rutina=self.cancelar_tiempo).ponIcono(Iconos.S_Cancelar())
         ly_tiempo = Colocacion.H().control(self.edRtiempo).control(bt_cancelar_tiempo).relleno(1)
@@ -307,12 +313,6 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         _label(lyG, _("Opening"), hbox)
 
         # Libros
-        fvar = self.configuration.file_books
-        self.list_books = Books.ListBooks()
-        self.list_books.restore_pickle(fvar)
-        self.list_books.check()
-
-        li_books = [(x.name, x) for x in self.list_books.lista]
         libInicial = li_books[0][1] if li_books else None
 
         li_resp_book = [
@@ -589,6 +589,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         elif self.rivalTipo == SelectEngines.EXTERNO:
             si_multi = self.rival.has_multipv()
+            limpia_time_depth = False
 
         if limpia_time_depth:
             self.edRtiempo.ponFloat(0.0)
@@ -626,7 +627,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             self.edRtiempo.ponFloat(0.0)
         self.edRtiempo.setEnabled(num == 0)
 
-    def cambiadoTiempo(self):
+    def change_time(self):
         num = self.edRtiempo.textoFloat()
         if num > 0.0:
             self.edRdepth.ponInt(0)
@@ -634,7 +635,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
     def cancelar_tiempo(self):
         self.edRtiempo.ponFloat(0.0)
-        self.cambiadoTiempo()
+        self.change_time()
 
     def cancelar_depth(self):
         self.edRdepth.ponInt(0)
@@ -782,7 +783,6 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         return dic
 
     def restore_dic(self, dic):
-
         # Básico
         color = dic.get("SIDE", "B")
         self.rb_white.activa(color == "B")
@@ -919,12 +919,11 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             fvar = self.configuration.file_books
             self.list_books.save_pickle(fvar)
             li = [(x.name, x) for x in self.list_books.lista]
-            if self.sender() == self.btNuevoBookR:
-                self.cbBooksR.rehacer(li, b)
-                self.cbBooksP.rehacer(li, self.cbBooksP.valor())
-            else:
-                self.cbBooksP.rehacer(li, b)
-                self.cbBooksR.rehacer(li, self.cbBooksR.valor())
+            book_R = self.cbBooksR.valor()
+            book_P = self.cbBooksP.valor()
+            sender = self.sender()
+            self.cbBooksR.rehacer(li, b if sender == self.btNuevoBookR else book_R)
+            self.cbBooksP.rehacer(li, b if sender == self.btNuevoBookP else book_P)
 
     def aperturasQuitar(self):
         self.opening_block = None

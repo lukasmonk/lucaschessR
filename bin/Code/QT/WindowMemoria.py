@@ -53,7 +53,7 @@ def paramMemoria(parent, txtCategoria, max_level):
 
 
 class WMemoria(QTVarios.WDialogo):
-    def __init__(self, procesador, txtcategoria, nivel, segundos, listaFen, record):
+    def __init__(self, procesador, txtcategoria, nivel, seconds, listaFen, record):
 
         titulo = _("Check your memory on a chessboard")
         icono = Iconos.Memoria()
@@ -64,7 +64,7 @@ class WMemoria(QTVarios.WDialogo):
 
         self.configuration = procesador.configuration
         self.nivel = nivel
-        self.segundos = segundos
+        self.seconds = seconds
         self.record = record
 
         # Board
@@ -107,7 +107,7 @@ class WMemoria(QTVarios.WDialogo):
                 self,
                 _X(
                     _("You have %1 seconds to remember the position of %2 pieces"),
-                    str(self.segundos),
+                    str(self.seconds),
                     str(self.nivel + 3),
                 ),
             )
@@ -276,14 +276,14 @@ class WMemoria(QTVarios.WDialogo):
         self.pon_toolbar(["seguir"])
 
         self.rotuloDispone.set_text(
-            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.segundos), str(self.nivel + 3))
+            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.seconds), str(self.nivel + 3))
         )
         self.rotuloDispone1.set_text(_("when you know you can press the Continue button"))
         self.rotuloDispone1.show()
         self.rotuloDispone1.show()
         self.gbTiempo.show()
 
-        self.tiempoPendiente = self.segundos
+        self.tiempoPendiente = self.seconds
         self.start_clock()
 
     def seguir(self):
@@ -371,7 +371,7 @@ class WMemoria(QTVarios.WDialogo):
 
     def repetir(self):
         self.rotuloDispone.set_text(
-            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.segundos), str(self.nivel + 3))
+            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.seconds), str(self.nivel + 3))
         )
         self.rotuloDispone.show()
         self.rotuloDispone1.hide()
@@ -408,8 +408,8 @@ class WMemoria(QTVarios.WDialogo):
             self.timer = None
 
 
-def lanzaMemoria(procesador, txtcategoria, nivel, segundos, listaFen, record):
-    w = WMemoria(procesador, txtcategoria, nivel, segundos, listaFen, record)
+def lanzaMemoria(procesador, txtcategoria, nivel, seconds, listaFen, record):
+    w = WMemoria(procesador, txtcategoria, nivel, seconds, listaFen, record)
     if w.exec_():
         return w.vtime
     else:

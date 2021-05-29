@@ -288,7 +288,7 @@ class DBFcache:
         self.cursor.execute(cSQL, liValues)
 
         idNuevo = self.cursor.lastrowid
-        self.liIDs.append([idNuevo, ])
+        self.liIDs.append([idNuevo])
 
         if okCommit:
             self.conexion.commit()

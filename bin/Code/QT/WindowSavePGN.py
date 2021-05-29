@@ -591,10 +591,11 @@ class FileSavePGN:
     def um(self):
         self.xum = QTUtil2.unMomento(self.owner, _("Saving..."))
 
-    def um_final(self):
+    def um_final(self, with_message=True):
         if self.xum:
             self.xum.final()
-        QTUtil2.message_bold(self.owner, _X(_("Saved to %1"), self.file))
+        if with_message:
+            QTUtil2.message_bold(self.owner, _X(_("Saved to %1"), self.file))
 
     def pb(self, total):
         self._pb = QTUtil2.BarraProgreso(self.owner, self.file, "", total)

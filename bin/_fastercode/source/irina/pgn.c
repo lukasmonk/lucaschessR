@@ -108,7 +108,7 @@ int pgn_read(char * body, char * fen)
             {
                 from_18 = *c;
                 c++;
-                if( *c == 'x' ) c++;
+                if( *c == 'x' || *c == '-') c++;
                 if( *c >= 'a' && *c <= 'h' )
                 {
                     to_AH = *c;
@@ -137,7 +137,7 @@ int pgn_read(char * body, char * fen)
                 from_18 = *c;
                 c++;
             }
-            if( *c == 'x' ) c++;
+            if( *c == 'x' || *c == '-') c++;
             if( *c >= 'a' && *c <= 'h' )
             {
                 to_AH = *c;

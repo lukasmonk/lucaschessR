@@ -96,12 +96,11 @@ class ManagerOpeningEngines(Manager.Manager):
         self.xrival = self.procesador.creaManagerMotor(rival, self.time, None)
         self.xrival.is_white = self.is_engine_side_white
 
-
-        self.xanalyzer.cambiaOpciones(max(self.xtutor.motorTiempoJugada, self.time + 5.0), 0)
+        self.xanalyzer.options(max(self.xtutor.ms_time_move, self.time + 5.0), 0, False)
 
         juez = self.configuration.buscaRival(self.trainingEngines["ENGINE_CONTROL"])
         self.xjuez = self.procesador.creaManagerMotor(juez, int(self.trainingEngines["ENGINE_TIME"] * 1000), None)
-        self.xjuez.anulaMultiPV()
+        self.xjuez.remove_multipv()
 
         self.li_info = [
             "<b>%s</b>: %d/%d - %s" % (_("Engine"), self.numengine + 1, num_engines, self.xrival.name),
@@ -298,8 +297,8 @@ class ManagerOpeningEngines(Manager.Manager):
             self.ponteEnJugada(move.njg)
             self.mensEspera(siCancelar=True, masTitulo="%d/%d" % (pos, total))
             name = self.xanalyzer.name
-            vtime = self.xanalyzer.motorTiempoJugada
-            depth = self.xanalyzer.motorProfundidad
+            vtime = self.xanalyzer.ms_time_move
+            depth = self.xanalyzer.depth_engine
             mrm = self.dbop.get_cache_engines(name, vtime, move.fenm2, depth)
             ok = False
             if mrm:
@@ -308,7 +307,7 @@ class ManagerOpeningEngines(Manager.Manager):
                     ok = True
             if not ok:
                 mrm, pos = self.xanalyzer.analysis_move(
-                    move, self.xanalyzer.motorTiempoJugada, self.xanalyzer.motorProfundidad
+                    move, self.xanalyzer.ms_time_move, self.xanalyzer.depth_engine
                 )
                 self.dbop.set_cache_engines(name, vtime, move.fenm2, mrm, depth)
 
@@ -367,7 +366,7 @@ class ManagerOpeningEngines(Manager.Manager):
         def calculaJG(move, siinicio):
             fen = move.position_before.fen() if siinicio else move.position.fen()
             name = self.xjuez.name
-            vtime = self.xjuez.motorTiempoJugada
+            vtime = self.xjuez.ms_time_move
             mrm = self.dbop.get_cache_engines(name, vtime, fen)
             if mrm is None:
                 self.mensEspera()

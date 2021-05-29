@@ -82,16 +82,23 @@ class WRunCounts(QTVarios.WDialogo):
         self.pon_info_posic()
         self.set_position()
 
+    def pulsada_celda(self, celda):  # Incluida por compatibilidad del Board
+        pass
+
     def set_position(self):
         self.move_base = self.count.game.move(self.count.current_posmove)
-        self.move_obj = self.count.game.move(self.count.current_posmove + self.count.current_depth)
+        num_move = self.count.current_posmove + self.count.current_depth
+        if num_move >= len(self.count.game):
+            self.position_obj = self.count.game.move(-1).position
+        else:
+            self.position_obj = self.count.game.move(self.count.current_posmove + self.count.current_depth).position_before
         self.board.set_position(self.move_base.position_before)
         self.ed_moves.setFocus()
 
     def pon_info_posic(self):
         self.lb_info.set_text(
             "%d+%d / %d"
-            % (self.count.current_posmove + 1, self.count.current_depth, len(self.count.game), )
+            % (self.count.current_posmove, self.count.current_depth, len(self.count.game), )
         )
 
     def closeEvent(self, event):
@@ -151,18 +158,20 @@ class WRunCounts(QTVarios.WDialogo):
     def check(self):
         tiempo = time.time() - self.time_base
 
-        position_obj = self.move_obj.position_before
-        moves = FasterCode.get_exmoves_fen(position_obj.fen())
+        moves = FasterCode.get_exmoves_fen(self.position_obj.fen())
 
         num_moves_calculated = int(self.ed_moves.texto())
+        ok = num_moves_calculated == len(moves)
+        xtry = self.count.current_posmove, self.count.current_depth, ok, tiempo
+        self.count.tries.append(xtry)
 
-        if num_moves_calculated == len(moves):
-            self.count.current_depth += 1
+        if ok:
             if (self.count.current_posmove + self.count.current_depth) >= len(self.count.game):
                 QTUtil2.message(self, _("Training finished"))
                 self.db_counts.change_count_capture(self.count)
                 self.terminar()
                 return
+            self.count.current_depth += 1
             self.lb_result.set_text("%s (%d)" % (_("Right, go to the next level of depth"), self.count.current_depth))
             self.lb_result.set_foreground("green")
 
@@ -179,7 +188,7 @@ class WRunCounts(QTVarios.WDialogo):
             else:
                 self.lb_result.set_text(_("Wrong, you must repeat this position"))
                 self.lb_result.set_foreground("red")
-            self.board.set_position(position_obj)
+            self.board.set_position(self.position_obj)
             for x in moves:
                 self.board.creaFlechaTmp(x.xfrom(), x.xto(), False)
 

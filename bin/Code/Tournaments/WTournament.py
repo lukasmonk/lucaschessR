@@ -765,7 +765,7 @@ class WTournament(QTVarios.WDialogo):
 
         dicValores["ROUNDS"] = rounds = options[0]
         dicValores["MINUTES"] = minutos = options[1]
-        dicValores["SECONDS"] = segundos = options[2]
+        dicValores["SECONDS"] = seconds = options[2]
 
         li_resp_engines = []
         for group in li_resp[1:]:
@@ -787,8 +787,8 @@ class WTournament(QTVarios.WDialogo):
         for r in range(rounds):
             for x in range(nSel - 1):
                 for y in range(x + 1, nSel):
-                    self.torneo.nuevoGame(liSel[x], liSel[y], minutos, segundos)
-                    self.torneo.nuevoGame(liSel[y], liSel[x], minutos, segundos)
+                    self.torneo.nuevoGame(liSel[x], liSel[y], minutos, seconds)
+                    self.torneo.nuevoGame(liSel[y], liSel[x], minutos, seconds)
 
         self.gridGamesQueued.refresh()
         self.gridGamesQueued.gobottom()

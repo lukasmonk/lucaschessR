@@ -742,7 +742,7 @@ class Configuration:
         li_resp = []
         maia = True
         for engine in li:
-            if engine[0].startswith("Maia"):
+            if engine[0].lower().startswith("maia"):
                 if maia:
                     engine[0] = "Maia 1100-1900"
                     maia = False

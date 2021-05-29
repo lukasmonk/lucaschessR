@@ -91,7 +91,7 @@ class DBFcache:
         """
         self.condicion = condicion
 
-    def leerBuffer(self, segundos=1.0, chunk=20000):
+    def leerBuffer(self, seconds=1.0, chunk=20000):
         self.resetCache()
         self.cursorBuffer = self.conexion.cursor()
         self.bof = True
@@ -118,11 +118,11 @@ class DBFcache:
                 self.cursorBuffer = None
                 break
             xt = time.time() - xInicio
-            if xt > segundos:
+            if xt > seconds:
                 break
         return self.siBufferPendiente
 
-    def leerMasBuffer(self, segundos=1.0, chunk=200):
+    def leerMasBuffer(self, seconds=1.0, chunk=200):
         if not self.siBufferPendiente:
             return True
         xInicio = time.time()
@@ -136,7 +136,7 @@ class DBFcache:
                 self.cursorBuffer.close()
                 break
             xt = time.time() - xInicio
-            if xt > segundos:
+            if xt > seconds:
                 break
         return self.siBufferPendiente
 

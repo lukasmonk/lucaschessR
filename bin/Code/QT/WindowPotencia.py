@@ -144,7 +144,7 @@ class PotenciaHistorico:
         fecha = datetime.datetime(year, month, day, hour, minute, second)
         return fecha
 
-    def append(self, fecha, score, engine, segundos, min_min, min_max, linea, ref):
+    def append(self, fecha, score, engine, seconds, min_min, min_max, linea, ref):
 
         br = self.dbf.baseRegistro()
         if ref is None:
@@ -157,7 +157,7 @@ class PotenciaHistorico:
         br.FECHA = self.fecha2txt(fecha)
         br.SCORE = score
         br.ENGINE = engine
-        br.SEGUNDOS = segundos
+        br.SEGUNDOS = seconds
         br.MIN_MIN = min_min
         br.MIN_MAX = min_max
         br.LINE = linea
@@ -387,7 +387,7 @@ class WPotenciaBase(QTVarios.WDialogo):
 
         self.historico = PotenciaHistorico(self.configuration.ficheroPotencia)
 
-        self.engine, self.segundos, self.min_min, self.min_max = self.leeParametros()
+        self.engine, self.seconds, self.min_min, self.min_max = self.leeParametros()
 
         # Historico
         o_columns = Columnas.ListaColumnas()
@@ -445,7 +445,7 @@ class WPotenciaBase(QTVarios.WDialogo):
         reg = self.historico[fil]
         linea = reg.LINE
         if linea:
-            w = WPotencia(self, self.engine, self.segundos, self.min_min, self.min_max, linea, reg.REF)
+            w = WPotencia(self, self.engine, self.seconds, self.min_min, self.min_max, linea, reg.REF)
             w.exec_()
             self.ghistorico.gotop()
             self.ghistorico.refresh()
@@ -453,12 +453,12 @@ class WPotenciaBase(QTVarios.WDialogo):
     def leeParametros(self):
         param = UtilSQL.DictSQL(self.configuration.ficheroPotencia, tabla="parametros")
         engine = param.get("ENGINE", "stockfish")
-        segundos = param.get("SEGUNDOS", 5)
+        seconds = param.get("SEGUNDOS", 5)
         min_min = param.get("MIN_MIN", 1)
         min_max = param.get("MIN_MAX", 5)
         param.close()
 
-        return engine, segundos, min_min, min_max
+        return engine, seconds, min_min, min_max
 
     def grid_num_datos(self, grid):
         return len(self.historico)
@@ -509,7 +509,7 @@ class WPotenciaBase(QTVarios.WDialogo):
 
         # # Segundos a pensar el tutor
         config = FormLayout.Spinbox(_("Duration of engine analysis (secs)"), 1, 99, 50)
-        li_gen.append((config, self.segundos))
+        li_gen.append((config, self.seconds))
 
         # Minutos
         config = FormLayout.Spinbox(_("Observation time in minutes"), 0, 99, 50)
@@ -523,13 +523,13 @@ class WPotenciaBase(QTVarios.WDialogo):
         if resultado:
             accion, liResp = resultado
             self.engine = liResp[0]
-            self.segundos = liResp[1]
+            self.seconds = liResp[1]
             self.min_min = liResp[2]
             self.min_max = liResp[3]
 
             param = UtilSQL.DictSQL(self.configuration.ficheroPotencia, tabla="parametros")
             param["ENGINE"] = self.engine
-            param["SEGUNDOS"] = self.segundos
+            param["SEGUNDOS"] = self.seconds
             param["MIN_MIN"] = self.min_min
             param["MIN_MAX"] = self.min_max
             param.close()
@@ -546,14 +546,14 @@ class WPotenciaBase(QTVarios.WDialogo):
             # self.tb.update()
 
     def empezar(self):
-        w = WPotencia(self, self.engine, self.segundos, self.min_min, self.min_max)
+        w = WPotencia(self, self.engine, self.seconds, self.min_min, self.min_max)
         w.exec_()
         self.ghistorico.gotop()
         self.ghistorico.refresh()
 
 
 class WPotencia(QTVarios.WDialogo):
-    def __init__(self, owner, engine, segundos, min_min, min_max, linea=None, ref=None):
+    def __init__(self, owner, engine, seconds, min_min, min_max, linea=None, ref=None):
 
         super(WPotencia, self).__init__(owner, _("Determine your calculating power"), Iconos.Potencia(), "potencia")
 
@@ -570,8 +570,8 @@ class WPotencia(QTVarios.WDialogo):
         if engine.startswith("*"):
             engine = engine[1:]
         confMotor = self.configuration.buscaTutor(engine)
-        self.xtutor = self.procesador.creaManagerMotor(confMotor, segundos * 1000, None)
-        self.xtutor.maximizaMultiPV()
+        self.xtutor = self.procesador.creaManagerMotor(confMotor, seconds * 1000, None)
+        self.xtutor.maximize_multipv()
 
         # Board
         config_board = self.configuration.config_board("POTENCIA", 48)
@@ -757,7 +757,7 @@ class WPotencia(QTVarios.WDialogo):
                     siError = True
                     break
                 move = Move.Move(None, cp, cpNue, from_sq, to_sq, promotion)
-                mrm, pos = self.xtutor.analysis_move(move, self.xtutor.motorTiempoJugada)
+                mrm, pos = self.xtutor.analysis_move(move, self.xtutor.ms_time_move)
                 move.analysis = mrm, pos
 
                 self.li_analysis.append(move)
@@ -787,7 +787,7 @@ class WPotencia(QTVarios.WDialogo):
                 Util.today(),
                 totalPuntos,
                 self.xtutor.key,
-                int(self.xtutor.motorTiempoJugada / 1000),
+                int(self.xtutor.ms_time_move / 1000),
                 self.min_min,
                 self.min_max,
                 self.linea,

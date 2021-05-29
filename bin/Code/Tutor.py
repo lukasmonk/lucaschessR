@@ -358,8 +358,8 @@ class Tutor:
                     self.boardTutor.flechaSC.hide()
                 li = FasterCode.get_captures(fen, siMB)
                 for m in li:
-                    d = m.from_sq()
-                    h = m.to_sq()
+                    d = m.xfrom()
+                    h = m.xto()
                     self.boardTutor.creaFlechaMov(d, h, "c")
             else:
                 self.boardTutor.remove_arrows()
@@ -385,8 +385,8 @@ class Tutor:
                     self.boardUsuario.flechaSC.hide()
                 li = FasterCode.get_captures(fen, siMB)
                 for m in li:
-                    d = m.from_sq()
-                    h = m.to_sq()
+                    d = m.xfrom()
+                    h = m.xto()
                     self.boardUsuario.creaFlechaMov(d, h, "c")
             else:
                 self.boardUsuario.remove_arrows()
@@ -407,7 +407,7 @@ class Tutor:
     #     player_move_puntos = self.rmUsuario.puntos
     #     player_move_mate = self.rmUsuario.mate
     #     tutor = self.managerTutor.name.replace('"', "").replace(";", "")
-    #     tutor_tiempo = self.managerTutor.motorTiempoJugada
+    #     tutor_tiempo = self.managerTutor.ms_time_move
     #
     #     try:
     #         if not os.path.isfile(self.x_save_csv):

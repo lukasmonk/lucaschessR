@@ -109,7 +109,16 @@ def activar():
     if is_linux:
         functype = ctypes.CFUNCTYPE
         path = os.path.join(Code.folder_OS, "DigitalBoards")
-        path_so = os.path.join(path, "libucb.so")
+        if Code.configuration.x_digital_board == "DGT":
+            path_so = os.path.join(path, "libdgt.so")
+        elif Code.configuration.x_digital_board == "Certabo":
+            path_so = os.path.join(path, "libcer.so")
+        elif Code.configuration.x_digital_board == "Millennium":
+            path_so = os.path.join(path, "libmcl.so")
+        elif Code.configuration.x_digital_board == "Citrine":
+            path_so = os.path.join(path, "libcit.so")
+        else:
+            path_so = os.path.join(path, "libucb.so")
         if os.path.isfile(path_so):
             dgt = ctypes.CDLL(path_so)
 

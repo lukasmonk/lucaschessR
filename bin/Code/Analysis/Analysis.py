@@ -25,7 +25,7 @@ class AnalyzeGame:
         self.configuration = procesador.configuration
         conf_engine = copy.deepcopy(self.configuration.buscaRival(alm.engine))
         if alm.multiPV:
-            conf_engine.actMultiPV(alm.multiPV)
+            conf_engine.update_multipv(alm.multiPV)
         self.xmanager = procesador.creaManagerMotor(conf_engine, alm.vtime, alm.depth, True, priority=alm.priority)
         self.vtime = alm.vtime
         self.depth = alm.depth
@@ -315,7 +315,7 @@ FILESW=%s:100
         def gui_dispatch(xrm):
             return not tmp_bp.is_canceled()
 
-        self.xmanager.ponGuiDispatch(gui_dispatch)  # Dispatch del engine, si esta puesto a 4 minutos por ejemplo que
+        self.xmanager.set_gui_dispatch(gui_dispatch)  # Dispatch del engine, si esta puesto a 4 minutos por ejemplo que
         # compruebe si se ha indicado que se cancele.
 
         si_blunders = self.kblunders > 0
@@ -702,8 +702,8 @@ class MuestraAnalisis:
             def mira(rm):
                 return not me.cancelado()
 
-            xengine.ponGuiDispatch(mira)
-            mrm, pos = xengine.analysis_move(move, xengine.motorTiempoJugada, xengine.motorProfundidad)
+            xengine.set_gui_dispatch(mira)
+            mrm, pos = xengine.analysis_move(move, xengine.ms_time_move, xengine.depth_engine)
             move.analysis = mrm, pos
             si_cancelado = me.cancelado()
             me.final()
@@ -721,11 +721,11 @@ class MuestraAnalisis:
         for um in self.li_tabs_analysis:
             if um.xengine.key == busca:
                 xengine = um.xengine
-                xengine.actMultiPV(alm.multiPV)
+                xengine.update_multipv(alm.multiPV)
                 break
         if xengine is None:
             conf_engine = self.configuration.buscaRival(alm.engine)
-            conf_engine.actMultiPV(alm.multiPV)
+            conf_engine.update_multipv(alm.multiPV)
             xengine = self.procesador.creaManagerMotor(conf_engine, alm.vtime, alm.depth, siMultiPV=True)
 
         me = QTUtil2.mensEspera.start(main_window, _("Analyzing the move...."), physical_pos="ad")
@@ -781,9 +781,9 @@ class AnalisisVariations:
         self.max_tutor = None
         self.game_tutor = None
 
-        if self.xtutor.motorTiempoJugada:
-            segundos_pensando = self.xtutor.motorTiempoJugada / 1000  # esta en milesimas
-            if self.xtutor.motorTiempoJugada % 1000 > 0:
+        if self.xtutor.ms_time_move:
+            segundos_pensando = self.xtutor.ms_time_move / 1000  # esta en milesimas
+            if self.xtutor.ms_time_move % 1000 > 0:
                 segundos_pensando += 1
         else:
             segundos_pensando = 3

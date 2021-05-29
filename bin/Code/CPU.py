@@ -30,8 +30,8 @@ class CPU:
         tarea.siExclusiva = siExclusiva
         return tid
 
-    def duerme(self, segundos, padre=0, siExclusiva=False):
-        tarea = Tareas.TareaDuerme(segundos)
+    def duerme(self, seconds, padre=0, siExclusiva=False):
+        tarea = Tareas.TareaDuerme(seconds)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
@@ -40,8 +40,8 @@ class CPU:
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
-    def muevePieza(self, from_a1h8, to_a1h8, segundos=1.0, padre=0, siExclusiva=False):
-        tarea = Tareas.TareaMuevePieza(from_a1h8, to_a1h8, segundos)
+    def muevePieza(self, from_a1h8, to_a1h8, seconds=1.0, padre=0, siExclusiva=False):
+        tarea = Tareas.TareaMuevePieza(from_a1h8, to_a1h8, seconds)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
@@ -55,8 +55,8 @@ class CPU:
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
-    def muevePiezaLI(self, lista, segundos=1.0, padre=0, siExclusiva=False):
-        tarea = Tareas.TareaMuevePiezaLI(lista, segundos)
+    def muevePiezaLI(self, lista, seconds=1.0, padre=0, siExclusiva=False):
+        tarea = Tareas.TareaMuevePiezaLI(lista, seconds)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 

@@ -56,7 +56,7 @@ class ManagerGM(Manager.Manager):
             tutor = self.configuration.buscaRival(self.engine)
             t_t = self.vtime * 100
             self.xtutor = self.procesador.creaManagerMotor(tutor, t_t, self.depth)
-            self.xtutor.setMultiPV(self.multiPV)
+            self.xtutor.set_multipv(self.multiPV)
             self.analysis = None
             self.continueTt = not Code.configuration.x_engine_notbackground
 
@@ -167,7 +167,7 @@ class ManagerGM(Manager.Manager):
         if self.siAnalizando:
             self.siAnalizando = False
             if self.continueTt:
-                self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+                self.mrmTutor = self.xtutor.ac_final(self.xtutor.ms_time_move)
             else:
                 self.mrmTutor = self.xtutor.ac_final_limit()
 

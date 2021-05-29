@@ -12,7 +12,12 @@ from Code.Engines import EngineResponse, Priorities
 
 
 class DirectEngine(object):
-    def __init__(self, name, exe, liOpcionesUCI=None, nMultiPV=0, priority=None, args=None):
+    def __init__(self, name, exe, liOpcionesUCI=None, num_multipv=0, priority=None, args=None, log=None):
+
+        self.log = None
+        if log:
+            self.log_open(log)
+
         self.name = name
 
         self.ponder = False
@@ -27,8 +32,6 @@ class DirectEngine(object):
         self.whoDispatch = name
         self.uci_ok = False
         self.pid = None
-
-        self.log = None
 
         self.uci_lines = []
 
@@ -77,7 +80,7 @@ class DirectEngine(object):
             self.pwait_list("isready", "readyok", 1000)
         self.ucinewgame()
 
-    def ponGuiDispatch(self, gui_dispatch, whoDispatch=None):
+    def set_gui_dispatch(self, gui_dispatch, whoDispatch=None):
         self.gui_dispatch = gui_dispatch
 
     def put_line(self, line):
@@ -96,7 +99,7 @@ class DirectEngine(object):
             self.log = None
 
     def log_write(self, line):
-        self.log.write("%s\n" % line)
+        self.log.write(line)
 
     def pwait_list(self, orden, txt_busca, maxtime):
         self.put_line(orden)

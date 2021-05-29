@@ -205,9 +205,12 @@ class Move:
         if self.li_nags:
             resp += " ".join([html_nag_txt(nag) for nag in self.li_nags])
 
-        if self.comment:
+        comment = self.comment
+        if self.li_themes:
+            comment += "[%theme " + ",".join(self.li_themes) + "]"
+        if comment:
             resp += " "
-            for txt in self.comment.strip().split("\n"):
+            for txt in comment.strip().split("\n"):
                 if txt:
                     resp += "{%s}" % txt.strip()
         if with_variations and len(self.variations):

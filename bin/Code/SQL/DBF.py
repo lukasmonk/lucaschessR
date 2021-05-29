@@ -158,7 +158,7 @@ class DBF:
                 break
         return self.siBufferPendiente
 
-    def leerBuffer(self, segundos=1.0, chunk=200):
+    def leerBuffer(self, seconds=1.0, chunk=200):
         self.cursorBuffer = self.conexion.cursor()
         self.bof = True
         self.recno = -1
@@ -183,11 +183,11 @@ class DBF:
                 self.cursorBuffer.close()
                 break
             xt = time.time() - xInicio
-            if xt > segundos:
+            if xt > seconds:
                 break
         return self.siBufferPendiente
 
-    def leerMasBuffer(self, segundos=1.0, chunk=200):
+    def leerMasBuffer(self, seconds=1.0, chunk=200):
         if not self.siBufferPendiente:
             return True
         xInicio = time.time()
@@ -201,7 +201,7 @@ class DBF:
                 self.cursorBuffer.close()
                 break
             xt = time.time() - xInicio
-            if xt > segundos:
+            if xt > seconds:
                 break
         return self.siBufferPendiente
 

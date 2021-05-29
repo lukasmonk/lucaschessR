@@ -366,16 +366,16 @@ def ld_countries(mapa):
 
 
 class DBWorkMap(SQLBase.DBBase):
-    trDic = {
-        "mate": _("Mate"),
-        "sts": _("STS"),
-        "basic": _("Basic"),
-        "easy": _("Easy"),
-        "medium": _("Medium"),
-        "hard": _("Hard"),
-    }
-
     def __init__(self, fichdb):
+        self.trDic = {
+            "mate": _("Mate"),
+            "sts": _("STS"),
+            "basic": _("Basic"),
+            "easy": _("Easy"),
+            "medium": _("Medium"),
+            "hard": _("Hard"),
+        }
+
         SQLBase.DBBase.__init__(self, fichdb)
 
         self.dicDB = UtilSQL.DictSQL(fichdb, tabla="CONFIG")

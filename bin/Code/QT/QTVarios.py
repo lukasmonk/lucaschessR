@@ -283,9 +283,9 @@ class Tiempo(QtWidgets.QDialog):
 
     def resultado(self):
         minutos = self.edMinutos.value()
-        segundos = self.edSegundos.value()
+        seconds = self.edSegundos.value()
 
-        return minutos, segundos
+        return minutos, seconds
 
 
 def vtime(owner, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999, default_minutes=10, default_seconds=0):

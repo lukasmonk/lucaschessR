@@ -1,4 +1,4 @@
-import os
+import locale
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
@@ -27,9 +27,6 @@ def run_gui(procesador):
     else:
         user = None
 
-    active_folder = Configuration.active_folder()
-    askfor_language = not os.path.isdir(active_folder) or not os.listdir(active_folder)
-
     procesador.start_with_user(user)
     configuration = procesador.configuration
     if user:
@@ -43,7 +40,7 @@ def run_gui(procesador):
                     Usuarios.Usuarios().save_list(list_users)
 
     # Comprobamos el lenguaje
-    if askfor_language and not configuration.translator:
+    if not configuration.x_translator:
         if user:
             conf_main = Configuration.Configuration("")
             ori = conf_main.file_external_engines()
@@ -57,16 +54,54 @@ def run_gui(procesador):
 
         else:
             li = configuration.list_translations()
+
+            li_info = locale.getdefaultlocale()
+            lng_default = "en"
+            name_default = "English"
+            if len(li_info) == 2:
+                lng = li_info[0][:2]
+                for k, name, porc, author in li:
+                    if k == lng:
+                        name_default = name
+                        lng_default = lng
+
             menu = QTVarios.LCMenuRondo(None)
+            menu.opcion(None, "Select your language", icono=Iconos.Book())
+            menu.separador()
+            menu.opcion(lng_default, "By default: %s" % name_default, icono=Iconos.AceptarPeque())
+            menu.separador()
+
+            font_metrics = QtGui.QFontMetrics(menu.font())
+            space_width = font_metrics.width(" ")
+
+            mx = 0
+            d_with = {}
             for k, name, porc, author in li:
-                if porc != 100:
+                if porc < 95:
                     name += " (%d%%)" % porc
-                menu.opcion(k, name)
+                name_with = font_metrics.width(name)
+                d_with[k] = name, name_with
+                if name_with > mx:
+                    mx = name_with
+            mx += space_width*2
+
+            for k, name, porc, author in li:
+                name, name_with = d_with[k]
+                resto = mx - name_with
+                name += " " * (resto//space_width) + "by %s" % author
+                if k == lng_default:
+                    menu.opcion(k, name, icono=Iconos.AceptarPeque())
+                else:
+                    menu.opcion(k, name)
+            menu.separador()
             resp = menu.lanza()
             if resp:
-                configuration.translator = resp
-                configuration.graba()
-                configuration.releeTRA()
+                lng = resp
+            else:
+                lng = lng_default
+            configuration.set_translator(lng)
+            configuration.graba()
+            configuration.releeTRA()
 
     # Estilo
     # https://github.com/gmarull/qtmodern/blob/master/qtmodern/styles.py
@@ -132,6 +167,7 @@ def run_gui(procesador):
     app.setEffectEnabled(QtCore.Qt.UI_AnimateMenu)
 
     QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "ChessAlpha2.ttf"))
+    QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "Inconsolata.ttf"))
 
     if configuration.x_font_family:
         font = Controles.TipoLetra(configuration.x_font_family)

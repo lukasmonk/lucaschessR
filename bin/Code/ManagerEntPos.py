@@ -1,6 +1,5 @@
 import os
 
-from PySide2 import QtCore
 from PySide2.QtCore import Qt
 
 import Code
@@ -14,7 +13,7 @@ from Code.Base.Constantes import *
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import WCompetitionWithTutor
+from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.SQL import UtilSQL
 
 
@@ -93,7 +92,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.ayudas_iniciales = 0
 
-        li_options = [TB_CLOSE, TB_CHANGE, TB_REINIT, TB_TAKEBACK]
+        li_options = [TB_CLOSE, TB_HELP, TB_CHANGE, TB_REINIT, TB_TAKEBACK]
         li_options.append(TB_PGN_LABELS)
         li_options.extend((TB_CONFIG, TB_UTILITIES))
         if self.num_trainings > 1:
@@ -172,11 +171,23 @@ class ManagerEntPos(Manager.Manager):
         elif key == TB_CONTINUE:
             self.sigue()
 
+        elif key == TB_HELP:
+            self.help()
+
         elif key in self.procesador.li_opciones_inicio:
             self.procesador.run_action(key)
 
         else:
             Manager.Manager.rutinaAccionDef(self, key)
+
+    def help(self):
+        if self.is_playing_gameobj():
+            move_obj = self.game_obj.move(self.pos_obj)
+            self.current_attempts += 1
+            if self.current_attempts == 1:
+                self.board.markPosition(move_obj.from_sq)
+            else:
+                self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
 
     def reiniciar(self):
         if self.is_rival_thinking:
@@ -251,11 +262,11 @@ class ManagerEntPos(Manager.Manager):
         siRival = is_white == self.is_engine_side_white
 
         if siRival:
-
+            self.pon_help(False)
             self.piensa_rival()
 
         else:
-
+            self.pon_help(self.is_playing_gameobj())
             self.piensa_humano(is_white)
 
     def piensa_humano(self, is_white):
@@ -272,7 +283,8 @@ class ManagerEntPos(Manager.Manager):
         self.is_rival_thinking = True
         self.disable_all()
 
-        if self.is_playing_gameobj():
+        is_obj = self.is_playing_gameobj()
+        if is_obj:
             if self.game_obj and self.pos_obj == len(self.game_obj):
                 self.is_rival_thinking = False
                 self.lineaTerminadaOpciones()
@@ -283,20 +295,20 @@ class ManagerEntPos(Manager.Manager):
 
         else:
             self.thinking(True)
-            self.rm_rival = self.xrival.juega()
+            self.rm_rival = self.xrival.play_game(self.game)
             self.thinking(False)
             from_sq, to_sq, promotion = (self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion)
 
         self.is_rival_thinking = False
         ok, mens, move = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
         self.is_analyzed_by_tutor = False
-        is_obj = self.is_playing_gameobj()
 
         self.move_the_pieces(move.liMovs, True)
         self.add_move(move, False)
 
-        if is_obj:
+        if is_obj and len(self.game_obj) == self.pos_obj:
             self.lineaTerminadaOpciones()
+
         self.play_next_move()
 
     def analizaInicio(self):
@@ -331,7 +343,7 @@ class ManagerEntPos(Manager.Manager):
         if self.is_analyzed_by_tutor:
             return
         self.main_window.pensando_tutor(True)
-        self.mrmTutor = self.xtutor.ac_final(self.xtutor.motorTiempoJugada)
+        self.mrmTutor = self.xtutor.ac_final(self.xtutor.ms_time_move)
         self.main_window.pensando_tutor(False)
 
     def analiza_stop(self):
@@ -347,6 +359,7 @@ class ManagerEntPos(Manager.Manager):
         self.play_next_move()
 
     def lineaTerminadaOpciones(self):
+        self.pon_help(False)
         self.state = ST_ENDGAME
         if self.is_automatic_jump:
             self.ent_siguiente(TB_NEXT)
@@ -355,9 +368,19 @@ class ManagerEntPos(Manager.Manager):
             QTUtil2.mensajeTemporal(self.main_window, _("Line completed"), 0.9, fixedSize=None)
             if not self.is_finished():
                 if not (TB_CONTINUE in self.li_options_toolbar):
-                    self.li_options_toolbar.insert(4, TB_CONTINUE)
+                    self.li_options_toolbar.insert(5, TB_CONTINUE)
                     self.main_window.pon_toolbar(self.li_options_toolbar)
             return False
+
+    def pon_help(self, si_poner):
+        if si_poner:
+            if TB_HELP not in self.li_options_toolbar:
+                self.li_options_toolbar.insert(1, TB_HELP)
+                self.main_window.pon_toolbar(self.li_options_toolbar)
+        else:
+            if TB_HELP in self.li_options_toolbar:
+                self.li_options_toolbar.remove(TB_HELP)
+                self.main_window.pon_toolbar(self.li_options_toolbar)
 
     def is_playing_gameobj(self):
         if self.game_obj:
@@ -387,10 +410,10 @@ class ManagerEntPos(Manager.Manager):
                 self.board.ponFlechasTmp(li_movs)
             else:
                 if a1h8[:2] != move_obj.from_sq:
-                    if self.current_attempts >= self.attempts:
+                    if self.attempts and self.current_attempts >= self.attempts:
                         self.board.markPosition(move_obj.from_sq)
                 else:
-                    if self.current_attempts >= self.attempts:
+                    if self.attempts and  self.current_attempts >= self.attempts:
                         self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
             if not ok:
                 self.sigueHumano()

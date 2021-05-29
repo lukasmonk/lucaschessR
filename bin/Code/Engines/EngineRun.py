@@ -19,7 +19,11 @@ from Code.QT import QTUtil2
 
 
 class RunEngine:
-    def __init__(self, name, exe, liOpcionesUCI=None, nMultiPV=0, priority=None, args=None):
+    def __init__(self, name, exe, liOpcionesUCI=None, num_multipv=0, priority=None, args=None, log=None):
+        self.log = None
+        if log:
+            self.log_open(log)
+
         if Code.DEBUG_ENGINE:
             self.put_line = self.put_line_debug
             self.xstdout_thread = self.xstdout_thread_debug
@@ -36,11 +40,9 @@ class RunEngine:
 
         self.gui_dispatch = None
         self.ultDispatch = 0
-        self.minDispatch = 1.0  # segundos
+        self.minDispatch = 1.0  # seconds
         self.whoDispatch = name
         self.uci_ok = False
-
-        self.log = None
 
         self.uci_lines = []
 
@@ -85,10 +87,10 @@ class RunEngine:
                 if opcion.lower() == "ponder":
                     self.ponder = valor == "true"
 
-        self.nMultiPV = nMultiPV
-        if nMultiPV:
-            self.ponMultiPV(nMultiPV)
-            if not uci_analysismode and nMultiPV > 1:
+        self.num_multipv = num_multipv
+        if num_multipv:
+            self.ponMultiPV(num_multipv)
+            if not uci_analysismode and num_multipv > 1:
                 for line in self.uci_lines:
                     if "UCI_AnalyseMode" in line:
                         self.set_option("UCI_AnalyseMode", "true")
@@ -108,7 +110,7 @@ class RunEngine:
             self.stdin_lock.acquire()
             line = line.encode()
             if self.log:
-                self.log_write(">>> %s\n" % line)
+                self.log.write(">>> %s\n" % line)
             self.stdin.write(line + b"\n")
             self.stdin.flush()
             self.stdin_lock.release()
@@ -118,7 +120,7 @@ class RunEngine:
             self.stdin_lock.acquire()
             line = line.encode()
             if self.log:
-                self.log_write(">>> %s\n" % line)
+                self.log.write(">>> %s\n" % line)
             self.stdin.write(line + b"\n")
             self.stdin.flush()
             self.stdin_lock.release()
@@ -128,9 +130,6 @@ class RunEngine:
         li = self.liBuffer
         self.liBuffer = []
         self.stdout_lock.release()
-        if self.log:
-            for line in li:
-                self.log_write(line)
         return li
 
     def hay_datos(self):
@@ -154,6 +153,8 @@ class RunEngine:
                 lock.release()
                 if self.direct_dispatch and "bestmove" in line:
                     self.direct_dispatch()
+                if self.log:
+                    self.log.write(line.strip() + "\n")
         except:
             pass
         finally:
@@ -188,9 +189,7 @@ class RunEngine:
         curdir = os.path.abspath(os.curdir)  # problem with "." as curdir
         os.chdir(self.direxe)  # to fix problems with non ascii folders
 
-        self.process = subprocess.Popen(
-            self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo
-        )
+        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo)
         os.chdir(curdir)
 
         self.pid = self.process.pid
@@ -224,11 +223,12 @@ class RunEngine:
                 if self.process.poll() is None:
                     self.put_line("stop")
                     self.put_line("quit")
+                    time.sleep(0.1)
                     self.process.kill()
                     self.process.terminate()
             except:
                 if Code.is_windows:
-                    subprocess.call(['taskkill', '/F', '/T', '/PID', str(self.pid)])
+                    subprocess.call(["taskkill", "/F", "/T", "/PID", str(self.pid)])
                 else:
                     os.kill(self.pid, signal.SIGTERM)
                 sys.stderr.write("INFO X CLOSE: except - the engine %s won't close properly.\n" % self.exe)
@@ -237,15 +237,12 @@ class RunEngine:
 
     def log_open(self, file):
         self.log = open(file, "at", encoding="utf-8")
-        self.log.write("%s %s\n\n" % (str(Util.today()), "-" * 70))
+        self.log.write("%s       %s\n\n" % (str(Util.today()), "-" * 70))
 
     def log_close(self):
         if self.log:
             self.log.close()
             self.log = None
-
-    def log_write(self, line):
-        self.log.write(line)
 
     def dispatch(self):
         QtCore.QCoreApplication.processEvents(QtCore.QEventLoop.ExcludeUserInputEvents)
@@ -312,20 +309,6 @@ class RunEngine:
             if not self.hay_datos():
                 time.sleep(0.001)
 
-    def wait_txt(self, seektxt, msStop):
-        ini_tiempo = time.time()
-        while True:
-            lt = self.get_lines()
-            for line in lt:
-                if seektxt in line:
-                    return True
-
-            queda = msStop - int((time.time() - ini_tiempo) * 1000)
-            if queda <= 0:
-                return False
-            if not self.hay_datos():
-                time.sleep(0.090)
-
     def work_ok(self, orden):
         self.reset()
         self.put_line(orden)
@@ -353,9 +336,10 @@ class RunEngine:
         if max_time:
             ms_time = max_time + 3000
         elif max_depth:
-            ms_time = 1000 * 1000  # 1000 secs, el tiempo calculado abajo no es bastante para mi ordenador - se pone un limite invisible y no me parece correcto
-            #ms_time = int(max_depth * ms_time / 3.0) * 100
-
+            ms_time = (
+                1000 * 1000
+            )  # 1000 secs, el tiempo calculado abajo no es bastante para mi ordenador - se pone un limite invisible y no me parece correcto
+            # ms_time = int(max_depth * ms_time / 3.0) * 100
 
         self.reset()
         if is_savelines:
@@ -366,25 +350,6 @@ class RunEngine:
 
         self.mrm.ordena()
 
-        return self.mrm
-
-    def seek_infinite(self, max_depth, max_time):
-        if max_depth:
-            busca = " depth %d " % (max_depth + 1,)
-
-            max_time = max_depth * 2000
-            if max_depth > 9:
-                max_time += (max_depth - 9) * 20000
-        else:
-            busca = " @@ "  # que no busque nada
-            max_depth = None
-
-        self.reset()
-        self.mrm.setTimeDepth(max_time, max_depth)
-
-        self.work_infinite(busca, max_time)
-
-        self.mrm.ordena()
         return self.mrm
 
     def seek_bestmove_time(self, time_white, time_black, inc_time_move):
@@ -532,13 +497,13 @@ class RunEngine:
         self.put_line("stop")
         return self.mrm
 
-    def ponGuiDispatch(self, gui_dispatch, whoDispatch=None):
+    def set_gui_dispatch(self, gui_dispatch, whoDispatch=None):
         self.gui_dispatch = gui_dispatch
         if whoDispatch is not None:
             self.whoDispatch = whoDispatch
 
-    def ponMultiPV(self, nMultiPV):
-        self.work_ok("setoption name MultiPV value %s" % nMultiPV)
+    def ponMultiPV(self, num_multipv):
+        self.work_ok("setoption name MultiPV value %s" % num_multipv)
 
     def orden_uci(self):
         self.reset()
@@ -563,18 +528,6 @@ class RunEngine:
     def bestmove_fen(self, fen, max_time, max_depth, is_savelines=False):
         self.set_fen_position(fen)
         return self.seek_bestmove(max_time, max_depth, is_savelines)
-
-    def bestmove_infinite_depth(self, game, max_depth):
-        self.set_game_position(game)
-        mrm = self.seek_infinite(max_depth, None)
-        self.put_line("stop")
-        return mrm
-
-    def bestmove_infinite(self, game, max_time):
-        self.set_game_position(game)
-        mrm = self.seek_infinite(None, max_time)
-        self.put_line("stop")
-        return mrm
 
     def bestmove_time(self, game, time_white, time_black, inc_time_move):
         self.set_game_position(game)
@@ -646,8 +599,8 @@ class RunEngine:
 
 
 class MaiaEngine(RunEngine):
-    def __init__(self, name, exe, liOpcionesUCI=None, nMultiPV=0, priority=None, args=None):
-        RunEngine.__init__(self, name, exe, liOpcionesUCI, nMultiPV, priority, args)
+    def __init__(self, name, exe, liOpcionesUCI=None, num_multipv=0, priority=None, args=None, log=None):
+        RunEngine.__init__(self, name, exe, liOpcionesUCI, num_multipv, priority, args, log)
         self.stopping = False
 
         level = int(name[5:])
@@ -656,17 +609,17 @@ class MaiaEngine(RunEngine):
         self.book = Books.Book("P", book_name, book_path, True)
         self.book.polyglot()
         self.book_select = []
-        mp = (level-1100)//10
-        ap = 40 - 20*(level-1100)//800
+        mp = (level - 1100) // 10
+        ap = 40 - 20 * (level - 1100) // 800
         au = 100 - mp - ap
-        self.book_select.extend(["mp"]*mp)
-        self.book_select.extend(["ap"]*ap)
-        self.book_select.extend(["au"]*au)
+        self.book_select.extend(["mp"] * mp)
+        self.book_select.extend(["ap"] * ap)
+        self.book_select.extend(["au"] * au)
 
     def simulate_time(self, ms_time):
         if ms_time:
             tini = time.time()
-            while not (self.stopping or (time.time()-tini)*1000 > ms_time):
+            while not (self.stopping or (time.time() - tini) * 1000 > ms_time):
                 QtCore.QCoreApplication.processEvents()
                 time.sleep(0.1)
         self.stopping = False
@@ -688,7 +641,7 @@ class MaiaEngine(RunEngine):
 
         self.work_bestmove(env, ms_time)
         if max_time:
-            self.simulate_time(max_time-(time.time()-tini)*1000)
+            self.simulate_time(max_time - (time.time() - tini) * 1000)
 
         self.mrm.ordena()
 
@@ -706,7 +659,7 @@ class MaiaEngine(RunEngine):
         self.work_bestmove(env, max_time)
 
         if time_white > 60000 and time_black > 60000:
-            self.simulate_time(min(time_white/40, random.randint(1000, 15000))-(time.time()-tini)*1000)
+            self.simulate_time(min(time_white / 40, random.randint(1000, 15000)) - (time.time() - tini) * 1000)
 
         self.mrm.ordena()
         return self.mrm
@@ -716,7 +669,7 @@ class MaiaEngine(RunEngine):
         env = "go nodes 1"
         max_time = time_white if self.is_white else time_black
         if time_white > 60000 and time_black > 60000:
-            time_simulate = min(time_white/40, random.randint(1000, 15000))
+            time_simulate = min(time_white / 40, random.randint(1000, 15000))
         else:
             time_simulate = 0
         self.play_with_return_maia(play_return, game, env, max_time, None, time_simulate)
@@ -754,7 +707,7 @@ class MaiaEngine(RunEngine):
         if len(game) < 30:
             pv = self.book.eligeJugadaTipo(game.last_position.fen(), random.choice(self.book_select))
             if pv:
-                self.mrm.dispatch("bestmove %s" %pv)
+                self.mrm.dispatch("bestmove %s" % pv)
                 self.mrm.ordena()
                 return True
         return False

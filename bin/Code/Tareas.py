@@ -26,12 +26,12 @@ class Tarea:
 
 
 class TareaDuerme(Tarea):
-    def __init__(self, segundos):
-        self.segundos = segundos
+    def __init__(self, seconds):
+        self.seconds = seconds
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
-        self.totalPasos = int(self.segundos * self.junks)
+        self.totalPasos = int(self.seconds * self.junks)
 
         self.pasoActual = 0
 
@@ -40,7 +40,7 @@ class TareaDuerme(Tarea):
         return self.pasoActual >= self.totalPasos  # si es ultimo
 
     def __str__(self):
-        return "DUERME %0.2f" % self.segundos
+        return "DUERME %0.2f" % self.seconds
 
 
 class TareaToolTip(Tarea):
@@ -103,11 +103,11 @@ class TareaBorraPieza(Tarea):
 
 
 class TareaMuevePieza(Tarea):
-    def __init__(self, from_a1h8, to_a1h8, segundos=0.0):
+    def __init__(self, from_a1h8, to_a1h8, seconds=0.0):
         self.pieza = None
         self.from_a1h8 = from_a1h8
         self.to_a1h8 = to_a1h8
-        self.segundos = segundos
+        self.seconds = seconds
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
@@ -119,7 +119,7 @@ class TareaMuevePieza(Tarea):
 
         linea = QtCore.QLineF(dx, dy, hx, hy)
 
-        pasos = int(self.segundos * self.junks)
+        pasos = int(self.seconds * self.junks)
         self.liPuntos = []
         for x in range(1, pasos + 1):
             self.liPuntos.append(linea.pointAt(float(x) / pasos))
@@ -157,7 +157,7 @@ class TareaMuevePieza(Tarea):
 
     def __str__(self):
         return _X(
-            _("Move piece from %1 to %2 on %3 second (s)"), self.from_a1h8, self.to_a1h8, "%0.2f" % self.segundos
+            _("Move piece from %1 to %2 on %3 second (s)"), self.from_a1h8, self.to_a1h8, "%0.2f" % self.seconds
         )
 
     def directo(self, board):
@@ -170,7 +170,7 @@ class TareaMuevePiezaV(TareaMuevePieza):
         self.vsegundos = vsegundos
 
     def enlaza(self, cpu):
-        self.segundos = self.vsegundos.valor
+        self.seconds = self.vsegundos.valor
         TareaMuevePieza.enlaza(self, cpu)
 
     def __str__(self):
@@ -186,9 +186,9 @@ class TareaMuevePiezaV(TareaMuevePieza):
 
 
 class TareaMuevePiezaLI(Tarea):
-    def __init__(self, lista, segundos):
+    def __init__(self, lista, seconds):
         self.lista = lista
-        self.segundos = segundos
+        self.seconds = seconds
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
@@ -197,7 +197,7 @@ class TareaMuevePiezaLI(Tarea):
         self.from_a1h8 = self.lista[0][0]
         self.to_a1h8 = self.lista[-1][1]
         self.liPuntos = []
-        pasos1 = int(self.segundos * self.junks / len(self.lista))
+        pasos1 = int(self.seconds * self.junks / len(self.lista))
 
         for from_a1h8, to_a1h8 in self.lista:
             dx, dy = self.a1h8_xy(from_a1h8)

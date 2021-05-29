@@ -234,23 +234,23 @@ class ControlMensEspera:
 mensEspera = ControlMensEspera()
 
 
-def mensajeTemporal(main_window, mensaje, segundos, background=None, pmImagen=None, physical_pos="c", fixedSize=None, siCancelar=None, titCancelar=None):
+def mensajeTemporal(main_window, mensaje, seconds, background=None, pmImagen=None, physical_pos="c", fixedSize=None, siCancelar=None, titCancelar=None):
     if siCancelar is None:
-        siCancelar = segundos > 3.0
+        siCancelar = seconds > 3.0
     if titCancelar is None:
         titCancelar = _("Continue")
     me = mensEspera.start(
         main_window, mensaje, background=background, pmImagen=pmImagen, siCancelar=siCancelar, titCancelar=titCancelar, physical_pos=physical_pos, fixedSize=fixedSize
     )
-    if segundos:
-        me.time(segundos)
+    if seconds:
+        me.time(seconds)
     return me
 
 
-def mensajeTemporalSinImagen(main_window, mensaje, segundos, background=None, puntos=12, physical_pos="c"):
+def mensajeTemporalSinImagen(main_window, mensaje, seconds, background=None, puntos=12, physical_pos="c"):
     me = mensEspera.start(main_window, mensaje, physical_pos=physical_pos, conImagen=False, puntos=puntos, fixedSize=None, background=background)
-    if segundos:
-        me.time(segundos)
+    if seconds:
+        me.time(seconds)
     return me
 
 

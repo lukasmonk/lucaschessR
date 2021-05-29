@@ -142,4 +142,3 @@ class Indice:
         self.nombre = nombre
         self.campos = campos
         self.siUnico = siUnico
-

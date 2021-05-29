@@ -257,7 +257,7 @@ class WTournamentRun(QtWidgets.QWidget):
             conf_engine = Code.configuration.buscaRival(self.torneo.adjudicator())
             self.xadjudicator = EngineManager.EngineManager(self, conf_engine)
             self.xadjudicator.options(self.torneo.adjudicator_time() * 1000, 0, False)
-            self.xadjudicator.anulaMultiPV()
+            self.xadjudicator.remove_multipv()
         else:
             self.xadjudicator = None
         self.next_control = 0
@@ -284,7 +284,7 @@ class WTournamentRun(QtWidgets.QWidget):
             rv = rival[side]
             self.xengine[side] = EngineManager.EngineManager(self, rv)
             self.xengine[side].options(rv.time * 1000, rv.depth, False)
-            self.xengine[side].ponGuiDispatch(self.gui_dispatch)
+            self.xengine[side].set_gui_dispatch(self.gui_dispatch)
 
             self.vtime[side] = Util.Timer(self.max_segundos)
 
@@ -487,9 +487,9 @@ class WTournamentRun(QtWidgets.QWidget):
             xrival = self.xengine[is_white]
             tiempoBlancas = self.vtime[True].tiempoPendiente
             tiempoNegras = self.vtime[False].tiempoPendiente
-            segundosJugada = xrival.motorTiempoJugada
+            segundosJugada = xrival.ms_time_move
             self.reloj_start(is_white)
-            mrm = xrival.juegaTiempoTorneo(self.game, tiempoBlancas, tiempoNegras, segundosJugada)
+            mrm = xrival.play_time_tourney(self.game, tiempoBlancas, tiempoNegras, segundosJugada)
             if self.state == ST_PAUSE:
                 self.reloj_pause(is_white)
                 self.board.borraMovibles()
@@ -657,27 +657,27 @@ class WTournamentRun(QtWidgets.QWidget):
             rapidez = self.configuration.x_pieces_speed * 1.0 / 100.0
             cpu = self.cpu
             cpu.reset()
-            segundos = None
+            seconds = None
 
             # primero los movimientos
             for movim in liMovs:
                 if movim[0] == "m":
-                    if segundos is None:
+                    if seconds is None:
                         from_sq, to_sq = movim[1], movim[2]
                         dc = ord(from_sq[0]) - ord(to_sq[0])
                         df = int(from_sq[1]) - int(to_sq[1])
-                        # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 segundos
+                        # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 seconds
                         dist = (dc ** 2 + df ** 2) ** 0.5
-                        segundos = 4.0 * dist / (9.9 * rapidez)
-                    cpu.muevePieza(movim[1], movim[2], siExclusiva=False, segundos=segundos)
+                        seconds = 4.0 * dist / (9.9 * rapidez)
+                    cpu.muevePieza(movim[1], movim[2], siExclusiva=False, seconds=seconds)
 
-            if segundos is None:
-                segundos = 1.0
+            if seconds is None:
+                seconds = 1.0
 
             # segundo los borrados
             for movim in liMovs:
                 if movim[0] == "b":
-                    n = cpu.duerme(segundos * 0.80 / rapidez)
+                    n = cpu.duerme(seconds * 0.80 / rapidez)
                     cpu.borraPieza(movim[1], padre=n)
 
             # tercero los cambios

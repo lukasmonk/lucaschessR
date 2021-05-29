@@ -50,9 +50,8 @@ class ControlPosicion:
         return p
 
     def legal(self):
-        if self.enroques != '-':
-            dic = {"K": ("K", "R", "e1", "h1"), "k": ("k", "r", "e8", "h8"), "Q": ("K", "R", "e1", "a1"),
-                   "q": ("k", "r", "e8", "a8")}
+        if self.enroques != "-":
+            dic = {"K": ("K", "R", "e1", "h1"), "k": ("k", "r", "e8", "h8"), "Q": ("K", "R", "e1", "a1"), "q": ("k", "r", "e8", "a8")}
             enr = ""
             for tipo in self.enroques:
                 rey, torre, posRey, posTorre = dic[tipo]
@@ -64,10 +63,10 @@ class ControlPosicion:
             if c in "36":
                 col = "4" if c == "3" else "5"
                 pz = "P" if self.siBlancas else "p"
-                ant = chr(ord(r)-1)
-                pz0 = self.casillas.get(ant+col)
-                nxt = chr(ord(r)+1)
-                pz2 = self.casillas.get(nxt+col)
+                ant = chr(ord(r) - 1)
+                pz0 = self.casillas.get(ant + col)
+                nxt = chr(ord(r) + 1)
+                pz2 = self.casillas.get(nxt + col)
                 if pz not in (pz0, pz2):
                     self.alPaso = "-"
             else:
@@ -92,7 +91,7 @@ class ControlPosicion:
         nli = len(li)
         if nli < 6:
             lid = ["w", "-", "-", "0", "1"]
-            li.extend(lid[nli-1:])
+            li.extend(lid[nli - 1 :])
         posicion, color, self.enroques, self.alPaso, mp, jg = li
 
         self.siBlancas = color == "w"
@@ -322,7 +321,7 @@ class ControlPosicion:
 
     def valor_material(self):
         valor = 0
-        d = { "R": 5, "Q": 10, "B": 3, "N": 3, "P": 1, "K": 0 }
+        d = {"R": 5, "Q": 10, "B": 3, "N": 3, "P": 1, "K": 0}
         for v in self.casillas.itervalues():
             if v:
                 valor += d[v.upper()]
@@ -522,4 +521,4 @@ class ControlPosicion:
 
 
 def distancia(desde, hasta):
-    return ((ord(desde[0])-ord(hasta[0]))**2 + (ord(desde[1])-ord(hasta[1]))**2)**0.5
+    return ((ord(desde[0]) - ord(hasta[0])) ** 2 + (ord(desde[1]) - ord(hasta[1])) ** 2) ** 0.5

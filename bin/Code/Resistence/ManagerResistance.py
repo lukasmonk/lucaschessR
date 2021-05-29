@@ -16,7 +16,7 @@ class ManagerResistance(Manager.Manager):
         self.numEngine = numEngine
         self.key = key
         is_white = "WHITE" in key
-        self.segundos, self.puntos, self.maxerror = resistance.actual()
+        self.seconds, self.puntos, self.maxerror = resistance.actual()
         self.movimientos = 0
         self.puntosRival = 0
 
@@ -36,12 +36,12 @@ class ManagerResistance(Manager.Manager):
 
         # debe hacerse antes que rival
         self.procesador.stop_engines()
-        self.xarbitro = self.procesador.creaManagerMotor(self.configuration.tutor, self.segundos * 1000, None)
-        self.xarbitro.anulaMultiPV()
+        self.xarbitro = self.procesador.creaManagerMotor(self.configuration.tutor, self.seconds * 1000, None)
+        self.xarbitro.remove_multipv()
 
         engine = resistance.dameClaveEngine(numEngine)
         rival = self.configuration.buscaRival(engine)
-        self.xrival = self.procesador.creaManagerMotor(rival, self.segundos * 1000, None)
+        self.xrival = self.procesador.creaManagerMotor(rival, self.seconds * 1000, None)
 
         self.main_window.pon_toolbar((TB_RESIGN, TB_REINIT, TB_CONFIG, TB_UTILITIES))
         self.main_window.activaJuego(True, False, siAyudas=False)
@@ -172,7 +172,7 @@ class ManagerResistance(Manager.Manager):
                     siPensar = False
 
             if siPensar:
-                self.rm_rival = self.xrival.juegaSegundos(self.segundos)
+                self.rm_rival = self.xrival.play_seconds(self.game, self.seconds)
                 self.puntosRival = self.rm_rival.centipawns_abs()
                 self.ponRotuloActual()
             self.thinking(False)
@@ -196,10 +196,10 @@ class ManagerResistance(Manager.Manager):
     def check(self):
         self.disable_all()
         if self.xrival.confMotor.key != self.xarbitro.confMotor.key:
-            sc = min(max(3, self.segundos), 10)
+            sc = min(max(3, self.seconds), 10)
 
             um = QTUtil2.mensEspera.start(self.main_window, _("Checking..."))
-            rm1 = self.xarbitro.juegaSegundos(sc)
+            rm1 = self.xarbitro.play_seconds(self.game, sc)
             self.puntosRival = -rm1.centipawns_abs()
             self.ponRotuloActual()
             if self.maxerror:
@@ -207,7 +207,7 @@ class ManagerResistance(Manager.Manager):
                 self.game = game1.copia()
                 self.game.anulaSoloUltimoMovimiento()
                 self.game.anulaSoloUltimoMovimiento()
-                rm0 = self.xarbitro.juegaSegundos(sc)
+                rm0 = self.xarbitro.play_seconds(self.game, sc)
                 self.game = game1
                 previoRival = -rm0.centipawns_abs()
                 lostmovepoints = self.puntosRival - previoRival

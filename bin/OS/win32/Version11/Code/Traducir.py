@@ -32,6 +32,7 @@ def _X(clave, op1, op2=None, op3=None):
             resp = resp.replace("%3", op3)
     return resp
 
+
 DOMAIN = "lucaschess"
 DIR_LOCALE = "Locale"
 
@@ -43,6 +44,6 @@ def install(lang=None):
     else:
         gettext.install(DOMAIN, DIR_LOCALE)
 
-    __builtin__.__dict__['_X'] = _X
-    __builtin__.__dict__['_F'] = _F
-    __builtin__.__dict__['_SP'] = _SP
+    __builtin__.__dict__["_X"] = _X
+    __builtin__.__dict__["_F"] = _F
+    __builtin__.__dict__["_SP"] = _SP

@@ -19,13 +19,16 @@ def creaDicHTML():
     base = '<span style="font-family:Chess Diagramm Pirat">%s</span>'
     ori = "KQRBNPkqrbnp"
     des = "rstuvw" + chr(126) + chr(130) + chr(131) + chr(132) + chr(133) + chr(134)
+
     def haz(c):
         return des[ori.index(c)]
+
     dic = {}
     for x in "nbrqk":
         dic[x.upper()] = base % haz(x.upper())
         dic[x] = base % haz(x)
     return dic
+
 
 dicHTMLFigs = creaDicHTML()
 
@@ -84,8 +87,7 @@ class Jugada:
         return self.posicion.fenBase()
 
     def siTablas(self):
-        return self.siTablasRepeticion or self.siTablas50 or self.siTablasFaltaMaterial or self.siTablasAcuerdo \
-               or self.siAhogado
+        return self.siTablasRepeticion or self.siTablas50 or self.siTablasFaltaMaterial or self.siTablasAcuerdo or self.siAhogado
 
     def pv2dgt(self):
         return self.posicionBase.pv2dgt(self.desde, self.hasta, self.coronacion)
@@ -184,7 +186,7 @@ class Jugada:
             liInicial = list(pgn)
             if liInicial and liInicial[-1] == "x":
                 piece = self.posicionBase.casillas[self.hasta]
-                if piece is None: # e.p.
+                if piece is None:  # e.p.
                     piece = "P"
                 liInicial.append(piece.upper())
             if (not liInicial) or (not liInicial[0].isupper()):
@@ -376,8 +378,7 @@ class Jugada:
         if almVariantes.mejorvariante:
             for rm in mrm.liMultiPV:
                 if rm.movimiento() != self.movimiento():
-                    self.analisis2variantesUno(partidaTemporal, rm, etiT, almVariantes.unmovevariante,
-                                               almVariantes.siPDT)
+                    self.analisis2variantesUno(partidaTemporal, rm, etiT, almVariantes.unmovevariante, almVariantes.siPDT)
                     break
         else:
             for rm in mrm.liMultiPV:
@@ -427,7 +428,7 @@ class Jugada:
             nfactor = 1
             for x in range(1, len(li)):
                 nue = li[x]
-                if nue-ant > 15:
+                if nue - ant > 15:
                     nfactor += 1
                     ant = nue
             self.elo_factor = nfactor

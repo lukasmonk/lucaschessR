@@ -32,9 +32,9 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
         self.board.ponerPiezasAbajo(self.is_white)
         self.board.set_position(self.cp_initial)
 
-        font = Controles.TipoLetra(puntos=self.configuration.x_sizefont_infolabels)
+        font = Controles.TipoLetra(puntos=26, peso=500)
 
-        lb_score_k = Controles.LB(self, _("Score") + ":").ponFuente(font)
+        lb_score_k = Controles.LB(self, _("Score")).ponFuente(font)
         self.lb_score = Controles.LB(self).ponFuente(font)
 
         li_acciones = ((_("Close"), Iconos.MainMenu(), self.terminar), None, (_("Begin"), Iconos.Empezar(), self.begin), (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir))
@@ -42,7 +42,7 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
         self.show_tb(self.terminar, self.begin)
 
         ly_info = Colocacion.G()
-        ly_info.controld(lb_score_k, 0, 0).controlc(self.lb_score, 0, 1)
+        ly_info.controlc(lb_score_k, 0, 0).controlc(self.lb_score, 1, 0)
 
         ly_right = Colocacion.V().control(self.tb).relleno().otro(ly_info).relleno()
 

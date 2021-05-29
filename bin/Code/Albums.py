@@ -38,8 +38,8 @@ class ManagerMotorAlbum:
             self.book.polyglot()
 
         # De compatibilidad
-        self.motorTiempoJugada = 0
-        self.motorProfundidad = 0
+        self.ms_time_move = 0
+        self.depth_engine = 0
 
         atexit.register(self.cerrar)
 

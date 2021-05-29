@@ -26,12 +26,44 @@ makePV = LCEngine.makePV
 num2move = LCEngine.num2move
 move2num = LCEngine.move2num
 
-rots = ["Event", "Site", "Date", "Round", "White", "Black", "Result",
-        "WhiteTitle", "BlackTitle", "WhiteElo", "BlackElo", "WhiteUSCF", "BlackUSCF", "WhiteNA", "BlackNA",
-        "WhiteType", "BlackType", "EventDate", "EventSponsor", "ECO", "UTCTime", "UTCDate", "TimeControl",
-        "SetUp", "FEN", "PlyCount",
-        "Section", "Stage", "Board", "Opening", "Variation", "SubVariation", "NIC", "Time",
-        "Termination", "Annotator", "Mode"
+rots = [
+    "Event",
+    "Site",
+    "Date",
+    "Round",
+    "White",
+    "Black",
+    "Result",
+    "WhiteTitle",
+    "BlackTitle",
+    "WhiteElo",
+    "BlackElo",
+    "WhiteUSCF",
+    "BlackUSCF",
+    "WhiteNA",
+    "BlackNA",
+    "WhiteType",
+    "BlackType",
+    "EventDate",
+    "EventSponsor",
+    "ECO",
+    "UTCTime",
+    "UTCDate",
+    "TimeControl",
+    "SetUp",
+    "FEN",
+    "PlyCount",
+    "Section",
+    "Stage",
+    "Board",
+    "Opening",
+    "Variation",
+    "SubVariation",
+    "NIC",
+    "Time",
+    "Termination",
+    "Annotator",
+    "Mode",
 ]
 drots = {x.upper(): x for x in rots}
 drots["PLIES"] = "PlyCount"
@@ -134,7 +166,7 @@ class TreeSTAT:
         basefenM2 = fen2fenM2(fen)
 
         def history(xmove, rfather):
-            li = [xmove,]
+            li = [xmove]
             sql = "SELECT RFATHER, XMOVE FROM STATS WHERE ROWID = ?"
             while rfather != self.riniFen:
                 cursor.execute(sql, (rfather,))
@@ -198,7 +230,7 @@ class TreeSTAT:
     def _fen2hash(self, fen):
         return hash(fen2fenM2(fen))
 
-    def _sum(self, hfen, rfather, xmove, w, b, d, o, tdepth ):
+    def _sum(self, hfen, rfather, xmove, w, b, d, o, tdepth):
         alm = self._readRow(hfen, rfather, xmove)
         if w:
             alm.W += w
@@ -263,9 +295,9 @@ class TreeSTAT:
                 self._writeRow(hfen, alm)
             self.massive = {}
 
-    def massive_sum(self, hfen, rfather, xmove, w, b, d, o, tdepth ):
+    def massive_sum(self, hfen, rfather, xmove, w, b, d, o, tdepth):
         if tdepth > 10:
-            return self._sum(hfen, rfather, xmove, w, b, d, o, tdepth )
+            return self._sum(hfen, rfather, xmove, w, b, d, o, tdepth)
 
         alm = self.massive.get((hfen, rfather))
         if not alm:
@@ -328,7 +360,7 @@ class TreeSTAT:
             fen = getFen()
             hashFen = self._fen2hash(fen)
             alm = self._readRowExt(rfather, hashFen, fen)
-            if not allmoves and (alm.W +alm.B+alm.D+alm.O) == 0:
+            if not allmoves and (alm.W + alm.B + alm.D + alm.O) == 0:
                 continue
             alm.move = move
             liResp.append(alm)
@@ -517,11 +549,11 @@ class TreeSTAT:
         dic["win"] = w
         dic["draw"] = d
         dic["lost"] = l
-        dic["pwin"] = w*100.0/tg if tg else 0.0
-        dic["pdraw"] = d*100.0/tg if tg else 0.0
-        dic["plost"] = l*100.0/tg if tg else 0.0
-        dic["pdrawwin"] = (w+d)*100.0/tg if tg else 0.0
-        dic["pdrawlost"] = (l+d)*100.0/tg if tg else 0.0
+        dic["pwin"] = w * 100.0 / tg if tg else 0.0
+        dic["pdraw"] = d * 100.0 / tg if tg else 0.0
+        dic["plost"] = l * 100.0 / tg if tg else 0.0
+        dic["pdrawwin"] = (w + d) * 100.0 / tg if tg else 0.0
+        dic["pdrawlost"] = (l + d) * 100.0 / tg if tg else 0.0
         liMoves.append(dic)
 
         return liMoves
@@ -532,8 +564,8 @@ class DBgames:
         self.nomFichero = Util.dirRelativo(nomFichero)
         self.with_dbSTAT = with_dbSTAT
         self.liCamposBase = ["EVENT", "SITE", "DATE", "WHITE", "BLACK", "RESULT", "ECO", "WHITEELO", "BLACKELO", "PLIES"]
-        self.liCamposWork = ["XPV", ]
-        self.liCamposBLOB = ["PGN", ]
+        self.liCamposWork = ["XPV"]
+        self.liCamposBLOB = ["PGN"]
 
         self.liCamposRead = []
         self.liCamposRead.extend(self.liCamposWork)
@@ -637,7 +669,7 @@ class DBgames:
         sql = "UPDATE GAMES SET XPV=? WHERE ROWID = %d" % rowidOther
         self._cursor.execute(sql, ("?????",))
 
-        updateAll = ",".join(["%s=?"%campo for campo in self.liCamposAll])
+        updateAll = ",".join(["%s=?" % campo for campo in self.liCamposAll])
         sql = "UPDATE GAMES SET %s" % updateAll + " WHERE ROWID = %d"
 
         self._cursor.execute(sql % rowid, regOther)
@@ -716,9 +748,9 @@ class DBgames:
             sql = "CREATE TABLE %s (" % self.tabla
             sql += "XPV VARCHAR NOT NULL PRIMARY KEY,"
             for field in self.liCamposBase:
-                sql += "%s VARCHAR,"% field
+                sql += "%s VARCHAR," % field
             for field in self.liCamposBLOB:
-                sql += "%s BLOB,"% field
+                sql += "%s BLOB," % field
             sql = sql[:-1] + " );"
             cursor.execute(sql)
             cursor.close()
@@ -755,8 +787,8 @@ class DBgames:
         li = []
         for campo, tipo in liOrden:
             if campo == "PLIES":
-                campo =  "CAST(PLIES AS INTEGER)"
-            li.append( "%s %s" % (campo, tipo))
+                campo = "CAST(PLIES AS INTEGER)"
+            li.append("%s %s" % (campo, tipo))
         self.order = ",".join(li)
         self.liRowids = []
         self.rowidReader.run(self.liRowids, self.filter, self.order)
@@ -773,7 +805,7 @@ class DBgames:
             result = self.field(recno, "RESULT")
             if self.with_dbSTAT:
                 self.dbSTAT.append(pv, result, -1)
-            self._cursor.execute(cSQL,(self.liRowids[recno],))
+            self._cursor.execute(cSQL, (self.liRowids[recno],))
             del self.liRowids[recno]
         if self.with_dbSTAT:
             self.dbSTAT.commit()
@@ -815,7 +847,7 @@ class DBgames:
     def leerPGNs(self, ficheros, dlTmp):
         erroneos = duplicados = importados = n = 0
 
-        t1 = time.time()-0.7  # para que empiece enseguida
+        t1 = time.time() - 0.7  # para que empiece enseguida
 
         if self.with_dbSTAT:
             self.dbSTAT.massive_append_set(True)
@@ -836,7 +868,7 @@ class DBgames:
         cursor = self._cursor
 
         sql = "insert into games (XPV,EVENT,SITE,DATE,WHITE,BLACK,RESULT,ECO,WHITEELO,BLACKELO,PGN,PLIES) values (?,?,?,?,?,?,?,?,?,?,?,?);"
-        liCabs = self.liCamposBase[:-1] # all except PLIES PGN, TAGS
+        liCabs = self.liCamposBase[:-1]  # all except PLIES PGN, TAGS
         liCabs.append("PLYCOUNT")
 
         for fichero in ficheros:
@@ -873,8 +905,8 @@ class DBgames:
                                     if pgn:
                                         pgn = unicode(pgn, encoding=codec, errors="ignore")
 
-                                if raw: # si no tiene variantes ni comentarios, se graba solo las tags que faltan
-                                    liRTags = [(dCablwr[k],v) for k, v in dCab.iteritems() if k not in liCabs] # k is always upper
+                                if raw:  # si no tiene variantes ni comentarios, se graba solo las tags que faltan
+                                    liRTags = [(dCablwr[k], v) for k, v in dCab.iteritems() if k not in liCabs]  # k is always upper
                                     if liRTags:
                                         pgn = {}
                                         pgn["RTAGS"] = liRTags
@@ -890,7 +922,7 @@ class DBgames:
                                 eco = dCab.get("ECO", "")
                                 whiteelo = dCab.get("WHITEELO", "")
                                 blackelo = dCab.get("BLACKELO", "")
-                                plies = (pv.count(" ")+1) if pv else 0
+                                plies = (pv.count(" ") + 1) if pv else 0
                                 if pgn:
                                     pgn = Util.var2blob(pgn)
 
@@ -911,8 +943,8 @@ class DBgames:
                                         self.dbSTAT.commit()
                                         self.dbSTAT.massive_append_set(True)
                     if n == next_n:
-                        if time.time()-t1> 0.8:
-                            if not dlTmp.actualiza(erroneos+duplicados+importados, erroneos, duplicados, importados):
+                        if time.time() - t1 > 0.8:
+                            if not dlTmp.actualiza(erroneos + duplicados + importados, erroneos, duplicados, importados):
                                 break
                             t1 = time.time()
                         next_n = n + random.randint(100, 500)
@@ -920,7 +952,7 @@ class DBgames:
         if liRegs:
             cursor.executemany(sql, liRegs)
             conexion.commit()
-        dlTmp.actualiza(erroneos+duplicados+importados, erroneos, duplicados, importados)
+        dlTmp.actualiza(erroneos + duplicados + importados, erroneos, duplicados, importados)
         dlTmp.ponSaving()
 
         if self.with_dbSTAT:
@@ -958,8 +990,20 @@ class DBgames:
                 duplicados += 1
             else:
                 pv = xpv2pv(xpv)
-                reg = (xpv, raw["EVENT"], raw["SITE"], raw["DATE"], raw["WHITE"], raw["BLACK"], raw["RESULT"], raw["ECO"], raw["WHITEELO"],
-                       raw["BLACKELO"], raw["PGN"], raw["PLIES"])
+                reg = (
+                    xpv,
+                    raw["EVENT"],
+                    raw["SITE"],
+                    raw["DATE"],
+                    raw["WHITE"],
+                    raw["BLACK"],
+                    raw["RESULT"],
+                    raw["ECO"],
+                    raw["WHITEELO"],
+                    raw["BLACKELO"],
+                    raw["PGN"],
+                    raw["PLIES"],
+                )
                 if self.with_dbSTAT:
                     self.dbSTAT.append(pv, raw["RESULT"])
                 liRegs.append(reg)
@@ -1017,28 +1061,28 @@ class DBgames:
         yield None
 
     def countData(self, filtro):
-        sql = "SELECT COUNT(*) FROM %s"%self.tabla
+        sql = "SELECT COUNT(*) FROM %s" % self.tabla
         if self.filter:
-            sql += " WHERE %s"%self.filter
+            sql += " WHERE %s" % self.filter
             if filtro:
                 sql += " AND %s" % filtro
         else:
             if filtro:
-                sql += " WHERE %s"% filtro
+                sql += " WHERE %s" % filtro
 
         self._cursor.execute(sql)
         return self._cursor.fetchone()[0]
 
     def yieldData(self, liFields, filtro):
         select = ",".join(liFields)
-        sql = "SELECT %s FROM %s"%(select, self.tabla)
+        sql = "SELECT %s FROM %s" % (select, self.tabla)
         if self.filter:
-            sql += " WHERE %s"%self.filter
+            sql += " WHERE %s" % self.filter
             if filtro:
                 sql += " AND %s" % filtro
         else:
             if filtro:
-                sql += " WHERE %s"% filtro
+                sql += " WHERE %s" % filtro
 
         self._cursor.execute(sql)
         while True:
@@ -1052,7 +1096,7 @@ class DBgames:
                 return
 
     def players(self):
-        sql = "SELECT DISTINCT WHITE FROM %s"%self.tabla
+        sql = "SELECT DISTINCT WHITE FROM %s" % self.tabla
         self._cursor.execute(sql)
         listaw = [raw[0] for raw in self._cursor.fetchall()]
 
@@ -1086,18 +1130,42 @@ class DBgames:
                 return p
 
         p.leerPV(xpv2pv(raw["XPV"]))
-        rots = ["Event", "Site", "Date", "Round", "White", "Black", "Result",
-                "WhiteTitle", "BlackTitle", "WhiteElo", "BlackElo", "WhiteUSCF", "BlackUSCF", "WhiteNA", "BlackNA",
-                "WhiteType", "BlackType", "EventDate", "EventSponsor", "ECO", "UTCTime", "UTCDate", "TimeControl",
-                "SetUp", "FEN", "PlyCount"]
-        drots = {x.upper():x for x in rots}
+        rots = [
+            "Event",
+            "Site",
+            "Date",
+            "Round",
+            "White",
+            "Black",
+            "Result",
+            "WhiteTitle",
+            "BlackTitle",
+            "WhiteElo",
+            "BlackElo",
+            "WhiteUSCF",
+            "BlackUSCF",
+            "WhiteNA",
+            "BlackNA",
+            "WhiteType",
+            "BlackType",
+            "EventDate",
+            "EventSponsor",
+            "ECO",
+            "UTCTime",
+            "UTCDate",
+            "TimeControl",
+            "SetUp",
+            "FEN",
+            "PlyCount",
+        ]
+        drots = {x.upper(): x for x in rots}
         drots["PLIES"] = "PlyCount"
 
         litags = []
         for field in self.liCamposBase:
-             v = raw[field]
-             if v:
-                 litags.append((drots.get(field, field), v if type(v) == unicode else str(v)))
+            v = raw[field]
+            if v:
+                litags.append((drots.get(field, field), v if type(v) == unicode else str(v)))
         if rtags:
             litags.extend(rtags)
 
@@ -1142,7 +1210,7 @@ class DBgames:
 
     def blankPartida(self):
         hoy = Util.hoy()
-        liTags = [["Date", "%d.%02d.%02d" % (hoy.year, hoy.month, hoy.day)],]
+        liTags = [["Date", "%d.%02d.%02d" % (hoy.year, hoy.month, hoy.day)]]
         return Partida.PartidaCompleta(liTags=liTags)
 
     def modifica(self, recno, partidaCompleta):
@@ -1164,7 +1232,7 @@ class DBgames:
         liData = []
         for field in self.liCamposBase:
             if reg_ant[field] != dTags.get(field):
-                liFields.append("%s=?"%field)
+                liFields.append("%s=?" % field)
                 liData.append(dTags.get(field))
         if xpgn != reg_ant["PGN"]:
             liFields.append("PGN=?")
@@ -1216,7 +1284,7 @@ class DBgames:
             dTags[key.upper()] = value
         dTags["PLIES"] = partidaCompleta.numJugadas()
 
-        data = [xpv, ]
+        data = [xpv]
         for field in self.liCamposBase:
             data.append(dTags.get(field, None))
         data.append(xpgn)
@@ -1236,7 +1304,7 @@ class DBgames:
         return self.inserta(partidaCompleta) if recno is None else self.modifica(recno, partidaCompleta)
 
     def massive_change_tags(self, li_tags_change, liRegistros, remove, overwrite, set_extend):
-        dtag = Util.SymbolDict({tag:val for tag, val in li_tags_change})
+        dtag = Util.SymbolDict({tag: val for tag, val in li_tags_change})
 
         def work_tag(tag, alm):
             if tag in dtag:
@@ -1284,10 +1352,13 @@ class DBgames:
             rowid = self.liRowids[recno]
             pgn = {"FULLGAME": p.save()}
             xpgn = Util.var2blob(pgn)
-            sql = "UPDATE GAMES SET EVENT=?, SITE=?, DATE=?, WHITE=?, BLACK=?, RESULT=?, " \
-                  "ECO=?, WHITEELO=?, BLACKELO=?, PGN=? WHERE ROWID = %d" % rowid
-            self._cursor.execute(sql, (alm.EVENT, alm.SITE, alm.DATE, alm.WHITE, alm.BLACK, alm.RESULT,
-                                       alm.ECO, alm.WHITEELO, alm.BLACKELO, xpgn))
+            sql = (
+                "UPDATE GAMES SET EVENT=?, SITE=?, DATE=?, WHITE=?, BLACK=?, RESULT=?, "
+                "ECO=?, WHITEELO=?, BLACKELO=?, PGN=? WHERE ROWID = %d" % rowid
+            )
+            self._cursor.execute(
+                sql, (alm.EVENT, alm.SITE, alm.DATE, alm.WHITE, alm.BLACK, alm.RESULT, alm.ECO, alm.WHITEELO, alm.BLACKELO, xpgn)
+            )
 
         self._conexion.commit()
 

@@ -363,9 +363,9 @@ class ImportarPGNDB(QtWidgets.QDialog):
             else:
                 previsto = int(tm1 * (self.total - valor))
                 minutos = previsto // 60
-                segundos = previsto % 60
+                seconds = previsto % 60
                 lb_min = _("minutes") if minutos > 1 else _("minute")
-                self.lb_previsto.set_text("%s: %d %s %d %s" % (_("Pending time"), minutos, lb_min, segundos, _("seconds")))
+                self.lb_previsto.set_text("%s: %d %s %d %s" % (_("Pending time"), minutos, lb_min, seconds, _("seconds")))
 
         QTUtil.refresh_gui()
         return not self.is_canceled

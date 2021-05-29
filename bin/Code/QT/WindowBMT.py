@@ -165,7 +165,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.texto_lbPrimera = _("* indicates actual move played in game")
         self.ptsMejor = 0
         self.ptsPrimero = 0
-        self.lbPrimera = Controles.LB(self, _(self.texto_lbPrimera))
+        self.lbPrimera = Controles.LB(self, self.texto_lbPrimera)
         f = Controles.TipoLetra(puntos=8)
         self.lbCondiciones = Controles.LB(self, "").ponFuente(f)
 
@@ -621,16 +621,16 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.lbPuntos.set_text(self.trPuntos % eti)
 
     def ponSegundos(self):
-        segundos = self.bmt_uno.segundos
+        seconds = self.bmt_uno.seconds
         if self.iniTiempo:
-            segundos += int(time.time() - self.iniTiempo)
-        minutos = segundos // 60
-        segundos -= minutos * 60
+            seconds += int(time.time() - self.iniTiempo)
+        minutos = seconds // 60
+        seconds -= minutos * 60
 
         if minutos:
-            eti = "%d'%d\"" % (minutos, segundos)
+            eti = "%d'%d\"" % (minutos, seconds)
         else:
-            eti = '%d"' % (segundos,)
+            eti = '%d"' % (seconds,)
         eti = self.trSegundos % eti
 
         if eti != self.antTxtSegundos:
@@ -880,7 +880,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
     def finalizaTiempo(self):
         if self.iniTiempo:
             vtime = time.time() - self.iniTiempo
-            self.bmt_uno.segundos += int(vtime)
+            self.bmt_uno.seconds += int(vtime)
         self.iniTiempo = None
         self.quitaReloj()
 

@@ -25,17 +25,17 @@ from Code import ManagerEverest
 from Code import ManagerFideFics
 from Code import ManagerMateMap
 from Code import ManagerMicElo
-from Code import ManagerCompeticion
 from Code import ManagerRoutes
 from Code import ManagerSingularM
 from Code import ManagerSolo
 from Code import ManagerGame
 from Code import Presentacion
-from Code import ManagerWashing
+from Code.Washing import ManagerWashing, WindowWashing
 from Code import ManagerPlayGame
 from Code import ManagerAnotar
 from Code import Adjournments
-from Code.QT import WCompetitionWithTutor, BasicMenus
+from Code.QT import BasicMenus
+from Code.CompetitionWithTutor import WCompetitionWithTutor, ManagerCompeticion
 from Code.QT import Iconos
 from Code.About import About
 from Code.MainWindow import MainWindow
@@ -50,7 +50,6 @@ from Code.QT import WindowSTS
 from Code.Sound import WindowSonido
 from Code.QT import WindowSingularM
 from Code.QT import WindowUsuarios
-from Code.QT import WindowWashing
 from Code.QT import WindowWorkMap
 from Code.QT import WindowPlayGame
 from Code.QT import Piezas
@@ -280,9 +279,9 @@ class Procesador:
         xtutor.function = _("tutor")
         xtutor.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         if self.configuration.x_tutor_multipv == 0:
-            xtutor.maximizaMultiPV()
+            xtutor.maximize_multipv()
         else:
-            xtutor.setMultiPV(self.configuration.x_tutor_multipv)
+            xtutor.set_multipv(self.configuration.x_tutor_multipv)
 
         self.xtutor = xtutor
 
@@ -302,9 +301,9 @@ class Procesador:
         xanalyzer.function = _("analyzer")
         xanalyzer.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         if self.configuration.x_tutor_multipv == 0:
-            xanalyzer.maximizaMultiPV()
+            xanalyzer.maximize_multipv()
         else:
-            xanalyzer.setMultiPV(self.configuration.x_tutor_multipv)
+            xanalyzer.set_multipv(self.configuration.x_tutor_multipv)
 
         self.xanalyzer = xanalyzer
         Code.xanalyzer = xanalyzer
@@ -317,7 +316,7 @@ class Procesador:
     def creaManagerMotor(self, confMotor, vtime, nivel, siMultiPV=False, priority=None):
         xmanager = EngineManager.EngineManager(self, confMotor)
         xmanager.options(vtime, nivel, siMultiPV)
-        xmanager.setPriority(priority)
+        xmanager.set_priority(priority)
         return xmanager
 
     def stop_engines(self):
@@ -357,7 +356,7 @@ class Procesador:
         uno = QTVarios.blancasNegrasTiempo(self.main_window)
         if not uno:
             return
-        is_white, siTiempo, minutos, segundos, fastmoves = uno
+        is_white, siTiempo, minutos, seconds, fastmoves = uno
         if is_white is None:
             return
 
@@ -367,7 +366,7 @@ class Procesador:
 
         dic["SITIEMPO"] = siTiempo and minutos > 0
         dic["MINUTOS"] = minutos
-        dic["SEGUNDOS"] = segundos
+        dic["SEGUNDOS"] = seconds
 
         dic["FASTMOVES"] = fastmoves
 
@@ -463,13 +462,13 @@ class Procesador:
             respT = QTVarios.vtime(self.main_window, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999,
                                    default_minutes=default_minutes, default_seconds=default_seconds)
             if respT:
-                minutos, segundos = respT
+                minutos, seconds = respT
                 dic = {
                     "MINUTES": minutos,
-                    "SECONDS": segundos
+                    "SECONDS": seconds
                 }
                 self.configuration.write_variables(key, dic)
-                self.manager.start(resp, minutos, segundos)
+                self.manager.start(resp, minutos, seconds)
 
     def ficselo(self, nivel):
         self.manager = ManagerFideFics.ManagerFideFics(self)
@@ -588,6 +587,19 @@ class Procesador:
         menu1.opcion(self.cambiaColores, _("General"), Iconos.Vista())
         menu.separador()
 
+        # Logs of engines
+        is_engines_log_active = Code.list_engine_managers.is_logs_active()
+        label = _("Save engines log")
+        if is_engines_log_active:
+            icono = Iconos.LogActive()
+            label += " ...%s..." % _("Working")
+            key = self.log_close
+        else:
+            icono = Iconos.LogInactive()
+            key = self.log_open
+        menu.opcion(key, label, icono)
+        menu.separador()
+
         menu.opcion(self.atajos_edit, _("Shortcuts"), Iconos.Atajos())
         menu.separador()
 
@@ -612,6 +624,12 @@ class Procesador:
                 resp[0](resp[1])
             else:
                 resp()
+
+    def log_open(self):
+        Code.list_engine_managers.active_logs(True)
+
+    def log_close(self):
+        Code.list_engine_managers.active_logs(False)
 
     def cambiaconfiguration(self):
         if WindowConfig.options(self.main_window, self.configuration):
@@ -709,7 +727,6 @@ class Procesador:
             self.sts()
         elif resp == "kibitzers":
             self.kibitzers_manager.edit()
-
         elif resp == "manual_save":
             self.manual_save()
 
@@ -990,7 +1007,6 @@ class Procesador:
                     list_books.save_pickle(self.configuration.file_books)
 
     def juegaExterno(self, fich_tmp):
-        print(fich_tmp)
         dic_sended = Util.restore_pickle(fich_tmp)
         dic = WPlayAgainstEngine.play_position(self, _("Play a position"), dic_sended["ISWHITE"])
         if dic is None:

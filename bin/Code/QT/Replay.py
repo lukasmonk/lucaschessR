@@ -31,25 +31,25 @@ def param_replay(configuration, parent):
     if resultado:
         accion, liResp = resultado
 
-        segundos, if_start, if_pgn, if_beep = liResp
-        dicVar["SECONDS"] = segundos
+        seconds, if_start, if_pgn, if_beep = liResp
+        dicVar["SECONDS"] = seconds
         dicVar["START"] = if_start
         dicVar["PGN"] = if_pgn
         dicVar["BEEP"] = if_beep
         configuration.write_variables(nomVar, dicVar)
-        return segundos, if_start, if_pgn, if_beep
+        return seconds, if_start, if_pgn, if_beep
     else:
         return None
 
 
 class Replay:
-    def __init__(self, manager, segundos, if_start, siPGN, if_beep):
+    def __init__(self, manager, seconds, if_start, siPGN, if_beep):
         self.manager = manager
         self.procesador = manager.procesador
         self.main_window = manager.main_window
         self.if_starts_with_black = manager.game.if_starts_with_black
         self.board = manager.board
-        self.segundos = segundos
+        self.seconds = seconds
         self.if_start = if_start
         self.if_beep = if_beep
         self.rapidez = 1.0
@@ -127,11 +127,11 @@ class Replay:
                     from_sq, to_sq = movim[1], movim[2]
                     dc = ord(from_sq[0]) - ord(to_sq[0])
                     df = int(from_sq[1]) - int(to_sq[1])
-                    # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 segundos
+                    # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 seconds
                     dist = (dc ** 2 + df ** 2) ** 0.5
                     rp = self.rapidez if self.rapidez > 1.0 else 1.0
                     secs = 4.0 * dist / (9.9 * rp)
-                cpu.muevePieza(movim[1], movim[2], siExclusiva=False, segundos=secs)
+                cpu.muevePieza(movim[1], movim[2], siExclusiva=False, seconds=secs)
 
         if secs is None:
             secs = 1.0
@@ -157,7 +157,7 @@ class Replay:
         self.manager.put_view()
 
         cpu.reset()
-        cpu.duerme(self.segundos / self.rapidez)
+        cpu.duerme(self.seconds / self.rapidez)
         cpu.runLineal()
 
     def muestraPausa(self, si_pausa, si_continue):

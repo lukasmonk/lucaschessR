@@ -170,11 +170,11 @@ class ControlPGN:
 
         xrival = getattr(self.manager, "xrival", None)
         if xrival and not (game_type in [GT_BOOK]):
-            if xrival.motorProfundidad:
-                resp += '[Depth "%d"]\n' % xrival.motorProfundidad
+            if xrival.depth_engine:
+                resp += '[Depth "%d"]\n' % xrival.depth_engine
 
-            if xrival.motorTiempoJugada:
-                resp += '[TimeEngineMS "%d"]\n' % xrival.motorTiempoJugada
+            if xrival.ms_time_move:
+                resp += '[TimeEngineMS "%d"]\n' % xrival.ms_time_move
 
             if self.manager.categoria:
                 resp += '[Category "%s"]\n' % self.manager.categoria.name()

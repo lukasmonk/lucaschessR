@@ -654,11 +654,11 @@ class FormWidget(QtWidgets.QWidget):
                     if dispatch:
                         field.stateChanged.connect(dispatch)
 
-                # Float segundos
-                elif isinstance(value, float):  # Para los segundos
+                # Float seconds
+                elif isinstance(value, float):  # Para los seconds
                     v = "%0.1f" % value
                     field = QtWidgets.QLineEdit(v, self)
-                    field.setValidator(QtGui.QDoubleValidator(0.0, 36000.0, 1, field))  # Para los segundos
+                    field.setValidator(QtGui.QDoubleValidator(0.0, 36000.0, 1, field))  # Para los seconds
                     field.setAlignment(QtCore.Qt.AlignRight)
                     field.setFixedWidth(40)
 

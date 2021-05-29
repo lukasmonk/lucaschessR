@@ -216,7 +216,7 @@ class WLines(QTVarios.WDialogo):
                 stFensM2.remove(fenm2)
 
         conf_engine = copy.deepcopy(self.configuration.buscaRival(claveMotor))
-        conf_engine.actMultiPV(multiPV)
+        conf_engine.update_multipv(multiPV)
         xmanager = self.procesador.creaManagerMotor(conf_engine, ms, depth, True)
 
         um.final()
@@ -854,7 +854,7 @@ class WLines(QTVarios.WDialogo):
             else:
                 me = QTUtil2.mensEspera.start(self, _("Analyzing the move...."), physical_pos="ad")
 
-                move.analysis = xanalyzer.analizaJugadaPartida(game, len(game) - 1, xanalyzer.motorTiempoJugada, xanalyzer.motorProfundidad)
+                move.analysis = xanalyzer.analizaJugadaPartida(game, len(game) - 1, xanalyzer.ms_time_move, xanalyzer.depth_engine)
                 me.final()
             Analysis.show_analysis(self.procesador, xanalyzer, move, self.pboard.board.is_white_bottom, 9999, len(game) - 1, main_window=self)
 

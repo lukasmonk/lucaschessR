@@ -164,8 +164,7 @@ class ManagerAlbum(Manager.Manager):
             self.thinking(True)
             self.disable_all()
 
-            fen = self.last_fen()
-            rm_rival = self.xrival.juega(fen)
+            rm_rival = self.xrival.play_game(self.game)
 
             self.thinking(False)
             if self.play_rival(rm_rival):

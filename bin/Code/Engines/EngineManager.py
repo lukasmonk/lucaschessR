@@ -10,17 +10,35 @@ from Code.Base.Constantes import ADJUST_SELECTED_BY_PLAYER
 class ListEngineManagers:
     def __init__(self):
         self.lista = []
+        self.with_logs = False
 
     def append(self, engine_manager):
+        self.check()
         self.lista.append(engine_manager)
+        if self.with_logs:
+            engine_manager.log_open()
 
-    def listaActivos(self):
-        return [engine_manager for engine_manager in self.lista if engine_manager.activo]
+    def check(self):
+        self.lista = [engine_manager for engine_manager in self.lista if engine_manager.activo]
 
     def close_all(self):
+        self.check()
         for engine_manager in self.lista:
             engine_manager.terminar()
         self.lista = []
+
+    def is_logs_active(self):
+        return self.with_logs
+
+    def active_logs(self, ok: bool):
+        self.check()
+        if ok != self.with_logs:
+            for engine_manager in self.lista:
+                if ok:
+                    engine_manager.log_open()
+                else:
+                    engine_manager.log_close()
+            self.with_logs = ok
 
 
 class EngineManager:
@@ -31,9 +49,11 @@ class EngineManager:
         self.confMotor = confMotor
         self.name = confMotor.name
         self.key = confMotor.key
-        self.nMultiPV = 0
+        self.num_multipv = 0
+        self.ms_time_move = None
+        self.depth_engine = None
 
-        self.function = _("Opponent").lower() # para distinguir entre tutor y analizador
+        self.function = _("Opponent").lower()  # para distinguir entre tutor y analizador
 
         self.priority = Priorities.priorities.normal
 
@@ -44,146 +64,96 @@ class EngineManager:
         self.ficheroLog = None
 
         self.direct = direct
+
         Code.list_engine_managers.append(self)
 
     def set_direct(self):
         self.direct = True
 
-    def options(self, tiempoJugada, profundidad, siMultiPV):
-        self.motorTiempoJugada = tiempoJugada
-        self.motorProfundidad = profundidad
-        self.nMultiPV = self.confMotor.multiPV if siMultiPV else 0
-
-        self.siInfinito = self.key == "tarrasch"
+    def options(self, ms_time_move, profundidad, siMultiPV):
+        self.ms_time_move = ms_time_move
+        self.depth_engine = profundidad
+        self.num_multipv = self.confMotor.multiPV if siMultiPV else 0
 
         if self.key in ("daydreamer", "cinnamon") and profundidad and profundidad == 1:
-            self.motorProfundidad = 2
+            self.depth_engine = 2
 
-    def log_open(self):
-        carpeta = os.path.join(Code.configuration.carpeta, "EngineLogs")
-        if not os.path.isdir(carpeta):
-            os.mkdir(carpeta)
-        plantlog = "%s_%%05d" % os.path.join(carpeta, self.name)
-        pos = 1
-        nomlog = plantlog % pos
-
-        while os.path.isfile(nomlog):
-            pos += 1
-            nomlog = plantlog % pos
-        self.ficheroLog = nomlog
-        if self.engine:
-            self.engine.log_open(nomlog)
-
-    def log_close(self):
-        self.ficheroLog = None
-        if self.engine:
-            self.engine.log_close()
-
-    def cambiaOpciones(self, tiempoJugada, profundidad):
-        self.motorTiempoJugada = tiempoJugada
-        self.motorProfundidad = profundidad
-
-    def setPriority(self, priority):
+    def set_priority(self, priority):
         self.priority = priority if priority else Priorities.priorities.normal
 
-    def maximizaMultiPV(self):
-        self.nMultiPV = 9999
+    def maximize_multipv(self):
+        self.num_multipv = 9999
 
-    def ponGuiDispatch(self, rutina, whoDispatch=None):
+    def set_gui_dispatch(self, rutina, whoDispatch=None):
         if self.engine:
-            self.engine.ponGuiDispatch(rutina, whoDispatch)
+            self.engine.set_gui_dispatch(rutina, whoDispatch)
         else:
             self.dispatching = rutina, whoDispatch
 
-    def actMultiPV(self, xMultiPV):
-        self.confMotor.actMultiPV(xMultiPV)
+    def update_multipv(self, xmultipv):
+        self.confMotor.update_multipv(xmultipv)
         self.check_engine()
         self.engine.ponMultiPV(self.confMotor.multiPV)
 
-    def anulaMultiPV(self):
-        self.nMultiPV = 0
+    def remove_multipv(self):
+        self.num_multipv = 0
 
-    def setMultiPV(self, nMultiPV):
-        if type(nMultiPV) == str:
-            self.confMotor.actMultiPV(nMultiPV)
-            nMultiPV = self.confMotor.multiPV
-        self.nMultiPV = nMultiPV
+    def set_multipv(self, num_multipv):
+        if type(num_multipv) == str:
+            self.confMotor.update_multipv(num_multipv)
+            num_multipv = self.confMotor.multiPV
+        self.num_multipv = num_multipv
 
     def remove_gui_dispatch(self):
         if self.engine:
             self.engine.gui_dispatch = None
 
-    def check_engine(self, nMultiPV=0):
+    def check_engine(self, num_multipv=0):
         if self.engine is not None:
             return False
-        if self.nMultiPV:
-            self.nMultiPV = min(self.nMultiPV, self.confMotor.maxMultiPV)
+        if self.num_multipv:
+            self.num_multipv = min(self.num_multipv, self.confMotor.maxMultiPV)
 
         exe = self.confMotor.ejecutable()
         args = self.confMotor.argumentos()
         liUCI = self.confMotor.liUCI
+
         if self.direct:
             self.engine = EngineRunDirect.DirectEngine(
-                self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args
+                self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog
             )
         elif self.name.lower().startswith("maia"):
-            self.engine = EngineRun.MaiaEngine(self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args)
+            self.engine = EngineRun.MaiaEngine(
+                self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog
+            )
         else:
-            self.engine = EngineRun.RunEngine(self.name, exe, liUCI, self.nMultiPV, priority=self.priority, args=args)
+            self.engine = EngineRun.RunEngine(
+                self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog
+            )
 
         if self.confMotor.siDebug:
             self.engine.siDebug = True
             self.engine.nomDebug = self.confMotor.nomDebug
+
         if self.dispatching:
-            rutina, whoDispatch = self.dispatching
-            self.engine.ponGuiDispatch(rutina, whoDispatch)
-        if self.ficheroLog:
-            self.engine.log_open(self.ficheroLog)
+            rutina, who_dispatch = self.dispatching
+            self.engine.set_gui_dispatch(rutina, who_dispatch)
 
         return True
 
-    def juegaSegundos(self, segundos):
+    def play_seconds(self, game, seconds):
         self.check_engine()
-        game = self.procesador.manager.game
-        if self.siInfinito:  # problema tarrasch
-            mrm = self.engine.bestmove_infinite(game, segundos * 1000)
-        else:
-            mrm = self.engine.bestmove_game(game, segundos * 1000, None)
+        mrm = self.engine.bestmove_game(game, seconds * 1000, None)
         return mrm.mejorMov() if mrm else None
 
-    def juega(self, nAjustado=0):
-        return self.juegaPartida(self.procesador.manager.game, nAjustado)
-
-    def juegaPartida(self, game, nAjustado=0):
+    def play_time(self, game, seconds_white, seconds_black, seconds_move, nAjustado=0):
         self.check_engine()
-
-        if self.siInfinito:  # problema tarrasch
-            if self.motorProfundidad:
-                mrm = self.engine.bestmove_infinite_depth(game, self.motorProfundidad)
-            else:
-                mrm = self.engine.bestmove_infinite(game, self.motorTiempoJugada)
-
-        else:
-            mrm = self.engine.bestmove_game(game, self.motorTiempoJugada, self.motorProfundidad)
-
-        if nAjustado:
-            mrm.game = game
-            if nAjustado >= 1000:
-                mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
-                mrm.fenBase = game.last_position.fen()
-            return mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
-        else:
-            return mrm.mejorMov()
-
-    def juegaTiempo(self, tiempoBlancas, tiempoNegras, tiempoJugada, nAjustado=0):
-        self.check_engine()
-        if self.motorTiempoJugada or self.motorProfundidad:
-            return self.juega(nAjustado)
-        tiempoBlancas = int(tiempoBlancas * 1000)
-        tiempoNegras = int(tiempoNegras * 1000)
-        tiempoJugada = int(tiempoJugada * 1000)
-        game = self.procesador.manager.game
-        mrm = self.engine.bestmove_time(game, tiempoBlancas, tiempoNegras, tiempoJugada)
+        if self.ms_time_move or self.depth_engine:
+            return self.play_game(game, nAjustado)
+        mseconds_white = int(seconds_white * 1000)
+        mseconds_black = int(seconds_black * 1000)
+        mseconds_move = int(seconds_move * 1000)
+        mrm = self.engine.bestmove_time(game, mseconds_white, mseconds_black, mseconds_move)
         if mrm is None:
             return None
 
@@ -196,24 +166,38 @@ class EngineManager:
         else:
             return mrm.mejorMov()
 
-    def juegaTiempoTorneo(self, game, tiempoBlancas, tiempoNegras, tiempoJugada):
+    def play_game(self, game, nAjustado=0):
+        self.check_engine()
+
+        mrm = self.engine.bestmove_game(game, self.ms_time_move, self.depth_engine)
+
+        if nAjustado:
+            mrm.game = game
+            if nAjustado >= 1000:
+                mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
+                mrm.fenBase = game.last_position.fen()
+            return mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
+        else:
+            return mrm.mejorMov()
+
+    def play_time_tourney(self, game, seconds_white, seconds_black, seconds_move):
         self.check_engine()
         if self.engine.pondering:
             self.engine.stop_ponder()
-        if self.motorTiempoJugada or self.motorProfundidad:
-            mrm = self.engine.bestmove_game(game, self.motorTiempoJugada, self.motorProfundidad)
+        if self.ms_time_move or self.depth_engine:
+            mrm = self.engine.bestmove_game(game, self.ms_time_move, self.depth_engine)
         else:
-            tiempoBlancas = int(tiempoBlancas * 1000)
-            tiempoNegras = int(tiempoNegras * 1000)
-            tiempoJugada = int(tiempoJugada * 1000)
-            mrm = self.engine.bestmove_time(game, tiempoBlancas, tiempoNegras, tiempoJugada)
+            mseconds_white = int(seconds_white * 1000)
+            mseconds_black = int(seconds_black * 1000)
+            mseconds_move = int(seconds_move * 1000)
+            mrm = self.engine.bestmove_time(game, mseconds_white, mseconds_black, mseconds_move)
         if self.engine and self.engine.ponder:  # test si self.engine, ya que puede haber terminado en el ponder
             self.engine.run_ponder(game, mrm)
         return mrm
 
     def analiza(self, fen):
         self.check_engine()
-        return self.engine.bestmove_fen(fen, self.motorTiempoJugada, self.motorProfundidad)
+        return self.engine.bestmove_fen(fen, self.ms_time_move, self.depth_engine)
 
     def valora(self, position, from_sq, to_sq, promotion):
         self.check_engine()
@@ -232,7 +216,7 @@ class EngineManager:
             self.promotion = promotion
             return rm
 
-        mrm = self.engine.bestmove_fen(fen, self.motorTiempoJugada, self.motorProfundidad)
+        mrm = self.engine.bestmove_fen(fen, self.ms_time_move, self.depth_engine)
         rm = mrm.mejorMov()
         rm.cambiaColor(position)
         mv = from_sq + to_sq + (promotion if promotion else "")
@@ -250,6 +234,7 @@ class EngineManager:
     def terminar(self):
         if self.engine:
             self.engine.close()
+            self.log_close()
             self.engine = None
             self.activo = False
 
@@ -293,17 +278,7 @@ class EngineManager:
         return mrm, pos
 
     def analizaJugadaPartida(
-        self,
-        game,
-        njg,
-        vtime,
-        depth=0,
-        brDepth=5,
-        brPuntos=50,
-        stability=False,
-        st_centipawns=0,
-        st_depths=0,
-        st_timelimit=0,
+        self, game, njg, vtime, depth=0, brDepth=5, brPuntos=50, stability=False, st_centipawns=0, st_depths=0, st_timelimit=0
     ):
         self.check_engine()
         if stability:
@@ -325,7 +300,7 @@ class EngineManager:
             return mrm, n
 
         # No esta considerado, obliga a hacer el analysis de nuevo from_sq position
-        mrm_next = self.engine.bestmove_game_jg(game, njg+1, vtime, depth, is_savelines=True)
+        mrm_next = self.engine.bestmove_game_jg(game, njg + 1, vtime, depth, is_savelines=True)
 
         if mrm_next and mrm_next.li_rm:
             rm = mrm_next.li_rm[0]
@@ -362,7 +337,7 @@ class EngineManager:
     def ac_inicio_limit(self, game):
         # tutor cuando no se quiere que trabaje en background
         self.check_engine()
-        self.engine.ac_inicio_limit(game, self.motorTiempoJugada, self.motorProfundidad)
+        self.engine.ac_inicio_limit(game, self.ms_time_move, self.depth_engine)
 
     def ac_minimo(self, minTiempo, lockAC):
         self.check_engine()
@@ -382,7 +357,7 @@ class EngineManager:
 
     def ac_final_limit(self):
         self.check_engine()
-        return self.engine.ac_final_limit(self.motorTiempoJugada)
+        return self.engine.ac_final_limit(self.ms_time_move)
 
     def set_option(self, name, value):
         self.check_engine()
@@ -411,40 +386,55 @@ class EngineManager:
         mrm.ordena()
         return mrm.mejorMov()
 
-    def play_time(self, routine_return, tiempoBlancas, tiempoNegras, tiempoJugada, nAjustado=0):
+    def play_time_routine(self, game, routine_return, seconds_white, seconds_black, seconds_move, nAjustado=0):
         self.check_engine()
-        game = self.procesador.manager.game
 
         def play_return(mrm):
-            self.engine.gui_dispatch = None
-            if mrm is None:
-                resp = None
-            elif nAjustado:
-                mrm.ordena()
-                mrm.game = game
-                if nAjustado >= 1000:
-                    mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
-                    mrm.fenBase = game.last_position.fen()
-                resp = mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
+            if self.engine:
+                self.engine.gui_dispatch = None
+                if mrm is None:
+                    resp = None
+                elif nAjustado:
+                    mrm.ordena()
+                    mrm.game = game
+                    if nAjustado >= 1000:
+                        mrm.liPersonalidades = self.procesador.configuration.liPersonalidades
+                        mrm.fenBase = game.last_position.fen()
+                    resp = mrm.mejorMovAjustado(nAjustado) if nAjustado != ADJUST_SELECTED_BY_PLAYER else mrm
+                else:
+                    resp = mrm.mejorMov()
             else:
-                resp = mrm.mejorMov()
+                resp = None
             routine_return(resp)
 
-        # mrm = self.engine.bestmove_game(game, 0, 5)
-        # play_return(mrm)
-        # return
-        if self.motorTiempoJugada or self.motorProfundidad:
-            if self.siInfinito:  # problema tarrasch
-                if self.motorProfundidad:
-                    mrm = self.engine.bestmove_infinite_depth(game, self.motorProfundidad)
-                else:
-                    mrm = self.engine.bestmove_infinite(game, self.motorTiempoJugada)
-                play_return(mrm)
-            else:
-                self.engine.play_bestmove_game(play_return, game, self.motorTiempoJugada, self.motorProfundidad)
+        if self.ms_time_move or self.depth_engine:
+            self.engine.play_bestmove_game(play_return, game, self.ms_time_move, self.depth_engine)
 
         else:
-            tiempoBlancas = int(tiempoBlancas * 1000)
-            tiempoNegras = int(tiempoNegras * 1000)
-            tiempoJugada = int(tiempoJugada * 1000)
-            self.engine.play_bestmove_time(play_return, game, tiempoBlancas, tiempoNegras, tiempoJugada)
+            mseconds_white = int(seconds_white * 1000)
+            mseconds_black = int(seconds_black * 1000)
+            mseconds_move = int(seconds_move * 1000)
+            self.engine.play_bestmove_time(play_return, game, mseconds_white, mseconds_black, mseconds_move)
+
+    def log_open(self):
+        if self.ficheroLog:
+            return
+        carpeta = os.path.join(Code.configuration.carpeta, "EngineLogs")
+        if not os.path.isdir(carpeta):
+            os.mkdir(carpeta)
+        plantlog = "%s_%%05d" % os.path.join(carpeta, self.name)
+        pos = 1
+        nomlog = plantlog % pos
+
+        while os.path.isfile(nomlog):
+            pos += 1
+            nomlog = plantlog % pos
+        self.ficheroLog = nomlog
+
+        if self.engine:
+            self.engine.log_open(nomlog)
+
+    def log_close(self):
+        self.ficheroLog = None
+        if self.engine:
+            self.engine.log_close()

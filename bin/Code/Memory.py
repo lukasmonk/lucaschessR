@@ -1,7 +1,7 @@
 import Code
 from Code.QT import WindowMemoria
 from Code import Util
-from Code import CompetitionWithTutor
+from Code.CompetitionWithTutor import CompetitionWithTutor
 
 
 class Memoria:
@@ -66,7 +66,7 @@ class Memoria:
     def lanzaNivel(self, numcategoria, nivel):
 
         piezas = nivel + 3
-        segundos = (6 - numcategoria) * piezas
+        seconds = (6 - numcategoria) * piezas
 
         liFen = self.dameListaFen(piezas)
         if not liFen:
@@ -75,7 +75,7 @@ class Memoria:
         cat = self.categorias.number(numcategoria)
 
         record = self.record(numcategoria, nivel)
-        vtime = WindowMemoria.lanzaMemoria(self.procesador, cat.name(), nivel, segundos, liFen, record)
+        vtime = WindowMemoria.lanzaMemoria(self.procesador, cat.name(), nivel, seconds, liFen, record)
         if vtime:
             if record == 0 or vtime < record:
                 li = self.dic_data[numcategoria]

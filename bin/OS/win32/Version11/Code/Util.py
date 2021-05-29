@@ -26,7 +26,7 @@ def xor_crypt(data, key):
     Author = http://bytes.com/profile/247871/darktemp/
     """
     if key:
-        return ''.join(chr(ord(x) ^ ord(y)) for (x, y) in izip(data, cycle(key)))
+        return "".join(chr(ord(x) ^ ord(y)) for (x, y) in izip(data, cycle(key)))
     else:
         return data
 
@@ -34,7 +34,9 @@ def xor_crypt(data, key):
 def nuevoID():
     d = datetime.datetime.now()
     r = random.randint
-    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(1, d.microsecond + 737) / 1000
+    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(
+        1, d.microsecond + 737
+    ) / 1000
     return t
 
 
@@ -82,7 +84,7 @@ def blob2var(blob):
 
 
 def dic2blob(dic):
-    varp = str(dic).replace(', ', ',').replace(': ', ':')
+    varp = str(dic).replace(", ", ",").replace(": ", ":")
     varz = zlib.compress(varp, 7)
     return sqlite3.Binary(varz)
 
@@ -158,8 +160,7 @@ def dtosext(f):
 
 def stodext(txt):
     if txt and len(txt) == 14 and txt.isdigit():
-        return datetime.datetime(int(txt[:4]), int(txt[4:6]), int(txt[6:8]),
-                                 int(txt[8:10]), int(txt[10:12]), int(txt[12:]))
+        return datetime.datetime(int(txt[:4]), int(txt[4:6]), int(txt[6:8]), int(txt[8:10]), int(txt[10:12]), int(txt[12:]))
     return None
 
 
@@ -175,8 +176,7 @@ def huella():
 
 def microsegundosRnd():
     d = datetime.datetime.now()
-    return random.randint(0, 1000) + 1000 * (
-        d.microsecond + 1000000 * (d.second + 60 * (d.minute + 60 * (d.hour + 24 * d.toordinal()))))
+    return random.randint(0, 1000) + 1000 * (d.microsecond + 1000000 * (d.second + 60 * (d.minute + 60 * (d.hour + 24 * d.toordinal()))))
 
 
 def fileNext(folder, base, ext):
@@ -254,7 +254,7 @@ def ini2lista(fichero, etiClave="CLAVE"):
                     n = linea.find("=")
                     if n:
                         clave1 = linea[:n].strip()
-                        valor = linea[n + 1:].strip()
+                        valor = linea[n + 1 :].strip()
                         dic[clave1] = valor
         f.close()
 
@@ -289,7 +289,7 @@ def ini2dic(fichero):
                     n = linea.find("=")
                     if n > 0:
                         clave1 = linea[:n].strip()
-                        valor = linea[n + 1:].strip()
+                        valor = linea[n + 1 :].strip()
                         dic[clave1] = valor
         f.close()
 
@@ -301,7 +301,7 @@ def ini8dic(fichero):
 
     if os.path.isfile(fichero):
 
-        f = codecs.open(fichero, "r", "utf-8", 'ignore')
+        f = codecs.open(fichero, "r", "utf-8", "ignore")
 
         for linea in f:
             linea = linea.strip()
@@ -314,7 +314,7 @@ def ini8dic(fichero):
                     n = linea.find("=")
                     if n > 0:
                         clave1 = linea[:n].strip()
-                        valor = linea[n + 1:].strip()
+                        valor = linea[n + 1 :].strip()
                         dic[clave1] = valor
         f.close()
 
@@ -322,7 +322,7 @@ def ini8dic(fichero):
 
 
 def dic8ini(fichero, dic):
-    f = codecs.open(fichero, "w", "utf-8", 'ignore')
+    f = codecs.open(fichero, "w", "utf-8", "ignore")
     for k in dic:
         f.write("[%s]\n" % k)
         for clave in dic[k]:
@@ -335,7 +335,7 @@ def iniBase8dic(fichero):
 
     if os.path.isfile(fichero):
 
-        f = codecs.open(fichero, "r", "utf-8", 'ignore')
+        f = codecs.open(fichero, "r", "utf-8", "ignore")
 
         for linea in f:
             linea = linea.strip()
@@ -345,7 +345,7 @@ def iniBase8dic(fichero):
                 n = linea.find("=")
                 if n:
                     clave = linea[:n].strip()
-                    valor = linea[n + 1:].strip()
+                    valor = linea[n + 1 :].strip()
                     dic[clave] = valor
         f.close()
 
@@ -353,7 +353,7 @@ def iniBase8dic(fichero):
 
 
 def dic8iniBase(fichero, dic):
-    f = codecs.open(fichero, "w", "utf-8", 'ignore')
+    f = codecs.open(fichero, "w", "utf-8", "ignore")
     for k in dic:
         f.write("%s=%s\n" % (k, dic[k]))
     f.close()
@@ -368,10 +368,10 @@ def creaCarpeta(carpeta):
 
 
 def secs2str(s):
-    m = s/60
-    s = s%60
-    h = m/60
-    m = m%60
+    m = s / 60
+    s = s % 60
+    h = m / 60
+    m = m % 60
     return "%02d:%02d:%02d" % (h, m, s)
 
 
@@ -485,10 +485,10 @@ class SymbolDict:
     def keys(self):
         return self._keys[:]
 
-    def __str__( self ):
+    def __str__(self):
         x = ""
         for t in self._keys:
-           x += "[%s]=[%s]\n"%(t, str(self.__getitem__(t)) )
+            x += "[%s]=[%s]\n" % (t, str(self.__getitem__(t)))
         return x.strip()
 
 
@@ -527,7 +527,7 @@ class IPC(object):
         cursor = self._conexion.cursor()
         dato = sqlite3.Binary(cPickle.dumps(valor))
         sql = "INSERT INTO DATOS (dato) values(?)"
-        cursor.execute(sql, [dato, ])
+        cursor.execute(sql, [dato])
         cursor.close()
         self._conexion.commit()
 
@@ -560,7 +560,7 @@ class Rondo:
 
 def validNomFichero(nombre):
     nombre = nombre.strip()
-    for x in "\\:/|?*^%><(),;\"":
+    for x in '\\:/|?*^%><(),;"':
         if x in nombre:
             nombre = nombre.replace(x, "_")
     return nombre
@@ -570,7 +570,7 @@ def asciiNomFichero(nombre):
     nombre = validNomFichero(nombre)
     li = []
     for x in nombre:
-        if not(31 < ord(x) < 127):
+        if not (31 < ord(x) < 127):
             li.append("_")
         else:
             li.append(x)
@@ -721,7 +721,8 @@ def fideELO(eloJugador, eloRival, resultado):
     probabilidad = 1.0 / (1.0 + (10.0 ** ((eloRival - eloJugador) / 400.0)))
     return int(k * (resultado - probabilidad))
 
-date_format = ["%Y.%m.%d", ]
+
+date_format = ["%Y.%m.%d"]
 
 
 def localDate(date):
@@ -813,6 +814,7 @@ def creaID():
     s = "%d,%s" % (r, d.isoformat()[2:].strip("0").replace("-", "").replace("T", "").replace(":", "").replace(".", ""))
     cr = enc(s)
     return cr
+
 
 # ~ import subprocess
 # ~ class Proceso():
@@ -1070,7 +1072,7 @@ class LIdisk:
 
 
 class Cursor:
-    def __init__(self, nomDB, conexion = None, with_commit=False):
+    def __init__(self, nomDB, conexion=None, with_commit=False):
         self.nomDB = nomDB
         self.conexion = conexion
         self.cursor = None
@@ -1149,7 +1151,7 @@ class ListSQL(object):
             with self.get_cursor_commit() as cursor:
                 sql = "DELETE FROM %s WHERE ROWID= ?" % self.tabla
                 rowid = self.liRowIDs[num]
-                cursor.execute(sql, [rowid,])
+                cursor.execute(sql, [rowid])
                 del self.liRowIDs[num]
 
     def __getitem__(self, num):
@@ -1157,7 +1159,7 @@ class ListSQL(object):
             with self.get_cursor() as cursor:
                 sql = "SELECT dato FROM %s WHERE ROWID= ?" % self.tabla
                 rowid = self.liRowIDs[num]
-                cursor.execute(sql, [rowid,])
+                cursor.execute(sql, [rowid])
                 li = cursor.fetchone()
                 return blob2var(li[0])
 
@@ -1298,7 +1300,7 @@ class DicBLOB(object):
         sql = "SELECT clave FROM %s" % self.tabla
         cursor.execute(sql)
         li = cursor.fetchall()
-        for clave, in li:
+        for (clave,) in li:
             self.stdic.add(clave)
         cursor.close()
 
@@ -1321,7 +1323,7 @@ class DicBLOB(object):
     def __delitem__(self, clave):
         cursor = self._conexion.cursor()
         sql = "DELETE FROM %s WHERE clave= ?" % self.tabla
-        liValores = [clave, ]
+        liValores = [clave]
         cursor.execute(sql, liValores)
         cursor.close()
         self._conexion.commit()
@@ -1332,7 +1334,7 @@ class DicBLOB(object):
         if clave in self.stdic:
             cursor = self._conexion.cursor()
             sql = "SELECT dato FROM %s WHERE clave= ?" % self.tabla
-            liValores = [clave, ]
+            liValores = [clave]
             cursor.execute(sql, liValores)
             li = cursor.fetchone()
             cursor.close()
@@ -1374,42 +1376,42 @@ class Timekeeper:
 
 
 # class OpenCodec:
-    # def __init__(self, path):
-        # with open(path) as f:
-            # u = chardet.universaldetector.UniversalDetector()
-            # for n, x in enumerate(f):
-                # u.feed(x)
-                # if n == 500:
-                    # break
-            # u.close()
-            # encoding = u.result.get("encoding", "latin-1")
-        # self.f = codecs.open(path, "r", encoding, 'ignore')
+# def __init__(self, path):
+# with open(path) as f:
+# u = chardet.universaldetector.UniversalDetector()
+# for n, x in enumerate(f):
+# u.feed(x)
+# if n == 500:
+# break
+# u.close()
+# encoding = u.result.get("encoding", "latin-1")
+# self.f = codecs.open(path, "r", encoding, 'ignore')
 
-    # def __enter__(self):
-        # return self.f
+# def __enter__(self):
+# return self.f
 
-    # def __exit__(self, xtype, value, traceback):
-        # self.f.close()
+# def __exit__(self, xtype, value, traceback):
+# self.f.close()
 
 
 # def txt_encoding(txt):
-    # u = chardet.universaldetector.UniversalDetector()
-    # u.feed(txt)
-    # u.close()
+# u = chardet.universaldetector.UniversalDetector()
+# u.feed(txt)
+# u.close()
 
-    # return u.result.get("encoding", "latin-1")
+# return u.result.get("encoding", "latin-1")
 
 
 # def file_encoding(fich, chunk=3000):
-    # with open(fich) as f:
-        # u = chardet.universaldetector.UniversalDetector()
-        # u.feed(f.read(chunk))
-        # u.close()
+# with open(fich) as f:
+# u = chardet.universaldetector.UniversalDetector()
+# u.feed(f.read(chunk))
+# u.close()
 
-    # return u.result.get("encoding", "ascii")
+# return u.result.get("encoding", "ascii")
 
 
-class RowidReader():
+class RowidReader:
     def __init__(self, nomFichero, tabla):
         self.nomFichero = nomFichero
         self.tabla = tabla
@@ -1425,7 +1427,7 @@ class RowidReader():
     def setWhere(self, where):
         self.where = where
 
-    def run(self, liRowids, filter, order ):
+    def run(self, liRowids, filter, order):
         self.stopnow()
         self.where = filter
         self.order = order
@@ -1439,14 +1441,14 @@ class RowidReader():
 
     def _run_thread(self):
         conexion = sqlite3.connect(self.nomFichero)
-        sql = "SELECT ROWID FROM %s"%self.tabla
+        sql = "SELECT ROWID FROM %s" % self.tabla
         if self.where:
-            sql += " WHERE %s"%self.where
+            sql += " WHERE %s" % self.where
         if self.order:
-            sql += " ORDER BY %s"%self.order
+            sql += " ORDER BY %s" % self.order
         cursor = conexion.cursor()
         cursor.execute(sql)
-        ch = random.randint(100,300)
+        ch = random.randint(100, 300)
         while not self.stop:
             li = cursor.fetchmany(ch)
             if li:
@@ -1473,7 +1475,7 @@ class RowidReader():
 
 
 def is64Windows():
-    return 'PROGRAMFILES(X86)' in os.environ
+    return "PROGRAMFILES(X86)" in os.environ
 
 
 class Log:

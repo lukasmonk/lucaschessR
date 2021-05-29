@@ -28,7 +28,7 @@ class WRunCoordinatesBlocks(QTVarios.WDialogo):
         self.cp_initial = Position.Position()
         self.cp_initial.set_pos_initial()
 
-        font = Controles.TipoLetra(puntos=self.configuration.x_sizefont_infolabels)
+        font = Controles.TipoLetra(puntos=14, peso=500)
 
         lb_block_k = Controles.LB(self, _("Block") + ":").ponFuente(font)
         self.lb_block = Controles.LB(self).ponFuente(font)

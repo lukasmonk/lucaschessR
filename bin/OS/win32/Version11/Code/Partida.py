@@ -123,8 +123,7 @@ class Partida:
         posicion = self.ultPosicion
         pv = []
         for mov in lipv:
-            if len(mov) >= 4 and mov[0] in "abcdefgh" and mov[1] in "12345678" and mov[2] in "abcdefgh" \
-                    and mov[3] in "12345678":
+            if len(mov) >= 4 and mov[0] in "abcdefgh" and mov[1] in "12345678" and mov[2] in "abcdefgh" and mov[3] in "12345678":
                 pv.append(mov)
             else:
                 break
@@ -305,7 +304,7 @@ class Partida:
         return [jg.movimiento() for jg in self.liJugadas]
 
     def pv_hasta(self, njug):
-        return " ".join([jg.movimiento() for jg in self.liJugadas[:njug+1]])
+        return " ".join([jg.movimiento() for jg in self.liJugadas[: njug + 1]])
 
     def anulaUltimoMovimiento(self, siBlancas):
         del self.liJugadas[-1]
@@ -334,7 +333,7 @@ class Partida:
             if hastaJugada == -1:
                 p.liJugadas = []
             elif hastaJugada < (p.numJugadas() - 1):
-                p.liJugadas = p.liJugadas[:hastaJugada + 1]
+                p.liJugadas = p.liJugadas[: hastaJugada + 1]
             if p.liJugadas:
                 p.ultPosicion = p.liJugadas[-1].posicion.copia()
             else:
@@ -364,7 +363,7 @@ class Partida:
             salta = 1
         else:
             salta = 0
-        for n, jg in enumerate(self.liJugadas[:hastaJugada + 1]):
+        for n, jg in enumerate(self.liJugadas[: hastaJugada + 1]):
             if n % 2 == salta:
                 resp += " %d." % numJugada
                 numJugada += 1
@@ -396,11 +395,11 @@ class Partida:
             jg.analisis = None
 
     def calc_elo_color(self, perfomance, siBlancas):
-        bad_moves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        verybad_moves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        nummoves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        sumelos = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        factormoves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
+        bad_moves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        verybad_moves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        nummoves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        sumelos = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        factormoves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
         last = OPENING
         for jg in self.liJugadas:
             if jg.analisis:
@@ -428,7 +427,7 @@ class Partida:
                 elif jg.verybad_move:
                     verybad_moves[std] += 1
                 nummoves[std] += 1
-                sumelos[std] += jg.elo*jg.elo_factor
+                sumelos[std] += jg.elo * jg.elo_factor
                 factormoves[std] += jg.elo_factor
 
         topes = {}
@@ -438,7 +437,7 @@ class Partida:
             numf = factormoves[std]
             tope = topes[std] = perfomance.limit(verybad_moves[std], bad_moves[std], nummoves[std])
             if numf:
-                elos[std] = int((sume*1.0/numf)*tope/perfomance.limit_max)
+                elos[std] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
             else:
                 elos[std] = 0
 
@@ -452,18 +451,18 @@ class Partida:
                 tope = topes[std]
 
         if numf:
-            elos[ALLGAME] = int((sume*1.0/numf)*tope/perfomance.limit_max)
+            elos[ALLGAME] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
         else:
             elos[ALLGAME] = 0
 
         return elos
 
     def calc_elo_colorFORM(self, perfomance, siBlancas):
-        bad_moves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        verybad_moves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        nummoves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        sumelos = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
-        factormoves = {OPENING:0, MIDDLEGAME:0, ENDGAME:0}
+        bad_moves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        verybad_moves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        nummoves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        sumelos = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        factormoves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
         last = OPENING
         for jg in self.liJugadas:
             if jg.analisis:
@@ -492,7 +491,7 @@ class Partida:
                 elif jg.verybad_move:
                     verybad_moves[std] += 1
                 nummoves[std] += 1
-                sumelos[std] += jg.elo*1.0
+                sumelos[std] += jg.elo * 1.0
                 factormoves[std] += 1.0
 
         topes = {}
@@ -502,7 +501,7 @@ class Partida:
             numf = factormoves[std]
             tope = topes[std] = perfomance.limit(verybad_moves[std], bad_moves[std], nummoves[std])
             if numf:
-                elos[std] = int((sume*1.0/numf)*tope/perfomance.limit_max)
+                elos[std] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
             else:
                 elos[std] = 0
 
@@ -516,7 +515,7 @@ class Partida:
                 tope = topes[std]
 
         if numf:
-            elos[ALLGAME] = int((sume*1.0/numf)*tope/perfomance.limit_max)
+            elos[ALLGAME] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
         else:
             elos[ALLGAME] = 0
 
@@ -527,6 +526,7 @@ class Partida:
             jg.siBook = False
         if self.siFenInicial():
             from Code import Apertura
+
             ap = Apertura.AperturaPol(999)
             for jg in self.liJugadas:
                 jg.siBook = ap.compruebaHumano(jg.posicionBase.fen(), jg.desde, jg.hasta)
@@ -539,7 +539,7 @@ class Partida:
 
         elos[None] = {}
         for std in (OPENING, MIDDLEGAME, ENDGAME, ALLGAME):
-            elos[None][std] = int((elos[True][std] + elos[False][std])/2.0)
+            elos[None][std] = int((elos[True][std] + elos[False][std]) / 2.0)
 
         return elos
 
@@ -548,6 +548,7 @@ class Partida:
             jg.siBook = False
         if self.siFenInicial():
             from Code import Apertura
+
             ap = Apertura.AperturaPol(999)
             for jg in self.liJugadas:
                 jg.siBook = ap.compruebaHumano(jg.posicionBase.fen(), jg.desde, jg.hasta)
@@ -560,7 +561,7 @@ class Partida:
 
         elos[None] = {}
         for std in (OPENING, MIDDLEGAME, ENDGAME, ALLGAME):
-            elos[None][std] = int((elos[True][std] + elos[False][std])/2.0)
+            elos[None][std] = int((elos[True][std] + elos[False][std]) / 2.0)
 
         return elos
 
@@ -629,19 +630,19 @@ class PartidaCompleta(Partida):
         n = fromtxt.find("]")
         if n:
             self.liTags = Util.txt2dic(fromtxt[:n])
-            self.recuperaDeTexto(fromtxt[n+1:])
+            self.recuperaDeTexto(fromtxt[n + 1 :])
 
     def setTags(self, litags):
         self.liTags = litags[:]
 
     def getTAG(self, tag):
-        for k,v in self.liTags:
+        for k, v in self.liTags:
             if k.upper() == tag:
                 return v
         return ""
 
     def dicTags(self):
-        return {k:v for k, v in self.liTags}
+        return {k: v for k, v in self.liTags}
 
     def set_extend_tags(self):
         op = self.getTAG("OPENING")
@@ -659,6 +660,7 @@ class PartidaCompleta(Partida):
 
     def readPGN(self, pgn):
         from Code import PGN  # evita el circulo vicioso
+
         unpgn = PGN.UnPGN()
         if not unpgn.leeTexto(pgn):
             return None
@@ -668,9 +670,9 @@ class PartidaCompleta(Partida):
         return self
 
     def pgn(self):
-        li = ['[%s "%s"]\n'%(k,v) for k,v in self.liTags]
+        li = ['[%s "%s"]\n' % (k, v) for k, v in self.liTags]
         txt = "".join(li)
-        txt += "\n%s"%self.pgnBase()
+        txt += "\n%s" % self.pgnBase()
         return txt
 
     def resetFEN(self, fen):
@@ -691,6 +693,7 @@ class PartidaCompleta(Partida):
             if tag:
                 li.append(tag)
         return "-".join(li)
+
 
 # firstLG = [True]
 
@@ -753,7 +756,7 @@ def calc_formula_elo(jg):  # , limit=200.0):
     # xshow: Factor de conversion a puntos para mostrar
     xshow = +1 if siBlancas else -1
     if not VarGen.configuracion.centipawns:
-        xshow = 0.01*xshow
+        xshow = 0.01 * xshow
 
     li = (
         ("xpiec", piew if siBlancas else pieb),
@@ -762,16 +765,12 @@ def calc_formula_elo(jg):  # , limit=200.0):
         ("xstm", +1 if siBlancas else -1),
         ("xplm", plm),
         ("xshow", xshow),
-        ("xlost", lostp_abs)
+        ("xlost", lostp_abs),
     )
     for k, v in li:
         if k in formula:
             formula = formula.replace(k, "%d.0" % v)
-    li = (
-        ("xgmo", gmo),
-        ("xmat", mat),
-        ("xpow", matw if siBlancas else matb),
-    )
+    li = (("xgmo", gmo), ("xmat", mat), ("xpow", matw if siBlancas else matb))
     for k, v in li:
 
         # LG(k, v)

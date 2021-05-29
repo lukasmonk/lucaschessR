@@ -140,7 +140,7 @@ class ManagerMateMap(Manager.Manager):
         self.thinking(True)
         self.disable_all()
 
-        self.rm_rival = self.xrival.juega()
+        self.rm_rival = self.xrival.play_game(self.game)
 
         self.thinking(False)
         from_sq, to_sq, promotion = self.rm_rival.from_sq, self.rm_rival.to_sq, self.rm_rival.promotion

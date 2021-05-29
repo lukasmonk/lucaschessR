@@ -48,7 +48,7 @@ class BMTUno:
 
         self.puntos = max_puntos
         self.max_puntos = max_puntos
-        self.segundos = 0
+        self.seconds = 0
         self.state = 0
         self.finished = False
         self.cl_game = cl_game
@@ -78,7 +78,7 @@ class BMTUno:
         for rm in self.mrm.li_rm:
             rm.siElegirPartida = False
         self.puntos = self.max_puntos
-        self.segundos = 0
+        self.seconds = 0
         self.state = 0
         self.finished = False
 
@@ -158,7 +158,7 @@ class BMTLista:
                 hechos += 1
                 t_estado += uno.state
                 t_puntos += uno.puntos
-            t_segundos += uno.segundos
+            t_segundos += uno.seconds
         return total, hechos, t_puntos, t_segundos, t_estado
 
     def extrae(self, from_sq, to_sq):

@@ -137,7 +137,7 @@ class WDBAnalisis:
         me = QTUtil2.analizando(self.wowner)
 
         conf_motor = Code.configuration.buscaRival(alm.engine)
-        conf_motor.actMultiPV(alm.multiPV)
+        conf_motor.update_multipv(alm.multiPV)
         xmotor = Code.procesador.creaManagerMotor(conf_motor, alm.vtime, alm.depth, siMultiPV=True)
 
         game = Game.Game()

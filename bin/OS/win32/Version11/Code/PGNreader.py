@@ -92,7 +92,7 @@ class Moves:
                     pos += 1
 
                 mv = Move()
-                x = mv.pgn = txt[desde:hasta + 1]
+                x = mv.pgn = txt[desde : hasta + 1]
                 if "-" in x:
                     if "o" in x:
                         x = x.replace("o", "O")
@@ -110,7 +110,7 @@ class Moves:
                     pos += 1
 
                 mv = Move()
-                x = mv.pgn = txt[desde:hasta + 1]
+                x = mv.pgn = txt[desde : hasta + 1]
                 if "-" in x:
                     x = x.replace("-", "")
                     mv.pgn = x
@@ -136,7 +136,7 @@ class Moves:
                 while pos < ntxt and txt[pos] in "!?":
                     hasta += 1
                     pos += 1
-                mv.criticas.append(txt[desde:hasta + 1])
+                mv.criticas.append(txt[desde : hasta + 1])
 
             elif c == "(":
                 pos += 1
@@ -207,7 +207,7 @@ class Moves:
                     pos += 1
 
                 mv = Move()
-                x = mv.pgn = txt[desde:hasta + 1].replace("0", "O").upper()
+                x = mv.pgn = txt[desde : hasta + 1].replace("0", "O").upper()
                 if x in ("O-O", "O-O-O", "O-O+", "O-O-O+"):
                     self.liMoves.append(mv)
             else:
@@ -263,7 +263,7 @@ class Game:
                 clave = li[0].strip().replace(" ", "")
                 ok = True
                 for c in clave:
-                    if not( 33 < ord(c) < 127):
+                    if not (33 < ord(c) < 127):
                         ok = False
                         break
                 if not ok:
@@ -305,7 +305,7 @@ def read1Game(pgn):
                 else:
                     siCab = False
                     siMov = True
-                    pgnMov = [linea, ]
+                    pgnMov = [linea]
         elif siMov:
             if linea:
                 pgnMov.append(linea)
@@ -328,7 +328,7 @@ def readGames(pgnfile):
             linea = linea.strip()
             if siBCab:
                 if linea and linea[0] == "[":
-                    pgnCab = [linea, ]
+                    pgnCab = [linea]
                     siBCab = False
                     siCab = True
             elif siCab:
@@ -338,30 +338,30 @@ def readGames(pgnfile):
                     else:
                         siCab = False
                         siMov = True
-                        pgnMov = [linea, ]
+                        pgnMov = [linea]
                 else:
                     siCab = False
                     siMov = True
                     pgnMov = []
             elif siMov:
                 if linea:
-                    if linea[0] == '[' and linea.endswith("]"):
+                    if linea[0] == "[" and linea.endswith("]"):
                         g = Game()
                         g.nbytes = nbytes
                         g.readLabels(pgnCab)
                         g.readBody("\n".join(pgnMov))
                         yield g
-                        pgnCab = [linea, ]
+                        pgnCab = [linea]
                         siCab = True
                     else:
                         pgnMov.append(linea)
                 # else:
-                    # g = Game()
-                    # g.nbytes = nbytes
-                    # g.readLabels(pgnCab)
-                    # g.readBody("\n".join(pgnMov))
-                    # yield g
-                    # siBCab = True
+                # g = Game()
+                # g.nbytes = nbytes
+                # g.readLabels(pgnCab)
+                # g.readBody("\n".join(pgnMov))
+                # yield g
+                # siBCab = True
 
         if not siBCab:
             g = Game()

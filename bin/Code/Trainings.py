@@ -17,8 +17,7 @@ from Code.GM import ManagerGM, WindowGM
 from Code import ManagerMate
 from Code.TurnOnLights import TurnOnLights
 from Code import Memory
-from Code import CompetitionWithTutor
-from Code.QT import WCompetitionWithTutor
+from Code.CompetitionWithTutor import CompetitionWithTutor, WCompetitionWithTutor
 from Code.QT import Iconos
 from Code.QT import WindowBMT
 from Code.QT import WindowDailyTest
@@ -450,7 +449,7 @@ class Entrenamientos:
                         posUltimo = data.get("POSULTIMO", 1)
                         jump = data.get("SALTA", False)
                         tipo = data.get("TYPE", "s")
-                        attempts = data.get("ATTEMPTS", 1)
+                        attempts = 0 #data.get("ATTEMPTS", 0) # Se mantienen por si alguien se ha aconstumbrado
                         resp = WCompetitionWithTutor.numPosicion(
                             self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo, attempts
                         )

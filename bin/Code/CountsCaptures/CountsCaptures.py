@@ -22,7 +22,7 @@ class CountCapture:
         self.tries = []  # pos,depth,success,time
 
     def is_finished(self):
-        return (self.current_posmove + self.current_depth) >= len(self.game)
+        return (self.current_posmove + self.current_depth) >= (len(self.game)+1)
 
     def save(self):
         dic = {
@@ -50,10 +50,29 @@ class CountCapture:
                 ntries += 1
         return (self.current_posmove - 1) / ntries if ntries > 0 else 0.0
 
+    def label_success(self) -> str:
+        ntries = len(self.tries)
+        if ntries == 0:
+            return ""
+        nok = 0
+        for posmove, depth, ok, tiempo in self.tries:
+            if ok:
+                nok += 1
+        porc = min(nok * 100.0 / ntries, 100.0)
+        return "%.01f%%" % porc
+
+    def label_time(self) -> str:
+        tm = 0.0
+        for posmove, depth, ok, tiempo in self.tries:
+            tm += tiempo
+        total = self.current_posmove + self.current_depth + 1
+        media = tm / total
+        return "%.01f\"/%.f\"" % (media, tm)
+
     def copy(self):
         capt_copy = CountCapture()
         capt_copy.game = self.game.copia()
-        capt_copy.current_posmove = 2
+        capt_copy.current_posmove = 0
         capt_copy.current_depth = 0
         capt_copy.tries = []
         return capt_copy

@@ -1,6 +1,8 @@
 import builtins
 import gettext
 import os
+import locale
+
 import Code
 
 
@@ -39,6 +41,10 @@ DIR_LOCALE = Code.path_resource("Locale")
 
 
 def install(lang=None):
+    if not lang:
+        li_info = locale.getdefaultlocale()
+        if len(li_info) == 2:
+            lang = li_info[0][:2]
     if lang and os.path.isfile("%s/%s/LC_MESSAGES/%s.mo" % (DIR_LOCALE, lang, DOMAIN)):
         t = gettext.translation(DOMAIN, DIR_LOCALE, languages=[lang])
         t.install(lang)

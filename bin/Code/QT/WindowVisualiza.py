@@ -583,8 +583,8 @@ class WPlay(QTVarios.WDialogo):
             liMV = FasterCode.get_exmoves()
             for mv in liMV:
                 if mv.capture():
-                    stAttacKing.add(mv.from_sq())
-                    stAttacKed.add(mv.to_sq())
+                    stAttacKing.add(mv.xfrom())
+                    stAttacKed.add(mv.xto())
 
         liSolucion = []
         for position, pieza in self.cp.squares.items():

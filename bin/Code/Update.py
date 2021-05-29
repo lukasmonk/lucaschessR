@@ -6,7 +6,7 @@ import Code
 from Code.QT import QTUtil2
 from Code import Util
 
-WEBUPDATES = "https://lucaschess.pythonanywhere.com/static/updater/updates_win32.txt"
+WEBUPDATES = "https://lucaschess.pythonanywhere.com/static/updater/updates_%s.txt" % ("win32" if Code.is_windows else "linux")
 
 
 def update_file(titulo, urlfichero, tam):

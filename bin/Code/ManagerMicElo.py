@@ -102,17 +102,17 @@ class ManagerMicElo(Manager.Manager):
 
         return li
 
-    def start(self, engine_rival, minutos, segundos):
-        self.base_inicio(engine_rival, minutos, segundos)
+    def start(self, engine_rival, minutos, seconds):
+        self.base_inicio(engine_rival, minutos, seconds)
         self.start_message()
         self.play_next_move()
 
-    def base_inicio(self, engine_rival, minutos, segundos):
+    def base_inicio(self, engine_rival, minutos, seconds):
         self.game_type = GT_MICELO
 
         self.engine_rival = engine_rival
         self.minutos = minutos
-        self.segundos = segundos
+        self.seconds = seconds
 
         self.is_competitive = True
 
@@ -136,7 +136,7 @@ class ManagerMicElo(Manager.Manager):
 
         self.vtime = {}
         self.maxSegundos = minutos * 60
-        self.secs_move = segundos
+        self.secs_move = seconds
 
         self.vtime[True] = Util.Timer(self.maxSegundos)
         self.vtime[False] = Util.Timer(self.maxSegundos)
@@ -255,7 +255,7 @@ class ManagerMicElo(Manager.Manager):
         dic = {
             "engine_rival": self.engine_rival.save(),
             "minutos": self.minutos,
-            "segundos": self.segundos,
+            "seconds": self.seconds,
             "game_save": self.game.save(),
             "time_white": self.vtime[WHITE].save(),
             "time_black": self.vtime[BLACK].save(),
@@ -276,9 +276,9 @@ class ManagerMicElo(Manager.Manager):
         engine_rival.alias = dic["alias"]
 
         minutos = dic["minutos"]
-        segundos = dic["segundos"]
+        seconds = dic["seconds"]
 
-        self.base_inicio(engine_rival, minutos, segundos)
+        self.base_inicio(engine_rival, minutos, seconds)
 
         self.game.restore(dic["game_save"])
 
@@ -369,7 +369,7 @@ class ManagerMicElo(Manager.Manager):
             if not siEncontrada:
                 tiempoBlancas = self.vtime[True].tiempoPendiente
                 tiempoNegras = self.vtime[False].tiempoPendiente
-                mrm = self.xrival.juegaTiempoTorneo(self.game, tiempoBlancas, tiempoNegras, self.secs_move)
+                mrm = self.xrival.play_time_tourney(self.game, tiempoBlancas, tiempoNegras, self.secs_move)
                 if mrm is None:
                     self.thinking(False)
                     return False

@@ -1,5 +1,6 @@
 from PySide2 import QtCore
 
+import Code
 from Code.Engines import EngineRun
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -14,7 +15,7 @@ class WStEval(WKibCommon.WKibCommon):
         WKibCommon.WKibCommon.__init__(self, cpu, Iconos.Book())
 
         self.em = Controles.EM(self, siHTML=False).read_only()
-        f = Controles.TipoLetra(name="Courier New", puntos=10)
+        f = Controles.TipoLetra(name=Code.font_mono, puntos=10)
         self.em.ponFuente(f)
 
         li_acciones = (

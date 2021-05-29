@@ -480,44 +480,6 @@ class DBgames:
         p.resultado()
         return p
 
-    def read_pgn_recno(self, recno):
-        raw = self.read_complete_recno(recno)
-        litags = []
-        result = "*"
-        for field in self.li_fields:
-            if not (field in ("XPV", "_DATA_", "PLYCOUNT")):
-                v = raw[field]
-                if v:
-                    litags.append((drots.get(field, field), v if type(v) == str else str(v)))
-                    if field == "RESULT":
-                        result = v if type(v) == str else str(v)
-        dcabs = self.read_config("dcabs", {})
-        if "Plycount" in dcabs:
-            litags.append(("PlyCount", str(raw["PLYCOUNT"])))
-        xpgn = raw["_DATA_"]
-        if xpgn:
-            if xpgn.startswith(BODY_SAVE):
-                ok, p = Game.pgn_game(xpgn[len(BODY_SAVE):].strip())
-            else:
-                p = Game.Game()
-                p.restore(xpgn)
-            p.set_tags(litags)
-            return p.pgn(), p.resultado()
-
-        xpv = raw["XPV"]
-        if xpv.startswith("|"):
-            nada, fen, xpv = xpv.split("|")
-            pv = xpv_pv(xpv) if xpv else ""
-            game = Game.pv_game(fen, pv)
-            pgn = game.pgnBase()
-        else:
-            pgn = xpv_pgn(raw["XPV"])
-        tags = []
-        for t, v in litags:
-            tags.append('[%s "%s"]' % (t, v))
-        pgn = "\n".join(tags) + "\n" + "\n" + pgn
-        return pgn, result
-
     def blank_game(self):
         hoy = Util.today()
         liTags = [["Date", "%d.%02d.%02d" % (hoy.year, hoy.month, hoy.day)]]

@@ -216,7 +216,7 @@ def polyglotUnir(owner):
 def eligeJugadaBooks(main_window, li_moves, is_white, siSelectSiempre=True):
     main_window.cursorFueraBoard()
     menu = QTVarios.LCMenu(main_window)
-    f = Controles.TipoLetra(name="Courier New", puntos=10)
+    f = Controles.TipoLetra(name=Code.font_mono, puntos=10)
     menu.ponFuente(f)
 
     titulo = _("White") if is_white else _("Black")
@@ -245,7 +245,7 @@ def eligeJugadaBooks(main_window, li_moves, is_white, siSelectSiempre=True):
 def saltaJugadaBooks(manager, li_moves, move):
     is_white = move.position_before.is_white
     menu = QTVarios.LCMenu(manager.main_window)
-    f = Controles.TipoLetra(name="Courier New", puntos=10)
+    f = Controles.TipoLetra(name=Code.font_mono, puntos=10)
     menu.ponFuente(f)
 
     icono = Iconos.PuntoNaranja() if is_white else Iconos.PuntoNegro()

@@ -189,12 +189,12 @@ class PGN:
             tb = SQLBase.TablaBase("GAMES")
             tb.liCampos = []
             for clave in dClaves:
-                tb.liCampos.append(SQLBase.Campo(clave.upper(), 'VARCHAR'))
+                tb.liCampos.append(SQLBase.Campo(clave.upper(), "VARCHAR"))
             if "PLIES" not in dClaves:
-                tb.liCampos.append(SQLBase.Campo("PLIES", 'VARCHAR'))
+                tb.liCampos.append(SQLBase.Campo("PLIES", "VARCHAR"))
                 dClaves["PLIES"] = 4
             if "PGN" not in dClaves:
-                tb.liCampos.append(SQLBase.Campo("PGN", 'TEXT'))
+                tb.liCampos.append(SQLBase.Campo("PGN", "TEXT"))
             cursor = bd.conexion.cursor()
             tb.crearBase(cursor)
             cursor.close()
@@ -227,7 +227,7 @@ class PGN:
                         continue
                     tam = len(valor)
                     if clave not in dClaves:
-                        dbf.nuevaColumna(clave.upper(), 'VARCHAR')
+                        dbf.nuevaColumna(clave.upper(), "VARCHAR")
                         dClaves[clave] = tam
                     else:
                         if dClaves[clave] < tam:
@@ -339,7 +339,7 @@ def rawPGN(pgn):
 
     txt = ""
     for k, v in g.labels.iteritems():
-        txt += "[%s \"%s\"]\n" % (k, v)
+        txt += '[%s "%s"]\n' % (k, v)
     txt += "\n\n"
     txt += p.pgnBase()
 

@@ -298,22 +298,22 @@ class GT_Marker(GT_Item):
 
 
 class GT_Action(GTarea):
-    GTA_INICIO, GTA_MAINARROW_REMOVE, GTA_PIECES_REMOVEALL, GTA_GRAPHICS_REMOVEALL, GTA_PIZARRA_REMOVE = (
-        "I",
-        "MAR",
-        "PRA",
-        "GRA",
-        "PR",
-    )
-    dicTxt = {
-        GTA_INICIO: _("Initial physical pos"),
-        GTA_MAINARROW_REMOVE: _("Remove main arrow"),
-        GTA_PIECES_REMOVEALL: _("Remove all pieces"),
-        GTA_GRAPHICS_REMOVEALL: _("Remove all graphics"),
-        GTA_PIZARRA_REMOVE: _("Remove text"),
-    }
-
     def __init__(self, guion):
+        self.GTA_INICIO, self.GTA_MAINARROW_REMOVE, self.GTA_PIECES_REMOVEALL, self.GTA_GRAPHICS_REMOVEALL, self.GTA_PIZARRA_REMOVE = (
+            "I",
+            "MAR",
+            "PRA",
+            "GRA",
+            "PR",
+        )
+        self.dicTxt = {
+            self.GTA_INICIO: _("Initial physical pos"),
+            self.GTA_MAINARROW_REMOVE: _("Remove main arrow"),
+            self.GTA_PIECES_REMOVEALL: _("Remove all pieces"),
+            self.GTA_GRAPHICS_REMOVEALL: _("Remove all graphics"),
+            self.GTA_PIZARRA_REMOVE: _("Remove text"),
+        }
+
         GTarea.__init__(self, guion, TP_ACTION)
         self._action = None
 

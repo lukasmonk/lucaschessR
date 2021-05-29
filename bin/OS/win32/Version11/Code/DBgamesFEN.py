@@ -28,8 +28,8 @@ class DBgamesFEN:
     def __init__(self, nomFichero):
         self.nomFichero = Util.dirRelativo(nomFichero)
         self.liCamposBase = ["FEN", "EVENT", "SITE", "DATE", "WHITE", "BLACK", "RESULT", "PLIES"]
-        self.liCamposWork = ["XPV", ]
-        self.liCamposBLOB = ["PGN", ]
+        self.liCamposWork = ["XPV"]
+        self.liCamposBLOB = ["PGN"]
 
         self.liCamposRead = []
         self.liCamposRead.extend(self.liCamposWork)
@@ -90,7 +90,7 @@ class DBgamesFEN:
         if self.order:
             sql += " ORDER BY %s" % self.order
         self._cursor.execute(sql)
-        self.liRowids = [ row[0] for row in self._cursor.fetchall()]
+        self.liRowids = [row[0] for row in self._cursor.fetchall()]
 
     def close(self):
         if self._conexion:
@@ -102,8 +102,8 @@ class DBgamesFEN:
         li = []
         for campo, tipo in liOrden:
             if campo == "PLIES":
-                campo =  "CAST(PLIES AS INTEGER)"
-            li.append( "%s %s" % (campo, tipo))
+                campo = "CAST(PLIES AS INTEGER)"
+            li.append("%s %s" % (campo, tipo))
         self.order = ",".join(li)
         self.liRowids = []
         self.rowidReader.run(self.liRowids, self.filter, self.order)
@@ -157,7 +157,7 @@ class DBgamesFEN:
         sql = "UPDATE GAMES SET FEN=? WHERE ROWID = %d" % rowidOther
         self._cursor.execute(sql, ("?????",))
 
-        updateAll = ",".join(["%s=?"%campo for campo in self.liCamposAll])
+        updateAll = ",".join(["%s=?" % campo for campo in self.liCamposAll])
         sql = "UPDATE GAMES SET %s" % updateAll + " WHERE ROWID = %d"
 
         self._cursor.execute(sql % rowid, regOther)
@@ -320,10 +320,34 @@ class DBgamesFEN:
         rtags = None
 
         p.leerPV(xpv2pv(raw["XPV"]))
-        rots = ["Event", "Site", "Date", "Round", "White", "Black", "Result",
-                "WhiteTitle", "BlackTitle", "WhiteElo", "BlackElo", "WhiteUSCF", "BlackUSCF", "WhiteNA", "BlackNA",
-                "WhiteType", "BlackType", "EventDate", "EventSponsor", "ECO", "UTCTime", "UTCDate", "TimeControl",
-                "SetUp", "FEN", "PlyCount"]
+        rots = [
+            "Event",
+            "Site",
+            "Date",
+            "Round",
+            "White",
+            "Black",
+            "Result",
+            "WhiteTitle",
+            "BlackTitle",
+            "WhiteElo",
+            "BlackElo",
+            "WhiteUSCF",
+            "BlackUSCF",
+            "WhiteNA",
+            "BlackNA",
+            "WhiteType",
+            "BlackType",
+            "EventDate",
+            "EventSponsor",
+            "ECO",
+            "UTCTime",
+            "UTCDate",
+            "TimeControl",
+            "SetUp",
+            "FEN",
+            "PlyCount",
+        ]
         drots = {x.upper(): x for x in rots}
         drots["PLIES"] = "PlyCount"
 
@@ -350,7 +374,7 @@ class DBgamesFEN:
         cSQL = "DELETE FROM GAMES WHERE rowid = ?"
         lista.sort(reverse=True)
         for recno in lista:
-            self._cursor.execute(cSQL,(self.liRowids[recno],))
+            self._cursor.execute(cSQL, (self.liRowids[recno],))
             del self.liRowids[recno]
         self._conexion.commit()
 
@@ -370,7 +394,7 @@ class DBgamesFEN:
         liData = []
         for field in self.liCamposBase:
             if reg_ant[field] != dTags.get(field):
-                liFields.append("%s=?"%field)
+                liFields.append("%s=?" % field)
                 liData.append(dTags.get(field))
         if xpgn != reg_ant["PGN"]:
             liFields.append("PGN=?")
@@ -420,8 +444,7 @@ class DBgamesFEN:
         for field in self.liCamposBase:
             data.append(dTags.get(field, None))
 
-        sql = "insert into GAMES (XPV,PGN,FEN,EVENT,SITE,DATE,WHITE,BLACK,RESULT,PLIES)" \
-              " values (?,?,?,?,?,?,?,?,?,?);"
+        sql = "insert into GAMES (XPV,PGN,FEN,EVENT,SITE,DATE,WHITE,BLACK,RESULT,PLIES)" " values (?,?,?,?,?,?,?,?,?,?);"
         self._cursor.execute(sql, data)
         self._conexion.commit()
 
@@ -458,8 +481,7 @@ class DBgamesFEN:
             if dup:
                 duplicados += 1
             else:
-                reg = (fen, raw["EVENT"], raw["SITE"], raw["DATE"], raw["WHITE"], raw["BLACK"], raw["XPV"], raw["PGN"],
-                       raw["PLIES"])
+                reg = (fen, raw["EVENT"], raw["SITE"], raw["DATE"], raw["WHITE"], raw["BLACK"], raw["XPV"], raw["PGN"], raw["PLIES"])
                 importados += 1
                 cursor.execute(sql, reg)
 
@@ -475,7 +497,7 @@ class DBgamesFEN:
         self.lee_rowids()
 
     def massive_change_tags(self, li_tags_change, liRegistros, remove, overwrite):
-        dtag = Util.SymbolDict({tag:val for tag, val in li_tags_change})
+        dtag = Util.SymbolDict({tag: val for tag, val in li_tags_change})
 
         def work_tag(tag, alm):
             if tag in dtag:

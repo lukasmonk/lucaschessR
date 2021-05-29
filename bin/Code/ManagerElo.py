@@ -465,7 +465,7 @@ class ManagerElo(Manager.Manager):
 
             if siPensar:
                 if self.siRivalInterno:
-                    rm_rival = self.xrival.juega()
+                    rm_rival = self.xrival.play_game(self.game)
                     dT, hT = 5, 15
                 else:
                     nJugadas = len(self.game)
@@ -473,7 +473,7 @@ class ManagerElo(Manager.Manager):
                         tp = 300
                     else:
                         tp = 600
-                    rm_rival = self.xrival.juegaTiempo(tp, tp, 0)  # engloba juega + juega Tiempo
+                    rm_rival = self.xrival.play_time(self.game, tp, tp, 0)  # engloba juega + juega Tiempo
                     pts = rm_rival.centipawns_abs()
                     if pts > 100:
                         dT, hT = 5, 15

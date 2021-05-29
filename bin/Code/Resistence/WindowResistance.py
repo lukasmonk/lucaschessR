@@ -101,14 +101,14 @@ class WResistance(QTVarios.WDialogo):
         self.accept()
 
     def configurar(self):
-        segundos, puntos, maxerror = self.resistance.actual()
+        seconds, puntos, maxerror = self.resistance.actual()
 
         separador = FormLayout.separador
 
         li_gen = [separador]
 
         config = FormLayout.Spinbox(_("Time in seconds"), 1, 99999, 80)
-        li_gen.append((config, segundos))
+        li_gen.append((config, seconds))
 
         li_gen.append(separador)
 
@@ -125,8 +125,8 @@ class WResistance(QTVarios.WDialogo):
         resultado = FormLayout.fedit(li_gen, title=_("Config"), parent=self, icon=Iconos.Configurar())
         if resultado:
             accion, liResp = resultado
-            segundos, puntos, maxerror = liResp
-            self.resistance.cambiaconfiguration(segundos, puntos, maxerror)
+            seconds, puntos, maxerror = liResp
+            self.resistance.cambiaconfiguration(seconds, puntos, maxerror)
             self.set_textAyuda()
             self.grid.refresh()
             return liResp[0]

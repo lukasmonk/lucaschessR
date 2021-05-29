@@ -1,14 +1,13 @@
 import sys
 import os
 
-current_dir = os.path.realpath(os.path.dirname(sys.argv[0]))
-
+current_dir = os.path.abspath(os.path.realpath(os.path.dirname(sys.argv[0])))
 if current_dir:
     os.chdir(current_dir)
 
 lucas_chess = None  # asignado en Translate
 
-folder_OS = os.path.realpath(os.path.join("OS", sys.platform))
+folder_OS = os.path.join(current_dir, "OS", sys.platform)
 
 folder_engines = os.path.join(folder_OS, "Engines")
 sys.path.insert(0, folder_OS)
@@ -53,6 +52,8 @@ tbookPTZ = path_resource("Openings", "fics15.bin")
 tbookI = path_resource("Openings", "irina.bin")
 xtutor = None
 
+font_mono = "Courier New" if is_windows else "Mono"
+
 list_engine_managers = None
 
 mate_en_dos = 175522
@@ -73,7 +74,7 @@ def relative_root(path):
 
 
 BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.22a"
+VERSION = "R 1.23"
 DEBUG = False
 DEBUG_ENGINE = False
 

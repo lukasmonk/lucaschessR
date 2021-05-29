@@ -33,7 +33,7 @@ class ManagerEverest(Manager.Manager):
         self.posJugadaObj = 0
         self.nombreObj = self.expedition.name
 
-        self.xanalyzer.maximizaMultiPV()
+        self.xanalyzer.maximize_multipv()
 
         self.puntos = 0
         self.vtime = 0.0

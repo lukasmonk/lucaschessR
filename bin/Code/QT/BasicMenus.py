@@ -96,6 +96,7 @@ def menu_tools_savemenu(procesador, dic_data=None):
     menu1.opcion("motores", _("External engines"), Iconos.Motores())
     menu1.separador()
     menu1.opcion("kibitzers", _("Kibitzers"), Iconos.Kibitzer())
+
     savemenu.separador()
 
     if Code.is_windows and Code.configuration.x_show_version11:

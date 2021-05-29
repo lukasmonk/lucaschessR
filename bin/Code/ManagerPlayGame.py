@@ -38,7 +38,7 @@ class ManagerPlayGame(Manager.Manager):
         self.siSave = False
         self.minTiempo = 5000
 
-        self.xanalyzer.maximizaMultiPV()
+        self.xanalyzer.maximize_multipv()
 
         self.puntosMax = 0
         self.puntos = 0

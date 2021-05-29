@@ -207,7 +207,7 @@ class WBase(QtWidgets.QWidget):
         self.lb_capt_black.setStyleSheet(style)
 
         # Relojes
-        f = Controles.TipoLetra("Arial Black", puntos=26, peso=75)
+        f = Controles.TipoLetra("Arial Black" if Code.is_windows else Code.font_mono, puntos=26, peso=500)
 
         def lbReloj():
             lb = (
