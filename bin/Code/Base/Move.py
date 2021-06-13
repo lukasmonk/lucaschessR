@@ -6,12 +6,12 @@ from Code.Base.Constantes import *
 from Code.Engines import EngineResponse
 
 
-def creaDicHTML():
+def crea_dic_html():
     base = '<span style="font-family:Chess Alpha 2"><big>%s</big></span>'
     return {x: base % x for x in "pnbrqkPNBRQK"}
 
 
-dicHTMLFigs = creaDicHTML()
+dicHTMLFigs = crea_dic_html()
 
 
 class Move:
@@ -444,10 +444,10 @@ class Variations:
                 break
 
         gm = game.copia()
-        if pos_add:
-            self.li_variations[pos_add] = gm
-        else:
+        if pos_add is None:
             self.li_variations.append(gm)
+        else:
+            self.li_variations[pos_add] = gm
 
     def zap(self):
         self.li_variations = []

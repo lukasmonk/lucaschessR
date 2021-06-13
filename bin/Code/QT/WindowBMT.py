@@ -33,7 +33,7 @@ class WHistorialBMT(QTVarios.WDialogo):
         # Datos ----------------------------------------------------------------
         self.dbf = dbf
         self.recnoActual = self.dbf.recno
-        bmt_lista = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA"))
+        bmt_lista = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA")).patch()
         self.liHistorial = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "HISTORIAL"))
         self.max_puntos = dbf.MAXPUNTOS
 
@@ -133,7 +133,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.dbf = dbf
         self.recnoActual = self.dbf.recno
         x = dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA")
-        self.bmt_lista = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA"))
+        self.bmt_lista = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA")).patch()
         self.bmt_lista.check_color()
         self.historial = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "HISTORIAL"))
         self.siTerminadaAntes = self.is_finished = self.bmt_lista.is_finished()
@@ -389,7 +389,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
                     num_pos_estate[y] += 1
 
         num_pos_estate[9] = nposic
-        labels_score = {9: "Repeat all", 8: "Best move", 7: "Excellent", 6: "Very good", 5: "Good", 4: "Acceptable"}
+        labels_score = {9: _("Repeat all"), 8: _("Best move"), 7: _("Excellent"), 6: _("Very good"), 5: _("Good"), 4: _("Acceptable")}
 
         li_gen = [(None, None)]
         liJ = []
@@ -677,7 +677,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
                 self.activaJugada1(n)
             self.bmt_uno.finished = True
             diferenciaPtsPrimero = self.ptsPrimero - self.ptsMejor
-            self.lbPrimera.set_text("%s (difference: %s pts)" % (self.texto_lbPrimera, "%+0.2f" % (diferenciaPtsPrimero / 100.0)))
+            self.lbPrimera.set_text("%s (%s %s)" % (self.texto_lbPrimera, "%+0.2f" % (diferenciaPtsPrimero / 100.0), _("pws")))
             self.muestra(num)
             self.ponPuntos(0)
             bt = self.liBT[self.actualP]
@@ -1076,7 +1076,7 @@ class WBMT(QTVarios.WDialogo):
             return
         name = dbf.NOMBRE
         extra = dbf.EXTRA
-        bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
+        bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
 
         # Motor y vtime, cogemos los estandars de analysis
         file = self.configuration.file_param_analysis()
@@ -1264,7 +1264,7 @@ class WBMT(QTVarios.WDialogo):
             bl = li_gen[0]
 
             um = QTUtil2.unMomento(self)
-            bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
+            bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
 
             from_sq = 0
             pos = 1
@@ -1308,7 +1308,7 @@ class WBMT(QTVarios.WDialogo):
         if resultado:
             accion, li_gen = resultado
 
-            bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
+            bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
             clista = li_gen[0]
             if clista:
                 lni = Util.ListaNumerosImpresion(clista)
@@ -1377,7 +1377,7 @@ class WBMT(QTVarios.WDialogo):
         li_unos = []
         dic_games = {}
         for recno in li:
-            bmt_lista1 = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
+            bmt_lista1 = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
             li_unos.extend(bmt_lista1.li_bmt_uno)
             dic_games.update(bmt_lista1.dic_games)
 
@@ -1456,13 +1456,13 @@ class WBMT(QTVarios.WDialogo):
                     regActual.PUNTOS = 0
                     regActual.FFINAL = ""
                     regActual.SEGUNDOS = 0
-                    bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
+                    bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
                     bmt_lista.reiniciar()
                     regActual.BMT_LISTA = bmt_lista
                     regActual.HISTORIAL = []
                     regActual.REPE = 0
                 else:
-                    regActual.BMT_LISTA = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
+                    regActual.BMT_LISTA = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
                     regActual.HISTORIAL = Util.zip2var(dbf.leeOtroCampo(recno, "HISTORIAL"))
 
                 Util.save_pickle(fbm1, regActual)
@@ -1582,7 +1582,7 @@ class WBMT(QTVarios.WDialogo):
         elif col == "PUNTOS":
             p = dbf.PUNTOS
             m = dbf.MAXPUNTOS
-            if grid.id == "T":
+            if grid.id == "T" and m > 0:
                 porc = p * 100 / m
                 return "%d/%d=%d" % (p, m, porc) + "%"
             else:

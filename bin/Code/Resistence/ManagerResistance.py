@@ -149,16 +149,16 @@ class ManagerResistance(Manager.Manager):
                 self.finJuego(True)
                 return
 
-        siRival = is_white == self.is_engine_side_white
+        si_rival = is_white == self.is_engine_side_white
         self.set_side_indicator(is_white)
 
         self.refresh()
 
-        if siRival:
+        if si_rival:
             self.thinking(True)
             self.disable_all()
 
-            siPensar = True
+            si_pensar = True
 
             puntosRivalPrevio = self.puntosRival
 
@@ -169,9 +169,9 @@ class ManagerResistance(Manager.Manager):
                     self.rm_rival.from_sq = from_sq
                     self.rm_rival.to_sq = to_sq
                     self.rm_rival.promotion = promotion
-                    siPensar = False
+                    si_pensar = False
 
-            if siPensar:
+            if si_pensar:
                 self.rm_rival = self.xrival.play_seconds(self.game, self.seconds)
                 self.puntosRival = self.rm_rival.centipawns_abs()
                 self.ponRotuloActual()
@@ -194,6 +194,8 @@ class ManagerResistance(Manager.Manager):
             self.activate_side(is_white)
 
     def check(self):
+        if len(self.game) <= (3 if self.is_engine_side_white else 2):
+            return False
         self.disable_all()
         if self.xrival.confMotor.key != self.xarbitro.confMotor.key:
             sc = min(max(3, self.seconds), 10)

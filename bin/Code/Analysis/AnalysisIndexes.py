@@ -342,7 +342,7 @@ def gen_indexes(game, elos, elos_form, alm):
     cw = _("White")
     cb = _("Black")
     ct = _("Total")
-    cpt = " " + _("pts")
+    cpt = " " + _("pws")
     xac = txt_levels
     prc = "%"
 

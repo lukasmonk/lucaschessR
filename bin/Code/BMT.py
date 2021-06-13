@@ -107,6 +107,13 @@ class BMTLista:
         self.li_bmt_uno = []
         self.dic_games = {}
 
+    def patch(self):
+        for uno in self.li_bmt_uno:
+            if hasattr(uno, "segundos"):
+                uno.seconds = uno.segundos
+                delattr(uno, "segundos")
+        return self
+
     def check_color(self):
         for uno in self.li_bmt_uno:
             uno.set_color_foreground()
@@ -186,4 +193,5 @@ class BMTLista:
         for num in range(0, len(self.li_bmt_uno)):
             while num < len(self.li_bmt_uno) and self.li_bmt_uno[num].fen in borrar_fen_lista:
                 del self.li_bmt_uno[num]
+
 

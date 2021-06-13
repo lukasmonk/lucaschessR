@@ -524,7 +524,7 @@ class Transsiberian:
 
     def reset(self):
         is_miles = self._is_miles
-        self.initialize()
+        self.initialize(self._level)
         self._is_miles = is_miles
         self.write_current()
 

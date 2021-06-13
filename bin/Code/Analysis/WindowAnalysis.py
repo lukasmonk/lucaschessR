@@ -342,7 +342,7 @@ class WMuestra(QtWidgets.QWidget):
 
     def cambiadoRM(self, row):
         self.um.set_pos_rm_active(row)
-        self.lbPuntuacion.set_text(self.um.score_active())
+        self.lbPuntuacion.set_text(self.um.score_active_depth())
 
         self.lbPGN.set_text(self.um.pgn_active())
 
@@ -451,7 +451,7 @@ class WMuestra(QtWidgets.QWidget):
 
     def grabar(self):
         menu = QTVarios.LCMenu(self)
-        menu.opcion(True, _("Complete variation"), Iconos.PuntoVerde())
+        menu.opcion(True, _("All moves"), Iconos.PuntoVerde())
         menu.separador()
         menu.opcion(False, _("Only the first move"), Iconos.PuntoRojo())
         is_complete = menu.lanza()
@@ -462,7 +462,7 @@ class WMuestra(QtWidgets.QWidget):
 
     def grabarTodos(self):
         menu = QTVarios.LCMenu(self)
-        menu.opcion(True, _("Complete variations"), Iconos.PuntoVerde())
+        menu.opcion(True, _("All moves in each variation"), Iconos.PuntoVerde())
         menu.separador()
         menu.opcion(False, _("Only the first move of each variation"), Iconos.PuntoRojo())
         is_complete = menu.lanza()
@@ -508,9 +508,10 @@ class WAnalisis(QTVarios.WDialogo):
             Controles.LB(self).align_center().ponTipoLetra(puntos=configuration.x_pgn_fontpoints, peso=75)
         )
         self.lbPGN = Controles.LB(self).set_wrap().ponTipoLetra(puntos=configuration.x_pgn_fontpoints).anchoFijo(self.board.ancho)
+        self.lbPGN.setStyleSheet("padding: 5px; border:1px solid gray;")
 
         self.setStyleSheet(
-            "QStatusBar::item { border-style: outset; border-width: 1px; border-color: LightSlateGray ;}"
+            "QStatusBar::item { border-style: outset; border: 1px solid LightSlateGray ;}"
         )
 
         liMasAcciones = (("FEN:%s" % _("Copy to clipboard"), "MoverFEN", Iconos.Clipboard()),)
@@ -743,6 +744,7 @@ class WAnalisisVariations(QtWidgets.QDialog):
         elif k == 16777216:  # esc
             self.stop_clock()
             self.accept()
+            return
         else:
             return
         self.oBase.process_toolbar(key, self.max_recursion)

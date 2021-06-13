@@ -408,6 +408,7 @@ class WGames(QtWidgets.QWidget):
                     self.grid_cambiado_registro(self, recno, None)
                 self.rehaz_columnas()
                 self.grid.refresh()
+                self.changes = True
 
             else:
                 QTUtil2.message_error(self, resp.mens_error)
@@ -554,9 +555,6 @@ class WGames(QtWidgets.QWidget):
         menu.separador()
         menu.opcion(self.tw_importar_DB, _("From other database"), Iconos.Database())
         menu.separador()
-        # menu.opcion(self.tw_importar_lcsb, _("From a lcsb file"), Iconos.JuegaSolo())
-        # menu.separador()
-
         resp = menu.lanza()
         if resp:
             resp()
@@ -993,6 +991,7 @@ class WGames(QtWidgets.QWidget):
         if dbn.allows_duplicates:
             dlTmp.hide_duplicates()
         dbn.append_db(self.dbGames, lista, dlTmp)
+        self.changes = False
 
     def tw_exportar_pgn(self, only_selected):
         w = WindowSavePGN.WSaveVarios(self, self.configuration)
@@ -1011,7 +1010,7 @@ class WGames(QtWidgets.QWidget):
                     game = self.dbGames.read_game_recno(recno)
                     if pb.is_canceled():
                         break
-                    if not game:
+                    if game is None:
                         continue
                     pgn = game.pgn()
                     result = game.resultado()
@@ -1022,6 +1021,8 @@ class WGames(QtWidgets.QWidget):
                             pgn += " " + result
                     ws.write(pgn + "\n")
 
+                if not pb.is_canceled():
+                    self.changes = False
                 pb.close()
                 ws.close()
 
@@ -1168,7 +1169,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.chb_complete = Controles.CHB(self, _("Allow complete games"), d_true("ALLOWS_COMPLETE_GAMES"))
         self.chb_positions = Controles.CHB(self, _("Allow positions"), d_true("ALLOWS_POSITIONS"))
         self.chb_duplicate = Controles.CHB(self, _("Allow duplicates"), d_false("ALLOWS_DUPLICATES"))
-        self.chb_zeromoves = Controles.CHB(self, _("Allow without moves"), d_false("ALLOWS_ZERO_MOVES"))
+        self.chb_zeromoves = Controles.CHB(self, _("Allow without moves"), d_true("ALLOWS_ZERO_MOVES"))
         ly_res = (
             Colocacion.V()
             .controlc(self.chb_complete)

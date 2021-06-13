@@ -97,9 +97,10 @@ class WRunCounts(QTVarios.WDialogo):
 
     def pon_info_posic(self):
         self.lb_info.set_text(
-            "%d+%d / %d"
-            % (self.count.current_posmove, self.count.current_depth, len(self.count.game), )
+            "%s: %d + %s: %d<br>%s: %d"
+            % (_("Position"), self.count.current_posmove, _("Depth"), self.count.current_depth, _("Total moves"), len(self.count.game), )
         )
+
 
     def closeEvent(self, event):
         self.save_video()

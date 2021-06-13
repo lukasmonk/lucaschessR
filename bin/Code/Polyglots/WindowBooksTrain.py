@@ -14,15 +14,16 @@ from Code import Util
 
 class WBooksTrain(QTVarios.WDialogo):
     ISWHITE, BOOK_PLAYER, BOOK_RIVAL, ALWAYS_HIGHEST, RESP_RIVAL = range(5)
+
     def __init__(self, procesador):
-        wParent = procesador.main_window
+        w_parent = procesador.main_window
         self.configuration = procesador.configuration
         self.procesador = procesador
 
         titulo = _("Training with a book")
         icono = Iconos.Libros()
 
-        QTVarios.WDialogo.__init__(self, wParent, titulo, icono, "bookstrain")
+        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, "bookstrain")
 
         self.setMinimumWidth(450)
 
@@ -32,9 +33,7 @@ class WBooksTrain(QTVarios.WDialogo):
         dic_data = self.restore()
 
         # Toolbar
-        liAcciones = [(_("Accept"), Iconos.Aceptar(), self.aceptar), None,
-                      (_("Cancel"), Iconos.Cancelar(), self.cancelar), None,
-                      ]
+        liAcciones = [(_("Accept"), Iconos.Aceptar(), self.aceptar), None, (_("Cancel"), Iconos.Cancelar(), self.cancelar), None]
         tb = Controles.TBrutina(self, liAcciones)
 
         # Side
@@ -96,7 +95,6 @@ class WBooksTrain(QTVarios.WDialogo):
 
         ly = Colocacion.V().controlc(self.cb_rival).espacio(10).controlc(self.cb_resp_rival)
         gb_rival = Controles.GB(self, _("Rival book"), ly).ponFuente(flb)
-
 
         vlayout = Colocacion.V()
         vlayout.control(gb_side).espacio(5)
@@ -160,7 +158,7 @@ class WBooksTrain(QTVarios.WDialogo):
             self.BOOK_PLAYER: self.book_player.name,
             self.ALWAYS_HIGHEST: self.player_highest,
             self.BOOK_RIVAL: self.book_rival.name,
-            self.RESP_RIVAL: self.rival_resp
+            self.RESP_RIVAL: self.rival_resp,
         }
         Util.save_pickle(self.configuration.file_train_books, dic)
 

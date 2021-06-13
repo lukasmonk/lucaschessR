@@ -998,7 +998,7 @@ class Board(QtWidgets.QGraphicsView):
                 for n, (pos, item) in enumerate(self.dicMovibles.items()):
                     if n != last:
                         bd = item.bloqueDatos
-                        if hasattr(bd_last, "tpid") and bd_last.tpid == bd.tpid and bd_last.a1h8 in (bd.a1h8, bd.a1h8[2:] + bd.a1h8[:2]):
+                        if hasattr(bd_last, "tpid") and hasattr(bd, "tpid") and bd_last.tpid == bd.tpid and bd_last.a1h8 in (bd.a1h8, bd.a1h8[2:] + bd.a1h8[:2]):
                             st.add(self.current_graphlive)
                             st.add(item)
                 for item in st:

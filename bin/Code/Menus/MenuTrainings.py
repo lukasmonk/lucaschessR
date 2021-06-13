@@ -89,7 +89,7 @@ class TrainingDir:
             xopcion(bmenu, "ep_%s" % xfile.path, xfile.name, icoOp)
 
 
-class Entrenamientos:
+class MenuTrainings:
     def __init__(self, procesador):
         self.procesador = procesador
         self.parent = procesador.main_window
@@ -127,8 +127,8 @@ class Entrenamientos:
         menu_basic.separador()
 
         menu2 = menu_basic.submenu(_("Find all moves"), Iconos.FindAllMoves())
-        xopcion(menu2, "find_all_moves_rival", _("Opponent"), Iconos.PuntoNaranja())
         xopcion(menu2, "find_all_moves_player", _("Player"), Iconos.PuntoAzul())
+        xopcion(menu2, "find_all_moves_rival", _("Opponent"), Iconos.PuntoNaranja())
 
         menu_basic.separador()
         self.horsesDef = hd = {

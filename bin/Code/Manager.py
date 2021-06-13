@@ -880,20 +880,29 @@ class Manager:
             else:
                 max_recursion = 9999
         if move.analysis is None:
-            siCancelar = self.xtutor.ms_time_move > 5000 or self.xtutor.depth_engine > 7
-            me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad", siCancelar=siCancelar)
+            siCancelar = self.xtutor.ms_time_move > 5000 or self.xtutor.depth_engine > 5
+            mens = _("Analyzing the move....")
+            me = QTUtil2.mensEspera.start(self.main_window, mens, physical_pos="ad", siCancelar=siCancelar, titCancelar=_("Stop"))
+            self.main_window.setDisabled(True)
             if siCancelar:
+                ya_cancelado = [False,]
 
-                def test_me(txt):
-                    return not me.cancelado()
+                def test_me(rm):
+                    if me.cancelado():
+                        if not ya_cancelado[0]:
+                            self.xanalyzer.stop()
+                            ya_cancelado[0] = True
+                    else:
+                        tm = rm.time
+                        if tm:
+                            tm /= 1000
+                        me.label("%s\n%s: %d %s: %.01f\"" % (mens, _("Depth"),  rm.depth, _("Time"), tm))
+                    return True
 
                 self.xanalyzer.set_gui_dispatch(test_me)
             mrm, pos = self.xanalyzer.analizaJugadaPartida(self.game, pos_jg, self.xtutor.ms_time_move, self.xtutor.depth_engine)
-            if siCancelar:
-                if me.cancelado():
-                    me.final()
-                    return
             move.analysis = mrm, pos
+            self.main_window.setDisabled(False)
             me.final()
 
         Analysis.show_analysis(self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, pos_jg)

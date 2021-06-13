@@ -117,6 +117,7 @@ class ManagerCompeticion(Manager.Manager):
         if len(self.game) and QTUtil2.pregunta(self.main_window, _("Restart the game?")):
             self.game.set_position()
             categoria, nivel, is_white = self.liReiniciar
+            self.procesador.stop_engines()
             self.start(self.categorias, categoria, nivel, is_white, self.puntos)
 
     def adjourn(self):

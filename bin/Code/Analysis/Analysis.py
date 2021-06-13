@@ -29,6 +29,7 @@ class AnalyzeGame:
         self.xmanager = procesador.creaManagerMotor(conf_engine, alm.vtime, alm.depth, True, priority=alm.priority)
         self.vtime = alm.vtime
         self.depth = alm.depth
+
         self.with_variations = alm.include_variations
 
         self.stability = alm.stability
@@ -609,6 +610,11 @@ class TabAnalysis:
     def score_active(self):
         rm = self.list_rm_name[self.pos_rm_active][0]
         return rm.texto()
+
+    def score_active_depth(self):
+        rm = self.list_rm_name[self.pos_rm_active][0]
+        txt = "%s   -   %s: %d" % (rm.texto(), _("Depth"), rm.depth)
+        return txt
 
     def complexity(self):
         return AnalysisIndexes.get_complexity(self.move.position_before, self.mrm)

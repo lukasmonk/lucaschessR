@@ -269,6 +269,8 @@ class WNumEntrenamiento(QtWidgets.QDialog):
     def __init__(self, w_parent, titulo, to_sq, etiqueta=None, pos=None, mensAdicional=None):
         super(WNumEntrenamiento, self).__init__(w_parent)
 
+        self.setFont(Controles.TipoLetra(puntos=Code.configuration.x_sizefont_infolabels))
+
         self.setWindowTitle(titulo)
         self.setWindowIcon(Iconos.Datos())
 
@@ -289,7 +291,8 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         if mensAdicional:
             lb2 = Controles.LB(self, mensAdicional)
             lb2.set_wrap().anchoMinimo(250)
-            lyV.control(lb2)
+            lyb2 = Colocacion.H().control(lb2).margen(15)
+            lyV.otro(lyb2)
         lyV.margen(3)
 
         self.setLayout(lyV)

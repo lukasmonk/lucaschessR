@@ -189,7 +189,7 @@ class ManagerOpeningEngines(Manager.Manager):
             if self.book:
                 move = self.book.eligeJugadaTipo(self.game.last_position.fen(), self.book.mode)
             if not move:
-                rm_rival = self.xrival.juegaPartida(self.game)
+                rm_rival = self.xrival.play_game(self.game)
                 move = rm_rival.movimiento()
                 self.dbop.set_cache_engines(self.keyengine, self.time, fenm2, move)
             from_sq, to_sq, promotion = move[:2], move[2:4], move[4:]

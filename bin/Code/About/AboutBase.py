@@ -311,6 +311,7 @@ class ThanksTo:
             ("Xpdnc", _("Permission of author")),
             ("Alexander", _("Permission of author")),
             ("Dan Brad", _("Permission of author")),
+            ("Tamer64", _("Permission of author")),
         ]
         for autor, licencia in li:
             txt += "<tr>"
@@ -387,6 +388,7 @@ class ThanksTo:
             ),
             ("Chess Pirat", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Klaus Wolf</a>', _("Freeware")),
             ("Chess Regular", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Alastair Scott</a>', _("Freeware")),
+            ("Chess Regular2", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Regular redesigned by Tamer64</a>', _("Freeware")),
             (
                 "Kilfiger",
                 '<a href="https://sites.google.com/site/jameskilfiger/">James Kilfiger</a>',

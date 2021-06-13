@@ -632,7 +632,7 @@ class WTournamentRun(QtWidgets.QWidget):
         rs = self.torneo.resign()
         if 0 < rs <= abs(pUlt):
             if self.xadjudicator:
-                rmTut = self.xadjudicator.juegaPartida(self.game)
+                rmTut = self.xadjudicator.play_game(self.game)
                 pTut = rmTut.centipawns_abs()
                 if abs(pTut) >= rs:
                     is_white = self.game.last_position.is_white

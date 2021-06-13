@@ -18,8 +18,8 @@ def options(parent, configuration):
 
     form.edit(_("Player's name"), configuration.x_player)
     form.separador()
-    # form.combobox(_("Window style"), configuration.estilos(), configuration.x_style)
-    # form.separador()
+    form.combobox(_("Window style"), configuration.estilos(), configuration.x_style)
+    form.separador()
 
     li_traducciones = configuration.list_translations()
     tr_actual = configuration.translator()
@@ -114,6 +114,8 @@ def options(parent, configuration):
         (_("Novag Citrine") + x, "Citrine"),
         (_("Novag UCB") + x, "Novag UCB"),
     ]
+    if Code.is_linux:
+        del li_db[1]
     form.combobox(_("Digital board"), li_db, configuration.x_digital_board)
 
     form.separador()
@@ -205,9 +207,9 @@ def options(parent, configuration):
         li_gen, li_son, li_tt, li_b, li_asp, li_pr, li_nc = resp
 
         if Code.is_windows:
-            (configuration.x_player, translator, configuration.x_menu_play, configuration.x_show_version11, configuration.x_check_for_update) = li_gen
+            (configuration.x_player, configuration.x_style, translator, configuration.x_menu_play, configuration.x_show_version11, configuration.x_check_for_update) = li_gen
         else:
-            (configuration.x_player, translator, configuration.x_menu_play, configuration.x_check_for_update) = li_gen
+            (configuration.x_player, configuration.x_style, translator, configuration.x_menu_play, configuration.x_check_for_update) = li_gen
 
         configuration.set_translator(translator)
 

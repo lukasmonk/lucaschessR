@@ -213,7 +213,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 time_control += "+%d" % self.segundosJugada
             self.game.set_tag("TimeControl", time_control)
             if self.secs_extra:
-                self.game.set_tag("TimeExtra" + "White" if self.human_side else "Black", "%d" % self.secs_extra)
+                self.game.set_tag("TimeExtra" + ("White" if self.human_side else "Black"), "%d" % self.secs_extra)
 
         self.pon_toolbar()
 
@@ -355,7 +355,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
             siJugador = self.human_side == xis_white
             if ot.siAgotado():
-                if siJugador and QTUtil2.pregunta(self.main_window, _X(_("%1 has won on time."), self.xrival.name) + "\n\n" + _("Add time and keep playing?")):
+                if siJugador and QTUtil2.pregunta(
+                    self.main_window, _X(_("%1 has won on time."), self.xrival.name) + "\n\n" + _("Add time and keep playing?")
+                ):
                     minX = WPlayAgainstEngine.dameMinutosExtra(self.main_window)
                     if minX:
                         ot.ponSegExtra(minX * 60)
@@ -895,7 +897,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 tiempoBlancas = tiempoNegras = 10 * 60 * 1000
                 segundosJugada = 0
 
-            self.xrival.play_time_routine(self.game, self.main_window.notify, tiempoBlancas, tiempoNegras, segundosJugada, nAjustado=self.nAjustarFuerza)
+            self.xrival.play_time_routine(
+                self.game, self.main_window.notify, tiempoBlancas, tiempoNegras, segundosJugada, nAjustado=self.nAjustarFuerza
+            )
 
     def sigueHumanoAnalisis(self):
         self.analizaInicio()
@@ -1215,7 +1219,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.saveSummary()
         self.autosave()
         QTUtil.refresh_gui()
-        if QTUtil2.pregunta(self.main_window, mensaje + "\n\n" + _("Do you want to play again?")):
+        p0 = self.main_window.base.pgn.pos()
+        p = self.main_window.mapToGlobal(p0)
+        if QTUtil2.pregunta(self.main_window, mensaje + "\n\n" + _("Do you want to play again?"), px=p.x(), py=p.y()):
             self.reiniciar(False)
         else:
             self.ponFinJuego(self.with_takeback)
@@ -1283,7 +1289,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             else:
                 nodes = ""
             seldepth = "/%d" % rm.seldepth if rm.seldepth else ""
-            li = ['<span style="color:%s">%s' % (color_engine, rm.name), '<b>%s</b> | <b>%d</b>%s | <b>%d"</b>%s' % (rm.abrTextoBase(), rm.depth, seldepth, rm.time // 1000, nodes)]
+            li = [
+                '<span style="color:%s">%s' % (color_engine, rm.name),
+                '<b>%s</b> | <b>%d</b>%s | <b>%d"</b>%s' % (rm.abrTextoBase(), rm.depth, seldepth, rm.time // 1000, nodes),
+            ]
             pv = rm.pv
             if tp < 999:
                 li1 = pv.split(" ")
@@ -1336,4 +1345,3 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.analizaFinal()
         elif self.human_is_playing:
             self.analizaInicio()
-

@@ -55,7 +55,7 @@ class WRunCaptures(QTVarios.WDialogo):
 
         self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).set_wrap()
         self.lb_info = (
-            Controles.LB(self).anchoFijo(254).set_foreground_backgound("white", "#496075").align_center().ponTipoLetra(puntos=14, peso=500)
+            Controles.LB(self).anchoFijo(254).set_foreground_backgound("white", "#496075").align_center().ponTipoLetra(puntos=self.configuration.x_menu_points)
         )
 
         # Botones
@@ -114,8 +114,8 @@ class WRunCaptures(QTVarios.WDialogo):
 
     def pon_info_posic(self):
         self.lb_info.set_text(
-            "%d+%d / %d"
-            % (self.capture.current_posmove, self.capture.current_depth, len(self.capture.game), )
+            "%s: %d + %s: %d<br>%s: %d"
+            % (_("Position"), self.capture.current_posmove, _("Depth"), self.capture.current_depth, _("Total moves"), len(self.capture.game), )
         )
 
     def pulsada_celda(self, celda):

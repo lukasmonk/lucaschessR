@@ -62,7 +62,9 @@ def save_dic_params(dic):
 def form_blunders_brilliancies(alm, configuration):
     li_blunders = [SEPARADOR]
 
-    li_blunders.append((FormLayout.Editbox(_("Is considered wrong move when the loss of centipawns is greater than"), tipo=int, ancho=50), alm.kblunders))
+    li_blunders.append(
+        (FormLayout.Editbox(_("Is considered wrong move when the loss of centipawns is greater than"), tipo=int, ancho=50), alm.kblunders)
+    )
     li_blunders.append(SEPARADOR)
 
     def file_next(base, ext):
@@ -208,13 +210,10 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
             li.append((book.name, book))
         config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
         li_gen.append((config, defecto))
-        li_gen.append(SEPARADOR)
 
         li_gen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
 
         li_gen.append((_("Start from the end of the game") + ":", alm.from_last_move))
-
-        li_gen.append(SEPARADOR)
 
         li_gen.append((_("Show graphics") + ":", alm.show_graphs))
 
@@ -273,7 +272,9 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
 
                 QTUtil.refresh_gui()
 
-    resultado = FormLayout.fedit(lista, title=_("Analysis Configuration"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones(), dispatch=dispatchR)
+    resultado = FormLayout.fedit(
+        lista, title=_("Analysis Configuration"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones(), dispatch=dispatchR
+    )
 
     if resultado:
         accion, liResp = resultado
@@ -301,11 +302,25 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
             alm.from_last_move = li_gen[10]
             alm.show_graphs = li_gen[11]
 
-            (alm.include_variations, alm.limit_include_variations, alm.best_variation, alm.info_variation, alm.si_pdt, alm.one_move_variation) = liVar
+            (
+                alm.include_variations,
+                alm.limit_include_variations,
+                alm.best_variation,
+                alm.info_variation,
+                alm.si_pdt,
+                alm.one_move_variation,
+            ) = liVar
 
             (alm.kblunders, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders) = liBlunders
 
-            (alm.dpbrilliancies, alm.ptbrilliancies, alm.fnsbrilliancies, alm.pgnbrilliancies, alm.oribrilliancies, alm.bmtbrilliancies) = liBrilliancies
+            (
+                alm.dpbrilliancies,
+                alm.ptbrilliancies,
+                alm.fnsbrilliancies,
+                alm.pgnbrilliancies,
+                alm.oribrilliancies,
+                alm.bmtbrilliancies,
+            ) = liBrilliancies
 
             (alm.stability, alm.st_depths, alm.st_centipawns, alm.st_timelimit) = liST
 
@@ -368,7 +383,14 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         color = "BOTH"
     li_gen.append((config, color))
 
-    li_gen.append(('<div align="right">' + _("Only player moves") + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"), ""))
+    li_gen.append(
+        (
+            '<div align="right">'
+            + _("Only player moves")
+            + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"),
+            "",
+        )
+    )
 
     fvar = configuration.file_books
     list_books = Books.ListBooks()
@@ -434,14 +456,18 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
 
                 QTUtil.refresh_gui()
 
-    resultado = FormLayout.fedit(lista, title=_("Mass analysis"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones(), dispatch=dispatchR)
+    resultado = FormLayout.fedit(
+        lista, title=_("Mass analysis"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones(), dispatch=dispatchR
+    )
 
     if resultado:
         accion, liResp = resultado
 
         li_gen, liVar, liBlunders, liBrilliancies = liResp
 
-        alm.engine, vtime, alm.depth, alm.timedepth, alm.multiPV, color, cjug, alm.book, alm.from_last_move, alm.delete_previous, alm.siVariosSeleccionados = li_gen
+        alm.engine, vtime, alm.depth, alm.timedepth, alm.multiPV, color, cjug, alm.book, alm.from_last_move, alm.delete_previous, alm.siVariosSeleccionados = (
+            li_gen
+        )
 
         alm.vtime = int(vtime * 1000)
         alm.white = color != "BLACK"
@@ -452,9 +478,13 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
 
         alm.kblunders, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders = liBlunders
 
-        alm.include_variations, alm.limiteinclude_variations, alm.best_variation, alm.info_variation, alm.si_pdt, alm.one_move_variation = liVar
+        alm.include_variations, alm.limiteinclude_variations, alm.best_variation, alm.info_variation, alm.si_pdt, alm.one_move_variation = (
+            liVar
+        )
 
-        alm.dpbrilliancies, alm.ptbrilliancies, alm.fnsbrilliancies, alm.pgnbrilliancies, alm.oribrilliancies, alm.bmtbrilliancies = liBrilliancies
+        alm.dpbrilliancies, alm.ptbrilliancies, alm.fnsbrilliancies, alm.pgnbrilliancies, alm.oribrilliancies, alm.bmtbrilliancies = (
+            liBrilliancies
+        )
 
         dic = {}
         for x in dir(alm):
@@ -462,7 +492,15 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
                 dic[x] = getattr(alm, x)
         save_dic_params(dic)
 
-        if not (alm.tacticblunders or alm.pgnblunders or alm.bmtblunders or alm.fnsbrilliancies or alm.pgnbrilliancies or alm.bmtbrilliancies or siDatabase):
+        if not (
+            alm.tacticblunders
+            or alm.pgnblunders
+            or alm.bmtblunders
+            or alm.fnsbrilliancies
+            or alm.pgnbrilliancies
+            or alm.bmtbrilliancies
+            or siDatabase
+        ):
             QTUtil2.message_error(parent, _("No file was specified where to save results"))
             return
 

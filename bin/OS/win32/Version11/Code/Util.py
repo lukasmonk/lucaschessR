@@ -992,7 +992,10 @@ class DicSQL(object):
         li = cursor.fetchall()
         for key, dato in li:
             dato = base64.decodestring(dato)
-            dic[key] = cPickle.loads(dato)
+            try:
+                dic[key] = cPickle.loads(dato)
+            except:
+                pass
         cursor.close()
 
         return dic

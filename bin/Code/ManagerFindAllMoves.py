@@ -5,12 +5,14 @@ import time
 import FasterCode
 
 import Code
-from Code.Base import Position
 from Code import Manager
+from Code import Util
+from Code.Base import Position
+from Code.Base.Constantes import *
 from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.QT import QTUtil2
-from Code import Util
-from Code.Base.Constantes import *
+from Code.QT import QTVarios
+from Code.QT import Iconos
 
 
 class ControlFindAllMoves:
@@ -22,7 +24,16 @@ class ControlFindAllMoves:
         if os.path.isfile(self.fichPuntos):
             self.liPuntos = Util.restore_pickle(self.fichPuntos)
         else:
-            self.liPuntos = [[0, 0]] * len(self.db)
+            self.liPuntos = []
+            for level in range(len(self.db)):
+                self.liPuntos.append([0, 0])
+
+        # import random
+        # self.liPuntos = []
+        # for level in range(len(self.db)):
+        #     self.liPuntos.append([0, 0])
+        # for level in range(59):
+        #     self.liPuntos[level][0] = random.randint(150, 450)*(level+1)
 
     def guardar(self):
         Util.save_pickle(self.fichPuntos, self.liPuntos)
@@ -37,11 +48,15 @@ class ControlFindAllMoves:
                 return i
         return nd - 1
 
+    def pos_with_error(self):
+        nd = self.num_rows()
+        for i in range(nd):
+            if self.liPuntos[i][1] > 0:
+                return i
+        return 999
+
     def analysis(self, row, key):  # compatibilidad
         return ""
-
-    # def conInformacion(self, row, key):  # compatibilidad
-    #     return None
 
     def only_move(self, row, key):  # compatibilidad
         return None
@@ -52,12 +67,15 @@ class ControlFindAllMoves:
     def dato(self, row, key):
         if key == "LEVEL":
             return str(row + 1)
+        vtime, errores = self.liPuntos[row]
+        if key == "TIME":
+            if vtime == 0:
+                return "-"
+            tiempo = vtime/100.0
+            tm = tiempo / (row+1)
+            return "%0.02f / %0.02f" % (tiempo, tm)
         else:
-            vtime, errores = self.liPuntos[row]
-            ctiempo = str(vtime)
-            ctiempo = "-" if vtime == 0 else (ctiempo[:-2] + "." + ctiempo[-2:])
-            cerrores = "-" if vtime == 0 else str(errores)
-            return ctiempo if key == "TIME" else cerrores
+            return "-" if vtime == 0 else str(errores)
 
     def dame(self, number):
         li = self.db[number]
@@ -65,8 +83,7 @@ class ControlFindAllMoves:
         return li[pos] + " 0 1"
 
     def mensResultado(self, number, vtime, errores):
-        ctiempo = str(vtime)
-        ctiempo = ctiempo[:-2] + "." + ctiempo[-2:]
+        tm = vtime/(number+1)
 
         if self.liPuntos[number][0] > 0:
             t0, e0 = self.liPuntos[number]
@@ -78,13 +95,14 @@ class ControlFindAllMoves:
         else:
             siRecord = True
 
-        mensaje = "<b>%s</b> : %d<br><b>%s</b> : %d<br><b>%s</b> : %s" % (
+        mensaje = "<b>%s</b> : %d<br><b>%s</b> : %d<br><b>%s</b> : %.02f/%.02f" % (
             _("Level"),
             number + 1,
             _("Errors"),
             errores,
             _("Time"),
-            ctiempo,
+            vtime/100.0,
+            tm/100.0
         )
         if siRecord:
             mensaje += "<br><br><b>%s</b><br>" % _("New record!")
@@ -92,6 +110,20 @@ class ControlFindAllMoves:
             self.guardar()
 
         return mensaje, siRecord
+
+    def remove_all(self):
+        Util.remove_file(self.fichPuntos)
+        self.liPuntos = [[0, 0]] * len(self.db)
+
+    def average_time(self):
+        num = 0
+        tm = 0.0
+        for row in range(self.num_rows()):
+            vtime, errores = self.liPuntos[row]
+            if vtime > 0:
+                num += (row +1)
+                tm += vtime
+        return tm/(num*100) if num > 0 else 0.0
 
 
 class ManagerFindAllMoves(Manager.Manager):
@@ -118,6 +150,7 @@ class ManagerFindAllMoves(Manager.Manager):
 
         self.board.exePulsadoNum = None
         self.remove_info()
+        self.ponRotulotm()
         self.refresh()
 
     def num_rows(self):
@@ -134,8 +167,25 @@ class ManagerFindAllMoves(Manager.Manager):
         elif key == TB_RESIGN:
             self.finJuego()
 
+        elif key == TB_CONFIG:
+            self.config()
+
         else:
             Manager.Manager.rutinaAccionDef(self, key)
+
+    def config(self):
+        menu = QTVarios.LCMenu(self.main_window)
+        menu.opcion("remove", _("Remove all results of all levels"), Iconos.Cancelar())
+
+        resp = menu.lanza()
+        if resp:
+            if resp == "remove":
+                if QTUtil2.pregunta(self.main_window,
+                                    _("Are you sure you want to delete all results of all levels and start again from scratch?")):
+                    self.pgn.remove_all()
+                    self.pgnRefresh(True)
+                    self.main_window.base.pgn.gotop()
+                    self.ponRotulotm()
 
     def fin60(self):
         self.main_window.board.siPosibleRotarBoard = True
@@ -144,12 +194,12 @@ class ManagerFindAllMoves(Manager.Manager):
         self.procesador.start()
 
     def finJuego(self):
-        self.main_window.pon_toolbar((TB_CLOSE, TB_PLAY))
+        self.main_window.pon_toolbar((TB_CLOSE, TB_PLAY, TB_CONFIG))
         self.disable_all()
         self.state = ST_ENDGAME
+        self.ponRotulotm()
 
     def jugar(self, number=None):
-
         if self.state == ST_PLAYING:
             self.state = ST_ENDGAME
             self.disable_all()
@@ -162,9 +212,9 @@ class ManagerFindAllMoves(Manager.Manager):
                 pos,
                 etiqueta=_("Level"),
                 pos=pos,
-                mensAdicional="<b>"
+                mensAdicional="<b><red>"
                 + _("Movements must be indicated in the following order: King, Queen, Rook, Bishop, Knight and Pawn.")
-                + "</b>",
+                + "</red></b>",
             )
             if number is None:
                 return
@@ -238,12 +288,21 @@ class ManagerFindAllMoves(Manager.Manager):
             % (_("White") if self.is_white else _("Black"), _("Level"), self.nivel + 1, _("Errors"), self.errores)
         )
 
+    def ponRotulotm(self):
+        self.main_window.set_label1("")
+        tm = self.pgn.average_time()
+        if tm == 0.0:
+            txt = ""
+        else:
+            txt = "<h3>%s/%s: %0.02f</h3>" % (_("Time"), _("Move"), tm)
+        self.main_window.set_label2(txt)
+        self.refresh()
+
     def final_x(self):
         self.procesador.start()
         return False
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        # promotion = None por compatibilidad
         if from_sq == to_sq:
             return
         a1h8 = from_sq + to_sq
@@ -267,18 +326,27 @@ class ManagerFindAllMoves(Manager.Manager):
     def put_result(self):
         vtime = int((time.time() - self.iniTiempo) * 100.0)
         self.finJuego()
-        self.set_position(self.cp)
-
-        self.refresh()
 
         mensaje, siRecord = self.pgn.mensResultado(self.number, vtime, self.errores)
-        QTUtil2.mensajeTemporal(self.main_window, mensaje, 3, background="#FFCD43" if siRecord else None)
+        self.ponRotulotm()
+
+        if self.number == 59 and siRecord and self.errores == 0:
+            mens = '<b><span style="color:green">%s</span></b>' % _("Congratulations, goal achieved")
+            QTUtil2.message(self.main_window, mens)
+        else:
+            QTUtil2.mensajeTemporal(self.main_window, mensaje, 3 if siRecord else 2,
+                                    background="#FFCD43" if siRecord else None)
+
 
     def analizaPosicion(self, row, key):
         if self.state == ST_PLAYING:
             self.finJuego()
             return
         if row <= self.pgn.primeroSinHacer():
+            pos_with_error = self.pgn.pos_with_error()
+            if pos_with_error < row:
+                QTUtil2.message(self.main_window, _("To be able to play at this level, the previous levels must be solved without errors."))
+                return
             self.jugar(row)
 
     def mueveJugada(self, tipo):

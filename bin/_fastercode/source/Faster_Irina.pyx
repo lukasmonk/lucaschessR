@@ -254,9 +254,13 @@ class PGNreader:
             if not linea:
                 break
 
-            body += linea
-            if not linea.strip():
+            ln = linea.strip()
+            if not ln:
                 break
+            if ln[:1] == b"[" and ln[-1:] == b"]":
+                self.f.seek(self.f.tell() - len(linea))
+                break
+            body += linea
 
         if b"FEN" in ulabels_values:
             fen = ulabels_values[b"FEN"]

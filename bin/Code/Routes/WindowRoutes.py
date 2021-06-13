@@ -5,7 +5,7 @@ from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import Routes
+from Code.Routes import Routes
 
 
 class WTranssiberian(QTVarios.WDialogo):

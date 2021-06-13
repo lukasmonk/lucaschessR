@@ -3,8 +3,8 @@ import random
 from Code import Manager
 from Code.Base import Move
 from Code.Polyglots import WindowBooks
-from Code.Engines import EngineResponse 
-from Code.Base.Constantes import * 
+from Code.Engines import EngineResponse
+from Code.Base.Constantes import *
 
 
 class ManagerTrainBooks(Manager.Manager):
@@ -105,9 +105,8 @@ class ManagerTrainBooks(Manager.Manager):
 
         fen = self.game.last_position.fen()
 
-
         siRival = is_white == self.is_book_side_white
-        book = self.book_rival if is_white else self.book_player
+        book = self.book_rival if siRival else self.book_player
         self.list_moves = book.get_list_moves(fen)
         if not self.list_moves:
             self.put_result()
@@ -202,7 +201,7 @@ class ManagerTrainBooks(Manager.Manager):
                         paux = p
                         saux = True
                     opacity = 1.0 if p == paux else max(p, 0.25)
-                self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
+                self.board.creaFlechaMulti(jug[0] + jug[1], siMain=simain, opacity=opacity)
 
             resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
             self.board.remove_arrows()
@@ -247,7 +246,7 @@ class ManagerTrainBooks(Manager.Manager):
                     paux = p
                     saux = True
                 opacity = 1.0 if p == paux else max(p, 0.25)
-            self.board.creaFlechaMulti(jug[0]+jug[1], siMain=simain, opacity=opacity)
+            self.board.creaFlechaMulti(jug[0] + jug[1], siMain=simain, opacity=opacity)
 
         resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
         self.board.remove_arrows()
@@ -349,8 +348,7 @@ class ManagerTrainBooks(Manager.Manager):
     def txt_matches(self):
         if self.movimientos:
             self.game.set_tag("Score", "%d/%d" % (self.aciertos, self.movimientos))
-            return "%s : %d/%d (%0.2f%%)" % (
-                _("Score"), self.aciertos, self.movimientos, 100.0 * self.aciertos / self.movimientos)
+            return "%s : %d/%d (%0.2f%%)" % (_("Score"), self.aciertos, self.movimientos, 100.0 * self.aciertos / self.movimientos)
         else:
             return ""
 

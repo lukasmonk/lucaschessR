@@ -208,4 +208,4 @@ def conversion_folder_base(folder):
 
 if sys.argv[1] == "folder":
     path = sys.argv[2]
-    conversion_folder_base(path)
+    conversion_folder_base(path.decode("latin-1"))

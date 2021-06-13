@@ -1,4 +1,5 @@
 from Code import Manager
+from Code import Util
 from Code.Base import Move
 from Code.QT import Iconos
 from Code.Base.Constantes import *
@@ -12,9 +13,10 @@ class ManagerVariations(Manager.Manager):
 
         self.siAceptado = False
 
-        self.is_competitive = is_competitive
-
         self.game = game
+        self.is_white_bottom = is_white_bottom
+        self.with_engine_active = with_engine_active
+        self.is_competitive = is_competitive
 
         self.game_type = GT_ALONE
 
@@ -164,7 +166,7 @@ class ManagerVariations(Manager.Manager):
         self.refresh()
 
     def reiniciar(self):
-        self.start(self.fen, self.lineaPGN, self.okMasOpciones, self.human_side)
+        self.start(self.game, self.is_white_bottom, self.with_engine_active, self.is_competitive)
 
     def configurar(self):
 
@@ -190,7 +192,7 @@ class ManagerVariations(Manager.Manager):
     def juegaRival(self):
         if not self.is_finished():
             self.thinking(True)
-            rm = self.xrival.play_game(nAjustado=self.xrival.nAjustarFuerza)
+            rm = self.xrival.play_game(self.game, nAjustado=self.xrival.nAjustarFuerza)
             if rm.from_sq:
                 ok, self.error, move = Move.get_game_move(
                     self.game, self.game.last_position, rm.from_sq, rm.to_sq, rm.promotion
@@ -225,6 +227,8 @@ class ManagerVariations(Manager.Manager):
     def ponRival(self, dic):
         dr = dic["RIVAL"]
         rival = dr["CM"]
+        if not Util.exist_file(rival.path_exe):
+            return self.cambioRival()
         r_t = dr.get("TIME", 0) * 100  # Se guarda en decimas -> milesimas
         r_p = dr.get("DEPTH", 0)
         if r_t <= 0:

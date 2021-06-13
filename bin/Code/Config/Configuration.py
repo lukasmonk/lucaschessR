@@ -183,7 +183,7 @@ class Configuration:
         self.x_save_pgn_folder = ""
         self.x_save_lcsb = ""
         self.x_translator = ""
-        self.x_style = "WindowsVista"
+        self.x_style = "WindowsVista" if Code.is_windows else "Fusion"
         self.x_tutor_view = POS_TUTOR_HORIZONTAL
 
         self.x_show_effects = False
@@ -216,7 +216,7 @@ class Configuration:
 
         self.colores_nags_defecto()
 
-        self.x_sizefont_infolabels = 10
+        self.x_sizefont_infolabels = 11
 
         self.x_pgn_selbackground = None
         self.x_pgn_headerbackground = None
@@ -540,7 +540,7 @@ class Configuration:
             eng = self.dic_engines[key]
             if eng.puedeSerTutor() and Util.exist_file(eng.path_exe):
                 return eng
-        return self.buscaTutor(self.tutor_inicial)
+        return self.buscaRival(self.tutor_inicial)
 
     def ayudaCambioTutor(self):  # TODO remove
         li = []
@@ -629,8 +629,6 @@ class Configuration:
         self.tutor = self.buscaTutor(self.x_tutor_clave)
         if self.tutor.key != self.x_tutor_clave:
             self.x_tutor_clave = self.tutor.key
-
-        self.x_style = "WindowsVista"
 
     def get_last_database(self):
         dic = self.read_variables("DATABASE")

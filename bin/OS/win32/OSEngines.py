@@ -82,8 +82,8 @@ def read_engines(folder_engines):
         2670,
     )
 
-    cm = mas("godel", "Juan Manuel Vazquez", "4.4.5", "https://sites.google.com/site/godelchessengine", "Godel32.exe", 2814)
-    cm.name = "Gödel 4.4.5"
+    cm = mas("godel", "Juan Manuel Vazquez", "7.0", "https://sites.google.com/site/godelchessengine", "Godel32.exe", 2950)
+    cm.name = "Gödel 7.0"
 
     cm = mas("rhetoric", "Alberto Sanjuan", "1.4.3", "http://www.chessrhetoric.com/", "Rhetoric_x32.exe", 2810)
     cm.ponMultiPV(1, 4)

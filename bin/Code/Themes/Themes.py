@@ -46,6 +46,18 @@ class Themes:
             "xRayAttack": _("X-Ray attack"),
             "zwischenzug": _("Zwischenzug"),
             "zugzwang": _("Zugzwang"),
+            "advantage": _("Advantage"),
+            "anastasiaMate": _("Anastasia mate"),
+            "arabianMate": _("Arabian mate"),
+            "bodenMate": _("Boden mate"),
+            "coercion": _("Coercion"),
+            "crushing": _("Crushing"),
+            "doubleBishopMate": _("Double bishop mate"),
+            "dovetailMate": _("Dovetail mate"),
+            "hookMate": _("Hook mate"),
+            "kingsideAttack": _("King side attack"),
+            "queensideAttack": _("Qeen side attack"),
+            "smotheredMate": _("Smothered mate"),
         }
 
         self.li_custom = []
@@ -74,10 +86,7 @@ class Themes:
 
     def write(self):
         self.li_head = [theme for theme in self.li_head if theme in self.li_custom or theme in self.dic_standard]
-        dic = {
-            "HEAD": self.li_head,
-            "CUSTOM": self.li_custom
-        }
+        dic = {"HEAD": self.li_head, "CUSTOM": self.li_custom}
         Code.configuration.write_variables("THEMES", dic)
 
     def __len__(self):
@@ -148,7 +157,3 @@ class Themes:
         for theme in move.li_themes:
             output.append(self.name(theme))
         return output
-
-
-
-

@@ -105,6 +105,8 @@ def menu_tools_savemenu(procesador, dic_data=None):
         menu1.separador()
         menu1.opcion("version11_openinglines", _("Opening lines"), Iconos.OpeningLines())
         menu1.separador()
+        menu1.opcion("version11_transsiberian", _("Transsiberian Railway"), Iconos.Train())
+        menu1.separador()
 
     return savemenu
 
@@ -425,7 +427,7 @@ def menu_information(procesador):
     menu.separador()
     menu.opcion("mail", _("Contact") + " (%s)" % "lukasmonk@gmail.com", Iconos.Mail())
     menu.separador()
-    if procesador.configuration.is_main and Code.is_windows:
+    if procesador.configuration.is_main:
         menu.opcion("actualiza", _("Check for updates"), Iconos.Actualiza())
         menu.separador()
 

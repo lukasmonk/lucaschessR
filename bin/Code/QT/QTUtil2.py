@@ -69,7 +69,8 @@ class MensEspera(QtWidgets.QWidget):
 
         assert parent is not None
 
-        super(MensEspera, self).__init__(parent)
+        # super(MensEspera, self).__init__(parent)
+        super(MensEspera, self).__init__(None)
 
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
         self.setStyleSheet("QWidget, QLabel { background: %s }" % background)
@@ -183,7 +184,7 @@ class ControlMensEspera:
         puntos=11,
         conImagen=True,
     ):
-        QTUtil.refresh_gui()
+        # QTUtil.refresh_gui()
         if self.me:
             self.final()
         if background is None:
@@ -561,7 +562,7 @@ def message_bold(owner, mens, titulo=None):
     message(owner, mens, titulo=titulo, si_bold=True)
 
 
-def pregunta(parent, mens, label_yes=None, label_no=None, si_top=False):
+def pregunta(parent, mens, label_yes=None, label_no=None, si_top=False, px=None, py=None):
     msg_box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Question, _("Question"), resalta(mens), parent=parent)
     if label_yes is None:
         label_yes = _("Yes")
@@ -572,6 +573,8 @@ def pregunta(parent, mens, label_yes=None, label_no=None, si_top=False):
     msg_box.addButton(label_no, QtWidgets.QMessageBox.NoRole)
     if si_top:
         msg_box.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+    if px is not None:
+        msg_box.move(px, py)  # topright: owner.x() + owner.width() - msg.width() - 46, owner.y()+4)
     msg_box.exec_()
 
     return msg_box.clickedButton() == si_button

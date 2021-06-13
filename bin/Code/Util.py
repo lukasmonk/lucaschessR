@@ -576,9 +576,9 @@ class Timer:
 
     def etiquetaDGT(self):
         segs = self.dameSegundos()
-        mins = segs / 60
+        mins = segs // 60
         segs -= mins * 60
-        hors = mins / 60
+        hors = mins // 60
         mins -= hors * 60
 
         return "%d:%02d:%02d" % (hors, mins, segs)

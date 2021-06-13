@@ -4,6 +4,7 @@ import pickle
 import shutil
 import sqlite3
 import subprocess
+import datetime
 
 import Code
 from Code import Util
@@ -294,8 +295,50 @@ class Version11:
         self.import_openinglines_folder(folder, folder)
         QTUtil2.message(self.wowner, _("Imported"))
 
+    def transsiberian(self):
+        dic = self.configuration.read_variables("VERSION11")
+        titulo = "Select the UsrData folder of version 11"
+        QTUtil2.message(self.wowner, titulo)
+        usrdata_folder = QTUtil2.leeCarpeta(self.wowner, dic.get("FOLDER_USRDATA", "../.."), titulo=titulo)
+        if not usrdata_folder:
+            return
+        if not usrdata_folder.lower().endswith("usrdata"):
+            QTUtil2.message(self.wowner, "This is not the UsrData folder")
+            return self.transsiberian()
+        file_variables = os.path.join(usrdata_folder, "Variables.pk")
+        if not Util.exist_file(file_variables):
+            QTUtil2.message(self.wowner, "This folder does not have the Transsiberian data file. (Variables.pk")
+            return self.transsiberian()
+
+        dic["FOLDER_USRDATA"] = os.path.abspath(usrdata_folder)
+        self.configuration.write_variables("VERSION11", dic)
+
+        ini_curdir = os.curdir
+        os.chdir(os.path.join(Code.folder_OS, "Version11"))
+        tmp_file = self.configuration.ficheroTemporal("txt")
+        self.py27("Variables.py", "TRANS", file_variables, tmp_file)
+        os.chdir(ini_curdir)
+        with open(tmp_file, "rb") as f:
+            x = f.read()
+            for c in range(10):
+                bq = b"%dL" % c
+                if bq not in x:
+                    continue
+                x = x.replace(bq, b"%d" % c)
+            dic = eval(x)
+            for key in dic:
+                self.configuration.write_variables(key, dic[key])
+                ok = True
+        if ok:
+            QTUtil2.message(self.wowner, _("Imported"))
+        else:
+            QTUtil2.message(self.wowner, _("Nothing to import"))
+
+
     def run(self, tipo):
         if tipo == "databases":
             self.databases()
         elif tipo == "openinglines":
             self.openinglines()
+        elif tipo == "transsiberian":
+            self.transsiberian()

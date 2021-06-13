@@ -334,12 +334,9 @@ class RunEngine:
 
         ms_time = 10000
         if max_time:
-            ms_time = max_time + 3000
+            ms_time = max_time + 5000
         elif max_depth:
-            ms_time = (
-                1000 * 1000
-            )  # 1000 secs, el tiempo calculado abajo no es bastante para mi ordenador - se pone un limite invisible y no me parece correcto
-            # ms_time = int(max_depth * ms_time / 3.0) * 100
+            ms_time = int(max_depth * ms_time / 3.0) * 100 * 10000000  # non stop
 
         self.reset()
         if is_savelines:

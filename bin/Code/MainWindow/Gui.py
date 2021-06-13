@@ -167,7 +167,7 @@ def run_gui(procesador):
     app.setEffectEnabled(QtCore.Qt.UI_AnimateMenu)
 
     QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "ChessAlpha2.ttf"))
-    QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "Inconsolata.ttf"))
+    # QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "Inconsolata.ttf"))
 
     if configuration.x_font_family:
         font = Controles.TipoLetra(configuration.x_font_family)

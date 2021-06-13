@@ -6,7 +6,7 @@ from stat import *
 
 import Code
 from Code import Util
-from Code import Routes
+from Code.Routes import Routes, WindowRoutes, ManagerRoutes
 from Code import Update
 from Code.Engines import EngineManager, WEngines
 from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson
@@ -16,7 +16,7 @@ from Code import CPU
 from Code.Config import Configuration, WindowConfig
 from Code import DGT
 from Code.Base import Position
-from Code import Trainings
+from Code.Menus import MenuTrainings, BasicMenus
 from Code import ManagerAlbum
 from Code.GM import ManagerGM
 from Code import ManagerElo
@@ -25,7 +25,6 @@ from Code import ManagerEverest
 from Code import ManagerFideFics
 from Code import ManagerMateMap
 from Code import ManagerMicElo
-from Code import ManagerRoutes
 from Code import ManagerSingularM
 from Code import ManagerSolo
 from Code import ManagerGame
@@ -34,7 +33,6 @@ from Code.Washing import ManagerWashing, WindowWashing
 from Code import ManagerPlayGame
 from Code import ManagerAnotar
 from Code import Adjournments
-from Code.QT import BasicMenus
 from Code.CompetitionWithTutor import WCompetitionWithTutor, ManagerCompeticion
 from Code.QT import Iconos
 from Code.About import About
@@ -45,7 +43,6 @@ from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines,
 from Code.QT import WindowBMT
 from Code.Board import WindowColors
 from Code.QT import WindowEverest
-from Code.QT import WindowRoutes
 from Code.QT import WindowSTS
 from Code.Sound import WindowSonido
 from Code.QT import WindowSingularM
@@ -147,7 +144,7 @@ class Procesador:
 
         self.cpu = CPU.CPU(self.main_window)
 
-        self.entrenamientos = Trainings.Entrenamientos(self)
+        self.entrenamientos = MenuTrainings.MenuTrainings(self)
 
         if self.configuration.x_check_for_update:
             Update.test_update(self)
@@ -1177,7 +1174,7 @@ class Procesador:
     def selectOneFNS(self, owner=None):
         if owner is None:
             owner = self.main_window
-        return Trainings.selectOneFNS(owner, self)
+        return MenuTrainings.selectOneFNS(owner, self)
 
     def gaviota_endings(self):
         WEndingsGTB.train_gtb(self)

@@ -28,7 +28,6 @@ class WBase(QtWidgets.QWidget):
         self.create_toolbar()
         self.create_board()
 
-        # self.creaCapturas()
         ly_bi = self.creaBloqueInformacion()
 
         ly_t = Colocacion.V().control(self.board).relleno()
@@ -522,7 +521,8 @@ class WBase(QtWidgets.QWidget):
                 self.lb_clock_white,
                 self.lb_clock_black,
                 self.lb_capt_white,
-                self.lb_capt_black
+                self.lb_capt_black,
+                self.parent().parent().informacionPGN
             ):
                 if widget.isVisible():
                     nonDistract.append(widget)
@@ -572,8 +572,9 @@ class WBase(QtWidgets.QWidget):
         max_num = self.lb_capt_white.width()//27
         xshow(max_num, "b", d[True], self.lb_capt_white)
         xshow(max_num, "w", d[False], self.lb_capt_black)
-        self.lb_capt_white.show()
-        self.lb_capt_black.show()
+        if self.lb_capt_white.isVisible():
+            self.lb_capt_white.show()
+            self.lb_capt_black.show()
 
     def ponAyudas(self, puntos, siQuitarAtras=True):
         self.num_hints = puntos

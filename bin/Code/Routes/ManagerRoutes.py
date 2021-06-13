@@ -10,7 +10,7 @@ from Code.Endings import LibChess
 from Code.Base import Game, Move, Position
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code import Routes
+from Code.Routes import Routes
 import Code
 from Code.Base.Constantes import *
 
@@ -577,8 +577,8 @@ class ManagerRoutesEndings(ManagerRoutes):
             self.mensajeEnPGN(_("Done"))
             self.route.end_ending()
         else:
-            QTUtil2.message_bold(self.main_window)
             mensaje = "%s<br>%s" % (_("Done with errors."), _("You must repeat the puzzle."))
+            QTUtil2.message_bold(self.main_window, mensaje)
             self.mensajeEnPGN(mensaje)
             self.start(self.route)
 
