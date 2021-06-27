@@ -35,7 +35,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     lirm_engine = None
     next_test_resign = 0
     opening_mandatory = None
-    opening_mandatory_active = False
     primeroBook = False
     book_player = None
     book_player_active = False
@@ -866,10 +865,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             return self.play_next_move()
 
         # OPENING MANDATORY---------------------------------------------------------------------------------------------
-        if self.opening_mandatory_active:
+        if self.opening_mandatory:
             is_choosed, from_sq, to_sq, promotion = self.opening_mandatory.run_engine(fen_ultimo)
             if not is_choosed:
-                self.opening_mandatory_active = False
+                self.opening_mandatory = None
 
         # BOOK----------------------------------------------------------------------------------------------------------
         if not is_choosed and self.book_rival_active:
