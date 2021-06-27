@@ -30,6 +30,8 @@ class AnalyzeGame:
         self.vtime = alm.vtime
         self.depth = alm.depth
 
+        self.themes_lichess = alm.themes_lichess
+
         self.with_variations = alm.include_variations
 
         self.stability = alm.stability
@@ -44,7 +46,10 @@ class AnalyzeGame:
         # oriblunders: si se guarda la game original
         # bmtblunders: name del entrenamiento BMT a crear
         self.kblunders = alm.kblunders
-        self.tacticblunders = os.path.join(self.configuration.personal_training_folder, "../Tactics", alm.tacticblunders) if alm.tacticblunders else None
+        self.kblunders_porc = alm.kblunders_porc
+        self.tacticblunders = (
+            os.path.join(self.configuration.personal_training_folder, "../Tactics", alm.tacticblunders) if alm.tacticblunders else None
+        )
         self.pgnblunders = alm.pgnblunders
         self.oriblunders = alm.oriblunders
         self.bmtblunders = alm.bmtblunders
@@ -468,13 +473,17 @@ FILESW=%s:100
             move.piecesactivity = AnalysisIndexes.calc_piecesactivity(cp, mrm)
             move.exchangetendency = AnalysisIndexes.calc_exchangetendency(cp, mrm)
 
-            if si_blunders or si_brilliancies or self.with_variations:
+            if si_blunders or si_brilliancies or self.with_variations or self.themes_lichess:
                 rm = mrm.li_rm[pos_act]
                 rm.ponBlunder(0)
                 mj = mrm.li_rm[0]
                 rm_pts = rm.centipawns_abs()
 
                 dif = mj.centipawns_abs() - rm_pts
+
+                mx = max(abs(mj.centipawns_abs()), abs(rm_pts))
+                dif_porc = int(dif * 100 / mx) if mx > 0 else 0
+
                 fen = move.position_before.fen()
 
                 if self.with_variations:
@@ -483,7 +492,10 @@ FILESW=%s:100
                         if not (self.alm.best_variation and dif == 0):
                             move.analisis2variantes(self.alm, self.delete_previous)
 
-                if dif > self.kblunders:
+                ok_blunder = dif >= self.kblunders
+                if ok_blunder and self.kblunders_porc > 0:
+                    ok_blunder = dif_porc >= self.kblunders_porc
+                if ok_blunder:
                     rm.ponBlunder(dif)
 
                     self.graba_tactic(game, njg, mrm, pos_act)
@@ -509,6 +521,9 @@ FILESW=%s:100
                     nag, color = mrm.set_nag_color(self.configuration, rm)
                     if nag:
                         move.add_nag(nag)
+
+                if dif > 0 and self.themes_lichess:
+                    move.assign_themes_lichess()
 
         # Ponemos el texto original en la ultima
         if si_poner_pgn_original_blunders and self.oriblunders:
@@ -709,7 +724,7 @@ class MuestraAnalisis:
                 return not me.cancelado()
 
             xengine.set_gui_dispatch(mira)
-            mrm, pos = xengine.analysis_move(move, xengine.ms_time_move, xengine.depth_engine)
+            mrm, pos = xengine.analysis_move(move, xengine.mstime_engine, xengine.depth_engine)
             move.analysis = mrm, pos
             si_cancelado = me.cancelado()
             me.final()
@@ -787,9 +802,9 @@ class AnalisisVariations:
         self.max_tutor = None
         self.game_tutor = None
 
-        if self.xtutor.ms_time_move:
-            segundos_pensando = self.xtutor.ms_time_move / 1000  # esta en milesimas
-            if self.xtutor.ms_time_move % 1000 > 0:
+        if self.xtutor.mstime_engine:
+            segundos_pensando = self.xtutor.mstime_engine / 1000  # esta en milesimas
+            if self.xtutor.mstime_engine % 1000 > 0:
                 segundos_pensando += 1
         else:
             segundos_pensando = 3

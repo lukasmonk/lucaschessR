@@ -76,7 +76,7 @@ class Bloque:
     name: str
     ordenVista: int
     tipo: int
-    
+
     def __init__(self, li_vars, dic=None):
         self.siMovible = True
         li_vars.append(("name", "c", ""))
@@ -140,7 +140,7 @@ class Texto(Bloque):
     colorTexto: int
     colorFondo: int
     valor: str
-    
+
     def __init__(self):
         li_vars = [
             ("tipoLetra", "o", TipoLetra()),
@@ -166,7 +166,7 @@ class Texto(Bloque):
 class Imagen(Bloque):
     physical_pos: Physicalphysical_pos
     pixmap: str
-    
+
     def __init__(self):
         li_vars = [("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 80, 0)), ("pixmap", "t", None)]
         Bloque.__init__(self, li_vars)
@@ -185,7 +185,7 @@ class Caja(Bloque):
     grosor: int
     redEsquina: int
     tipo: int
-    
+
     def __init__(self):
         li_vars = [
             ("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 80, 0)),
@@ -215,7 +215,7 @@ class Circulo(Bloque):
     grosor: int
     grados: int
     tipo: int
-    
+
     def __init__(self):
         li_vars = [
             ("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 80, 0)),
@@ -233,14 +233,9 @@ class Pieza(Bloque):
     pieza: str
     row: int
     column: int
-    
+
     def __init__(self):
-        li_vars = [
-            ("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 1, 0)),
-            ("pieza", "t", "p"),
-            ("row", "n", 1),
-            ("column", "n", 1),
-        ]
+        li_vars = [("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 1, 0)), ("pieza", "t", "p"), ("row", "n", 1), ("column", "n", 1)]
         Bloque.__init__(self, li_vars)
 
 
@@ -278,7 +273,7 @@ class Flecha(Bloque):
             ("opacity", "n", 1.0),
             ("redondeos", "l", False),
             ("forma", "t", "a"),
-            # a = abierta -> ,  c = cerrada la cabeza, 1 = poligono cuadrado, 
+            # a = abierta -> ,  c = cerrada la cabeza, 1 = poligono cuadrado,
             #                   2 = poligono 1 punto base, 3 = poligono 1 punto base cabeza
             ("ancho", "n", 10),  # ancho de la base de la arrow si es un poligono
             ("vuelo", "n", 5),  # ancho adicional en la base
@@ -321,7 +316,7 @@ class Marco(Bloque):
     opacity: int
     width_square: int
     png: str
-    
+
     def __init__(self, dic=None):
         li_vars = [
             ("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 80, 0)),
@@ -347,7 +342,7 @@ class SVG(Bloque):
     width_square: int
     psize: int
     png: str
-    
+
     def __init__(self, dic=None):
         # orden por debajo de las piezas
         li_vars = [

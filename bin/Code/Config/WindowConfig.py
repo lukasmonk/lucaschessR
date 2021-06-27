@@ -32,7 +32,11 @@ def options(parent, configuration):
     form.combobox(_("Language"), li, tr_actual)
     form.separador()
 
-    li = [(_("Play against an engine"), MENU_PLAY_ANY_ENGINE), (_("Opponents for young players"), MENU_PLAY_YOUNG_PLAYERS), (_("Both"), MENU_PLAY_BOTH)]
+    li = [
+        (_("Play against an engine"), MENU_PLAY_ANY_ENGINE),
+        (_("Opponents for young players"), MENU_PLAY_YOUNG_PLAYERS),
+        (_("Both"), MENU_PLAY_BOTH),
+    ]
     form.combobox(_("Menu Play"), li, configuration.x_menu_play)
     form.separador()
 
@@ -98,7 +102,10 @@ def options(parent, configuration):
     form.dial("%s (%s=1)" % (_("Speed"), _("Default")), 1, len(drap), drap_v.get(configuration.x_pieces_speed, 100), siporc=False)
     form.separador()
 
-    li_mouse_sh = [(_("Type fixed: you must always indicate origin and destination"), False), (_("Type predictive: program tries to guess your intention"), True)]
+    li_mouse_sh = [
+        (_("Type fixed: you must always indicate origin and destination"), False),
+        (_("Type predictive: program tries to guess your intention"), True),
+    ]
     form.combobox(_("Mouse shortcuts"), li_mouse_sh, configuration.x_mouse_shortcuts)
     form.checkbox(_("Show candidates"), configuration.x_show_candidates)
     form.checkbox(_("Always promote to queen\nALT key allows to change"), configuration.x_autopromotion_q)
@@ -106,16 +113,25 @@ def options(parent, configuration):
     form.separador()
 
     x = " - %s Graham O'Neill (https://goneill.co.nz)" % _("developed by")
-    li_db = [
-        (_("None"), ""),
-        (_("DGT") + ("" if Code.is_windows else x), "DGT"),
-        (_("Certabo") + x, "Certabo"),
-        (_("Millennium") + x, "Millennium"),
-        (_("Novag Citrine") + x, "Citrine"),
-        (_("Novag UCB") + x, "Novag UCB"),
-    ]
-    if Code.is_linux:
-        del li_db[1]
+    if Code.is_windows:
+        li_db = [
+            (_("None"), ""),
+            (_("DGT"), "DGT"),
+            (_("DGT Alternate") + x, "DGT-gon"),
+            (_("Certabo") + x, "Certabo"),
+            (_("Millennium") + x, "Millennium"),
+            (_("Novag Citrine") + x, "Citrine"),
+            (_("Novag UCB") + x, "Novag UCB"),
+        ]
+    else:
+        li_db = [
+            (_("None"), ""),
+            (_("DGT") + x, "DGT-gon"),
+            (_("Certabo") + x, "Certabo"),
+            (_("Millennium") + x, "Millennium"),
+            (_("Novag Citrine") + x, "Citrine"),
+            (_("Novag UCB") + x, "Novag UCB"),
+        ]
     form.combobox(_("Digital board"), li_db, configuration.x_digital_board)
 
     form.separador()
@@ -207,9 +223,22 @@ def options(parent, configuration):
         li_gen, li_son, li_tt, li_b, li_asp, li_pr, li_nc = resp
 
         if Code.is_windows:
-            (configuration.x_player, configuration.x_style, translator, configuration.x_menu_play, configuration.x_show_version11, configuration.x_check_for_update) = li_gen
+            (
+                configuration.x_player,
+                configuration.x_style,
+                translator,
+                configuration.x_menu_play,
+                configuration.x_show_version11,
+                configuration.x_check_for_update,
+            ) = li_gen
         else:
-            (configuration.x_player, configuration.x_style, translator, configuration.x_menu_play, configuration.x_check_for_update) = li_gen
+            (
+                configuration.x_player,
+                configuration.x_style,
+                translator,
+                configuration.x_menu_play,
+                configuration.x_check_for_update,
+            ) = li_gen
 
         configuration.set_translator(translator)
 

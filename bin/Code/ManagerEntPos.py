@@ -5,8 +5,8 @@ from PySide2.QtCore import Qt
 import Code
 from Code import FNSLine
 from Code import Manager
-from Code import TrListas
-from Code import Tutor
+from Code.Config import TrListas
+from Code.Tutor import Tutor
 from Code import Util
 from Code.Base import Game, Move
 from Code.Base.Constantes import *
@@ -115,7 +115,9 @@ class ManagerEntPos(Manager.Manager):
         QTUtil.refresh_gui()
 
         if self.xrival is None:
-            self.xrival = self.procesador.creaManagerMotor(self.configuration.tutor, self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth)
+            self.xrival = self.procesador.creaManagerMotor(
+                self.configuration.tutor, self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth
+            )
 
         player = self.configuration.nom_player()
         other = _("the engine")
@@ -194,7 +196,9 @@ class ManagerEntPos(Manager.Manager):
             self.xrival.stop()
         if self.is_analyzing:
             self.xtutor.stop()
-        self.start(self.pos_training, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump)
+        self.start(
+            self.pos_training, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump
+        )
 
     def ent_siguiente(self, tipo):
         if not (self.human_is_playing or self.state == ST_ENDGAME):
@@ -205,7 +209,9 @@ class ManagerEntPos(Manager.Manager):
         elif pos == 0:
             pos = self.num_trainings
         self.analiza_stop()
-        self.start(pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump, self.attempts)
+        self.start(
+            pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump, self.attempts
+        )
 
     def control_teclado(self, nkey):
         if nkey in (Qt.Key_Plus, Qt.Key_PageDown):
@@ -218,7 +224,11 @@ class ManagerEntPos(Manager.Manager):
             self.saveSelectedPosition("|".join(li))
 
     def listHelpTeclado(self):
-        return [("+/%s" % _("Page Down"), _("Next position")), ("-/%s" % _("Page Up"), _("Previous position")), ("T", _("Save position in 'Selected positions' file"))]
+        return [
+            ("+/%s" % _("Page Down"), _("Next position")),
+            ("-/%s" % _("Page Up"), _("Previous position")),
+            ("T", _("Save position in 'Selected positions' file")),
+        ]
 
     def end_game(self):
         self.procesador.start()
@@ -343,7 +353,7 @@ class ManagerEntPos(Manager.Manager):
         if self.is_analyzed_by_tutor:
             return
         self.main_window.pensando_tutor(True)
-        self.mrmTutor = self.xtutor.ac_final(self.xtutor.ms_time_move)
+        self.mrmTutor = self.xtutor.ac_final(self.xtutor.mstime_engine)
         self.main_window.pensando_tutor(False)
 
     def analiza_stop(self):
@@ -413,7 +423,7 @@ class ManagerEntPos(Manager.Manager):
                     if self.attempts and self.current_attempts >= self.attempts:
                         self.board.markPosition(move_obj.from_sq)
                 else:
-                    if self.attempts and  self.current_attempts >= self.attempts:
+                    if self.attempts and self.current_attempts >= self.attempts:
                         self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
             if not ok:
                 self.sigueHumano()
@@ -555,7 +565,9 @@ class ManagerEntPos(Manager.Manager):
         name = os.path.basename(nom_dir)
 
         QTUtil2.message(
-            self.main_window, _("Tactic training %s created.") % nom_dir, explanation=_X(_("You can access this training from menu Train - Learn tactics by repetition - %1"), name)
+            self.main_window,
+            _("Tactic training %s created.") % nom_dir,
+            explanation=_X(_("You can access this training from menu Train - Learn tactics by repetition - %1"), name),
         )
 
         self.procesador.entrenamientos.rehaz()

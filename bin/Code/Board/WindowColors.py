@@ -14,7 +14,6 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.Board import Board, BoardArrows, ConfBoards
-from Code import TrListas
 from Code import Util
 import Code
 
@@ -67,7 +66,8 @@ class BotonColor(QtWidgets.QPushButton):
     def pulsado(self):
         ncolor = self.rut_actual()
         color = QTUtil.qtColor(ncolor)
-        color = QtWidgets.QColorDialog.getColor(color, self.parent, _("Choose a color"))
+
+        color = QtWidgets.QColorDialog.getColor(color, title=_("Choose a color"))
         if color.isValid():
             self.rut_actual(color.rgba())
             self.rut_actualiza()
@@ -286,7 +286,9 @@ class WColores(QTVarios.WDialogo):
         lbFondo = crea_lb(_("Background"))
         self.btFondo = BotonColor(self, self.config_board.colorFondo, self.actualizaBoard)
         self.btFondoPNG = BotonImagen(self, self.config_board.png64Fondo, self.actualizaBoard, self.btFondo)
-        self.chbExtended = Controles.CHB(self, _("Extended to outer border"), self.config_board.extendedColor()).capture_changes(self, self.extendedColor)
+        self.chbExtended = Controles.CHB(self, _("Extended to outer border"), self.config_board.extendedColor()).capture_changes(
+            self, self.extendedColor
+        )
 
         # Actual
         self.chbTemas = Controles.CHB(self, _("Default"), self.config_board.siDefTema()).capture_changes(self, self.defectoTemas)
@@ -309,7 +311,9 @@ class WColores(QTVarios.WDialogo):
         lbFlecha = crea_lb(_("Move indicator"))
         self.lyF = BotonFlecha(self, self.config_board.fTransicion, self.config_board.flechaDefecto, self.actualizaBoard)
         lbFlechaAlternativa = crea_lb(_("Arrow alternative"))
-        self.lyFAlternativa = BotonFlecha(self, self.config_board.fAlternativa, self.config_board.flechaAlternativaDefecto, self.actualizaBoard)
+        self.lyFAlternativa = BotonFlecha(
+            self, self.config_board.fAlternativa, self.config_board.flechaAlternativaDefecto, self.actualizaBoard
+        )
         lbFlechaActivo = crea_lb(_("Active moves"))
         self.lyFActual = BotonFlecha(self, self.config_board.fActivo, self.config_board.flechaActivoDefecto, self.actualizaBoard)
         lbFlechaRival = crea_lb(_("Opponent moves"))
@@ -384,7 +388,9 @@ class WColores(QTVarios.WDialogo):
 
         # _sepLetras
         lbSepLetras = crea_lb(_("Separation") + " %")
-        self.sbSepLetras = Controles.SB(self, self.config_board.sepLetras(), -1000, 1000).tamMaximo(50).capture_changes(self.actualizaBoardM)
+        self.sbSepLetras = (
+            Controles.SB(self, self.config_board.sepLetras(), -1000, 1000).tamMaximo(50).capture_changes(self.actualizaBoardM)
+        )
         self.chbDefSepLetras = xDefecto(self.config_board.siDefSepLetras())
         l2mas1(lyG, 4, lbSepLetras, self.sbSepLetras, self.chbDefSepLetras)
 
@@ -404,13 +410,17 @@ class WColores(QTVarios.WDialogo):
 
         # _tamRecuadro
         lbTamRecuadro = crea_lb(_("Outer Border Size") + " %")
-        self.sbTamRecuadro = Controles.SB(self, self.config_board.tamRecuadro(), 0, 10000).tamMaximo(50).capture_changes(self.actualizaBoardM)
+        self.sbTamRecuadro = (
+            Controles.SB(self, self.config_board.tamRecuadro(), 0, 10000).tamMaximo(50).capture_changes(self.actualizaBoardM)
+        )
         self.chbDefTamRecuadro = xDefecto(self.config_board.siDefTamRecuadro())
         l2mas1(ly_otros, 1, lbTamRecuadro, self.sbTamRecuadro, self.chbDefTamRecuadro)
 
         # _tamFrontera
         lbTamFrontera = crea_lb(_("Inner Border Size") + " %")
-        self.sbTamFrontera = Controles.SB(self, self.config_board.tamFrontera(), 0, 10000).tamMaximo(50).capture_changes(self.actualizaBoardM)
+        self.sbTamFrontera = (
+            Controles.SB(self, self.config_board.tamFrontera(), 0, 10000).tamMaximo(50).capture_changes(self.actualizaBoardM)
+        )
         self.chbDefTamFrontera = xDefecto(self.config_board.siDefTamFrontera())
         l2mas1(ly_otros, 2, lbTamFrontera, self.sbTamFrontera, self.chbDefTamFrontera)
 
@@ -456,7 +466,13 @@ class WColores(QTVarios.WDialogo):
         self.elegido = None
 
         self.li_themes = self.read_own_themes()
-        self.current_theme = {"NOMBRE": "", "SECCION": "", "CHANGE_PIECES": True, "o_tema": self.config_board.grabaTema(), "o_base": self.config_board.grabaBase()}
+        self.current_theme = {
+            "NOMBRE": "",
+            "SECCION": "",
+            "CHANGE_PIECES": True,
+            "o_tema": self.config_board.grabaTema(),
+            "o_base": self.config_board.grabaBase(),
+        }
         self.own_theme_selected = False
         self.cambiadoTema()
         self.defectoTemas()

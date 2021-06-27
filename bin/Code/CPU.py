@@ -4,7 +4,7 @@ import time
 from PySide2 import QtCore
 
 from Code.QT import QTUtil
-from Code import Tareas
+from Code.MainWindow import Tareas
 
 
 class CPU:

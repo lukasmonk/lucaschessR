@@ -66,10 +66,7 @@ class WResistance(QTVarios.WDialogo):
 
     def set_textAyuda(self):
         txt = self.resistance.rotuloActual(True)
-        self.lb.set_text(
-            '<center><b>%s<br><font color="red">%s</red></b></center>'
-            % (txt, _("Double click in any cell to begin to play"))
-        )
+        self.lb.set_text('<center><b>%s<br><font color="red">%s</red></b></center>' % (txt, _("Double click in any cell to begin to play")))
 
     def grid_num_datos(self, grid):
         return self.resistance.num_engines()
@@ -117,9 +114,7 @@ class WResistance(QTVarios.WDialogo):
 
         li_gen.append(separador)
 
-        config = FormLayout.Spinbox(
-            _("Max lost centipawns in a single move") + ":\n" + _("0 = not consider this limit"), 0, 1000, 80
-        )
+        config = FormLayout.Spinbox(_("Max lost centipawns in a single move") + ":\n" + _("0 = not consider this limit"), 0, 1000, 80)
         li_gen.append((config, maxerror))
 
         resultado = FormLayout.fedit(li_gen, title=_("Config"), parent=self, icon=Iconos.Configurar())

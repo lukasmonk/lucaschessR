@@ -172,7 +172,9 @@ class WLines(QTVarios.WDialogo):
         config = FormLayout.Combobox(_("Engine"), self.configuration.comboMotoresMultiPV10(4))
         li_gen.append((config, dicVar.get("ENGINE", self.configuration.tutor)))
 
-        li_gen.append((_("Duration of engine analysis (secs)") + ":", dicVar.get("SEGUNDOS", float(self.configuration.x_tutor_mstime / 1000.0))))
+        li_gen.append(
+            (_("Duration of engine analysis (secs)") + ":", dicVar.get("SEGUNDOS", float(self.configuration.x_tutor_mstime / 1000.0)))
+        )
         liDepths = [("--", 0)]
         for x in range(1, 51):
             liDepths.append((str(x), x))
@@ -854,9 +856,11 @@ class WLines(QTVarios.WDialogo):
             else:
                 me = QTUtil2.mensEspera.start(self, _("Analyzing the move...."), physical_pos="ad")
 
-                move.analysis = xanalyzer.analizaJugadaPartida(game, len(game) - 1, xanalyzer.ms_time_move, xanalyzer.depth_engine)
+                move.analysis = xanalyzer.analizaJugadaPartida(game, len(game) - 1, xanalyzer.mstime_engine, xanalyzer.depth_engine)
                 me.final()
-            Analysis.show_analysis(self.procesador, xanalyzer, move, self.pboard.board.is_white_bottom, 9999, len(game) - 1, main_window=self)
+            Analysis.show_analysis(
+                self.procesador, xanalyzer, move, self.pboard.board.is_white_bottom, 9999, len(game) - 1, main_window=self
+            )
 
             dic = self.dbop.getfenvalue(fenm2)
             dic["ANALISIS"] = move.analysis[0]
@@ -918,9 +922,13 @@ class WLines(QTVarios.WDialogo):
 
         elif resp == "lines":
             li_gen = [FormLayout.separador]
-            config = FormLayout.Editbox('<div align="right">' + _("Lines") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx=r"[0-9,\-,\,]*")
+            config = FormLayout.Editbox(
+                '<div align="right">' + _("Lines") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx=r"[0-9,\-,\,]*"
+            )
             li_gen.append((config, ""))
-            resultado = FormLayout.fedit(li_gen, title=_("Remove a list of lines"), parent=self, anchoMinimo=460, icon=Iconos.OpeningLines())
+            resultado = FormLayout.fedit(
+                li_gen, title=_("Remove a list of lines"), parent=self, anchoMinimo=460, icon=Iconos.OpeningLines()
+            )
             if resultado:
                 accion, liResp = resultado
                 clista = liResp[0]

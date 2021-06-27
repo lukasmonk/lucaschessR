@@ -20,9 +20,7 @@ class WAnotar(QTVarios.WDialogo):
         self.lista = self.db.keys(True, True)
         self.resultado = None
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, _("Writing down moves of a game"), Iconos.Write(), "annotateagame"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Writing down moves of a game"), Iconos.Write(), "annotateagame")
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 110)

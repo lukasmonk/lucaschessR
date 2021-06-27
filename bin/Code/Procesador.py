@@ -8,27 +8,22 @@ import Code
 from Code import Util
 from Code.Routes import Routes, WindowRoutes, ManagerRoutes
 from Code import Update
-from Code.Engines import EngineManager, WEngines
-from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson
+from Code.Engines import EngineManager, WEngines, WindowSTS
+from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson, Albums, ManagerAlbum, WindowAlbumes
 from Code.Base.Constantes import *
-from Code import Albums
 from Code import CPU
-from Code.Config import Configuration, WindowConfig
+from Code.Config import Configuration, WindowConfig, WindowUsuarios
 from Code import DGT
 from Code.Base import Position
 from Code.Menus import MenuTrainings, BasicMenus
-from Code import ManagerAlbum
 from Code.GM import ManagerGM
-from Code import ManagerElo
+from Code.Competitions import ManagerElo, ManagerFideFics, ManagerMicElo
 from Code import ManagerEntPos
 from Code import ManagerEverest
-from Code import ManagerFideFics
 from Code import ManagerMateMap
-from Code import ManagerMicElo
 from Code import ManagerSingularM
 from Code import ManagerSolo
 from Code import ManagerGame
-from Code import Presentacion
 from Code.Washing import ManagerWashing, WindowWashing
 from Code import ManagerPlayGame
 from Code import ManagerAnotar
@@ -36,17 +31,14 @@ from Code import Adjournments
 from Code.CompetitionWithTutor import WCompetitionWithTutor, ManagerCompeticion
 from Code.QT import Iconos
 from Code.About import About
-from Code.MainWindow import MainWindow
-from Code.QT import WindowAlbumes
+from Code.MainWindow import MainWindow, Presentacion
 from Code.QT import WindowAnotar
 from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd, ManagerOpeningLines
 from Code.QT import WindowBMT
 from Code.Board import WindowColors
 from Code.QT import WindowEverest
-from Code.QT import WindowSTS
 from Code.Sound import WindowSonido
 from Code.QT import WindowSingularM
-from Code.QT import WindowUsuarios
 from Code.QT import WindowWorkMap
 from Code.QT import WindowPlayGame
 from Code.QT import Piezas
@@ -83,7 +75,15 @@ class Procesador:
     def start_with_user(self, user):
         self.user = user
 
-        self.li_opciones_inicio = [TB_QUIT, TB_PLAY, TB_TRAIN, TB_COMPETE, TB_TOOLS, TB_OPTIONS, TB_INFORMATION]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
+        self.li_opciones_inicio = [
+            TB_QUIT,
+            TB_PLAY,
+            TB_TRAIN,
+            TB_COMPETE,
+            TB_TOOLS,
+            TB_OPTIONS,
+            TB_INFORMATION,
+        ]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
 
         self.configuration = Configuration.Configuration(user)
         self.configuration.start()
@@ -91,7 +91,7 @@ class Procesador:
         Code.procesador = self
         OpeningsStd.reset()
 
-        if len(sys.argv) == 1: # si no nofuncionan los kibitzers en linux
+        if len(sys.argv) == 1:  # si no nofuncionan los kibitzers en linux
             self.configuration.limpiaTemporal()
 
         # Tras crear configuración miramos si hay Adjournments
@@ -456,14 +456,18 @@ class Procesador:
             dic = self.configuration.read_variables(key)
             default_minutes = dic.get("MINUTES", 10)
             default_seconds = dic.get("SECONDS", 0)
-            respT = QTVarios.vtime(self.main_window, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999,
-                                   default_minutes=default_minutes, default_seconds=default_seconds)
+            respT = QTVarios.vtime(
+                self.main_window,
+                minMinutos=1,
+                minSegundos=0,
+                maxMinutos=999,
+                maxSegundos=999,
+                default_minutes=default_minutes,
+                default_seconds=default_seconds,
+            )
             if respT:
                 minutos, seconds = respT
-                dic = {
-                    "MINUTES": minutos,
-                    "SECONDS": seconds
-                }
+                dic = {"MINUTES": minutos, "SECONDS": seconds}
                 self.configuration.write_variables(key, dic)
                 self.manager.start(resp, minutos, seconds)
 
@@ -646,7 +650,9 @@ class Procesador:
         w.exec_()
 
     def folder_change(self):
-        carpeta = QTUtil2.leeCarpeta(self.main_window, self.configuration.carpeta, _("Change the folder where all data is saved") + "\n" + _("Be careful please"))
+        carpeta = QTUtil2.leeCarpeta(
+            self.main_window, self.configuration.carpeta, _("Change the folder where all data is saved") + "\n" + _("Be careful please")
+        )
         if carpeta:
             if os.path.isdir(carpeta):
                 self.configuration.changeActiveFolder(carpeta)
@@ -744,7 +750,6 @@ class Procesador:
     def version11(self, tipo):
         b = Version11.Version11(self)
         b.run(tipo)
-
 
     def openings(self):
         dicline = WindowOpeningLines.openingLines(self)
@@ -1188,7 +1193,15 @@ class ProcesadorVariations(Procesador):
 
         self.configuration = Code.configuration
 
-        self.li_opciones_inicio = [TB_QUIT, TB_PLAY, TB_TRAIN, TB_COMPETE, TB_TOOLS, TB_OPTIONS, TB_INFORMATION]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
+        self.li_opciones_inicio = [
+            TB_QUIT,
+            TB_PLAY,
+            TB_TRAIN,
+            TB_COMPETE,
+            TB_TOOLS,
+            TB_OPTIONS,
+            TB_INFORMATION,
+        ]  # Lo incluimos aqui porque sino no lo lee, en caso de aplazada
 
         self.siPresentacion = False
 

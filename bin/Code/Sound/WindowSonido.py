@@ -16,7 +16,7 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.Board import BoardElements, BoardTypes
 from Code.Sound import Sound
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 
 

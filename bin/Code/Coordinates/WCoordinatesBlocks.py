@@ -63,7 +63,7 @@ class WCoordinatesBlocks(QTVarios.WDialogo):
         return len(self.db)
 
     def grid_dato(self, grid, row, o_column):
-        coordinate : CoordinatesBlocks.CoordinatesBlocks = self.db.coordinate(row)
+        coordinate: CoordinatesBlocks.CoordinatesBlocks = self.db.coordinate(row)
         col = o_column.key
         if col == "DATE_INI":
             return Util.dtostr_hm(coordinate.date_ini)

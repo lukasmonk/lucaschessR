@@ -5,8 +5,6 @@ from Code.Base import Move, Game
 from Code.QT import Controles, Colocacion, QTVarios, Iconos, QTUtil2
 
 
-
-
 class LBPGN(Controles.LB):
     def __init__(self, parent, puntos, link):
         Controles.LB.__init__(self, parent)
@@ -24,7 +22,7 @@ class LBPGN(Controles.LB):
     def mouseDoubleClickEvent(self, event):
         self.wparent.double_click(self)
 
-    def mousePressEvent(self, ev:PySide2.QtGui.QMouseEvent):
+    def mousePressEvent(self, ev: PySide2.QtGui.QMouseEvent):
         if ev.button() == QtCore.Qt.RightButton:
             return self.wparent.right_click(self)
         # Controles.LB.mousePressEvent(self, ev)
@@ -101,7 +99,7 @@ class ShowPGN(QtWidgets.QScrollArea):
         menu = QTVarios.LCMenu(self)
         menu.opcion("remove_line", _("Remove line"), Iconos.DeleteRow())
         if self.selected_link and self.selected_link in lb_sender.text():  # move selected in variation
-            if not self.selected_link.endswith("|0"): # si no es el primero
+            if not self.selected_link.endswith("|0"):  # si no es el primero
                 menu.separador()
                 menu.opcion("remove_move", _("Remove move"), Iconos.DeleteColumn())
             menu.separador()
@@ -139,7 +137,7 @@ class ShowPGN(QtWidgets.QScrollArea):
         self.move: Move.Move = work_move
         self.selected_link = selected_link
 
-        def do_variation(variation_game:Game.Game, base_select):
+        def do_variation(variation_game: Game.Game, base_select):
             num_move = variation_game.primeraJugada()
             pgn_work = ""
             if variation_game.first_comment:

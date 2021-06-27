@@ -11,9 +11,9 @@ class GenTry:
         num_ini, num_end = ord(xfrom[1]), ord(xto[1])
 
         li = []
-        for letra in range(letra_ini, letra_end+1):
-            for num in range(num_ini, num_end+1):
-               li.append(chr(letra)+chr(num))
+        for letra in range(letra_ini, letra_end + 1):
+            for num in range(num_ini, num_end + 1):
+                li.append(chr(letra) + chr(num))
         self.li_base = li
         self.pos = -1
         self.li_current = None
@@ -26,10 +26,10 @@ class GenTry:
 
     def next(self):
         self.pos += 1
-        if self.pos >= len(self.li_current)-1:
+        if self.pos >= len(self.li_current) - 1:
             self.gen_new()
             self.pos += 1
-        return self.li_current[self.pos], self.li_current[self.pos+1]
+        return self.li_current[self.pos], self.li_current[self.pos + 1]
 
 
 class CoordinatesBasic:
@@ -57,11 +57,7 @@ class CoordinatesBasic:
         self.score = score
 
     def save(self):
-        dic = {
-            "date": self.date,
-            "side": self.side,
-            "score": self.score,
-        }
+        dic = {"date": self.date, "side": self.side, "score": self.score}
         return dic
 
     def restore(self, dic):

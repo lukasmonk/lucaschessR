@@ -23,7 +23,10 @@ class WAbout(QtWidgets.QDialog):
 
         head = '<span style="font-size:30pt; font-weight="700"; font-family:arial; color:#2D2B2B">%s</span><br>' % Code.lucas_chess
         head += '<span style="font-size:15pt;">%s</span><br>' % _X(_("version %1"), procesador.version)
-        head += '<span style="font-size:10pt;color:2D2B2B">%s: %s</span>' % (_("Author"), '<a href="mailto:lukasmonk@gmail.com">Lucas Monge</a>')
+        head += '<span style="font-size:10pt;color:2D2B2B">%s: %s</span>' % (
+            _("Author"),
+            '<a href="mailto:lukasmonk@gmail.com">Lucas Monge</a>',
+        )
         head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">%s</a>' % (procesador.web, procesador.web)
         head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Blog : Fresh news</a>' % (procesador.blog,)
         head += ' - <a style="font-size:10pt; color:2D2B2B" href="%s">Sources: github</a><br>' % (procesador.github,)

@@ -1,10 +1,8 @@
-from Code.Openings import Opening
 from Code import Manager
-from Code.Base import Move, Game
-from Code.QT import QTUtil2
 from Code import Util
-from Code.Engines import EngineResponse
+from Code.Base import Move
 from Code.Base.Constantes import *
+from Code.QT import QTUtil2
 
 
 class ManagerResistance(Manager.Manager):
@@ -19,6 +17,7 @@ class ManagerResistance(Manager.Manager):
         self.seconds, self.puntos, self.maxerror = resistance.actual()
         self.movimientos = 0
         self.puntosRival = 0
+        self.lostmovepoints = 0
 
         self.human_is_playing = False
         self.state = ST_PLAYING
@@ -30,9 +29,6 @@ class ManagerResistance(Manager.Manager):
 
         self.rm_rival = None
         self.moves_rival = 0
-
-        self.in_the_opening = False
-        self.opening = Opening.OpeningPol(5)  # lee las aperturas
 
         # debe hacerse antes que rival
         self.procesador.stop_engines()
@@ -162,15 +158,6 @@ class ManagerResistance(Manager.Manager):
 
             puntosRivalPrevio = self.puntosRival
 
-            if self.in_the_opening:
-                ok, from_sq, to_sq, promotion = self.opening.run_engine(self.last_fen())
-                if ok:
-                    self.rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
-                    self.rm_rival.from_sq = from_sq
-                    self.rm_rival.to_sq = to_sq
-                    self.rm_rival.promotion = promotion
-                    si_pensar = False
-
             if si_pensar:
                 self.rm_rival = self.xrival.play_seconds(self.game, self.seconds)
                 self.puntosRival = self.rm_rival.centipawns_abs()
@@ -180,40 +167,36 @@ class ManagerResistance(Manager.Manager):
             if self.play_rival(self.rm_rival):
                 self.moves_rival += 1
                 lostmovepoints = self.puntosRival - puntosRivalPrevio
-                if self.siBoxing and self.puntosRival > self.puntos and self.moves_rival > 1:
-                    if self.check():
-                        return
-                if self.siBoxing and self.maxerror and lostmovepoints > self.maxerror and self.moves_rival > 1:
-                    if self.check():
-                        return
-
+                if self.siBoxing and self.moves_rival > 1:
+                    if (self.puntosRival > self.puntos) or (self.maxerror and lostmovepoints > self.maxerror):
+                        if self.check():
+                            return
                 self.play_next_move()
+
         else:
 
             self.human_is_playing = True
             self.activate_side(is_white)
 
     def check(self):
-        if len(self.game) <= (3 if self.is_engine_side_white else 2):
+        if len(self.game) < (3 if self.is_engine_side_white else 4):
             return False
         self.disable_all()
         if self.xrival.confMotor.key != self.xarbitro.confMotor.key:
-            sc = min(max(3, self.seconds), 10)
+            sc = max(3, self.seconds)
 
             um = QTUtil2.mensEspera.start(self.main_window, _("Checking..."))
             rm1 = self.xarbitro.play_seconds(self.game, sc)
             self.puntosRival = -rm1.centipawns_abs()
             self.ponRotuloActual()
             if self.maxerror:
-                game1 = self.game
-                self.game = game1.copia()
-                self.game.anulaSoloUltimoMovimiento()
-                self.game.anulaSoloUltimoMovimiento()
-                rm0 = self.xarbitro.play_seconds(self.game, sc)
-                self.game = game1
+                game1 = self.game.copia()
+                game1.anulaSoloUltimoMovimiento()
+                game1.anulaSoloUltimoMovimiento()
+                rm0 = self.xarbitro.play_seconds(game1, sc)
                 previoRival = -rm0.centipawns_abs()
-                lostmovepoints = self.puntosRival - previoRival
-                if lostmovepoints > self.maxerror:
+                self.lostmovepoints = self.puntosRival - previoRival
+                if self.lostmovepoints > self.maxerror:
                     self.movimientos -= 1
                     um.final()
                     return self.finJuego(False)
@@ -226,18 +209,32 @@ class ManagerResistance(Manager.Manager):
         return False
 
     def finJuego(self, siFinPartida):
-        if self.siBoxing and self.movimientos:
-            siRecord = self.resistance.put_result(self.numEngine, self.key, self.movimientos)
+        if self.siBoxing:
+            if self.movimientos:
+                siRecord = self.resistance.put_result(self.numEngine, self.key, self.movimientos)
+            else:
+                siRecord = False
+
+            if siFinPartida:
+                txt = "<h2>%s<h2>" % (_("Game ended"))
+                txt += "<h3>%s<h3>" % (self.resistance.dameEti(Util.today(), self.movimientos))
+            else:
+                if self.puntosRival > self.puntos:
+                    txt = "<h3>%s</h3>" % (_X(_("You have lost %1 centipawns."), str(self.puntosRival)))
+                else:
+                    txt = ""
+                if self.lostmovepoints > 0:
+                    msg = _("You have lost in the last move %d centipawns")
+                    try:
+                        msg = msg % self.lostmovepoints
+                    except:
+                        msg += " %d" % self.lostmovepoints
+                    txt += "<h3>%s</h3>" % msg
+
             if siRecord:
-                txt = "<h2>%s<h2>" % (_("New record!"))
+                txt += "<h2>%s<h2>" % (_("New record!"))
                 txt += "<h3>%s<h3>" % (self.resistance.dameEtiRecord(self.key, self.numEngine))
                 self.ponRotuloObjetivo()
-            else:
-                if siFinPartida:
-                    txt = "<h2>%s<h2>" % (_("Game ended"))
-                    txt += "<h3>%s<h3>" % (self.resistance.dameEti(Util.today(), self.movimientos))
-                else:
-                    txt = "<h3>%s</h3>" % (_X(_("You have lost %1 centipawns."), str(-self.puntosRival)))
 
             if siFinPartida:
                 self.mensajeEnPGN(txt)
@@ -270,9 +267,6 @@ class ManagerResistance(Manager.Manager):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
-
-        if self.in_the_opening:
-            self.opening.check_human(self.last_fen(), from_sq, to_sq)
 
         self.move_the_pieces(move.liMovs)
 

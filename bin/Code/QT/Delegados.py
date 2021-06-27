@@ -186,9 +186,7 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
         yTotal = rect.y()
 
         if option.state & QtWidgets.QStyle.State_Selected:
-            painter.fillRect(
-                rect, QtGui.QColor(Code.configuration.pgn_selbackground())
-            )  # sino no se ve en CDE-Motif-Windows
+            painter.fillRect(rect, QtGui.QColor(Code.configuration.pgn_selbackground()))  # sino no se ve en CDE-Motif-Windows
         elif self.siFondo:
             fondo = index.model().getFondo(index)
             if fondo:
@@ -498,9 +496,7 @@ class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
         x0 = rect.x()
         y0 = rect.y()
         if option.state & QtWidgets.QStyle.State_Selected:
-            painter.fillRect(
-                rect, QtGui.QColor(Code.configuration.pgn_selbackground())
-            )  # sino no se ve en CDE-Motif-Windows
+            painter.fillRect(rect, QtGui.QColor(Code.configuration.pgn_selbackground()))  # sino no se ve en CDE-Motif-Windows
         elif self.siFondo:
             fondo = index.model().getFondo(index)
             if fondo:

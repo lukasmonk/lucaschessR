@@ -257,10 +257,7 @@ class ManagerTactics(Manager.Manager):
     def cambiar(self):
         if self.tactic.w_next_position >= 0:
             pos = WCompetitionWithTutor.edit_training_position(
-                self.main_window,
-                self.tactic.title_extended(),
-                self.tactic.w_next_position,
-                pos=self.tactic.w_next_position,
+                self.main_window, self.tactic.title_extended(), self.tactic.w_next_position, pos=self.tactic.w_next_position
             )
             if pos is not None:
                 self.tactic.w_next_position = pos - 1

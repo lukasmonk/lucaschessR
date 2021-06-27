@@ -7,15 +7,14 @@ import Code
 from Code import Adjournments
 from Code import DGT
 from Code import Manager
-from Code import Personalities
-from Code import Tutor
+from Code.Tutor import Tutor
 from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game, Move, Position
 from Code.Base.Constantes import *
 from Code.Engines import EngineResponse, SelectEngines
 from Code.Openings import Opening
-from Code.PlayAgainstEngine import WPlayAgainstEngine
+from Code.PlayAgainstEngine import WPlayAgainstEngine, Personalities
 from Code.Polyglots import Books, WindowBooks
 from Code.QT import Iconos
 from Code.QT import QTUtil
@@ -35,14 +34,16 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     conf_engine = None
     lirm_engine = None
     next_test_resign = 0
-    aperturaStd = None
-    aperturaObl = None
+    opening_mandatory = None
+    opening_mandatory_active = False
     primeroBook = False
-    bookP = None
-    bookPdepth = 0
-    bookR = None
-    bookRR = None
-    bookRdepth = 0
+    book_player = None
+    book_player_active = False
+    book_player_depth = 0
+    book_rival = None
+    book_rival_active = False
+    book_rival_select = None
+    book_rival_depth = 0
     is_tutor_enabled = False
     nArrows = 0
     thoughtOp = -1
@@ -62,8 +63,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     zeitnot = 0
     vtime = None
     is_analyzed_by_tutor = False
-    bookMandatory = None
-    maxMoveBook = 9999
     toolbar_state = None
     premove = None
     last_time_show_arrows = None
@@ -103,7 +102,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.next_test_resign = 0
         self.resign_limit = -99999  # never
 
-        self.aperturaObl = self.aperturaStd = None
+        self.opening_mandatory = None
 
         self.fen = dic_var["FEN"]
         if self.fen:
@@ -113,25 +112,30 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.game.pending_opening = False
         else:
             if dic_var["OPENING"]:
-                self.aperturaObl = Opening.JuegaOpening(dic_var["OPENING"].a1h8)
+                self.opening_mandatory = Opening.JuegaOpening(dic_var["OPENING"].a1h8)
                 self.primeroBook = False  # la opening es obligatoria
 
-        self.bookR = dic_var.get("BOOKR", None)
-        if self.bookR:
-            self.bookRdepth = dic_var.get("BOOKRDEPTH", 0)
-            self.bookR.polyglot()
-            self.bookRR = dic_var.get("BOOKRR", "mp")
+        self.book_rival_active = False
+        self.book_rival = dic_var.get("BOOKR", None)
+        if self.book_rival:
+            self.book_rival_active = True
+            self.book_rival_depth = dic_var.get("BOOKRDEPTH", 0)
+            self.book_rival.polyglot()
+            self.book_rival_select = dic_var.get("BOOKRR", "mp")
         elif dic_var["RIVAL"].get("TYPE", None) in (SelectEngines.MICGM, SelectEngines.MICPER):
             if self.conf_engine.book:
-                self.bookR = Books.Book("P", self.conf_engine.book, self.conf_engine.book, True)
-                self.bookR.polyglot()
-                self.bookRR = "mp"
-                self.bookRdepth = 0
+                self.book_rival_active = True
+                self.book_rival = Books.Book("P", self.conf_engine.book, self.conf_engine.book, True)
+                self.book_rival.polyglot()
+                self.book_rival_select = "mp"
+                self.book_rival_depth = 0
 
-        self.bookP = dic_var.get("BOOKP", None)
-        if self.bookP:
-            self.bookPdepth = dic_var.get("BOOKPDEPTH", 0)
-            self.bookP.polyglot()
+        self.book_player_active = False
+        self.book_player = dic_var.get("BOOKP", None)
+        if self.book_player:
+            self.book_player_active = True
+            self.book_player_depth = dic_var.get("BOOKPDEPTH", 0)
+            self.book_player.polyglot()
 
         self.is_tutor_enabled = (Code.dgtDispatch is None) and self.configuration.x_default_tutor_active
         self.main_window.set_activate_tutor(self.is_tutor_enabled)
@@ -179,7 +183,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if r_p <= 0:
                 r_p = None
             if r_t is None and r_p is None and not dic_var["WITHTIME"]:
-                r_t = 1000
+                r_t = None
             self.xrival = self.procesador.creaManagerMotor(rival, r_t, r_p, self.nAjustarFuerza != ADJUST_BETTER)
             if self.nAjustarFuerza != ADJUST_BETTER:
                 self.xrival.maximize_multipv()
@@ -298,8 +302,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def ponRotuloBasico(self):
         rotulo1 = ""
-        if self.bookR:
-            rotulo1 += "<br>%s: <b>%s</b>" % (_("Book"), os.path.basename(self.bookR.name))
+        if self.book_rival_active:
+            rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Rival"), os.path.basename(self.book_rival.name))
+        if self.book_player_active:
+            rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Player"), os.path.basename(self.book_player.name))
         self.set_label1(rotulo1)
 
     def show_time(self, siUsuario):
@@ -511,7 +517,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if self.siTiempo:
             self.main_window.stop_clock()
         self.analizaTerminar()
-        # self.game.set_position()
+        if self.book_rival_select == "su" or self.nAjustarFuerza == ADJUST_SELECTED_BY_PLAYER:
+            self.cache = {}
         self.reinicio["cache"] = self.cache
         self.game.reset()
         self.toolbar_state = ST_ENDGAME
@@ -655,17 +662,18 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.play_next_move()
 
     def testBook(self):
-        if self.bookR:
-            resp = self.bookR.get_list_moves(self.last_fen())
+        if self.book_rival_active:
+            resp = self.book_rival.get_list_moves(self.last_fen())
             if not resp:
-                self.bookR = None
+                self.book_rival_active = False
                 self.ponRotuloBasico()
 
     def reOpenBook(self):
-        self.bookR = self.reinicio.get("BOOK", None)
-        if self.bookR:
-            self.bookR.polyglot()
+        if self.book_rival:
+            self.book_rival_active = True
             self.ponRotuloBasico()
+        if self.book_player:
+            self.book_player_active = True
 
     def play_next_move(self):
         if self.state == ST_ENDGAME:
@@ -687,7 +695,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         siRival = is_white == self.is_engine_side_white
 
-        if self.bookR:
+        if self.book_rival:
             self.testBook()
 
         if siRival:
@@ -708,7 +716,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.is_analyzing = False
         self.is_analyzed_by_tutor = False
         if not self.tutor_con_flechas:
-            if self.aperturaObl or not self.is_tutor_enabled or self.ayudas_iniciales <= 0:
+            if self.opening_mandatory or not self.is_tutor_enabled or self.ayudas_iniciales <= 0:
                 return
         if not self.is_finished():
             if self.continueTt:
@@ -738,7 +746,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             return
         self.main_window.pensando_tutor(True)
         if self.continueTt:
-            self.mrmTutor = self.xtutor.ac_final(self.xtutor.ms_time_move)
+            self.mrmTutor = self.xtutor.ac_final(self.xtutor.mstime_engine)
         else:
             self.mrmTutor = self.xtutor.ac_final_limit()
         self.main_window.pensando_tutor(False)
@@ -785,27 +793,23 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if resp:
                 return resp
 
-    def eligeJugadaBookBase(self, book, bookRR):
-        num_moves = self.game.last_position.num_moves
-        if self.maxMoveBook:
-            if self.maxMoveBook <= num_moves:
-                return False, None, None, None
+    def eligeJugadaBookBase(self, book, book_select):
         fen = self.last_fen()
 
-        if bookRR == "su":
+        if book_select == "su":
             listaJugadas = book.get_list_moves(fen)
             if listaJugadas:
                 resp = WindowBooks.eligeJugadaBooks(self.main_window, listaJugadas, self.game.last_position.is_white)
                 return True, resp[0], resp[1], resp[2]
         else:
-            pv = book.eligeJugadaTipo(fen, bookRR)
+            pv = book.eligeJugadaTipo(fen, book_select)
             if pv:
                 return True, pv[:2], pv[2:4], pv[4:]
 
         return False, None, None, None
 
     def eligeJugadaBook(self):
-        return self.eligeJugadaBookBase(self.bookR, self.bookRR)
+        return self.eligeJugadaBookBase(self.book_rival, self.book_rival_select)
 
     def eligeJugadaBookAjustada(self):
         if self.nAjustarFuerza < 1000:
@@ -847,41 +851,43 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if not self.is_tutor_enabled:
             self.activate_side(self.human_side)
 
-        fen_ultimo = self.last_fen()
+        from_sq = to_sq = promotion = ""
+        is_choosed = False
 
+        # CACHE---------------------------------------------------------------------------------------------------------
+        fen_ultimo = self.last_fen()
         if fen_ultimo in self.cache:
             move = self.cache[fen_ultimo]
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
             if self.siTiempo:
                 self.vtime[self.is_engine_side_white].restore(move.cacheTime)
+                self.show_clocks()
             return self.play_next_move()
 
-        from_sq = to_sq = promotion = ""
-        si_encontrada = False
+        # OPENING MANDATORY---------------------------------------------------------------------------------------------
+        if self.opening_mandatory_active:
+            is_choosed, from_sq, to_sq, promotion = self.opening_mandatory.run_engine(fen_ultimo)
+            if not is_choosed:
+                self.opening_mandatory_active = False
 
-        if self.aperturaObl:
-            si_encontrada, from_sq, to_sq, promotion = self.aperturaObl.run_engine(fen_ultimo)
-            if not si_encontrada:
-                self.aperturaObl = None
+        # BOOK----------------------------------------------------------------------------------------------------------
+        if not is_choosed and self.book_rival_active:
+            if self.book_rival_depth == 0 or self.book_rival_depth >= len(self.game):
+                is_choosed, from_sq, to_sq, promotion = self.eligeJugadaBook()
+                if not is_choosed:
+                    self.book_rival_active = False
+            else:
+                self.book_rival_active = False
+            self.ponRotuloBasico()
 
-        if not si_encontrada and self.bookR:
-            if self.game.last_position.num_moves < self.maxMoveBook:
-                si_encontrada, from_sq, to_sq, promotion = self.eligeJugadaBook()
-            if not si_encontrada:
-                self.bookR = None
-
-        if not si_encontrada and self.aperturaStd:
-            si_encontrada, from_sq, to_sq, promotion = self.aperturaStd.run_engine(fen_ultimo)
-            if not si_encontrada:
-                self.aperturaStd = None
-
-        if not si_encontrada and self.siBookAjustarFuerza:
-            si_encontrada, from_sq, to_sq, promotion = self.eligeJugadaBookAjustada()  # book de la personalidad
-            if not si_encontrada:
+        if not is_choosed and self.siBookAjustarFuerza:
+            is_choosed, from_sq, to_sq, promotion = self.eligeJugadaBookAjustada()  # book de la personalidad
+            if not is_choosed:
                 self.siBookAjustarFuerza = False
 
-        if si_encontrada:
+        # --------------------------------------------------------------------------------------------------------------
+        if is_choosed:
             rm_rival = EngineResponse.EngineResponse("Opening", self.is_engine_side_white)
             rm_rival.from_sq = from_sq
             rm_rival.to_sq = to_sq
@@ -890,15 +896,15 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         else:
             self.thinking(True)
             if self.siTiempo:
-                tiempoBlancas = self.vtime[True].tiempoPendiente
-                tiempoNegras = self.vtime[False].tiempoPendiente
-                segundosJugada = self.segundosJugada
+                seconds_white = self.vtime[True].tiempoPendiente
+                seconds_black = self.vtime[False].tiempoPendiente
+                seconds_move = self.segundosJugada
             else:
-                tiempoBlancas = tiempoNegras = 10 * 60 * 1000
-                segundosJugada = 0
+                seconds_white = seconds_black = 10 * 60
+                seconds_move = 0
 
             self.xrival.play_time_routine(
-                self.game, self.main_window.notify, tiempoBlancas, tiempoNegras, segundosJugada, nAjustado=self.nAjustarFuerza
+                self.game, self.main_window.notify, seconds_white, seconds_black, seconds_move, nAjustado=self.nAjustarFuerza
             )
 
     def sigueHumanoAnalisis(self):
@@ -969,14 +975,14 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         fen_base = self.last_fen()
 
-        if self.bookR and self.bookMandatory:
-            listaJugadas = self.bookR.get_list_moves(fen_base)
+        if self.book_rival:
+            listaJugadas = self.book_rival.get_list_moves(fen_base)
             if listaJugadas:
                 apdesde, aphasta, appromotion, nada, nada1 = listaJugadas[0]
                 return self.player_has_moved_base(apdesde, aphasta, appromotion)
 
-        if self.aperturaObl:
-            apdesde, aphasta = self.aperturaObl.from_to_active(fen_base)
+        if self.opening_mandatory:
+            apdesde, aphasta = self.opening_mandatory.from_to_active(fen_base)
             if apdesde:
                 return self.player_has_moved_base(apdesde, aphasta)
 
@@ -994,72 +1000,71 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         if not move:
             return False
 
-        movimiento = move.movimiento()
-
-        siAnalisis = False
-
-        is_selected = False
-
+        a1h8 = move.movimiento()
+        si_analisis = False
+        is_choosed = False
         fen_base = self.last_fen()
 
-        if self.bookR and self.bookMandatory:
-            listaJugadas = self.bookR.get_list_moves(fen_base)
-            if listaJugadas:
-                li = []
-                for apdesde, aphasta, appromotion, nada, nada1 in listaJugadas:
-                    mx = apdesde + aphasta + appromotion
-                    if mx.strip().lower() == movimiento:
-                        is_selected = True
-                        break
-                    li.append((apdesde, aphasta, False))
-                if not is_selected:
-                    self.board.ponFlechasTmp(li)
-                    self.sigueHumano()
-                    return False
-
-        if not is_selected and self.aperturaObl:
-            if self.aperturaObl.check_human(fen_base, from_sq, to_sq):
-                is_selected = True
+        # OPENING MANDATORY---------------------------------------------------------------------------------------------
+        if self.opening_mandatory:
+            if self.opening_mandatory.check_human(fen_base, from_sq, to_sq):
+                is_choosed = True
             else:
-                apdesde, aphasta = self.aperturaObl.from_to_active(fen_base)
+                apdesde, aphasta = self.opening_mandatory.from_to_active(fen_base)
                 if apdesde is None:
-                    self.aperturaObl = None
+                    self.opening_mandatory = None
                 else:
                     self.board.ponFlechasTmp(((apdesde, aphasta, False),))
                     self.sigueHumano()
                     return False
 
-        if not is_selected and self.aperturaStd:
-            if self.aperturaStd.check_human(fen_base, from_sq, to_sq):
-                is_selected = True
+        # BOOK----------------------------------------------------------------------------------------------------------
+        if not is_choosed and self.book_player_active:
+            if self.book_player_depth == 0 or self.book_player_depth >= len(self.game):
+                lista_jugadas = self.book_player.get_list_moves(fen_base)
+                if lista_jugadas:
+                    li = []
+                    for apdesde, aphasta, appromotion, nada, nada1 in lista_jugadas:
+                        mx = apdesde + aphasta + appromotion
+                        if mx.strip().lower() == a1h8:
+                            is_choosed = True
+                            break
+                        li.append((apdesde, aphasta, False))
+                    if not is_choosed:
+                        self.board.ponFlechasTmp(li)
+                        self.sigueHumano()
+                        return False
+                else:
+                    self.book_player_active = False
             else:
-                if not self.aperturaStd.is_active(fen_base):
-                    self.aperturaStd = None
+                self.book_player_active = False
+            self.ponRotuloBasico()
 
+        # TUTOR---------------------------------------------------------------------------------------------------------
         is_mate = move.is_mate
         self.analizaFinal(is_mate)  # tiene que acabar siempre
-        if not is_mate and not is_selected and self.is_tutor_enabled:
-            if not self.tutor_book.si_esta(fen_base, movimiento):
-                rmUser, n = self.mrmTutor.buscaRM(movimiento)
-                if not rmUser:
+        if not is_mate and not is_choosed and self.is_tutor_enabled:
+            if not self.tutor_book.si_esta(fen_base, a1h8):
+                rm_user, n = self.mrmTutor.buscaRM(a1h8)
+                if not rm_user:
                     self.main_window.pensando_tutor(True)
-                    rmUser = self.xtutor.valora(self.game.last_position, from_sq, to_sq, move.promotion)
+                    rm_user = self.xtutor.valora(self.game.last_position, from_sq, to_sq, move.promotion)
                     self.main_window.pensando_tutor(False)
-                    if not rmUser:
+                    if not rm_user:
                         self.sigueHumanoAnalisis()
                         return False
-                    self.mrmTutor.agregaRM(rmUser)
-                siAnalisis = True
-                pointsBest, pointsUser = self.mrmTutor.difPointsBest(movimiento)
+                    self.mrmTutor.agregaRM(rm_user)
+                si_analisis = True
+                pointsBest, pointsUser = self.mrmTutor.difPointsBest(a1h8)
                 self.setSummary("POINTSBEST", pointsBest)
                 self.setSummary("POINTSUSER", pointsUser)
                 difpts = self.configuration.x_tutor_difpoints
                 difporc = self.configuration.x_tutor_difporc
-                if self.mrmTutor.mejorRMQue(rmUser, difpts, difporc):
+                if self.mrmTutor.mejorRMQue(rm_user, difpts, difporc):
                     if not move.is_mate:
                         si_tutor = True
                         if self.chance:
-                            num = self.mrmTutor.numMejorMovQue(movimiento)
+                            num = self.mrmTutor.numMejorMovQue(a1h8)
                             if num:
                                 rmTutor = self.mrmTutor.rmBest()
                                 menu = QTVarios.LCMenu(self.main_window)
@@ -1072,7 +1077,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                                 menu.separador()
                                 menu.opcion("try", "&2. %s" % _("Try again"), Iconos.Atras())
                                 menu.separador()
-                                menu.opcion("user", "&3. %s (%s)" % (_("Select my move"), rmUser.abrTextoBase()), Iconos.Player())
+                                menu.opcion("user", "&3. %s (%s)" % (_("Select my move"), rm_user.abrTextoBase()), Iconos.Player())
                                 self.main_window.cursorFueraBoard()
                                 resp = menu.lanza()
                                 if resp == "try":
@@ -1086,10 +1091,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                         if si_tutor:
                             tutor = Tutor.Tutor(self, move, from_sq, to_sq, False)
 
-                            if self.aperturaStd:
-                                liApPosibles = self.listaOpeningsStd.list_possible_openings(self.game)
-                            else:
-                                liApPosibles = None
+                            liApPosibles = self.listaOpeningsStd.list_possible_openings(self.game)
 
                             if tutor.elegir(self.hints > 0, liApPosibles=liApPosibles):
                                 if self.hints > 0:  # doble entrada a tutor.
@@ -1108,12 +1110,13 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
                             del tutor
 
+        # --------------------------------------------------------------------------------------------------------------
         self.setSummary("TIMEUSER", self.timekeeper.stop())
         self.reloj_stop(True)
 
         self.move_the_pieces(move.liMovs)
 
-        if siAnalisis:
+        if si_analisis:
             rm, nPos = self.mrmTutor.buscaRM(move.movimiento())
             if rm:
                 move.analysis = self.mrmTutor, nPos
@@ -1316,7 +1319,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         if not (hasattr(move, "analysis") and move.analysis):
             me = QTUtil2.mensEspera.start(self.main_window, _("Analyzing the move...."), physical_pos="ad")
-            mrm, pos = self.xanalyzer.analysis_move(move, self.xanalyzer.ms_time_move, self.xanalyzer.depth_engine)
+            mrm, pos = self.xanalyzer.analysis_move(move, self.xanalyzer.mstime_engine, self.xanalyzer.depth_engine)
             move.analysis = mrm, pos
             me.final()
 

@@ -17,6 +17,7 @@ from Code import Util
 sys.path.append(os.path.join(current_dir, "Code"))
 
 import Code.Traducir as Traducir
+
 Traducir.install()
 
 key = sys.argv[1]

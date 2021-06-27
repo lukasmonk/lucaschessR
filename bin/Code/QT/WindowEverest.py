@@ -127,10 +127,9 @@ class WNewExpedition(QTVarios.WDialogo):
             li_gen = []
             li_gen.append((None, "%s: %d" % (_("Total games"), nreccount)))
             li_gen.append(sep)
-            config = FormLayout.Editbox(_("Select games") + "<br>" +
-                                        _("By example:") + " -5,7-9,14,19-" + "<br>" +
-                                        _("Empty means all games"),
-                                        rx="[0-9,\-,\,]*")
+            config = FormLayout.Editbox(
+                _("Select games") + "<br>" + _("By example:") + " -5,7-9,14,19-" + "<br>" + _("Empty means all games"), rx="[0-9,\-,\,]*"
+            )
             li_gen.append((config, plant))
 
             li_gen.append(sep)
@@ -146,8 +145,7 @@ class WNewExpedition(QTVarios.WDialogo):
             config = FormLayout.Spinbox(_("Max moves"), 0, 999, 50)
             li_gen.append((config, 0))
 
-            resultado = FormLayout.fedit(li_gen, title=_("Select games"), parent=self, anchoMinimo=200,
-                                         icon=Iconos.Opciones())
+            resultado = FormLayout.fedit(li_gen, title=_("Select games"), parent=self, anchoMinimo=200, icon=Iconos.Opciones())
             if resultado:
                 accion, liResp = resultado
                 plant, shuffle, reverse, max_moves = liResp
@@ -183,10 +181,7 @@ class WNewExpedition(QTVarios.WDialogo):
                     lipv = pv.strip().split(" ")
                     if len(lipv) > max_moves:
                         pv = " ".join(lipv[:max_moves])
-                dt = {
-                    "LABELS": g.li_tags,
-                    "XPV": FasterCode.pv_xpv(pv)
-                }
+                dt = {"LABELS": g.li_tags, "XPV": FasterCode.pv_xpv(pv)}
                 games.append(dt)
 
             self.litourneys.append(dic)
@@ -195,6 +190,7 @@ class WNewExpedition(QTVarios.WDialogo):
             self.cbtourney.rehacer(li, dic)
 
         db.close()
+
 
 class WExpedition(QTVarios.WDialogo):
     def __init__(self, wowner, configuration, recno):
@@ -213,12 +209,7 @@ class WExpedition(QTVarios.WDialogo):
         wsvg.setFixedSize(762, int(762.0 * 520.0 / 1172.0))
         lySVG = Colocacion.H().relleno(1).control(wsvg).relleno(1)
 
-        li_acciones = (
-            (_("Climb"), Iconos.Empezar(), self.climb),
-            None,
-            (_("Close"), Iconos.MainMenu(), self.cancel),
-            None,
-        )
+        li_acciones = ((_("Climb"), Iconos.Empezar(), self.climb), None, (_("Close"), Iconos.MainMenu(), self.cancel), None)
         tb = Controles.TBrutina(self, li_acciones).vertical()
         if self.current is None:
             tb.setAccionVisible(self.climb, False)
@@ -226,9 +217,7 @@ class WExpedition(QTVarios.WDialogo):
         lyRot = Colocacion.H()
         for elem in label:
             lb_rotulo = Controles.LB(self, elem).align_center()
-            lb_rotulo.setStyleSheet(
-                "QWidget { border-style: groove; border-width: 2px; border-color: LightSlateGray ;}"
-            )
+            lb_rotulo.setStyleSheet("QWidget { border-style: groove; border-width: 2px; border-color: LightSlateGray ;}")
             lb_rotulo.ponTipoLetra(puntos=12, peso=700)
             lyRot.control(lb_rotulo)
 
@@ -307,9 +296,7 @@ class WExpedition(QTVarios.WDialogo):
 class WEverest(QTVarios.WDialogo):
     def __init__(self, procesador):
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, _("Expeditions to the Everest"), Iconos.Trekking(), "everestBase"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Expeditions to the Everest"), Iconos.Trekking(), "everestBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration

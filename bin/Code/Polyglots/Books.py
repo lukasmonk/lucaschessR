@@ -168,9 +168,7 @@ class ListBooks:
                     pgn = move.pgn_translated()
                     puntos = "%7.02f%%" % pc if ok else "   ???"
 
-                    liResp.append(
-                        ("%d|%d" % (nlibro, njug), "%s%-5s%s - %s" % (previo, pgn, posterior, puntos), ico, liOp)
-                    )
+                    liResp.append(("%d|%d" % (nlibro, njug), "%s%-5s%s - %s" % (previo, pgn, posterior, puntos), ico, liOp))
                     if not ok:
                         break
 
@@ -334,6 +332,7 @@ class Book:
 
 class Libro(Book):  # Cambio de denominación, error en restore wplayagainst engine
     pass
+
 
 class Entry:
     key = 0

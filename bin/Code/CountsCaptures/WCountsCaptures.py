@@ -163,4 +163,3 @@ class WCountsCaptures(QTVarios.WDialogo):
         else:
             self.configuration.x_counts_showall = showall
         self.configuration.graba()
-

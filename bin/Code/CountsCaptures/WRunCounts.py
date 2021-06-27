@@ -24,9 +24,9 @@ class WRunCounts(QTVarios.WDialogo):
         self.board.crea()
 
         # Rotulo informacion
-        self.lb_info_game = Controles.LB(
-            self, self.count.game.titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")
-        ).ponTipoLetra(puntos=self.configuration.x_pgn_fontpoints)
+        self.lb_info_game = Controles.LB(self, self.count.game.titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")).ponTipoLetra(
+            puntos=self.configuration.x_pgn_fontpoints
+        )
 
         # Movimientos
         self.ed_moves = Controles.ED(self, "").ponTipoLetra(puntos=32)
@@ -98,9 +98,8 @@ class WRunCounts(QTVarios.WDialogo):
     def pon_info_posic(self):
         self.lb_info.set_text(
             "%s: %d + %s: %d<br>%s: %d"
-            % (_("Position"), self.count.current_posmove, _("Depth"), self.count.current_depth, _("Total moves"), len(self.count.game), )
+            % (_("Position"), self.count.current_posmove, _("Depth"), self.count.current_depth, _("Total moves"), len(self.count.game))
         )
-
 
     def closeEvent(self, event):
         self.save_video()
@@ -141,7 +140,7 @@ class WRunCounts(QTVarios.WDialogo):
                 if factor < 0.5:
                     factor = 0.5
 
-                time.sleep(2.6*factor*factor)
+                time.sleep(2.6 * factor * factor)
                 self.board.pon_texto("", 0)
                 QTUtil.refresh_gui()
 
@@ -182,9 +181,7 @@ class WRunCounts(QTVarios.WDialogo):
                 if self.count.current_posmove < 0:
                     self.count.current_posmove = 0
                 self.count.current_depth = 0
-                self.lb_result.set_text(
-                    "%s (%d)" % (_("Wrong, return to the last position solved"), self.count.current_posmove + 1)
-                )
+                self.lb_result.set_text("%s (%d)" % (_("Wrong, return to the last position solved"), self.count.current_posmove + 1))
                 self.lb_result.set_foreground("red")
             else:
                 self.lb_result.set_text(_("Wrong, you must repeat this position"))
@@ -192,7 +189,6 @@ class WRunCounts(QTVarios.WDialogo):
             self.board.set_position(self.position_obj)
             for x in moves:
                 self.board.creaFlechaTmp(x.xfrom(), x.xto(), False)
-
 
         self.db_counts.change_count_capture(self.count)
         self.pon_info_posic()

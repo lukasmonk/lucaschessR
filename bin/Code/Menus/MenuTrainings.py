@@ -6,7 +6,7 @@ import Code
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import Controles
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 from Code.Base.Constantes import *
@@ -234,12 +234,7 @@ class MenuTrainings:
                         ini = os.path.join(carpeta, "Config.ini")
                         if os.path.isfile(ini):
                             name = entry.name
-                            xopcion(
-                                submenu,
-                                "tactica|%s|%s|%s|%s" % (tipo, name, carpeta, ini),
-                                trTraining(name),
-                                nico.otro(),
-                            )
+                            xopcion(submenu, "tactica|%s|%s|%s|%s" % (tipo, name, carpeta, ini), trTraining(name), nico.otro())
                             menu_t.separador()
                             lista.append((carpeta, name))
                         else:
@@ -449,7 +444,7 @@ class MenuTrainings:
                         posUltimo = data.get("POSULTIMO", 1)
                         jump = data.get("SALTA", False)
                         tipo = data.get("TYPE", "s")
-                        attempts = 0 #data.get("ATTEMPTS", 0) # Se mantienen por si alguien se ha aconstumbrado
+                        attempts = 0  # data.get("ATTEMPTS", 0) # Se mantienen por si alguien se ha aconstumbrado
                         resp = WCompetitionWithTutor.numPosicion(
                             self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo, attempts
                         )
@@ -664,9 +659,7 @@ class MenuTrainings:
             li_tam_blocks = None
             one_line = True
 
-        resp = WindowTurnOnLights.windowTurnOnLigths(
-            self.procesador, name, title, icono, folder, li_tam_blocks, one_line
-        )
+        resp = WindowTurnOnLights.windowTurnOnLigths(self.procesador, name, title, icono, folder, li_tam_blocks, one_line)
         if resp:
             num_theme, num_block, tol = resp
             self.procesador.game_type = GT_TURN_ON_LIGHTS

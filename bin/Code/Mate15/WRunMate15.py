@@ -53,7 +53,6 @@ class WRunMate15(QTVarios.WDialogo):
         self.gb = Controles.GB(self, _("Next moves and their solutions"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=75))
         self.gb.hide()
 
-
         li_acciones = (
             (_("Close"), Iconos.MainMenu(), self.terminar),
             None,
@@ -66,9 +65,7 @@ class WRunMate15(QTVarios.WDialogo):
 
         ly_left = Colocacion.V().control(self.tb).control(self.board)
 
-        ly_right = Colocacion.V().controlc(self.lb_info).espacio(40).\
-            controlc(self.lb_first_move).espacio(20).\
-            control(self.gb).relleno()
+        ly_right = Colocacion.V().controlc(self.lb_info).espacio(40).controlc(self.lb_first_move).espacio(20).control(self.gb).relleno()
 
         ly_center = Colocacion.H().otro(ly_left).otro(ly_right).margen(3)
 
@@ -203,7 +200,7 @@ class WRunMate15(QTVarios.WDialogo):
             self.bt_check.show()
         else:
             tiempo = time.time() - self.time_base
-            self.lb_result.set_text("%s: %.1f\"" % (_("Time"), tiempo))
+            self.lb_result.set_text('%s: %.1f"' % (_("Time"), tiempo))
             self.lb_result.show()
             self.mate15.append_try(tiempo)
             self.db_mate15.save(self.mate15)

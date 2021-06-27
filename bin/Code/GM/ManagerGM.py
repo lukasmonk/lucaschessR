@@ -167,7 +167,7 @@ class ManagerGM(Manager.Manager):
         if self.siAnalizando:
             self.siAnalizando = False
             if self.continueTt:
-                self.mrmTutor = self.xtutor.ac_final(self.xtutor.ms_time_move)
+                self.mrmTutor = self.xtutor.ac_final(self.xtutor.mstime_engine)
             else:
                 self.mrmTutor = self.xtutor.ac_final_limit()
 
@@ -343,7 +343,9 @@ class ManagerGM(Manager.Manager):
             dpts = rmUsu.centipawns_abs() - rmGM.centipawns_abs()
 
             if self.mostrar is None or ((self.mostrar is True) and not isValid):
-                w = WindowJuicio.WJuicio(self, self.xtutor, self.nombreGM, position, mrm, rmGM, rmUsu, analysis, is_competitive=not self.show_evals)
+                w = WindowJuicio.WJuicio(
+                    self, self.xtutor, self.nombreGM, position, mrm, rmGM, rmUsu, analysis, is_competitive=not self.show_evals
+                )
                 w.exec_()
 
                 rm, pos_gm = w.analysis[0].buscaRM(jgGM.movimiento())

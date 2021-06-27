@@ -71,8 +71,8 @@ class ControlFindAllMoves:
         if key == "TIME":
             if vtime == 0:
                 return "-"
-            tiempo = vtime/100.0
-            tm = tiempo / (row+1)
+            tiempo = vtime / 100.0
+            tm = tiempo / (row + 1)
             return "%0.02f / %0.02f" % (tiempo, tm)
         else:
             return "-" if vtime == 0 else str(errores)
@@ -83,7 +83,7 @@ class ControlFindAllMoves:
         return li[pos] + " 0 1"
 
     def mensResultado(self, number, vtime, errores):
-        tm = vtime/(number+1)
+        tm = vtime / (number + 1)
 
         if self.liPuntos[number][0] > 0:
             t0, e0 = self.liPuntos[number]
@@ -101,8 +101,8 @@ class ControlFindAllMoves:
             _("Errors"),
             errores,
             _("Time"),
-            vtime/100.0,
-            tm/100.0
+            vtime / 100.0,
+            tm / 100.0,
         )
         if siRecord:
             mensaje += "<br><br><b>%s</b><br>" % _("New record!")
@@ -121,9 +121,9 @@ class ControlFindAllMoves:
         for row in range(self.num_rows()):
             vtime, errores = self.liPuntos[row]
             if vtime > 0:
-                num += (row +1)
+                num += row + 1
                 tm += vtime
-        return tm/(num*100) if num > 0 else 0.0
+        return tm / (num * 100) if num > 0 else 0.0
 
 
 class ManagerFindAllMoves(Manager.Manager):
@@ -180,8 +180,9 @@ class ManagerFindAllMoves(Manager.Manager):
         resp = menu.lanza()
         if resp:
             if resp == "remove":
-                if QTUtil2.pregunta(self.main_window,
-                                    _("Are you sure you want to delete all results of all levels and start again from scratch?")):
+                if QTUtil2.pregunta(
+                    self.main_window, _("Are you sure you want to delete all results of all levels and start again from scratch?")
+                ):
                     self.pgn.remove_all()
                     self.pgnRefresh(True)
                     self.main_window.base.pgn.gotop()
@@ -205,7 +206,11 @@ class ManagerFindAllMoves(Manager.Manager):
             self.disable_all()
 
         if number is None:
+
             pos = self.pgn.primeroSinHacer() + 1
+            pos_with_error = self.pgn.pos_with_error() + 1
+            if pos_with_error <= pos:
+                pos = pos_with_error
             number = WCompetitionWithTutor.edit_training_position(
                 self.main_window,
                 _("Find all moves"),
@@ -334,9 +339,7 @@ class ManagerFindAllMoves(Manager.Manager):
             mens = '<b><span style="color:green">%s</span></b>' % _("Congratulations, goal achieved")
             QTUtil2.message(self.main_window, mens)
         else:
-            QTUtil2.mensajeTemporal(self.main_window, mensaje, 3 if siRecord else 2,
-                                    background="#FFCD43" if siRecord else None)
-
+            QTUtil2.mensajeTemporal(self.main_window, mensaje, 3 if siRecord else 2, background="#FFCD43" if siRecord else None)
 
     def analizaPosicion(self, row, key):
         if self.state == ST_PLAYING:

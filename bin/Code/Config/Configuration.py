@@ -7,8 +7,7 @@ from PySide2.QtCore import Qt
 
 import Code
 from Code.Board import ConfBoards
-from Code import TrListas
-from Code import Translate
+from Code.Config import Translate, TrListas
 from Code import Util
 from Code.QT import QTUtil
 from Code.SQL import UtilSQL
@@ -76,9 +75,7 @@ class Perfomance:
 
     def elo(self, xlost):
         # 3500.0 - ((60 * xlost) / (xgmo ** 0.4)) + abs(xeval ** 0.8)
-        return min(
-            max(int(self.limit_max - self.lost_factor * (xlost ** self.lost_exp)), self.limit_min), self.limit_max
-        )
+        return min(max(int(self.limit_max - self.lost_factor * (xlost ** self.lost_exp)), self.limit_min), self.limit_max)
 
     def elo_bad_vbad(self, xlost):
         elo = self.elo(xlost)
@@ -90,9 +87,7 @@ class Perfomance:
         if verybad or bad:
             return int(
                 max(
-                    self.limit_max
-                    - self.very_bad_factor * 1000.0 * verybad / nummoves
-                    - self.bad_factor * 1000.0 * bad / nummoves,
+                    self.limit_max - self.very_bad_factor * 1000.0 * verybad / nummoves - self.bad_factor * 1000.0 * bad / nummoves,
                     self.bad_limit_min,
                 )
             )
@@ -812,7 +807,7 @@ class Configuration:
                 base = ancho * 950 / 1495
                 if alto > base:
                     alto = base
-                var['x_anchoPieza'] = int(alto*8/100)
+                var["x_anchoPieza"] = int(alto * 8 / 100)
                 db["BASE"] = self.dic_conf_boards_pk["BASE"] = var
         # with open("../resources/IntFiles/basepk.board", "wb") as f:
         #      f.write(pickle.dumps(db["BASE"]))

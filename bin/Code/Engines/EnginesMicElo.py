@@ -27,9 +27,7 @@ def read_mic_engines():
                 if alias.isupper():
                     eng.name = Util.primera_mayuscula(alias)
                     eng.alias = eng.name
-                    eng.book = Code.path_resource(
-                        "Openings", "Players", "%s.bin" % alias.lower()
-                    )
+                    eng.book = Code.path_resource("Openings", "Players", "%s.bin" % alias.lower())
                 else:
                     eng.book = None
                 li.append(eng)

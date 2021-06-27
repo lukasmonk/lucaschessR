@@ -105,9 +105,7 @@ class WPosicion(QtWidgets.QWidget):
         pb_scanner_deduce = Controles.PB(self, _("Deduce"), self.scanner_deduce, plano=False)
         self.chb_scanner_flip = Controles.CHB(self, _("Flip the board"), False).capture_changes(self, self.scanner_flip)
         self.pb_scanner_learn = Controles.PB(self, _("Learn"), self.scanner_learn, plano=False)
-        self.pb_scanner_learn_quit = Controles.PB(self, "", self.scanner_learn_quit).ponIcono(
-            Iconos.Menos(), icon_size=24
-        )
+        self.pb_scanner_learn_quit = Controles.PB(self, "", self.scanner_learn_quit).ponIcono(Iconos.Menos(), icon_size=24)
         self.pb_scanner_learn_quit.ponToolTip(_("Remove last learned")).anchoFijo(24)
 
         self.sb_scanner_tolerance, lb_scanner_tolerance = QTUtil2.spinBoxLB(
@@ -142,22 +140,8 @@ class WPosicion(QtWidgets.QWidget):
         ly.controld(lbFullMoves, 1, 2).control(self.edFullMoves, 1, 3)
         gbOtros = Controles.GB(self, "", ly)
 
-        lyT = (
-            Colocacion.H()
-            .relleno()
-            .control(lb_scanner_tolerance)
-            .espacio(5)
-            .control(self.sb_scanner_tolerance)
-            .relleno()
-        )
-        lyTL = (
-            Colocacion.H()
-            .relleno()
-            .control(lb_scanner_tolerance_learns)
-            .espacio(5)
-            .control(self.sb_scanner_tolerance_learns)
-            .relleno()
-        )
+        lyT = Colocacion.H().relleno().control(lb_scanner_tolerance).espacio(5).control(self.sb_scanner_tolerance).relleno()
+        lyTL = Colocacion.H().relleno().control(lb_scanner_tolerance_learns).espacio(5).control(self.sb_scanner_tolerance_learns).relleno()
         lyL = Colocacion.H().control(self.pb_scanner_learn).control(self.pb_scanner_learn_quit)
         lyS = Colocacion.H().control(lb_scanner_select).control(self.cb_scanner_select).control(pb_scanner_more)
         ly = Colocacion.V().control(self.chb_scanner_flip).control(pb_scanner_deduce).otro(lyL).otro(lyT).otro(lyTL)
@@ -274,14 +258,10 @@ class WPosicion(QtWidgets.QWidget):
         li_options = []
         if not siK:
             li_options.append((_("King"), "K"))
-        li_options.extend(
-            [(_("Queen"), "Q"), (_("Rook"), "R"), (_("Bishop"), "B"), (_("Knight"), "N"), (_("Pawn"), "P")]
-        )
+        li_options.extend([(_("Queen"), "Q"), (_("Rook"), "R"), (_("Bishop"), "B"), (_("Knight"), "N"), (_("Pawn"), "P")])
         if not sik:
             li_options.append((_("King"), "k"))
-        li_options.extend(
-            [(_("Queen"), "q"), (_("Rook"), "r"), (_("Bishop"), "b"), (_("Knight"), "n"), (_("Pawn"), "p")]
-        )
+        li_options.extend([(_("Queen"), "q"), (_("Rook"), "r"), (_("Bishop"), "b"), (_("Knight"), "n"), (_("Pawn"), "p")])
 
         for txt, pieza in li_options:
             icono = self.board.piezas.icono(pieza)
@@ -413,9 +393,7 @@ class WPosicion(QtWidgets.QWidget):
 
             self.vars_scanner.read()
             self.vars_scanner.tolerance = self.sb_scanner_tolerance.valor()  # releemos la variable
-            self.vars_scanner.tolerance_learns = min(
-                self.sb_scanner_tolerance_learns.valor(), self.vars_scanner.tolerance
-            )
+            self.vars_scanner.tolerance_learns = min(self.sb_scanner_tolerance_learns.valor(), self.vars_scanner.tolerance)
 
             if os.path.isfile(fich_png) and Util.filesize(fich_png):
                 self.scanner_read_png(fich_png)
@@ -547,9 +525,7 @@ class WPosicion(QtWidgets.QWidget):
             config = FormLayout.Editbox(_("Name"), ancho=120)
             li_gen.append((config, name))
 
-            resultado = FormLayout.fedit(
-                li_gen, title=_("New scanner"), parent=self, anchoMinimo=200, icon=Iconos.Scanner()
-            )
+            resultado = FormLayout.fedit(li_gen, title=_("New scanner"), parent=self, anchoMinimo=200, icon=Iconos.Scanner())
             if resultado:
                 accion, li_gen = resultado
                 name = li_gen[0].strip()
@@ -685,12 +661,8 @@ class WPGN(QtWidgets.QWidget):
         o_columns.nueva("NUMBER", _("N."), 35, centered=True)
         self.si_figurines_pgn = configuration.x_pgn_withfigurines
         nAnchoColor = (self.board.ancho - 35 - 20) // 2
-        o_columns.nueva(
-            "WHITE", _("White"), nAnchoColor, edicion=Delegados.EtiquetaPGN(True if self.si_figurines_pgn else None)
-        )
-        o_columns.nueva(
-            "BLACK", _("Black"), nAnchoColor, edicion=Delegados.EtiquetaPGN(False if self.si_figurines_pgn else None)
-        )
+        o_columns.nueva("WHITE", _("White"), nAnchoColor, edicion=Delegados.EtiquetaPGN(True if self.si_figurines_pgn else None))
+        o_columns.nueva("BLACK", _("Black"), nAnchoColor, edicion=Delegados.EtiquetaPGN(False if self.si_figurines_pgn else None))
         self.pgn = Grid.Grid(self, o_columns, siCabeceraMovible=False, siSelecFilas=True)
         self.pgn.setMinimumWidth(self.board.ancho)
 

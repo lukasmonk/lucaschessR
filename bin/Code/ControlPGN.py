@@ -173,8 +173,8 @@ class ControlPGN:
             if xrival.depth_engine:
                 resp += '[Depth "%d"]\n' % xrival.depth_engine
 
-            if xrival.ms_time_move:
-                resp += '[TimeEngineMS "%d"]\n' % xrival.ms_time_move
+            if xrival.mstime_engine:
+                resp += '[TimeEngineMS "%d"]\n' % xrival.mstime_engine
 
             if self.manager.categoria:
                 resp += '[Category "%s"]\n' % self.manager.categoria.name()

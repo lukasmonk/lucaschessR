@@ -13,7 +13,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.Board import Board
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 
@@ -262,9 +262,7 @@ class WLearn1(QTVarios.WDialogo):
         li_gen.append((None, None))
         li_gen.append((_("Show clock"), dic.get("CLOCK", True)))
 
-        resultado = FormLayout.fedit(
-            li_gen, title=_("New try"), anchoMinimo=200, parent=self, icon=Iconos.TutorialesCrear()
-        )
+        resultado = FormLayout.fedit(li_gen, title=_("New try"), anchoMinimo=200, parent=self, icon=Iconos.TutorialesCrear())
         if resultado is None:
             return
 
@@ -313,26 +311,18 @@ class WLearnPuente(QTVarios.WDialogo):
         self.boardIni = Board.Board(self, config_board)
         self.boardIni.crea()
         self.boardIni.set_dispatcher(self.player_has_moved, None)
-        self.lbIni = (
-            Controles.LB(self).align_center().set_foreground_backgound("#076C9F", "#EFEFEF").anchoMinimo(self.boardIni.ancho)
-        )
+        self.lbIni = Controles.LB(self).align_center().set_foreground_backgound("#076C9F", "#EFEFEF").anchoMinimo(self.boardIni.ancho)
         lyIni = Colocacion.V().control(self.boardIni).control(self.lbIni)
 
         self.boardFin = Board.BoardEstatico(self, config_board)
         self.boardFin.crea()
-        self.lbFin = (
-            Controles.LB(self).align_center().set_foreground_backgound("#076C9F", "#EFEFEF").anchoMinimo(self.boardFin.ancho)
-        )
+        self.lbFin = Controles.LB(self).align_center().set_foreground_backgound("#076C9F", "#EFEFEF").anchoMinimo(self.boardFin.ancho)
         lyFin = Colocacion.V().control(self.boardFin).control(self.lbFin)
 
         # Rotulo vtime
         f = Controles.TipoLetra(puntos=30, peso=75)
         self.lbReloj = (
-            Controles.LB(self, "00:00")
-            .ponFuente(f)
-            .align_center()
-            .set_foreground_backgound("#076C9F", "#EFEFEF")
-            .anchoMinimo(200)
+            Controles.LB(self, "00:00").ponFuente(f).align_center().set_foreground_backgound("#076C9F", "#EFEFEF").anchoMinimo(200)
         )
         self.lbReloj.setFrameStyle(QtWidgets.QFrame.Box | QtWidgets.QFrame.Raised)
 

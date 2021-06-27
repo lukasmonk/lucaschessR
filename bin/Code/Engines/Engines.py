@@ -251,7 +251,9 @@ class OpcionUCI:
             return False
 
     def lee_string(self, li):
-        if (len(li) == 3 or len(li) == 4) and li[2] == "default":  # proposed by tico-tico in https://github.com/lukasmonk/lucaschess/issues/18
+        if (len(li) == 3 or len(li) == 4) and li[
+            2
+        ] == "default":  # proposed by tico-tico in https://github.com/lukasmonk/lucaschess/issues/18
             self.default = "" if len(li) == 3 or li[3] == "<empty>" else li[3]  # proposed by tico-tico
             return True
         else:
@@ -298,7 +300,15 @@ class OpcionUCI:
             self.li_vars = dic["li_vars"]
 
     def save_dic(self):
-        dic = {"tipo": self.tipo, "name": self.name, "default": self.default, "valor": self.valor, "minimo": self.minimo, "maximo": self.maximo, "li_vars": self.li_vars}
+        dic = {
+            "tipo": self.tipo,
+            "name": self.name,
+            "default": self.default,
+            "valor": self.valor,
+            "minimo": self.minimo,
+            "maximo": self.maximo,
+            "li_vars": self.li_vars,
+        }
         return dic
 
     def label_default(self):

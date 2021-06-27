@@ -513,7 +513,9 @@ class WGM(QTVarios.WDialogo):
                 self.aperturaMuestra()
             elif menu.siDer:
                 opening_block = resp
-                if QTUtil2.pregunta(self, _X(_("Do you want to delete the opening %1 from the list of favourite openings?"), opening_block.trNombre)):
+                if QTUtil2.pregunta(
+                    self, _X(_("Do you want to delete the opening %1 from the list of favourite openings?"), opening_block.trNombre)
+                ):
                     del self.li_preferred_openings[n_pos]
 
     def aperturaMuestra(self):
@@ -574,7 +576,14 @@ class WImportar(QTVarios.WDialogo):
         extparam = "imp_gm"
         QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
 
-        li_acciones = [(_("Import"), Iconos.Aceptar(), self.importar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None, (_("Mark"), Iconos.Marcar(), self.marcar), None]
+        li_acciones = [
+            (_("Import"), Iconos.Aceptar(), self.importar),
+            None,
+            (_("Cancel"), Iconos.Cancelar(), self.reject),
+            None,
+            (_("Mark"), Iconos.Marcar(), self.marcar),
+            None,
+        ]
         tb = Controles.TBrutina(self, li_acciones)
 
         # Lista

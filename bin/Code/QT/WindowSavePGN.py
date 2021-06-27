@@ -14,7 +14,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 
 
@@ -30,9 +30,7 @@ class WBaseSave(QtWidgets.QWidget):
 
         lb_file = Controles.LB(self, _("File to save") + ": ")
         bt_history = Controles.PB(self, "", self.history).ponIcono(Iconos.Favoritos(), 24).ponToolTip(_("Previous"))
-        bt_boxrooms = (
-            Controles.PB(self, "", self.boxrooms).ponIcono(Iconos.BoxRooms(), 24).ponToolTip(_("Boxrooms PGN"))
-        )
+        bt_boxrooms = Controles.PB(self, "", self.boxrooms).ponIcono(Iconos.BoxRooms(), 24).ponToolTip(_("Boxrooms PGN"))
         self.bt_file = Controles.PB(self, "", self.file_select, plano=False).anchoMinimo(300)
 
         # Codec
@@ -181,7 +179,7 @@ class WSave(QTVarios.WDialogo):
             if not self.game.get_tag("Opening"):
                 self.game.set_tag("Opening", self.game.opening.trNombre)
 
-        self.li_labels = [[k,v] for k, v in self.game.li_tags]
+        self.li_labels = [[k, v] for k, v in self.game.li_tags]
         self.configuration = configuration
         self.file = ""
         self.vars_read()
@@ -207,9 +205,7 @@ class WSave(QTVarios.WDialogo):
         # Tab-file -----------------------------------------------------------------------------------------------
         lb_file = Controles.LB(self, _("File to save") + ": ").ponFuente(f)
         bt_history = Controles.PB(self, "", self.history).ponIcono(Iconos.Favoritos(), 24).ponToolTip(_("Previous")).ponFuente(f)
-        bt_boxrooms = (
-            Controles.PB(self, "", self.boxrooms).ponIcono(Iconos.BoxRooms(), 24).ponToolTip(_("Boxrooms PGN"))
-        )
+        bt_boxrooms = Controles.PB(self, "", self.boxrooms).ponIcono(Iconos.BoxRooms(), 24).ponToolTip(_("Boxrooms PGN"))
         self.bt_file = Controles.PB(self, "", self.file_select, plano=False).anchoMinimo(300).ponFuente(f)
 
         # Codec
@@ -227,15 +223,7 @@ class WSave(QTVarios.WDialogo):
 
         lyF = Colocacion.H().control(lb_file).control(self.bt_file).control(bt_history).control(bt_boxrooms).relleno(1)
         lyC = Colocacion.H().control(lb_codec).control(self.cb_codecs).relleno(1)
-        ly = (
-            Colocacion.V()
-            .espacio(15)
-            .otro(lyF)
-            .otro(lyC)
-            .control(self.chb_overwrite)
-            .control(self.chb_remove_c_v)
-            .relleno(1)
-        )
+        ly = Colocacion.V().espacio(15).otro(lyF).otro(lyC).control(self.chb_overwrite).control(self.chb_remove_c_v).relleno(1)
         w = QtWidgets.QWidget()
         w.setLayout(ly)
         tabs.nuevaTab(w, _("File"))
@@ -459,7 +447,7 @@ class WSave(QTVarios.WDialogo):
             if not self.game.get_tag("Opening"):
                 self.game.set_tag("Opening", self.game.opening.trNombre)
 
-        self.li_labels = [[k,v] for k, v in self.game.li_tags]
+        self.li_labels = [[k, v] for k, v in self.game.li_tags]
         self.grid_labels.refresh()
         self.em_body.set_text(self.body)
 
@@ -522,12 +510,7 @@ class WSaveVarios(QTVarios.WDialogo):
         self.configuration = configuration
 
         # Opciones
-        li_options = [
-            (_("Save"), Iconos.GrabarFichero(), self.aceptar),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.reject),
-            None,
-        ]
+        li_options = [(_("Save"), Iconos.GrabarFichero(), self.aceptar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None]
         self.tb = QTVarios.LCTB(self, li_options)
 
         self.wbase = WBaseSave(self, configuration)

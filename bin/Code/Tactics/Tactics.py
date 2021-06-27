@@ -62,12 +62,7 @@ class Reinforcement:
         self.save()
 
     def save(self):
-        dic = {
-            "li_num_fens": self.li_num_fens,
-            "li_work_fens": self.li_work_fens,
-            "pos_active": self.pos_active,
-            "active": self.active,
-        }
+        dic = {"li_num_fens": self.li_num_fens, "li_work_fens": self.li_work_fens, "pos_active": self.pos_active, "active": self.active}
         with self.tactica.dbdatos() as db:
             db["DICREINFORCEMENT"] = dic
 
@@ -575,13 +570,7 @@ class Tactic:
             liHisto = db["HISTO"]
             if not liHisto:
                 liHisto = []
-                dicActual = {
-                    "FINICIAL": Util.today(),
-                    "FFINAL": None,
-                    "SECONDS": 0.0,
-                    "POS": self.total_positions(),
-                    "ERRORS": 0,
-                }
+                dicActual = {"FINICIAL": Util.today(), "FFINAL": None, "SECONDS": 0.0, "POS": self.total_positions(), "ERRORS": 0}
                 liHisto.insert(0, dicActual)
             liHisto[0]["FFINAL"] = Util.today()
             liHisto[0]["SECONDS"] = db["SECONDS"]
@@ -673,9 +662,7 @@ class Tactic:
         n = len(self.showtext)
         if n == 0:
             return True
-        current_position = (
-            self.current_position()
-        )  # debemos utilizar los estandar y no los work ya que no serían correctos si reinforcing
+        current_position = self.current_position()  # debemos utilizar los estandar y no los work ya que no serían correctos si reinforcing
         total_positions = self.total_positions()
         bloque = total_positions * 1.0 / n
         ns = int(current_position / bloque)
@@ -721,15 +708,7 @@ class Tactic:
             '<table border="1" with="100%%" align="center" cellpadding="5" cellspacing="0">'
             "%s"
             '<tr><td  align="center"><h4>%s: %d/%d<br><font color="%s">%s</font></h4></td></tr>'
-            "</table>"
-            % (
-                reinforcement_title,
-                _("Current position"),
-                self.w_current_position + 1,
-                self.w_total_positions,
-                color,
-                txt,
-            )
+            "</table>" % (reinforcement_title, _("Current position"), self.w_current_position + 1, self.w_total_positions, color, txt)
         )
         return html
 
@@ -742,9 +721,7 @@ class Tactic:
             self.w_next_position = 0
         else:
             self.reinforcement.add_error(self.w_current_position)
-            self.w_next_position = self.w_current_position - self.penalization_positions(
-                self.w_current_position, self.w_total_positions
-            )
+            self.w_next_position = self.w_current_position - self.penalization_positions(self.w_current_position, self.w_total_positions)
             if self.w_next_position < 0:
                 self.w_next_position = 0
 

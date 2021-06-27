@@ -318,7 +318,9 @@ class WVariations(QtWidgets.QWidget):
         if number == -1:
             game = Game.Game(ini_posicion=self.move.position_before)
 
-        change_game = Variations.edit_variation(Code.procesador, game, with_engine_active=with_engine_active, is_white_bottom=self.get_board().is_white_bottom)
+        change_game = Variations.edit_variation(
+            Code.procesador, game, with_engine_active=with_engine_active, is_white_bottom=self.get_board().is_white_bottom
+        )
         if change_game:
             self.move.variations.change(number, change_game)
             self.mostrar()

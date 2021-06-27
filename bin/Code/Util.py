@@ -136,7 +136,7 @@ def ini_dic(file: str) -> dict:
                     n = line.find("=")
                     if n:
                         key = line[:n].strip()
-                        value = line[n + 1:].strip()
+                        value = line[n + 1 :].strip()
                         dic[key] = value
     return dic
 
@@ -148,14 +148,18 @@ def today():
 def new_id() -> int:
     d = datetime.datetime.now()
     r = random.randint
-    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(1, d.microsecond + 737) // 1000
+    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(
+        1, d.microsecond + 737
+    ) // 1000
     return t
 
 
 def str_id() -> str:
     d = datetime.datetime.now()
     r = random.randint
-    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(1, d.microsecond + 737) // 1000
+    t = (((((r(1, d.year) * 12 + r(1, d.month)) * 31 + d.day) * 24 + d.hour) * 60 + d.minute) * 60 + d.second) * 1000 + r(
+        1, d.microsecond + 737
+    ) // 1000
     return str(t)
 
 
@@ -271,7 +275,7 @@ def ini2dic(file):
                         n = linea.find("=")
                         if n > 0:
                             clave1 = linea[:n].strip()
-                            valor = linea[n + 1:].strip()
+                            valor = linea[n + 1 :].strip()
                             dic[clave1] = valor
 
     return dic_base
@@ -299,7 +303,7 @@ def ini_base2dic(file):
                     n = linea.find("=")
                     if n:
                         key = linea[:n].strip()
-                        valor = linea[n + 1:].strip()
+                        valor = linea[n + 1 :].strip()
                         dic[key] = valor
 
     return dic
@@ -311,8 +315,6 @@ def dic2ini_base(file, dic):
             f.write("[%s]\n" % k)
             for key in dic[k]:
                 f.write("%s=%s\n" % (key, dic[k][key]))
-
-
 
 
 def secs2str(s):
@@ -823,6 +825,6 @@ def div_list(list, max_group):
     xfrom = 0
     li_groups = []
     while xfrom < nlist:
-        li_groups.append(list[xfrom:xfrom + max_group])
+        li_groups.append(list[xfrom : xfrom + max_group])
         xfrom += max_group
     return li_groups

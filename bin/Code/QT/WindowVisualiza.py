@@ -22,9 +22,7 @@ from Code.SQL import UtilSQL
 class WControl(QTVarios.WDialogo):
     def __init__(self, procesador, path_bloque):
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, _("The board at a glance"), Iconos.Gafas(), "visualizaBase"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, _("The board at a glance"), Iconos.Gafas(), "visualizaBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -364,29 +362,14 @@ class WPlay(QTVarios.WDialogo):
         f = Controles.TipoLetra("", 11, 80, False, False, False, None)
 
         bt = Controles.PB(self, _("Close"), self.terminar, plano=False).ponIcono(Iconos.MainMenu()).ponFuente(f)
-        self.btBoard = (
-            Controles.PB(self, _("Go to board"), self.activaBoard, plano=False)
-            .ponIcono(Iconos.Board())
-            .ponFuente(f)
-        )
+        self.btBoard = Controles.PB(self, _("Go to board"), self.activaBoard, plano=False).ponIcono(Iconos.Board()).ponFuente(f)
         self.btComprueba = (
-            Controles.PB(self, _("Test the solution"), self.compruebaSolucion, plano=False)
-            .ponIcono(Iconos.Check())
-            .ponFuente(f)
+            Controles.PB(self, _("Test the solution"), self.compruebaSolucion, plano=False).ponIcono(Iconos.Check()).ponFuente(f)
         )
         self.btGotoNextLevel = (
-            Controles.PB(self, _("Go to next level"), self.gotoNextLevel, plano=False)
-            .ponIcono(Iconos.GoToNext())
-            .ponFuente(f)
+            Controles.PB(self, _("Go to next level"), self.gotoNextLevel, plano=False).ponIcono(Iconos.GoToNext()).ponFuente(f)
         )
-        ly0 = (
-            Colocacion.H()
-            .control(bt)
-            .relleno()
-            .control(self.btBoard)
-            .control(self.btComprueba)
-            .control(self.btGotoNextLevel)
-        )
+        ly0 = Colocacion.H().control(bt).relleno().control(self.btBoard).control(self.btComprueba).control(self.btGotoNextLevel)
 
         lyBase = Colocacion.H().control(self.gbBoard).control(self.gbSolucion)
 

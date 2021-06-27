@@ -87,12 +87,8 @@ class FormLayout:
     def font(self, label, init_value):
         self.li_gen.append((FontCombobox(label), init_value))
 
-    def file(
-        self, label, extension, siSave, init_value, siRelativo=True, anchoMinimo=None, ficheroDefecto="", li_histo=None
-    ):
-        self.li_gen.append(
-            (Fichero(label, extension, siSave, siRelativo, anchoMinimo, ficheroDefecto, li_histo), init_value)
-        )
+    def file(self, label, extension, siSave, init_value, siRelativo=True, anchoMinimo=None, ficheroDefecto="", li_histo=None):
+        self.li_gen.append((Fichero(label, extension, siSave, siRelativo, anchoMinimo, ficheroDefecto, li_histo), init_value))
 
     def filename(self, label: str, init_value: str):
         self.li_gen.append((Editbox(label, rx="[^\\:/|?*^%><()]*"), init_value))
@@ -246,9 +242,7 @@ class BotonFichero(QtWidgets.QPushButton):
     def cambiaFichero(self):
         titulo = _("File to save") if self.siSave else _("File to read")
         fbusca = self.file if self.file else self.ficheroDefecto
-        filtro = (
-            self.extension if "(" in self.extension else (_("File") + " %s (*.%s)" % (self.extension, self.extension))
-        )
+        filtro = self.extension if "(" in self.extension else (_("File") + " %s (*.%s)" % (self.extension, self.extension))
         if self.siSave:
             resp = QTUtil2.salvaFichero(self, titulo, fbusca, filtro)
         else:
@@ -282,9 +276,7 @@ class LBotonFichero(QtWidgets.QHBoxLayout):
         if config.li_histo and not config.ficheroDefecto:
             config.ficheroDefecto = os.path.dirname(config.li_histo[0])
 
-        self.boton = BotonFichero(
-            file, config.extension, config.siSave, config.siRelativo, config.anchoMinimo, config.ficheroDefecto
-        )
+        self.boton = BotonFichero(file, config.extension, config.siSave, config.siRelativo, config.anchoMinimo, config.ficheroDefecto)
         btCancelar = Controles.PB(parent, "", self.cancelar)
         btCancelar.ponIcono(Iconos.Delete()).anchoFijo(16)
         self.parent = parent
@@ -376,10 +368,7 @@ class BotonColor(QtWidgets.QPushButton):
             color = QtGui.QColor()
             color.setRgba(self.xcolor)
         color = QtWidgets.QColorDialog.getColor(
-            color,
-            self.parentWidget(),
-            _("Color"),
-            QtWidgets.QColorDialog.ShowAlphaChannel | QtWidgets.QColorDialog.DontUseNativeDialog,
+            color, self.parentWidget(), _("Color"), QtWidgets.QColorDialog.ShowAlphaChannel | QtWidgets.QColorDialog.DontUseNativeDialog
         )
         if color.isValid():
             if self.siSTR:
@@ -748,12 +737,7 @@ class FormComboWidget(QtWidgets.QWidget):
 
         self.stackwidget = QtWidgets.QStackWidget(self)
         layout.control(self.stackwidget)
-        self.connect(
-            self.combobox,
-            QtCore.SIGNAL("currentIndexChanged(int)"),
-            self.stackwidget,
-            QtCore.SLOT("setCurrentIndex(int)"),
-        )
+        self.connect(self.combobox, QtCore.SIGNAL("currentIndexChanged(int)"), self.stackwidget, QtCore.SLOT("setCurrentIndex(int)"))
 
         self.widgetlist = []
         for data, title, comment in datalist:

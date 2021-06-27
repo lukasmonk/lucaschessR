@@ -12,7 +12,7 @@ from Code.Themes import Themes
 
 
 class WThemes(QTVarios.WDialogo):
-    def __init__(self, owner, themes:Themes.Themes, current_move: Move.Move):
+    def __init__(self, owner, themes: Themes.Themes, current_move: Move.Move):
         title = _("Select themes")
         extparam = "selelectthemes"
 

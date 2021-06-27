@@ -64,9 +64,7 @@ class Scanner(QtWidgets.QDialog):
             screen = QtWidgets.QApplication.primaryScreen()
             desktop = screen.grabWindow(0, 0, 0, QTUtil.anchoEscritorio(), QTUtil.altoEscritorio())
             selected_pixmap = desktop.copy(rect)
-            selected_pixmap = selected_pixmap.scaled(
-                256, 256, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation
-            )
+            selected_pixmap = selected_pixmap.scaled(256, 256, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
             selected_pixmap.save(self.fich_png)
         else:
             with open(self.fich_png, "w"):

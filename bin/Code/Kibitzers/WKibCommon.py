@@ -36,7 +36,9 @@ class WKibCommon(QtWidgets.QDialog):
         self.show_board = self.dicVideo.get("SHOW_BOARD", True)
         self.nArrows = self.dicVideo.get("NARROWS", 1 if cpu.tipo == Kibitzers.KIB_THREATS else 2)
 
-        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(
+            QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint
+        )
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 

@@ -1,4 +1,4 @@
-from Code import TrListas
+from Code.Config import TrListas
 from Code.Base import Position
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -16,7 +16,6 @@ class WTagsPGN(QTVarios.WDialogo):
         extparam = "editlabels"
         self.listandard = STANDARD_TAGS
         self.is_fen_possible = is_fen_possible
-
 
         QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
         self.procesador = procesador

@@ -5,7 +5,7 @@ import time
 from PySide2 import QtWidgets, QtCore
 
 import Code.Openings.WindowOpenings as WindowOpenings
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.Analysis import Analysis, WindowAnalysisParam
 from Code.Base import Game
@@ -110,7 +110,6 @@ class WGames(QtWidgets.QWidget):
                 None,
                 (_("Train"), Iconos.TrainStatic(), self.tw_train),
                 None,
-
             ]
 
         self.tbWork = QTVarios.LCTB(self, liAccionesWork)
@@ -125,9 +124,9 @@ class WGames(QtWidgets.QWidget):
         menu = QTVarios.LCMenu(self)
         menu.opcion(self.tw_play_against, _("Play against a game"), Iconos.Law())
         menu.separador()
-        if self.dbGames.has_positions():
-            menu.opcion(self.tw_uti_tactic, _("Create tactics training"), Iconos.Tacticas())
-            menu.separador()
+        # if self.dbGames.has_positions():
+        menu.opcion(self.tw_uti_tactic, _("Create tactics training"), Iconos.Tacticas())
+        menu.separador()
         eti = _("Play like a Grandmaster")
         menu.opcion(self.tw_gm, _X(_("Create training to %1"), eti), Iconos.GranMaestro())
         menu.separador()
@@ -439,8 +438,15 @@ class WGames(QtWidgets.QWidget):
         else:
             with_previous_next = self.edit_previous_next
         game.recno = recno
-        game = self.procesador.manager_game(self, game, not self.dbGames.allows_positions, False, self.infoMove.board,
-                                            with_previous_next=with_previous_next, save_routine=self.edit_save)
+        game = self.procesador.manager_game(
+            self,
+            game,
+            not self.dbGames.allows_positions,
+            False,
+            self.infoMove.board,
+            with_previous_next=with_previous_next,
+            save_routine=self.edit_save,
+        )
         if game:
             self.changes = True
             self.edit_save(game.recno, game)
@@ -571,18 +577,14 @@ class WGames(QtWidgets.QWidget):
         submenu.opcion((self.tw_exportar_pgn, False), _("All registers"), Iconos.PuntoVerde())
         if li_sel:
             submenu.separador()
-            submenu.opcion(
-                (self.tw_exportar_pgn, True), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul()
-            )
+            submenu.opcion((self.tw_exportar_pgn, True), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul())
 
         menu.separador()
         submenu = menu.submenu(_("To other database"), Iconos.Database())
         submenu.opcion((self.tw_exportar_db, li_all), _("All registers"), Iconos.PuntoVerde())
         if li_sel:
             submenu.separador()
-            submenu.opcion(
-                (self.tw_exportar_db, li_sel), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul()
-            )
+            submenu.opcion((self.tw_exportar_db, li_sel), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul())
 
         resp = menu.lanza()
         if resp:
@@ -764,27 +766,21 @@ class WGames(QtWidgets.QWidget):
             form.edit(_("Training name"), name)
             form.separador()
 
-            form.edit_np('<div align="right">%s:<br>%s</div>' %  (
-                    _("Only player moves"),
-                    _("(You can add multiple aliases separated by ; and wildcards with * )"),
-                ), player
+            form.edit_np(
+                '<div align="right">%s:<br>%s</div>'
+                % (_("Only player moves"), _("(You can add multiple aliases separated by ; and wildcards with * )")),
+                player,
             )
             form.separador()
 
-            form.checkbox( _("Only selected games"), selected)
+            form.checkbox(_("Only selected games"), selected)
             form.separador()
 
-            li = [(_("Both sides"), None),
-                  (_("White"), WHITE),
-                  (_("Black"), BLACK)]
+            li = [(_("Both sides"), None), (_("White"), WHITE), (_("Black"), BLACK)]
             form.combobox(_("Which side"), li, side)
             form.separador()
 
-            li = [(_("Any"), None),
-                  (_("Win"), ("Win")),
-                  (_("Win+Draw"), "Win+Draw"),
-                  (_("Lost"), "Lost"),
-                  (_("Lost+Draw"), "Lost+Draw")]
+            li = [(_("Any"), None), (_("Win"), ("Win")), (_("Win+Draw"), "Win+Draw"), (_("Lost"), "Lost"), (_("Lost+Draw"), "Lost+Draw")]
             form.combobox(_("Result"), li, result)
             form.separador()
 
@@ -853,7 +849,7 @@ class WGames(QtWidgets.QWidget):
         if len(liRegistros) < 2:
             liRegistros = range(self.dbGames.reccount())
 
-        WDB_Utils.crearTactic(self.procesador, self, liRegistros, rutinaDatos, self.dbGames.get_name())
+        WDB_Utils.create_tactics(self.procesador, self, liRegistros, rutinaDatos, self.dbGames.get_name())
 
     def tw_pack(self):
         um = QTUtil2.unMomento(self)
@@ -1097,7 +1093,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         ly_name = Colocacion.H().control(lb_name).control(self.ed_name)
 
         folder = os.path.dirname(Util.relative_path(d_str("FILEPATH")))
-        folder = folder[len(configuration.folder_databases()):]
+        folder = folder[len(configuration.folder_databases()) :]
         if folder.strip():
             folder = folder.strip(os.sep)
             li = folder.split(os.sep)
@@ -1112,18 +1108,12 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         lb_group = Controles.LB2P(self, _("Group"))
         self.ed_group = Controles.ED(self, group).controlrx(valid_rx)
-        self.bt_group = (
-            Controles.PB(self, "", self.mira_group).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
-        )
-        ly_group = (
-            Colocacion.H().control(lb_group).control(self.ed_group).espacio(-10).control(self.bt_group).relleno(1)
-        )
+        self.bt_group = Controles.PB(self, "", self.mira_group).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
+        ly_group = Colocacion.H().control(lb_group).control(self.ed_group).espacio(-10).control(self.bt_group).relleno(1)
 
         lb_subgroup_l1 = Controles.LB2P(self, _("Subgroup"))
         self.ed_subgroup_l1 = Controles.ED(self, subgroup1).controlrx(valid_rx)
-        self.bt_subgroup_l1 = (
-            Controles.PB(self, "", self.mira_subgroup_l1).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
-        )
+        self.bt_subgroup_l1 = Controles.PB(self, "", self.mira_subgroup_l1).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
         ly_subgroup_l1 = (
             Colocacion.H()
             .espacio(40)
@@ -1136,9 +1126,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         lb_subgroup_l2 = Controles.LB2P(self, "%s → %s" % (_("Subgroup"), _("Subgroup")))
         self.ed_subgroup_l2 = Controles.ED(self, subgroup2).controlrx(valid_rx)
-        self.bt_subgroup_l2 = (
-            Controles.PB(self, "", self.mira_subgroup_l2).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
-        )
+        self.bt_subgroup_l2 = Controles.PB(self, "", self.mira_subgroup_l2).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
         ly_subgroup_l2 = (
             Colocacion.H()
             .espacio(40)
@@ -1161,9 +1149,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.external_folder = d_str("EXTERNAL_FOLDER")
         lb_external = Controles.LB2P(self, _("Store in an external folder"))
         self.bt_external = Controles.PB(self, self.external_folder, self.select_external, False)
-        self.bt_external.setSizePolicy(
-            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        )
+        self.bt_external.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
         ly_external = Colocacion.H().control(lb_external).control(self.bt_external)
 
         self.chb_complete = Controles.CHB(self, _("Allow complete games"), d_true("ALLOWS_COMPLETE_GAMES"))
@@ -1180,12 +1166,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         gb_restrictions = Controles.GB(self, _("Import restrictions"), ly_res)
 
-        li_acciones = [
-            (_("Save"), Iconos.Aceptar(), self.save),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.reject),
-            None,
-        ]
+        li_acciones = [(_("Save"), Iconos.Aceptar(), self.save), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None]
         self.tb = QTVarios.LCTB(self, li_acciones)
 
         x0 = 16
@@ -1207,9 +1188,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
             folder = os.path.realpath(folder)
             default = os.path.realpath(self.configuration.folder_databases())
             if folder.startswith(default):
-                QTUtil2.message_error(
-                    self, "%s:\n%s\n\n%s" % (_("The folder must be outside the default folder"), default, folder)
-                )
+                QTUtil2.message_error(self, "%s:\n%s\n\n%s" % (_("The folder must be outside the default folder"), default, folder))
                 return
             self.external_folder = folder
 
@@ -1353,13 +1332,7 @@ class WTags(QTVarios.WDialogo):
 
         self.li_data = []
         for tag in li_basetags:
-            dic = {
-                "KEY": tag,
-                "LABEL": dcabs.get(tag, Util.primera_mayuscula(tag)),
-                "ACTION": "-",
-                "VALUE": "",
-                "NEW": False,
-            }
+            dic = {"KEY": tag, "LABEL": dcabs.get(tag, Util.primera_mayuscula(tag)), "ACTION": "-", "VALUE": "", "NEW": False}
             dic["PREV_LABEL"] = dic["KEY"]
             self.li_data.append(dic)
 

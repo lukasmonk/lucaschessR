@@ -1,4 +1,5 @@
 import os
+import time
 
 from PySide2 import QtCore, QtWidgets
 
@@ -325,24 +326,24 @@ def mensajeEntrenamientos(owner, liCreados, liNoCreados):
     QTUtil2.message_bold(owner, txt)
 
 
-def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
-    # Se pide el name de la carpeta
-    li_gen = [(None, None)]
+def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
 
-    li_gen.append((_("Name") + ":", name))
+    form = FormLayout.FormLayout(wowner, _("Create tactics training"), Iconos.Tacticas())
 
-    li_gen.append((None, None))
+    form.separador()
+    form.edit(_("Name"), name)
 
+    form.separador()
     li_j = [(_("Default"), 0), (_("White"), 1), (_("Black"), 2)]
-    config = FormLayout.Combobox(_("Point of view"), li_j)
-    li_gen.append((config, 0))
+    form.combobox(_("Point of view"), li_j, 0)
 
-    eti = _("Create tactics training")
-    resultado = FormLayout.fedit(li_gen, title=eti, parent=wowner, anchoMinimo=460, icon=Iconos.Tacticas())
+    resultado = form.run()
 
     if not resultado:
         return
+
     accion, li_gen = resultado
+
     menuname = li_gen[0].strip()
     if not menuname:
         return
@@ -381,11 +382,13 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
     # Se crea el file con los puzzles
     f = open(nom_fns, "wt", encoding="utf-8", errors="ignore")
 
-    nregs = len(liRegistros)
-    tmp_bp = QTUtil2.BarraProgreso(wowner, menuname, _("Game"), nregs)
+    nregs = len(li_registros)
+    tmp_bp = QTUtil2.BarraProgreso(wowner, menuname, "%s: %d" % (_("Games"), nregs), nregs)
     tmp_bp.mostrar()
 
     fen0 = FEN_INITIAL
+
+    t = time.time()
 
     for n in range(nregs):
 
@@ -393,10 +396,13 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
             break
 
         tmp_bp.pon(n + 1)
+        if time.time() - t > 1.0 or (nregs - n) < 10:
+            tmp_bp.mensaje("%d/%d" % (n + 1, nregs))
+            t = time.time()
 
-        recno = liRegistros[n]
+        recno = li_registros[n]
 
-        dic_valores = rutinaDatos(recno)
+        dic_valores = rutina_datos(recno)
         plies = dic_valores["PLIES"]
         if plies == 0:
             continue
@@ -465,13 +471,17 @@ def crearTactic(procesador, wowner, liRegistros, rutinaDatos, name):
     Util.dic2ini_base(nom_ini, dic_ini)
 
     QTUtil2.message_bold(
-        wowner, ("%s<br>%s<br>  %s<br>    ➔%s<br>        ➔%s" % (
-                        _("Tactic training %s created.") % menuname,
-                        _("You can access this training from"),
-                        _("Trainings"),
-                        _("Learn tactics by repetition"),
-                        rest_dir)
-                 )
+        wowner,
+        (
+            "%s<br>%s<br>  %s<br>    ➔%s<br>        ➔%s"
+            % (
+                _("Tactic training %s created.") % menuname,
+                _("You can access this training from"),
+                _("Trainings"),
+                _("Learn tactics by repetition"),
+                rest_dir,
+            )
+        ),
     )
 
     procesador.entrenamientos.rehaz()

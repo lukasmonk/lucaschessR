@@ -609,6 +609,6 @@ class DictBigDB(object):
 def check_table_in_db(path_db: str, table: str):
     conexion = sqlite3.connect(path_db)
     cursor = conexion.cursor()
-    cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name=?", (table, ))
+    cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name=?", (table,))
     resp = cursor.fetchone()[0] == 1
     conexion.close()

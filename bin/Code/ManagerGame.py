@@ -1,7 +1,7 @@
 import FasterCode
 
 from Code import Manager
-from Code import TrListas
+from Code.Config import TrListas
 from Code.Base import Game, Position
 from Code.Base.Constantes import *
 from Code.PlayAgainstEngine import WPlayAgainstEngine
@@ -259,9 +259,7 @@ class ManagerGame(Manager.Manager):
     def configure_gs(self):
         sep = (None, None, None)
 
-        li_mas_opciones = [
-            ("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion()),
-        ]
+        li_mas_opciones = [("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion())]
 
         resp = self.configurar(li_mas_opciones, siCambioTutor=True, siSonidos=True)
 
@@ -294,13 +292,7 @@ class ManagerGame(Manager.Manager):
                 ]
             )
 
-        li_mas_opciones.extend(
-            [
-                (None, None, True),
-                sep,
-                ("books", _("Consult a book"), Iconos.Libros()),
-            ]
-        )
+        li_mas_opciones.extend([(None, None, True), sep, ("books", _("Consult a book"), Iconos.Libros())])
 
         resp = self.utilidades(li_mas_opciones)
 

@@ -9,7 +9,7 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code import TrListas
+from Code.Config import TrListas
 import Code
 from Code.Base.Constantes import *
 
@@ -165,12 +165,12 @@ class BlindfoldConfig:
         Code.configuration.write_variables("BLINDFOLD", self.dicPiezas)
 
     def add_current(self, name):
-        kdic = {k:v for k, v in self.dicPiezas.items() if not k.startswith("_")}
+        kdic = {k: v for k, v in self.dicPiezas.items() if not k.startswith("_")}
         self.dicPiezas["_" + name] = kdic
         Code.configuration.write_variables("BLINDFOLD", self.dicPiezas)
 
     def saved(self, name):
-        return self.dicPiezas["_"+name]
+        return self.dicPiezas["_" + name]
 
 
 class Blindfold(ConjuntoPiezas):
@@ -340,11 +340,7 @@ class WBlindfold(QTVarios.WDialogo):
                 li_gen.append((_("Name") + ":", ""))
 
                 resultado = FormLayout.fedit(
-                    li_gen,
-                    title=_("Save current configuration"),
-                    parent=self,
-                    anchoMinimo=460,
-                    icon=Iconos.TutorialesCrear(),
+                    li_gen, title=_("Save current configuration"), parent=self, anchoMinimo=460, icon=Iconos.TutorialesCrear()
                 )
                 if resultado is None:
                     return None
@@ -395,11 +391,7 @@ class WBlindfold(QTVarios.WDialogo):
                 li_gen.append((_("Name") + ":", ""))
 
                 resultado = FormLayout.fedit(
-                    li_gen,
-                    title=_("Save current configuration"),
-                    parent=self,
-                    anchoMinimo=460,
-                    icon=Iconos.TutorialesCrear(),
+                    li_gen, title=_("Save current configuration"), parent=self, anchoMinimo=460, icon=Iconos.TutorialesCrear()
                 )
                 if resultado is None:
                     return None

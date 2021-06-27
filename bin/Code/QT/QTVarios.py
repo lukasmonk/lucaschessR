@@ -212,18 +212,12 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
             "WITH_TIME": self.gbT.isChecked(),
             "MINUTES": self.edMinutos.valor(),
             "SECONDS": self.edSegundos.valor(),
-            "FAST_MOVES": self.chb_fastmoves.valor()
+            "FAST_MOVES": self.chb_fastmoves.valor(),
         }
         Code.configuration.write_variables(self.key_saved, dic)
 
     def resultado(self):
-        return (
-            self.color,
-            self.gbT.isChecked(),
-            self.edMinutos.valor(),
-            self.edSegundos.valor(),
-            self.chb_fastmoves.valor(),
-        )
+        return (self.color, self.gbT.isChecked(), self.edMinutos.valor(), self.edSegundos.valor(), self.chb_fastmoves.valor())
 
     def change_time(self):
         self.muestra_tiempo(self.gbT.isChecked())
@@ -260,7 +254,7 @@ class Tiempo(QtWidgets.QDialog):
 
         tb = QTUtil2.tbAcceptCancel(self)
 
-        f = Controles.TipoLetra(puntos = 11)
+        f = Controles.TipoLetra(puntos=11)
 
         # Tiempo
         self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(
@@ -347,7 +341,7 @@ def lyBotonesMovimiento(
             li_acciones.append(None)
 
     tb = Controles.TB(owner, li_acciones, False, icon_size=icon_size, rutina=rutina)
-    tb.setMinimumHeight(icon_size+4)
+    tb.setMinimumHeight(icon_size + 4)
     ly = Colocacion.H().relleno().control(tb).relleno()
     return ly, tb
 
@@ -504,12 +498,7 @@ class ListaPiezas(QtWidgets.QWidget):
 
 def rondoPuntos(shuffle=True):
     nico = Util.Rondo(
-        Iconos.PuntoAmarillo(),
-        Iconos.PuntoNaranja(),
-        Iconos.PuntoVerde(),
-        Iconos.PuntoAzul(),
-        Iconos.PuntoMagenta(),
-        Iconos.PuntoRojo(),
+        Iconos.PuntoAmarillo(), Iconos.PuntoNaranja(), Iconos.PuntoVerde(), Iconos.PuntoAzul(), Iconos.PuntoMagenta(), Iconos.PuntoRojo()
     )
     if shuffle:
         nico.shuffle()
@@ -517,9 +506,7 @@ def rondoPuntos(shuffle=True):
 
 
 def rondoColores(shuffle=True):
-    nico = Util.Rondo(
-        Iconos.Amarillo(), Iconos.Naranja(), Iconos.Verde(), Iconos.Azul(), Iconos.Magenta(), Iconos.Rojo()
-    )
+    nico = Util.Rondo(Iconos.Amarillo(), Iconos.Naranja(), Iconos.Verde(), Iconos.Azul(), Iconos.Magenta(), Iconos.Rojo())
     if shuffle:
         nico.shuffle()
     return nico
@@ -712,9 +699,7 @@ class MensajeFics(QtWidgets.QDialog):
         self.mostrar()
 
     def colocaCentrado(self, owner):
-        self.move(
-            owner.x() + owner.width() // 2 - self.width() // 2, owner.y() + owner.height() // 2 - self.height() // 2
-        )
+        self.move(owner.x() + owner.width() // 2 - self.width() // 2, owner.y() + owner.height() // 2 - self.height() // 2)
         QTUtil.refresh_gui()
         self.show()
         QTUtil.refresh_gui()
@@ -936,15 +921,7 @@ class ReadAnnotation(QtWidgets.QDialog):
         self.errores = 0
         self.resultado = None
 
-        layout = (
-            Colocacion.H()
-            .relleno(1)
-            .control(btAyuda)
-            .control(self.edAnotacion)
-            .control(btAceptar)
-            .control(btCancelar)
-            .margen(3)
-        )
+        layout = Colocacion.H().relleno(1).control(btAyuda).control(self.edAnotacion).control(btAceptar).control(btCancelar).margen(3)
         self.setLayout(layout)
         self.move(parent.x() + parent.board.width() - 308, parent.y() + parent.board.y() - 18)
 
@@ -996,5 +973,3 @@ def change_interval(owner, configuration):
     if vtime > 0.01:
         configuration.x_interval_replay = int(vtime * 1000)
         configuration.graba()
-
-

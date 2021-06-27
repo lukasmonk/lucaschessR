@@ -48,9 +48,7 @@ class WJuicio(QTVarios.WDialogo):
         self.lbTiempo = Controles.LB(self).align_center()
 
         liMas = ((_("Close"), "close", Iconos.AceptarPeque()),)
-        lyBM, tbBM = QTVarios.lyBotonesMovimiento(
-            self, "", siLibre=False, icon_size=24, siMas=manager.continueTt, liMasAcciones=liMas
-        )
+        lyBM, tbBM = QTVarios.lyBotonesMovimiento(self, "", siLibre=False, icon_size=24, siMas=manager.continueTt, liMasAcciones=liMas)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("POSREAL", "#", 40, centered=True)

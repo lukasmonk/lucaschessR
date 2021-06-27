@@ -5,7 +5,7 @@ from PySide2 import QtCore
 
 from Code import BMT
 from Code import ControlPGN
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game, Position
@@ -285,7 +285,12 @@ class WEntrenarBMT(QTVarios.WDialogo):
         li_gen = [(None, None)]
 
         # # Nombre del entrenamiento
-        li_gen.append((FormLayout.Editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50), self.pts_tolerance))
+        li_gen.append(
+            (
+                FormLayout.Editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50),
+                self.pts_tolerance,
+            )
+        )
 
         titulo = "Training settings"
         resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
@@ -347,7 +352,13 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         total, hechos, t_puntos, t_segundos, t_estado = self.bmt_lista.calc_thpse()
 
-        if (hechos != ahechos) or (t_puntos != at_puntos) or (t_segundos != at_segundos) or (t_estado != at_estado) or len(self.borrar_fen_lista) > 0:
+        if (
+            (hechos != ahechos)
+            or (t_puntos != at_puntos)
+            or (t_segundos != at_segundos)
+            or (t_estado != at_estado)
+            or len(self.borrar_fen_lista) > 0
+        ):
 
             reg = self.dbf.baseRegistro()
 
@@ -1300,7 +1311,9 @@ class WBMT(QTVarios.WDialogo):
             return
         reg = dbf.registroActual()  # Importante ya que dbf puede cambiarse mientras se edita
         li_gen = [(None, None)]
-        config = FormLayout.Editbox('<div align="right">' + _("List of positions") + "<br>" + _("By example:") + " -5,7-9,14,19-", rx=r"[0-9,\-,\,]*")
+        config = FormLayout.Editbox(
+            '<div align="right">' + _("List of positions") + "<br>" + _("By example:") + " -5,7-9,14,19-", rx=r"[0-9,\-,\,]*"
+        )
         li_gen.append((config, ""))
 
         resultado = FormLayout.fedit(li_gen, title=reg.NOMBRE, parent=self, anchoMinimo=200, icon=Iconos.Opciones())
@@ -1424,7 +1437,13 @@ class WBMT(QTVarios.WDialogo):
         um.final()
 
     def cambiar(self):
-        fbmt = QTUtil2.salvaFichero(self, _("Select/create another file of training"), self.configuration.ficheroBMT, _("File") + " bmt (*.bmt)", siConfirmarSobreescritura=False)
+        fbmt = QTUtil2.salvaFichero(
+            self,
+            _("Select/create another file of training"),
+            self.configuration.ficheroBMT,
+            _("File") + " bmt (*.bmt)",
+            siConfirmarSobreescritura=False,
+        )
         if fbmt:
             fbmt = Util.relative_path(fbmt)
             abmt = self.bmt

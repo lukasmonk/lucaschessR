@@ -3,7 +3,7 @@ import os
 from PySide2 import QtWidgets, QtCore, QtGui
 
 from Code import Util
-from Code import TrListas
+from Code.Config import TrListas
 from Code.Director import TabVisual, WindowTab, WindowTabVFlechas, WindowTabVMarcos, WindowTabVMarkers, WindowTabVSVGs
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -71,9 +71,7 @@ class WPanelDirector(QTVarios.WDialogo):
 
         self.register_grid(self.g_guion)
 
-        self.chbSaveWhenFinished = Controles.CHB(
-            self, _("Save when finished"), self.dbConfig.get("SAVEWHENFINISHED", False)
-        )
+        self.chbSaveWhenFinished = Controles.CHB(self, _("Save when finished"), self.dbConfig.get("SAVEWHENFINISHED", False))
 
         # Visuales
         self.selectBanda = WindowTab.SelectBanda(self)
@@ -628,7 +626,7 @@ class WPanelDirector(QTVarios.WDialogo):
         xid = li[2]
         ok = False
         if tp == TabVisual.TP_FLECHA:
-            regFlecha = BoardTypes.Flecha(dic = self.dbFlechas[xid])
+            regFlecha = BoardTypes.Flecha(dic=self.dbFlechas[xid])
             w = WindowTabVFlechas.WTV_Flecha(self, regFlecha, True)
             if w.exec_():
                 self.dbFlechas[xid] = w.regFlecha.save_dic()
@@ -830,16 +828,7 @@ class WPanelDirector(QTVarios.WDialogo):
                 "vuelo",
                 "descuelgue",
             ),
-            TabVisual.TP_MARCO: (
-                "name",
-                "color",
-                "colorinterior",
-                "colorinterior2",
-                "grosor",
-                "redEsquina",
-                "tipo",
-                "opacity",
-            ),
+            TabVisual.TP_MARCO: ("name", "color", "colorinterior", "colorinterior2", "grosor", "redEsquina", "tipo", "opacity"),
             TabVisual.TP_SVG: ("name", "opacity"),
             TabVisual.TP_MARKER: ("name", "opacity"),
         }
@@ -920,6 +909,8 @@ class WPanelDirector(QTVarios.WDialogo):
                         pos = 6
                     self.borrar_lista()
                     lb = self.selectBanda.get_pos(pos)
+                    if not lb.id:
+                        return
                     nada, tp, nid = lb.id.split("_")
                     nid = int(nid)
                     self.datos_new = self.creaTarea(tp, nid, a1 + a1, -1)

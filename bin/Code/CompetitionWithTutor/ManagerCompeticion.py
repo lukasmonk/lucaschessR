@@ -3,7 +3,7 @@ from Code.Polyglots import Books
 from Code import Manager
 from Code.Base import Move
 from Code.QT import QTUtil2
-from Code import Tutor
+from Code.Tutor import Tutor
 from Code import Adjournments
 from Code.CompetitionWithTutor import CompetitionWithTutor
 import Code

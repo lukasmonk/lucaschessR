@@ -101,7 +101,15 @@ class ThanksTo:
             return mtxt
 
         # Version R
-        li_base = ["Alfonso Solbes", "Alan Lee", '<a href="https://goneill.co.nz/index.php">Graham O\'Neill</a>', "Eric", "Laudecir Daniel", "Nambi", "Johannes Bolzano"]
+        li_base = [
+            "Alfonso Solbes",
+            "Alan Lee",
+            '<a href="https://goneill.co.nz/index.php">Graham O\'Neill</a>',
+            "Eric",
+            "Laudecir Daniel",
+            "Nambi",
+            "Johannes Bolzano",
+        ]
         li_resto = []
         txt += version("R", li_base, li_resto, False)
 
@@ -236,33 +244,13 @@ class ThanksTo:
 
         li = [
             ("Nuvola", "David Vignoni", "http://www.icon-king.com/projects/nuvola/", "LGPL"),
-            (
-                "Icons for Windows8",
-                "Icons8",
-                "https://icons8.com",
-                "Creative Commons Attribution-NoDerivs 3.0 Unported",
-            ),
+            ("Icons for Windows8", "Icons8", "https://icons8.com", "Creative Commons Attribution-NoDerivs 3.0 Unported"),
             ("Gnome", "Gnome", "https://github.com/GNOME/gnome-icon-theme", "GPL"),
-            (
-                "Silk icon set 1.3",
-                "Mark James",
-                "http://www.famfamfam.com/lab/icons/silk/",
-                "Creative Commons Attribution 2.5 License",
-            ),
+            ("Silk icon set 1.3", "Mark James", "http://www.famfamfam.com/lab/icons/silk/", "Creative Commons Attribution 2.5 License"),
             ("Wooicons1", "Janik Baumgartner", "http://www.woothemes.com/2010/08/woocons1/", "GPL"),
-            (
-                "Ultimate Gnome 0.5.1",
-                "Marco Tessarotto",
-                "http://gnome-look.org/content/show.php/Ultimate+Gnome?content=75000",
-                "GPL",
-            ),
+            ("Ultimate Gnome 0.5.1", "Marco Tessarotto", "http://gnome-look.org/content/show.php/Ultimate+Gnome?content=75000", "GPL"),
             ("SnowIsh SVG", "Saki", "http://gnome-look.org/content/show.php/SnowIsh+SVG+%26+PNG?content=32599", "GPL"),
-            (
-                "Cartoon animal icons",
-                "Martin Bérubé",
-                "http://www.how-to-draw-funny-cartoons.com/",
-                "Free for personal non-commercial use",
-            ),
+            ("Cartoon animal icons", "Martin Bérubé", "http://www.how-to-draw-funny-cartoons.com/", "Free for personal non-commercial use"),
             (
                 "Album of vehicles",
                 "Icons-Land",
@@ -276,12 +264,7 @@ class ThanksTo:
                 "https://commons.wikimedia.org/wiki/File:Trans-Siberian_railway_map.svg",
                 "CC BY-SA 2.5 via Wikimedia Commons",
             ),
-            (
-                "Washing machine",
-                "Shinnoske",
-                "https://openclipart.org/detail/218905/simple-washing-machine",
-                "Public domain",
-            ),
+            ("Washing machine", "Shinnoske", "https://openclipart.org/detail/218905/simple-washing-machine", "Public domain"),
         ]
         for tipo, autor, web, licencia in li:
             txt += "<tr>"
@@ -352,17 +335,11 @@ class ThanksTo:
     def pieces(self):
         txt = self.table_ini()
 
-        # txt += "<tr>"
-        # txt += "<td></td>"
-        # txt += self.th(_("Author"))
-        # txt += self.th(_("License"))
-        # txt += "</tr>"
-
         li = [
             ("ChessiconsV3.5", '<a href="http://www.virtualpieces.net">Peter Wong</a>', _("Permission of author")),
             ("Merida-Internet", '<a href="http://www.rybkachess.com">Felix Kling</a>', _("Permission of author")),
             (
-                "Spatial-Fantasy<br>SKulls-Freak-Prmi",
+                "Spatial-Fantasy-Fantasy Alt<br>SKulls-Freak-Prmi<br>Celtic-Eyes",
                 '<a href="http://poisson.phc.unipi.it/~monge/chess_art.php">Maurizio Monge</a>',
                 "GPL",
             ),
@@ -371,16 +348,8 @@ class ThanksTo:
                 '<a href="http://en.wikipedia.org/wiki/User:Cburnett/GFDL_images/Chess">Cburnett</a>',
                 "Creative Commons Attribution 2.5 License",
             ),
-            (
-                "Chess Alpha",
-                '<a href="http://www.enpassant.dk/chess/fonteng.htm">Eric Bentzen</a>',
-                _("Permission of author"),
-            ),
-            (
-                "Montreal",
-                '<a href="http://alcor.concordia.ca/~gpkatch/montreal_font.html">Gary Katch</a>',
-                _("Permission of author"),
-            ),
+            ("Chess Alpha", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Eric Bentzen</a>', _("Permission of author")),
+            ("Montreal", '<a href="http://alcor.concordia.ca/~gpkatch/montreal_font.html">Gary Katch</a>', _("Permission of author")),
             (
                 "Magnetic-Leipzig<br>AlfonsoX-Maya<br>Condal",
                 '<a href="http://www.enpassant.dk/chess/fonteng.htm">Armando H. Marroquín</a>',
@@ -389,11 +358,7 @@ class ThanksTo:
             ("Chess Pirat", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Klaus Wolf</a>', _("Freeware")),
             ("Chess Regular", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Alastair Scott</a>', _("Freeware")),
             ("Chess Regular2", '<a href="http://www.enpassant.dk/chess/fonteng.htm">Regular redesigned by Tamer64</a>', _("Freeware")),
-            (
-                "Kilfiger",
-                '<a href="https://sites.google.com/site/jameskilfiger/">James Kilfiger</a>',
-                "SIL open font licence",
-            ),
+            ("Kilfiger", '<a href="https://sites.google.com/site/jameskilfiger/">James Kilfiger</a>', "SIL open font licence"),
             (
                 "Cartoon",
                 '<a href="http://www.how-to-draw-funny-cartoons.com">Based on work by <br>Martin Bérubé</a>',
@@ -505,10 +470,7 @@ class ThanksTo:
             ("Wikipedia", "http://en.wikipedia.org/wiki/List_of_chess_games"),
             ("fics", "http://ficsgames.org/cgi-bin/download.cgi"),
             ("Norman Pollock", "http://40h.000webhostapp.com/"),
-            (
-                "STS<br>" + _X(_("Created by %1"), "Dan Corbit,Swaminathan"),
-                "https://sites.google.com/site/strategictestsuite/about-1",
-            ),
+            ("STS<br>" + _X(_("Created by %1"), "Dan Corbit,Swaminathan"), "https://sites.google.com/site/strategictestsuite/about-1"),
         )
         txt = '<center><table border="1" cellpadding="5" cellspacing="0" >'
         for nom, web in li:
@@ -540,11 +502,8 @@ class ThanksTo:
             ("photohash", "Chris Pickett and others", "https://github.com/bunchesofdonald/photohash"),
             ("cython", "Cython 0.29.14", "http://cython.org/"),
             ("formlayout", _X(_("Created by %1"), "Pierre Raybaut"), "https://github.com/PierreRaybaut/formlayout"),
-            (
-                "sortedcontainers",
-                _X(_("Created by %1"), "Grant Jenks"),
-                "http://www.grantjenks.com/docs/sortedcontainers/",
-            ),
+            ("sortedcontainers", _X(_("Created by %1"), "Grant Jenks"), "http://www.grantjenks.com/docs/sortedcontainers/"),
+            ("lichess-puzzler", _X(_("Created by %1"), "Thibault Duplessis"), "https://github.com/ornicar/lichess-puzzler"),
         )
         txt = self.table_ini()
 

@@ -267,13 +267,7 @@ def get_gamestage(cp, mrm):
         gst = 4
     else:
         gst = 5
-    dic = {
-        1: _("Opening"),
-        2: _("Transition to middlegame"),
-        3: _("Middlegame"),
-        4: _("Transition to endgame"),
-        5: _("Endgame"),
-    }
+    dic = {1: _("Opening"), 2: _("Transition to middlegame"), 3: _("Middlegame"), 4: _("Transition to endgame"), 5: _("Endgame")}
     return dic[gst]
 
 
@@ -356,25 +350,10 @@ def gen_indexes(game, elos, elos_form, alm):
     txt = plantilla_l % (_("Average lost scores"), average[True], cpt, average[False], cpt, average_t, cpt)
     txt += plantilla_d % (_("Domination"), domination[True], domination[False])
     txt += plantilla_c % (_("Complexity"), xac(complexity[True]), xac(complexity[False]), xac(complexity_t))
-    txt += plantilla_c % (
-        _("Efficient mobility"),
-        xac(efficientmobility[True]),
-        xac(efficientmobility[False]),
-        xac(efficientmobility_t),
-    )
+    txt += plantilla_c % (_("Efficient mobility"), xac(efficientmobility[True]), xac(efficientmobility[False]), xac(efficientmobility_t))
     txt += plantilla_c % (_("Narrowness"), xac(narrowness[True]), xac(narrowness[False]), xac(narrowness_t))
-    txt += plantilla_c % (
-        _("Pieces activity"),
-        xac(piecesactivity[True]),
-        xac(piecesactivity[False]),
-        xac(piecesactivity_t),
-    )
-    txt += plantilla_c % (
-        _("Exchange tendency"),
-        xac(exchangetendency[True]),
-        xac(exchangetendency[False]),
-        xac(exchangetendency_t),
-    )
+    txt += plantilla_c % (_("Pieces activity"), xac(piecesactivity[True]), xac(piecesactivity[False]), xac(piecesactivity_t))
+    txt += plantilla_c % (_("Exchange tendency"), xac(exchangetendency[True]), xac(exchangetendency[False]), xac(exchangetendency_t))
     txt += plantilla_l % ("%", alm.porcW, prc, alm.porcB, prc, alm.porcT, prc)
 
     # txt += plantilla_c % ( _("Elo performance"), elos[True][Game.ALLGAME], elos[False][Game.ALLGAME], elos[None][Game.ALLGAME])
@@ -387,12 +366,7 @@ def gen_indexes(game, elos, elos_form, alm):
     #     if elos[None][std]:
     #         txt += plantilla_c % ( tit, int(elosFORM[True][std]), int(elosFORM[False][std]), int(elosFORM[None][std]))
 
-    txt += plantilla_c % (
-        _("Elo performance"),
-        elos_form[True][ALLGAME],
-        elos_form[False][ALLGAME],
-        elos_form[None][ALLGAME],
-    )
+    txt += plantilla_c % (_("Elo performance"), elos_form[True][ALLGAME], elos_form[False][ALLGAME], elos_form[None][ALLGAME])
     for std, tit in ((OPENING, _("Opening")), (MIDDLEGAME, _("Middle game")), (ENDGAME, _("End game"))):
         if elos[None][std]:
             txt += plantilla_c % (tit, int(elos_form[True][std]), int(elos_form[False][std]), int(elos_form[None][std]))
@@ -408,23 +382,8 @@ def gen_indexes(game, elos, elos_form, alm):
     txt += plantilla_d % (_("Domination"), domination[True], "%", domination[False], "%")
     txt += plantilla_c % (_("Complexity"), xac(complexity[True]), xac(complexity[False]), xac(complexity_t))
     txt += plantilla_c % (_("Narrowness"), xac(narrowness[True]), xac(narrowness[False]), xac(narrowness_t))
-    txt += plantilla_c % (
-        _("Efficient mobility"),
-        xac(efficientmobility[True]),
-        xac(efficientmobility[False]),
-        xac(efficientmobility_t),
-    )
-    txt += plantilla_c % (
-        _("Pieces activity"),
-        xac(piecesactivity[True]),
-        xac(piecesactivity[False]),
-        xac(piecesactivity_t),
-    )
-    txt += plantilla_c % (
-        _("Exchange tendency"),
-        xac(exchangetendency[True]),
-        xac(exchangetendency[False]),
-        xac(exchangetendency_t),
-    )
+    txt += plantilla_c % (_("Efficient mobility"), xac(efficientmobility[True]), xac(efficientmobility[False]), xac(efficientmobility_t))
+    txt += plantilla_c % (_("Pieces activity"), xac(piecesactivity[True]), xac(piecesactivity[False]), xac(piecesactivity_t))
+    txt += plantilla_c % (_("Exchange tendency"), xac(exchangetendency[True]), xac(exchangetendency[False]), xac(exchangetendency_t))
 
     return txt_html, txt, elos[True][Game.ALLGAME], elos[False][Game.ALLGAME], elos[None][Game.ALLGAME]

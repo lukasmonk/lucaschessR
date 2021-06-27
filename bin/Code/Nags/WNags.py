@@ -11,7 +11,7 @@ from Code.QT import QTVarios
 
 
 class WNags(QTVarios.WDialogo):
-    def __init__(self, owner, nags:Nags.Nags, current_move: Move.Move):
+    def __init__(self, owner, nags: Nags.Nags, current_move: Move.Move):
         title = _("Ratings")
         extparam = "selelectnags"
 

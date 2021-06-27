@@ -149,16 +149,7 @@ class ManagerAnotar(Manager.Manager):
         if numjug > 0:
             self.set_label2(
                 '%s: <b>%d</b><br>%s: %0.2f"<br>%s: <b>%d</b><br>%s: <b>%d</b>'
-                % (
-                    _("Moves"),
-                    numjug,
-                    _("Average time"),
-                    self.vtime / numjug,
-                    _("Errors"),
-                    self.errores,
-                    _("Hints"),
-                    self.ayudas_recibidas,
-                )
+                % (_("Moves"), numjug, _("Average time"), self.vtime / numjug, _("Errors"), self.errores, _("Hints"), self.ayudas_recibidas)
             )
             if numjug > 2:
                 db = UtilSQL.DictSQL(self.configuration.ficheroAnotar)
@@ -171,6 +162,6 @@ class ManagerAnotar(Manager.Manager):
                     "HINTS": self.ayudas_recibidas,
                     "ERRORS": self.errores,
                     "COLOR": self.si_blancas_abajo,
-                    "TOTAL_MOVES": len(self.game_objetivo)
+                    "TOTAL_MOVES": len(self.game_objetivo),
                 }
                 db.close()

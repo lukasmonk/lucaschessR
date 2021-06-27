@@ -130,9 +130,12 @@ class WHorsesBase(QTVarios.WDialogo):
 
         # Tool bar
         li_acciones = (
-            (_("Close"), Iconos.MainMenu(), self.terminar), None,
-            (_("Start"), Iconos.Empezar(), self.empezar), None,
-            (_("Remove"), Iconos.Borrar(), self.borrar), None,
+            (_("Close"), Iconos.MainMenu(), self.terminar),
+            None,
+            (_("Start"), Iconos.Empezar(), self.empezar),
+            None,
+            (_("Remove"), Iconos.Borrar(), self.borrar),
+            None,
         )
         self.tb = Controles.TBrutina(self, li_acciones)
 
@@ -213,8 +216,10 @@ class WHorses(QTVarios.WDialogo):
 
         # Tool bar
         li_acciones = (
-            (_("Cancel"), Iconos.Cancelar(), self.cancelar), None,
-            (_("Reinit"), Iconos.Reiniciar(), self.reiniciar), None,
+            (_("Cancel"), Iconos.Cancelar(), self.cancelar),
+            None,
+            (_("Reinit"), Iconos.Reiniciar(), self.reiniciar),
+            None,
             (_("Help"), Iconos.AyudaGR(), self.ayuda),
         )
         self.tb = Controles.TBrutina(self, li_acciones)

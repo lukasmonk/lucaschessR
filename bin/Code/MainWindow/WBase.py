@@ -140,7 +140,7 @@ class WBase(QtWidgets.QWidget):
 
     def create_board(self):
         ae = QTUtil.altoEscritorio()
-        mx = int(ae *0.08)
+        mx = int(ae * 0.08)
         config_board = self.manager.configuration.config_board("BASE", mx)
         self.board = Board.Board(self, config_board)
         self.board.crea()
@@ -174,12 +174,8 @@ class WBase(QtWidgets.QWidget):
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 52, centered=True)
         si_figurines_pgn = configuration.x_pgn_withfigurines
-        o_columns.nueva(
-            "WHITE", _("White"), with_each_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
-        )
-        o_columns.nueva(
-            "BLACK", _("Black"), with_each_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
-        )
+        o_columns.nueva("WHITE", _("White"), with_each_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None))
+        o_columns.nueva("BLACK", _("Black"), with_each_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None))
         self.pgn = Grid.Grid(self, o_columns, siCabeceraMovible=False)
         self.pgn.setMinimumWidth(width_pgn)
         self.pgn.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -190,14 +186,16 @@ class WBase(QtWidgets.QWidget):
         # # Blancas y negras
         f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels + 2, peso=75)
         self.lb_player_white = Controles.LB(self).anchoFijo(nAnchoLabels).align_center().ponFuente(f).set_wrap()
-        style = "QWidget { border-style: groove; border-width: 2px; border-color: Gray; padding: 4px 4px 4px 4px;background-color:%s;color:%s;}"
+        style = (
+            "QWidget { border-style: groove; border-width: 2px; border-color: Gray; padding: 4px 4px 4px 4px;background-color:%s;color:%s;}"
+        )
         self.lb_player_white.setStyleSheet(style % ("white", "black"))
 
         self.lb_player_black = Controles.LB(self).anchoFijo(nAnchoLabels).align_center().ponFuente(f).set_wrap()
         self.lb_player_black.setStyleSheet(style % ("black", "white"))
 
         # # Capturas
-        n_alto_fijo = 3*(configuration.x_sizefont_infolabels + 2)
+        n_alto_fijo = 3 * (configuration.x_sizefont_infolabels + 2)
         self.lb_capt_white = Controles.LB(self).anchoFijo(nAnchoLabels).set_wrap().altoFijo(n_alto_fijo)
         style = "QWidget { border-style: groove; border-width: 1px; border-color: LightGray; padding: 2px 0px 2px 0px;}"
         self.lb_capt_white.setStyleSheet(style)
@@ -491,9 +489,19 @@ class WBase(QtWidgets.QWidget):
 
     def hide_replay(self):
         self.li_hide_replay = []
-        for control in (self.pgn, self.bt_active_tutor, self.lbRotulo1, self.lbRotulo2, self.lbRotulo3,
-                        self.lb_capt_white, self.lb_capt_black, self.lb_player_white, self.lb_player_black,
-                        self.lb_clock_white, self.lb_clock_black):
+        for control in (
+            self.pgn,
+            self.bt_active_tutor,
+            self.lbRotulo1,
+            self.lbRotulo2,
+            self.lbRotulo3,
+            self.lb_capt_white,
+            self.lb_capt_black,
+            self.lb_player_white,
+            self.lb_player_black,
+            self.lb_clock_white,
+            self.lb_clock_black,
+        ):
             if control.isVisible():
                 self.li_hide_replay.append(control)
                 control.hide()
@@ -522,7 +530,7 @@ class WBase(QtWidgets.QWidget):
                 self.lb_clock_black,
                 self.lb_capt_white,
                 self.lb_capt_black,
-                self.parent().parent().informacionPGN
+                self.parent().parent().informacionPGN,
             ):
                 if widget.isVisible():
                     nonDistract.append(widget)
@@ -556,11 +564,11 @@ class WBase(QtWidgets.QWidget):
             for x in range(num):
                 d[pz.isupper()].append(pz)
 
-        value = {"q":1, "r":2, "b":3, "n":4, "p":5}
+        value = {"q": 1, "r": 2, "b": 3, "n": 4, "p": 5}
 
         def xshow(max_num, tp, li, lb):
             html = ""
-            li.sort(key=lambda x:value[x.lower()])
+            li.sort(key=lambda x: value[x.lower()])
             for n, pz in enumerate(li):
                 # if n >= max_num: # la situación en la que sobran
                 #     html += "+++"
@@ -569,7 +577,7 @@ class WBase(QtWidgets.QWidget):
                 html += '<img src="../Resources/IntFiles/Figs/%s%s.png" width="30" height="30">' % (tp, pz.lower())
             lb.set_text(html)
 
-        max_num = self.lb_capt_white.width()//27
+        max_num = self.lb_capt_white.width() // 27
         xshow(max_num, "b", d[True], self.lb_capt_white)
         xshow(max_num, "w", d[False], self.lb_capt_black)
         if self.lb_capt_white.isVisible():
@@ -620,6 +628,7 @@ class WBase(QtWidgets.QWidget):
     def get_labels(self):
         def get(lb):
             return lb.texto() if lb.isVisible() else None
+
         return get(self.lbRotulo1), get(self.lbRotulo2), get(self.lbRotulo3)
 
     def ponRelojBlancas(self, tm, tm2):

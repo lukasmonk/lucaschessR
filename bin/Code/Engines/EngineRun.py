@@ -151,10 +151,10 @@ class RunEngine:
                 if self.direct_dispatch:
                     self.mrm.dispatch(line)
                 lock.release()
-                if self.direct_dispatch and "bestmove" in line:
-                    self.direct_dispatch()
                 if self.log:
                     self.log.write(line.strip() + "\n")
+                if self.direct_dispatch and "bestmove" in line:
+                    self.direct_dispatch()
         except:
             pass
         finally:

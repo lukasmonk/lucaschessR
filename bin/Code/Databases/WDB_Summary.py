@@ -102,11 +102,7 @@ class WSummary(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-        self.qtColor = (
-            QTUtil.qtColorRGB(221, 255, 221),
-            QTUtil.qtColorRGB(247, 247, 247),
-            QTUtil.qtColorRGB(255, 217, 217),
-        )
+        self.qtColor = (QTUtil.qtColorRGB(221, 255, 221), QTUtil.qtColorRGB(247, 247, 247), QTUtil.qtColorRGB(255, 217, 217))
         self.qtColorTotales = QTUtil.qtColorRGB(170, 170, 170)
 
     def close_db(self):
@@ -266,7 +262,7 @@ class WSummary(QtWidgets.QWidget):
                 self.cambiaInfoMove()
 
     def reindexar(self, depth=None):
-        if not depth:
+        if depth is None:
             if not QTUtil2.pregunta(self, _("Do you want to rebuild stats?")):
                 return
 
@@ -345,8 +341,8 @@ class WSummary(QtWidgets.QWidget):
         dic_analisis = {}
         analisisMRM = self.wdb_analysis.mrm(pvMirar)
         if analisisMRM:
-             for rm in analisisMRM.li_rm:
-                 dic_analisis[rm.movimiento()] = rm
+            for rm in analisisMRM.li_rm:
+                dic_analisis[rm.movimiento()] = rm
         self.liMoves = self.dbGames.get_summary(pvMirar, dic_analisis, self.si_figurines_pgn, self.allmoves)
 
         self.grid.refresh()
@@ -439,11 +435,7 @@ class WSummaryBase(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-        self.qtColor = (
-            QTUtil.qtColorRGB(221, 255, 221),
-            QTUtil.qtColorRGB(247, 247, 247),
-            QTUtil.qtColorRGB(255, 217, 217),
-        )
+        self.qtColor = (QTUtil.qtColorRGB(221, 255, 221), QTUtil.qtColorRGB(247, 247, 247), QTUtil.qtColorRGB(255, 217, 217))
         self.qtColorTotales = QTUtil.qtColorRGB(170, 170, 170)
 
     def grid_doble_clickCabecera(self, grid, o_column):

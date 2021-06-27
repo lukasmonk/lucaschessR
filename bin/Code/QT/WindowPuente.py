@@ -139,23 +139,13 @@ class WEdMove(QtWidgets.QWidget):
         self.promocion = " "
 
         self.origen = (
-            EDCelda(self, "")
-            .caracteres(2)
-            .controlrx("(|[a-h][1-8])")
-            .anchoFijo(32)
-            .align_center()
-            .capture_changes(self.miraPromocion)
+            EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(32).align_center().capture_changes(self.miraPromocion)
         )
 
         self.arrow = arrow = Controles.LB(self).ponImagen(Iconos.pmMover())
 
         self.destino = (
-            EDCelda(self, "")
-            .caracteres(2)
-            .controlrx("(|[a-h][1-8])")
-            .anchoFijo(32)
-            .align_center()
-            .capture_changes(self.miraPromocion)
+            EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(32).align_center().capture_changes(self.miraPromocion)
         )
 
         self.pbPromocion = Controles.PB(self, "", self.pulsadoPromocion, plano=False).anchoFijo(24)
@@ -454,26 +444,12 @@ class WPuente(QTVarios.WDialogo):
 
         # Botones
         f = Controles.TipoLetra(puntos=12, peso=75)
-        self.btComprobar = (
-            Controles.PB(self, _("Check"), self.comprobar, plano=False)
-            .ponIcono(Iconos.Check(), icon_size=32)
-            .ponFuente(f)
-        )
+        self.btComprobar = Controles.PB(self, _("Check"), self.comprobar, plano=False).ponIcono(Iconos.Check(), icon_size=32).ponFuente(f)
         self.btSeguir = (
-            Controles.PB(self, _("Continue"), self.seguir, plano=False)
-            .ponIcono(Iconos.Pelicula_Seguir(), icon_size=32)
-            .ponFuente(f)
+            Controles.PB(self, _("Continue"), self.seguir, plano=False).ponIcono(Iconos.Pelicula_Seguir(), icon_size=32).ponFuente(f)
         )
-        self.btTerminar = (
-            Controles.PB(self, _("Close"), self.terminar, plano=False)
-            .ponIcono(Iconos.MainMenu(), icon_size=32)
-            .ponFuente(f)
-        )
-        self.btCancelar = (
-            Controles.PB(self, _("Cancel"), self.terminar, plano=False)
-            .ponIcono(Iconos.Cancelar(), icon_size=32)
-            .ponFuente(f)
-        )
+        self.btTerminar = Controles.PB(self, _("Close"), self.terminar, plano=False).ponIcono(Iconos.MainMenu(), icon_size=32).ponFuente(f)
+        self.btCancelar = Controles.PB(self, _("Cancel"), self.terminar, plano=False).ponIcono(Iconos.Cancelar(), icon_size=32).ponFuente(f)
 
         # Layout
         lyC = (

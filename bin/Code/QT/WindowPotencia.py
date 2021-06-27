@@ -196,23 +196,13 @@ class WEdMove(QtWidgets.QWidget):
         self.promocion = " "
 
         self.origen = (
-            EDCelda(self, "")
-            .caracteres(2)
-            .controlrx("(|[a-h][1-8])")
-            .anchoFijo(24)
-            .align_center()
-            .capture_changes(self.miraPromocion)
+            EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(24).align_center().capture_changes(self.miraPromocion)
         )
 
         self.arrow = arrow = Controles.LB(self).ponImagen(Iconos.pmMover())
 
         self.destino = (
-            EDCelda(self, "")
-            .caracteres(2)
-            .controlrx("(|[a-h][1-8])")
-            .anchoFijo(24)
-            .align_center()
-            .capture_changes(self.miraPromocion)
+            EDCelda(self, "").caracteres(2).controlrx("(|[a-h][1-8])").anchoFijo(24).align_center().capture_changes(self.miraPromocion)
         )
 
         self.pbPromocion = Controles.PB(self, "", self.pulsadoPromocion, plano=False).anchoFijo(24)
@@ -378,9 +368,7 @@ class WBlqMove(QtWidgets.QWidget):
 class WPotenciaBase(QTVarios.WDialogo):
     def __init__(self, procesador):
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, _("Determine your calculating power"), Iconos.Potencia(), "potenciaBase"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Determine your calculating power"), Iconos.Potencia(), "potenciaBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -557,9 +545,7 @@ class WPotencia(QTVarios.WDialogo):
 
         super(WPotencia, self).__init__(owner, _("Determine your calculating power"), Iconos.Potencia(), "potencia")
 
-        self.game, self.dicPGN, info, self.jugadaInicial, self.linea = (
-            lee_1_linea_mfn(linea) if linea else lee_linea_mfn()
-        )
+        self.game, self.dicPGN, info, self.jugadaInicial, self.linea = lee_1_linea_mfn(linea) if linea else lee_linea_mfn()
         self.fen = self.game.move(self.jugadaInicial).position.fen()
         self.ref = ref
 
@@ -757,7 +743,7 @@ class WPotencia(QTVarios.WDialogo):
                     siError = True
                     break
                 move = Move.Move(None, cp, cpNue, from_sq, to_sq, promotion)
-                mrm, pos = self.xtutor.analysis_move(move, self.xtutor.ms_time_move)
+                mrm, pos = self.xtutor.analysis_move(move, self.xtutor.mstime_engine)
                 move.analysis = mrm, pos
 
                 self.li_analysis.append(move)
@@ -787,7 +773,7 @@ class WPotencia(QTVarios.WDialogo):
                 Util.today(),
                 totalPuntos,
                 self.xtutor.key,
-                int(self.xtutor.ms_time_move / 1000),
+                int(self.xtutor.mstime_engine / 1000),
                 self.min_min,
                 self.min_max,
                 self.linea,
@@ -845,9 +831,7 @@ class WPotencia(QTVarios.WDialogo):
 
         move = self.li_analysis[position]
         is_white = move.position_before.is_white
-        Analysis.show_analysis(
-            self.procesador, self.xtutor, move, is_white, 9999999, 1, main_window=self, must_save=False
-        )
+        Analysis.show_analysis(self.procesador, self.xtutor, move, is_white, 9999999, 1, main_window=self, must_save=False)
 
 
 def windowPotencia(procesador):

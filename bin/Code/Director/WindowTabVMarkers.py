@@ -34,12 +34,7 @@ class WTV_Marker(QtWidgets.QDialog):
             if name:
                 regMarker.name = name
 
-        li_acciones = [
-            (_("Save"), Iconos.Aceptar(), self.grabar),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.reject),
-            None,
-        ]
+        li_acciones = [(_("Save"), Iconos.Aceptar(), self.grabar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None]
         tb = Controles.TBrutina(self, li_acciones)
 
         # Board
@@ -75,7 +70,7 @@ class WTV_Marker(QtWidgets.QDialog):
 
         # orden
         config = FormLayout.Combobox(_("Order concerning other items"), QTUtil2.listaOrdenes())
-        li_gen.append((config, regMarker.position.orden))
+        li_gen.append((config, regMarker.physical_pos.orden))
 
         self.form = FormLayout.FormWidget(li_gen, dispatch=self.cambios)
 
@@ -102,9 +97,9 @@ class WTV_Marker(QtWidgets.QDialog):
                 regMarker.opacity = (100.0 - float(li[1])) / 100.0
                 regMarker.psize = li[2]
                 regMarker.poscelda = li[3]
-                regMarker.position.orden = li[4]
+                regMarker.physical_pos.orden = li[4]
                 marker.setOpacity(regMarker.opacity)
-                marker.setZValue(regMarker.position.orden)
+                marker.setZValue(regMarker.physical_pos.orden)
                 marker.update()
             self.board.escena.update()
             QTUtil.refresh_gui()

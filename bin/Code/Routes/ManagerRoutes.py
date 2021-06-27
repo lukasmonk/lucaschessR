@@ -286,9 +286,7 @@ class ManagerRoutesPlay(ManagerRoutes):
                     QTUtil2.mensajeTemporal(self.main_window, _("Wrong move"), 2)
                     self.run_action(TB_REINIT)
                 else:
-                    QTUtil2.message_error(
-                        self.main_window, "%s\n%s" % (_("Wrong move"), _("Right move: %s") % Game.pv_san(fen, op_pv))
-                    )
+                    QTUtil2.message_error(self.main_window, "%s\n%s" % (_("Wrong move"), _("Right move: %s") % Game.pv_san(fen, op_pv)))
                     self.sigueHumano()
                 return False
             self.posOpening += 1
@@ -425,7 +423,7 @@ class ManagerRoutesEndings(ManagerRoutes):
 
     def ponWarnings(self):
         if self.warnings <= self.max_warnings:
-            self.set_label2(_("Warnings: %d/%d")% (self.warnings, self.max_warnings))
+            self.set_label2(_("Warnings: %d/%d") % (self.warnings, self.max_warnings))
         else:
             self.set_label2(_("You must repeat the puzzle."))
 

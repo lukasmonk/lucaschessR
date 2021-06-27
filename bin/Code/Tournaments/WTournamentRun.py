@@ -148,21 +148,11 @@ class WTournamentRun(QtWidgets.QWidget):
         li_acciones = [(_("Close"), Iconos.Close(), self.close), None]
         if state == ST_PLAYING:
             li_acciones.extend(
-                [
-                    (_("Pause"), Iconos.Pause(), self.pausa),
-                    None,
-                    (_("Adjudication"), Iconos.EndGame(), self.adjudication),
-                    None,
-                ]
+                [(_("Pause"), Iconos.Pause(), self.pausa), None, (_("Adjudication"), Iconos.EndGame(), self.adjudication), None]
             )
         elif state == ST_PAUSE:
             li_acciones.extend(
-                [
-                    (_("Continue"), Iconos.Continue(), self.seguir),
-                    None,
-                    (_("Adjudication"), Iconos.EndGame(), self.adjudication),
-                    None,
-                ]
+                [(_("Continue"), Iconos.Continue(), self.seguir), None, (_("Adjudication"), Iconos.EndGame(), self.adjudication), None]
             )
         self.tb.reset(li_acciones)
 
@@ -175,12 +165,8 @@ class WTournamentRun(QtWidgets.QWidget):
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("NUMBER", _("N."), 52, centered=True)
         si_figurines_pgn = configuration.x_pgn_withfigurines
-        o_columnas.nueva(
-            "WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
-        )
-        o_columnas.nueva(
-            "BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
-        )
+        o_columnas.nueva("WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None))
+        o_columnas.nueva("BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None))
         self.grid_pgn = Grid.Grid(self, o_columnas, siCabeceraMovible=False)
         self.grid_pgn.setMinimumWidth(n_ancho_pgn)
         self.grid_pgn.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -266,10 +252,7 @@ class WTournamentRun(QtWidgets.QWidget):
         self.segundos_jugada = self.tournament_game.segundos_jugada
 
         # abrimos motores
-        rival = {
-            WHITE: self.torneo.buscaHEngine(self.tournament_game.hwhite),
-            BLACK: self.torneo.buscaHEngine(self.tournament_game.hblack),
-        }
+        rival = {WHITE: self.torneo.buscaHEngine(self.tournament_game.hwhite), BLACK: self.torneo.buscaHEngine(self.tournament_game.hblack)}
         for side in (WHITE, BLACK):
             self.lb_player[side].set_text(rival[side].key)
 
@@ -487,7 +470,7 @@ class WTournamentRun(QtWidgets.QWidget):
             xrival = self.xengine[is_white]
             tiempoBlancas = self.vtime[True].tiempoPendiente
             tiempoNegras = self.vtime[False].tiempoPendiente
-            segundosJugada = xrival.ms_time_move
+            segundosJugada = xrival.mstime_engine
             self.reloj_start(is_white)
             mrm = xrival.play_time_tourney(self.game, tiempoBlancas, tiempoNegras, segundosJugada)
             if self.state == ST_PAUSE:

@@ -22,7 +22,7 @@ class CountCapture:
         self.tries = []  # pos,depth,success,time
 
     def is_finished(self):
-        return (self.current_posmove + self.current_depth) >= (len(self.game)+1)
+        return (self.current_posmove + self.current_depth) >= (len(self.game) + 1)
 
     def save(self):
         dic = {
@@ -67,7 +67,7 @@ class CountCapture:
             tm += tiempo
         total = self.current_posmove + self.current_depth + 1
         media = tm / total
-        return "%.01f\"/%.f\"" % (media, tm)
+        return '%.01f"/%.f"' % (media, tm)
 
     def copy(self):
         capt_copy = CountCapture()

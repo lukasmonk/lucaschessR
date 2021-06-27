@@ -4,7 +4,7 @@ import time
 import FasterCode
 
 from Code import Manager
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.Base import Game, Position
 from Code.Base.Constantes import *

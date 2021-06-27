@@ -181,7 +181,7 @@ class PiezaSC(BloqueSC):
         self.setAcceptHoverEvents(True)
 
         ancho = physical_pos.ancho
-        self.limL = -10 #ancho * 20 / 100
+        self.limL = -10  # ancho * 20 / 100
         self.limH = ancho - self.limL
         self.dragable = False
 

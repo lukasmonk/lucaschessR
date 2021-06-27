@@ -54,8 +54,9 @@ def envia(quien, dato):
 
 def set_position(game):
     if Code.dgt:
-        if (Code.configuration.x_digital_board == "DGT") or \
-           (Code.configuration.x_digital_board == "Novag UCB" and Code.configuration.x_digital_board_version == 0):
+        if (Code.configuration.x_digital_board == "DGT") or (
+            Code.configuration.x_digital_board == "Novag UCB" and Code.configuration.x_digital_board_version == 0
+        ):
             writePosition(game.last_position.fenDGT())
         else:
             writePosition(game.last_position.fen())
@@ -72,6 +73,7 @@ def log(cad):
         q.write("\n[%s] %s\n" % (Util.today(), cad))
         for line in traceback.format_stack():
             q.write("    %s\n" % line.strip())
+
 
 # CALLBACKS
 
@@ -109,7 +111,7 @@ def activar():
     if is_linux:
         functype = ctypes.CFUNCTYPE
         path = os.path.join(Code.folder_OS, "DigitalBoards")
-        if Code.configuration.x_digital_board == "DGT":
+        if Code.configuration.x_digital_board == "DGT-gon":
             path_so = os.path.join(path, "libdgt.so")
         elif Code.configuration.x_digital_board == "Certabo":
             path_so = os.path.join(path, "libcer.so")
@@ -125,16 +127,18 @@ def activar():
     else:
         functype = ctypes.WINFUNCTYPE
         for path in (
+            os.path.join(Code.folder_OS, "DigitalBoards"),
+            "",
             "C:/Program Files (x86)/DGT Projects/",
             "C:/Program Files (x86)/Common Files/DGT Projects/",
             "C:/Program Files/DGT Projects/",
             "C:/Program Files/Common Files/DGT Projects/",
-            os.path.join(Code.folder_OS, "DigitalBoards"),
-            "",
         ):
             try:
                 if Code.configuration.x_digital_board == "DGT":
                     path_dll = os.path.join(path, "DGTEBDLL.dll")
+                elif Code.configuration.x_digital_board == "DGT-gon":
+                    path_dll = os.path.join(path, "DGT_DLL.dll")
                 elif Code.configuration.x_digital_board == "Certabo":
                     path_dll = os.path.join(path, "CER_DLL.dll")
                 elif Code.configuration.x_digital_board == "Millennium":
@@ -259,13 +263,14 @@ def writePosition(cposicion):
 
 def writeClocks(wclock, bclock):
     if Code.dgt:
-        if Code.configuration.x_digital_board == "DGT":
+        if (Code.configuration.x_digital_board == "DGT") or (Code.configuration.x_digital_board == "DGT-gon"):
             # log( "WriteClocks: W-%s B-%s"%(str(wclock), str(bclock)) )
             dgt = Code.dgt
-            dgt._DGTDLL_SetNRun(wclock, bclock, 0)
+            dgt._DGTDLL_SetNRun(wclock.encode(), bclock.encode(), 0)
 
 
 # Utilidades para la trasferencia de datos
+
 
 def _dgt2fen(datobyte):
     n = 0

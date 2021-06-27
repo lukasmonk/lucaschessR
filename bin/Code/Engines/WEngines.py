@@ -109,7 +109,7 @@ class WEngines(QTVarios.WDialogo):
         li_gen.append((config, ""))
 
         for num in range(1, 11):
-            li_gen.append(("%s:" %(_("Argument %d") % num), ""))
+            li_gen.append(("%s:" % (_("Argument %d") % num), ""))
         li_gen.append(separador)
         resultado = FormLayout.fedit(li_gen, title=_("Command"), parent=self, anchoMinimo=600, icon=Iconos.Terminal())
         if resultado:
@@ -298,29 +298,10 @@ class WEngine(QtWidgets.QDialog):
             self.cbBooks = Controles.CB(self, li, engine.book)
             btNuevoBook = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), icon_size=16)
             # # Respuesta rival
-            li = (
-                (_("Uniform random"), "au"),
-                (_("Proportional random"), "ap"),
-                (_("Always the highest percentage"), "mp"),
-            )
+            li = ((_("Uniform random"), "au"), (_("Proportional random"), "ap"), (_("Always the highest percentage"), "mp"))
             self.cbBooksRR = QTUtil2.comboBoxLB(self, li, engine.bookRR)
-            lyBook = (
-                Colocacion.H()
-                .control(lbBook)
-                .control(self.cbBooks)
-                .control(self.cbBooksRR)
-                .control(btNuevoBook)
-                .relleno()
-            )
-            lyDT = (
-                Colocacion.H()
-                .control(lbDepth)
-                .control(self.sbDepth)
-                .espacio(40)
-                .control(lbTime)
-                .control(self.sbTime)
-                .relleno()
-            )
+            lyBook = Colocacion.H().control(lbBook).control(self.cbBooks).control(self.cbBooksRR).control(btNuevoBook).relleno()
+            lyDT = Colocacion.H().control(lbDepth).control(self.sbDepth).espacio(40).control(lbTime).control(self.sbTime).relleno()
             lyTorneo = Colocacion.V().otro(lyDT).otro(lyBook)
 
         # Layout
@@ -363,10 +344,7 @@ class WEngine(QtWidgets.QDialog):
         for engine in self.liMotores:
             if (self.motorExterno != engine) and (engine.key == alias):
                 QTUtil2.message_error(
-                    self,
-                    _(
-                        "There is already another engine with the same alias, the alias must change in order to have both."
-                    ),
+                    self, _("There is already another engine with the same alias, the alias must change in order to have both.")
                 )
                 return
         self.motorExterno.key = alias
@@ -396,9 +374,7 @@ def wgen_options_engine(owner, engine):
         tipo = opcion.tipo
         lb = Controles.LB(owner, opcion.name + ":").align_right()
         if tipo == "spin":
-            control = QTUtil2.spinBoxLB(
-                owner, opcion.valor, opcion.minimo, opcion.maximo, maxTam=50 if opcion.maximo < 1000 else 80
-            )
+            control = QTUtil2.spinBoxLB(owner, opcion.valor, opcion.minimo, opcion.maximo, maxTam=50 if opcion.maximo < 1000 else 80)
             lb.set_text("%s [%d-%d] :" % (opcion.name, opcion.minimo, opcion.maximo))
         elif tipo == "check":
             control = Controles.CHB(owner, " ", opcion.valor)
@@ -511,15 +487,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
         self.liMotores = self.manager.list_engines(elo)
         self.liMotoresActivos = self.liMotores
 
-        liFiltro = (
-            ("---", None),
-            (">=", ">"),
-            ("<=", "<"),
-            ("+-100", "100"),
-            ("+-200", "200"),
-            ("+-400", "400"),
-            ("+-800", "800"),
-        )
+        liFiltro = (("---", None), (">=", ">"), ("<=", "<"), ("+-100", "100"), ("+-200", "200"), ("+-400", "400"), ("+-800", "800"))
 
         self.cbElo = Controles.CB(self, liFiltro, None).capture_changes(self.filtrar)
 

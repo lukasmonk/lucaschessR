@@ -229,19 +229,7 @@ class ListaColumnas:
         @return: la column creada.
         """
         column = Columna(
-            key,
-            head,
-            ancho,
-            centered,
-            siDerecha,
-            rgbTexto,
-            rgbFondo,
-            siOrden,
-            estadoOrden,
-            edicion,
-            siEditable,
-            must_show,
-            siChecked,
+            key, head, ancho, centered, siDerecha, rgbTexto, rgbFondo, siOrden, estadoOrden, edicion, siEditable, must_show, siChecked
         )
         self.li_columns.append(column)
         self.posCreacion += 1

@@ -2,7 +2,7 @@ import copy
 import time
 
 from Code.Board import BoardTypes
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
@@ -512,11 +512,7 @@ class Guion:
     def writePizarra(self, tarea):
         if self.pizarra is None:
             self.pizarra = BoardTypes.Pizarra(
-                self,
-                self.board,
-                self.anchoPizarra,
-                edit_mode=self.winDirector is not None,
-                with_continue=tarea.continuar(),
+                self, self.board, self.anchoPizarra, edit_mode=self.winDirector is not None, with_continue=tarea.continuar()
             )
             self.pizarra.mensaje.setFocus()
         self.pizarra.write(tarea)

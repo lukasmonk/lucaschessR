@@ -12,10 +12,10 @@ class BMT(SQLBase.DBBase):
         if not self.existeTabla(self.tabla):
             cursor = self.conexion.cursor()
             for sql in (
-                    "CREATE TABLE %s( ESTADO VARCHAR(1),ORDEN INTEGER,NOMBRE TEXT,EXTRA TEXT,TOTAL INTEGER,HECHOS INTEGER,"
-                    "PUNTOS INTEGER,MAXPUNTOS INTEGER,FINICIAL VARCHAR(8),FFINAL VARCHAR(8),SEGUNDOS INTEGER,REPE INTEGER,"
-                    "BMT_LISTA BLOB,HISTORIAL BLOB);",
-                    "CREATE INDEX [NOMBRE] ON '%s'(ORDEN DESC,NOMBRE);",
+                "CREATE TABLE %s( ESTADO VARCHAR(1),ORDEN INTEGER,NOMBRE TEXT,EXTRA TEXT,TOTAL INTEGER,HECHOS INTEGER,"
+                "PUNTOS INTEGER,MAXPUNTOS INTEGER,FINICIAL VARCHAR(8),FFINAL VARCHAR(8),SEGUNDOS INTEGER,REPE INTEGER,"
+                "BMT_LISTA BLOB,HISTORIAL BLOB);",
+                "CREATE INDEX [NOMBRE] ON '%s'(ORDEN DESC,NOMBRE);",
             ):
                 cursor.execute(sql % self.tabla)
                 self.conexion.commit()
@@ -193,5 +193,3 @@ class BMTLista:
         for num in range(0, len(self.li_bmt_uno)):
             while num < len(self.li_bmt_uno) and self.li_bmt_uno[num].fen in borrar_fen_lista:
                 del self.li_bmt_uno[num]
-
-

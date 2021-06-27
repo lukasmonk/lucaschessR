@@ -87,7 +87,7 @@ class WPolyglot(QTVarios.WDialogo):
         self.li_moves = [FasterCode.BinMove(info_move) for info_move in self.position.get_exmoves()]
 
         li = self.db_entries.get_entries(position.fen())
-        d_entries = {entry.move:entry for entry in li}
+        d_entries = {entry.move: entry for entry in li}
 
         for binmove in self.li_moves:
             mv = binmove.imove()
@@ -155,7 +155,7 @@ class WPolyglot(QTVarios.WDialogo):
 
         rowid = self.db_entries.save_entry(binmove.rowid, entry)
         binmove.rowid = entry.rowid = rowid
-        if rowid  == 0:
+        if rowid == 0:
             for field in ("score", "depth", "learn"):
                 binmove.set_field(field, 0)
 

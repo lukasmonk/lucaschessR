@@ -5,7 +5,6 @@ from PySide2 import QtWidgets, QtCore
 
 import Code
 import Code.Nags.Nags
-from Code import TrListas
 from Code.Analysis import WindowAnalysisParam
 from Code.Base import Game, Position
 from Code.Base.Constantes import *
@@ -206,7 +205,15 @@ class ListaMoves:
 
     def reordenaSegunValoracion(self):
         li = []
-        dnum = {VERY_GOOD_MOVE: 0, GOOD_MOVE: 1000, SPECULATIVE_MOVE: 1300, QUESTIONABLE_MOVE: 1700, BAD_MOVE: 2000, VERY_POOR_MOVE: 3000, NO_RATING: 4000}
+        dnum = {
+            VERY_GOOD_MOVE: 0,
+            GOOD_MOVE: 1000,
+            SPECULATIVE_MOVE: 1300,
+            QUESTIONABLE_MOVE: 1700,
+            BAD_MOVE: 2000,
+            VERY_POOR_MOVE: 3000,
+            NO_RATING: 4000,
+        }
         for mov in self.liMovesInicial:
             v = mov.valoracion
             num = dnum[v]
@@ -234,7 +241,7 @@ class ListaMoves:
 
         for n, rm in enumerate(mrm.li_rm):
             a1h8 = rm.movimiento()
-            dic[rm.movimiento()] = rm
+            dic[a1h8] = rm
             dicPos[a1h8] = n + 1
 
         li = []
@@ -281,8 +288,8 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.listaMoves = owner.listaMoves
         self.procesador = procesador
 
-        self.setHeaderLabels((_("Moves"), _("Score"), _("Comments")))
-        self.setColumnHidden(4, True)
+        self.setHeaderLabels((_("Moves"), _("Score"), _("Comments"), "T"))
+        self.setColumnHidden(3, True)
 
         dic_nags = Code.Nags.Nags.dic_nags()
         self.dicValoracion = collections.OrderedDict()
@@ -308,7 +315,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.dicItemMoves = {}
         self.ponMoves(self.listaMoves)
 
-        self.sortItems(4, QtCore.Qt.AscendingOrder)
+        self.sortItems(3, QtCore.Qt.AscendingOrder)
 
     def editedH(self, col):
         item = self.currentItem()
@@ -381,7 +388,9 @@ class TreeMoves(QtWidgets.QTreeWidget):
         config = FormLayout.Editbox(_("Comments"), ancho=230)
         li_gen.append((config, mov.comment))
 
-        resultado = FormLayout.fedit(li_gen, title=_("Comments") + " " + mov.titulo, parent=self, anchoMinimo=200, icon=Iconos.ComentarioEditar())
+        resultado = FormLayout.fedit(
+            li_gen, title=_("Comments") + " " + mov.titulo, parent=self, anchoMinimo=200, icon=Iconos.ComentarioEditar()
+        )
         if resultado is None:
             return
 
@@ -420,7 +429,9 @@ class TreeMoves(QtWidgets.QTreeWidget):
         board = wowner.infoMove.board
         import Code.Variations as Variations
 
-        Variations.edit_variation_moves(self.procesador, wowner, board.is_white_bottom, fen, lineaPGN, titulo=mov.titulo + " - " + mov.etiPuntos(True))
+        Variations.edit_variation_moves(
+            self.procesador, wowner, board.is_white_bottom, fen, lineaPGN, titulo=mov.titulo + " - " + mov.etiPuntos(True)
+        )
 
     def mostrarOcultar(self, item, mov):
         lm = mov.listaMovesPadre
@@ -484,18 +495,25 @@ class TreeMoves(QtWidgets.QTreeWidget):
     def iconoValoracion(self, valoracion):
         cnf = Code.configuration
 
-        dic = {0: "lightgray", 1: cnf.x_color_nag1, 2: cnf.x_color_nag2, 3: cnf.x_color_nag3, 4: cnf.x_color_nag4, 5: cnf.x_color_nag5, 6: cnf.x_color_nag6}
+        dic = {
+            0: "lightgray",
+            1: cnf.x_color_nag1,
+            2: cnf.x_color_nag2,
+            3: cnf.x_color_nag3,
+            4: cnf.x_color_nag4,
+            5: cnf.x_color_nag5,
+            6: cnf.x_color_nag6,
+        }
         return QTUtil.colorIcon(dic[valoracion], 8, 8)
 
     def ponIconoValoracion(self, item, valoracion):
-
         item.setIcon(0, self.iconoValoracion(valoracion))
 
     def ordenaMoves(self, listaMoves):
         for n, mov in enumerate(listaMoves.liMoves):
             c_ord = "%02d" % (n + 1)
-            mov.item.setText(4, c_ord)
-        self.sortItems(4, QtCore.Qt.AscendingOrder)
+            mov.item.setText(3, c_ord)
+        self.sortItems(3, QtCore.Qt.AscendingOrder)
 
     def goto(self, mov):
         mov = mov.listaMovesPadre.buscaMovVisibleDesde(mov)

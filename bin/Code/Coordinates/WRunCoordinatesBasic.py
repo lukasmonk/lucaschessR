@@ -37,7 +37,12 @@ class WRunCoordinatesBasic(QTVarios.WDialogo):
         lb_score_k = Controles.LB(self, _("Score")).ponFuente(font)
         self.lb_score = Controles.LB(self).ponFuente(font)
 
-        li_acciones = ((_("Close"), Iconos.MainMenu(), self.terminar), None, (_("Begin"), Iconos.Empezar(), self.begin), (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir))
+        li_acciones = (
+            (_("Close"), Iconos.MainMenu(), self.terminar),
+            None,
+            (_("Begin"), Iconos.Empezar(), self.begin),
+            (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
+        )
         self.tb = QTVarios.LCTB(self, li_acciones)
         self.show_tb(self.terminar, self.begin)
 

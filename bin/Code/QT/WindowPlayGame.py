@@ -6,7 +6,7 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 from Code.Databases import WindowDatabase
@@ -84,7 +84,7 @@ class WPlayGameBase(QTVarios.WDialogo):
             o_columns.nueva(key, label, 80, centered=centered)
 
         # # Claves segun orden estandar
-        liBasic = ("EVENT", "SITE", "DATE", "ROUND", "WHITE", "BLACK", "RESULT", "ECO", "FEN", "WHITEELO", "BLACKELO")
+        self.li_keys = liBasic = ("EVENT", "SITE", "DATE", "ROUND", "WHITE", "BLACK", "RESULT", "ECO", "FEN", "WHITEELO", "BLACKELO")
         for key in liBasic:
             label = TrListas.pgnLabel(key)
             creaCol(key, label, key != "EVENT")
@@ -123,9 +123,14 @@ class WPlayGameBase(QTVarios.WDialogo):
     def grid_dato(self, grid, row, o_column):
         col = o_column.key
         reg = self.db.leeRegistro(row)
-        game = Game.Game()
-        game.restore(reg["GAME"])
-        return game.get_tag(col)
+        if "CACHE" in reg:
+            dic_tags = reg["CACHE"]
+        else:
+            game = Game.Game()
+            game.restore(reg["GAME"])
+            reg["CACHE"] = {k: game.get_tag(k) for k in self.li_keys}
+            self.db.cambiaRegistro(row, reg)
+        return reg["CACHE"].get(col, "")
 
     def terminar(self):
         self.save_video()
@@ -206,7 +211,14 @@ class WPlay1(QTVarios.WDialogo):
         self.grid.setMinimumWidth(self.grid.anchoColumnas() + 20)
 
         # Tool bar
-        li_acciones = ((_("Close"), Iconos.MainMenu(), self.terminar), None, (_("Train"), Iconos.Entrenar(), self.empezar), None, (_("Remove"), Iconos.Borrar(), self.borrar), None)
+        li_acciones = (
+            (_("Close"), Iconos.MainMenu(), self.terminar),
+            None,
+            (_("Train"), Iconos.Entrenar(), self.empezar),
+            None,
+            (_("Remove"), Iconos.Borrar(), self.borrar),
+            None,
+        )
         self.tb = QTVarios.LCTB(self, li_acciones)
 
         # Colocamos

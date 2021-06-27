@@ -5,7 +5,7 @@ import random
 import Code
 from Code.Base import Game
 from Code import Util
-from Code import TrListas
+from Code.Config import TrListas
 
 
 class Reg:
@@ -368,16 +368,7 @@ class Transsiberian:
                 x1 = x2 = ""
             li.append(
                 "%s%2d. %s - %s (%s, %d %s) %s"
-                % (
-                    x1,
-                    line.stage,
-                    line.st_from.name,
-                    line.st_to.name,
-                    km_mi(line.km, self._is_miles),
-                    line.num_stations,
-                    _("stations"),
-                    x2,
-                )
+                % (x1, line.stage, line.st_from.name, line.st_to.name, km_mi(line.km, self._is_miles), line.num_stations, _("stations"), x2)
             )
         return "<br>".join(li)
 
@@ -394,9 +385,7 @@ class Transsiberian:
                 x2 = "</b>"
             else:
                 x1 = x2 = ""
-            li.append(
-                "%s%2d. %s - %s (%s) %s" % (x1, n, st_from.name, st.name, km_mi(st.km - st_from.km, self._is_miles), x2)
-            )
+            li.append("%s%2d. %s - %s (%s) %s" % (x1, n, st_from.name, st.name, km_mi(st.km - st_from.km, self._is_miles), x2))
             st_from = st
         return "<br>".join(li)
 

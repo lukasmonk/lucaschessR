@@ -318,12 +318,7 @@ class WConfTactics(QtWidgets.QWidget):
         lb_r_cycles = Controles.LB(self, _("Cycles") + ": ")
         self.sb_reinf_cycles = Controles.SB(self, self.reinforcement_cycles, 1, 10)
         ly = (
-            Colocacion.H()
-            .control(lb_r_errors)
-            .control(self.cb_reinf_errors)
-            .espacio(30)
-            .control(lb_r_cycles)
-            .control(self.sb_reinf_cycles)
+            Colocacion.H().control(lb_r_errors).control(self.cb_reinf_errors).espacio(30).control(lb_r_cycles).control(self.sb_reinf_cycles)
         )
         gb_reinforcement = Controles.GB(self, _("Reinforcement"), ly).ponFuente(f)
 
@@ -577,9 +572,7 @@ class WConfTactics(QtWidgets.QWidget):
 class WEditaTactica(QTVarios.WDialogo):
     def __init__(self, owner, tactica, ncopia):
 
-        QTVarios.WDialogo.__init__(
-            self, owner, _X(_("Configuration of %1"), tactica.title), Iconos.Tacticas(), "editTactica"
-        )
+        QTVarios.WDialogo.__init__(self, owner, _X(_("Configuration of %1"), tactica.title), Iconos.Tacticas(), "editTactica")
 
         self.tactica = tactica
 

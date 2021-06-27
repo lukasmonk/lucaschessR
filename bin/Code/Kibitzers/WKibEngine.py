@@ -161,7 +161,7 @@ class WKibEngine(WKibCommon.WKibCommon):
         rm = self.li_moves[row]
         key = o_column.key
         if key == "EVALUATION":
-            return rm.abrTexto()
+            return rm.abrTextoBase()
 
         elif key == "BESTMOVE":
             p = Game.Game(ini_posicion=self.game.last_position)
@@ -214,6 +214,7 @@ class WKibEngine(WKibCommon.WKibCommon):
         if not Util.exist_file(exe):
             QTUtil2.message_error(self, "%s:\n  %s" % (_("Engine not found"), exe))
             import sys
+
             sys.exit()
         args = self.kibitzer.args
         li_uci = self.kibitzer.liUCI

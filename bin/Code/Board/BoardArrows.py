@@ -356,9 +356,7 @@ def paintArrow(painter, bf):
                 painter.drawPolygon(QtGui.QPolygonF([p_ini, p_cab1, p_ala1, p_fin, p_ala2, p_cab2, p_ini]))
             # tipo 3 base cabeza = un punto
             elif forma == "3":
-                painter.drawPolygon(
-                    QtGui.QPolygonF([p_base1, p_basecab, p_ala1, p_fin, p_ala2, p_basecab, p_base2, p_base1])
-                )
+                painter.drawPolygon(QtGui.QPolygonF([p_base1, p_basecab, p_ala1, p_fin, p_ala2, p_basecab, p_base2, p_base1]))
 
     return poligonoSizeBottom, poligonoMove, poligonoSizeTop
 

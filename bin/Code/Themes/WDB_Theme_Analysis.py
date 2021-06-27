@@ -43,7 +43,7 @@ class WDBMoveAnalysis(QTVarios.WDialogo):
 
         self.status = QtWidgets.QStatusBar(self)
         self.status.setFixedHeight(22)
-        self.status.showMessage( " %s %s %s" % (symbol, _("calculated using all games"), missing_tags_output))
+        self.status.showMessage(" %s %s %s" % (symbol, _("calculated using all games"), missing_tags_output))
 
         # Colocamos ---------------------------------------------------------------
         ly = Colocacion.V().control(self.grid).control(self.status).margen(1)
@@ -79,7 +79,7 @@ class SelectedGameThemeAnalyzer:
 
             game_has_themes = False
             themes_in_game = []
-            my_game: Game.Game = w_parent.dbGames.read_game_recno(recno)            
+            my_game: Game.Game = w_parent.dbGames.read_game_recno(recno)
             for move_num, move in enumerate(my_game.li_moves):
                 lostp_abs = move.get_points_lost()
                 if lostp_abs is not None:
@@ -88,28 +88,37 @@ class SelectedGameThemeAnalyzer:
                         self.tag_count += 1
                         lostp_abs = min(move.get_points_lost(), 2000)  # limite para missed checkmate
                         if theme not in self.dic_themes:
-                            self.dic_themes[theme] = {'centipawns_lost': 0, 'count': 0, 'total_time': 0, 'games': 0}
-                        self.dic_themes[theme]['centipawns_lost'] += lostp_abs
-                        self.dic_themes[theme]['count'] += 1
+                            self.dic_themes[theme] = {"centipawns_lost": 0, "count": 0, "total_time": 0, "games": 0}
+                        self.dic_themes[theme]["centipawns_lost"] += lostp_abs
+                        self.dic_themes[theme]["count"] += 1
                         if theme not in themes_in_game:
                             themes_in_game.append(theme)
-                            self.dic_themes[theme]['games'] += 1
+                            self.dic_themes[theme]["games"] += 1
 
             if not game_has_themes:
                 # self.li_games_missing_themes.append("# %s (%s-%s)" % (recno + 1, my_game.get_tag("White"),
                 #                                                  my_game.get_tag("Black")))
-                self.li_games_missing_themes.append("#%s" % (recno + 1, ))
+                self.li_games_missing_themes.append("#%s" % (recno + 1,))
 
-        for key, value in sorted(self.dic_themes.items(), key=lambda i: i[1]['count'], reverse=True):            
-            self.li_output_dic.append({'theme': key,
-                                       'games': "%s (%s" % (value['games'], int(100*value['games']/self.game_count)) + "%)",
-                                  'centipawns_lost': value['centipawns_lost'],
-                                  'count': value['count'],
-                                  'occ_game': round(value['count'] / self.game_count, 2),
-                                  'loss_game': int(value['centipawns_lost'] / self.game_count)})
+        for key, value in sorted(self.dic_themes.items(), key=lambda i: i[1]["count"], reverse=True):
+            self.li_output_dic.append(
+                {
+                    "theme": key,
+                    "games": "%s (%s" % (value["games"], int(100 * value["games"] / self.game_count)) + "%)",
+                    "centipawns_lost": value["centipawns_lost"],
+                    "count": value["count"],
+                    "occ_game": round(value["count"] / self.game_count, 2),
+                    "loss_game": int(value["centipawns_lost"] / self.game_count),
+                }
+            )
 
         if len(self.li_games_missing_themes):
-            self.missing_tags_output = " -  %s: %s" % (_("Games without themes")," ,".join(self.li_games_missing_themes))
+            self.missing_tags_output = " -  %s: %s" % (_("Games without themes"), " ,".join(self.li_games_missing_themes))
 
-        self.title = "%s - %d %s  (%d %s)" % (_("Statistics on tactical themes"), self.game_count, _("games analysed"),  self.tag_count, _("tags found"))
-
+        self.title = "%s - %d %s  (%d %s)" % (
+            _("Statistics on tactical themes"),
+            self.game_count,
+            _("games analysed"),
+            self.tag_count,
+            _("tags found"),
+        )

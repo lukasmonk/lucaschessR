@@ -26,9 +26,7 @@ class WOpeningLines(QTVarios.WDialogo):
         self.resultado = None
         self.listaOpenings = OpeningLines.ListaOpenings(self.configuration)
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, self.getTitulo(), Iconos.OpeningLines(), "openingLines"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, self.getTitulo(), Iconos.OpeningLines(), "openingLines")
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("TITLE", _("Name"), 240)
@@ -158,9 +156,7 @@ class WOpeningLines(QTVarios.WDialogo):
                         li_gen.append(FormLayout.separador)
                         li_gen.append((None, error))
 
-                    resultado = FormLayout.fedit(
-                        li_gen, title=nof, parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460
-                    )
+                    resultado = FormLayout.fedit(li_gen, title=nof, parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460)
                     if resultado:
                         accion, liResp = resultado
                         name = liResp[0].strip()
@@ -247,9 +243,7 @@ class WOpeningLines(QTVarios.WDialogo):
     def get_nombre(self, name):
         li_gen = [(None, None)]
         li_gen.append((_("Opening studio name") + ":", name))
-        resultado = FormLayout.fedit(
-            li_gen, title=_("Opening studio name"), parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460
-        )
+        resultado = FormLayout.fedit(li_gen, title=_("Opening studio name"), parent=self, icon=Iconos.OpeningLines(), anchoMinimo=460)
         if resultado:
             accion, liResp = resultado
             name = liResp[0].strip()

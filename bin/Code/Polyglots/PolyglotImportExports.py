@@ -54,7 +54,7 @@ class PolyglotExport:
                 weight_max = max(xentry.weight for xentry in li_current)
                 if weight_max >= 32767:
                     factor = 32767 / weight_max
-                li_current.sort(key = lambda x: x.weight, reverse=True)
+                li_current.sort(key=lambda x: x.weight, reverse=True)
             for xentry in li_current:
                 if xentry.weight > 0:
                     if uniform:
@@ -479,7 +479,11 @@ def import_polyglot_config(owner, configuration, titulo, with_collisions):
     form.spinbox(_("Minimum score") + " (0-100)", 0, 100, 50, dic.get("MINSCORE", 0))
 
     form.separador()
-    li_options = ((_("Number of games"), CALCWEIGHT_NUMGAMES), (_("Number of games") + " * " + _("Score"), CALCWEIGHT_NUMGAMES_SCORE), (_("Score") + "% * 100", CALCWEIGHT_SCORE))
+    li_options = (
+        (_("Number of games"), CALCWEIGHT_NUMGAMES),
+        (_("Number of games") + " * " + _("Score"), CALCWEIGHT_NUMGAMES_SCORE),
+        (_("Score") + "% * 100", CALCWEIGHT_SCORE),
+    )
     form.combobox(_("Calculation of the weight"), li_options, dic.get("CALCWEIGHT", CALCWEIGHT_NUMGAMES))
     form.separador()
     form.checkbox(_("Save score"), dic.get("SAVESCORE", False))
@@ -556,7 +560,12 @@ def export_polyglot_config(owner, configuration, file_nom_def):
 
     path_bin = os.path.realpath(path_bin)
     if Util.exist_file(path_bin):
-        yn = QTUtil2.preguntaCancelar(owner, _X(_("The file %1 already exists, what do you want to do?"), os.path.basename(path_bin)), si=_("Overwrite"), no=_("Choose another"))
+        yn = QTUtil2.preguntaCancelar(
+            owner,
+            _X(_("The file %1 already exists, what do you want to do?"), os.path.basename(path_bin)),
+            si=_("Overwrite"),
+            no=_("Choose another"),
+        )
         if yn is None:
             return
         if not yn:

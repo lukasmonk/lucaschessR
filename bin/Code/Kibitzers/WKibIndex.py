@@ -39,7 +39,9 @@ class WKibIndex(QtWidgets.QDialog):
         self.setWindowTitle(cpu.titulo)
         self.setWindowIcon(Iconos.Motor())
 
-        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(
+            QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint
+        )
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 

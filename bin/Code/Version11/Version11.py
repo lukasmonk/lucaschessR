@@ -15,6 +15,7 @@ from Code.Engines import EngineResponse
 from Code.QT import QTUtil2
 from Code.SQL import UtilSQL
 
+
 class DicSQLV11(object):
     def __init__(self, nomDB, tabla="Data"):
         self.table = tabla
@@ -333,7 +334,6 @@ class Version11:
             QTUtil2.message(self.wowner, _("Imported"))
         else:
             QTUtil2.message(self.wowner, _("Nothing to import"))
-
 
     def run(self, tipo):
         if tipo == "databases":

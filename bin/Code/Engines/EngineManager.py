@@ -50,7 +50,7 @@ class EngineManager:
         self.name = confMotor.name
         self.key = confMotor.key
         self.num_multipv = 0
-        self.ms_time_move = None
+        self.mstime_engine = None
         self.depth_engine = None
 
         self.function = _("Opponent").lower()  # para distinguir entre tutor y analizador
@@ -70,12 +70,12 @@ class EngineManager:
     def set_direct(self):
         self.direct = True
 
-    def options(self, ms_time_move, profundidad, siMultiPV):
-        self.ms_time_move = ms_time_move
-        self.depth_engine = profundidad
+    def options(self, mstime_engine, depth_engine, siMultiPV):
+        self.mstime_engine = mstime_engine
+        self.depth_engine = depth_engine
         self.num_multipv = self.confMotor.multiPV if siMultiPV else 0
 
-        if self.key in ("daydreamer", "cinnamon") and profundidad and profundidad == 1:
+        if self.key in ("daydreamer", "cinnamon") and depth_engine and depth_engine == 1:
             self.depth_engine = 2
 
     def set_priority(self, priority):
@@ -148,7 +148,7 @@ class EngineManager:
 
     def play_time(self, game, seconds_white, seconds_black, seconds_move, nAjustado=0):
         self.check_engine()
-        if self.ms_time_move or self.depth_engine:
+        if self.mstime_engine or self.depth_engine:
             return self.play_game(game, nAjustado)
         mseconds_white = int(seconds_white * 1000)
         mseconds_black = int(seconds_black * 1000)
@@ -169,7 +169,7 @@ class EngineManager:
     def play_game(self, game, nAjustado=0):
         self.check_engine()
 
-        mrm = self.engine.bestmove_game(game, self.ms_time_move, self.depth_engine)
+        mrm = self.engine.bestmove_game(game, self.mstime_engine, self.depth_engine)
 
         if nAjustado:
             mrm.game = game
@@ -184,8 +184,8 @@ class EngineManager:
         self.check_engine()
         if self.engine.pondering:
             self.engine.stop_ponder()
-        if self.ms_time_move or self.depth_engine:
-            mrm = self.engine.bestmove_game(game, self.ms_time_move, self.depth_engine)
+        if self.mstime_engine or self.depth_engine:
+            mrm = self.engine.bestmove_game(game, self.mstime_engine, self.depth_engine)
         else:
             mseconds_white = int(seconds_white * 1000)
             mseconds_black = int(seconds_black * 1000)
@@ -197,7 +197,7 @@ class EngineManager:
 
     def analiza(self, fen):
         self.check_engine()
-        return self.engine.bestmove_fen(fen, self.ms_time_move, self.depth_engine)
+        return self.engine.bestmove_fen(fen, self.mstime_engine, self.depth_engine)
 
     def valora(self, position, from_sq, to_sq, promotion):
         self.check_engine()
@@ -216,7 +216,7 @@ class EngineManager:
             self.promotion = promotion
             return rm
 
-        mrm = self.engine.bestmove_fen(fen, self.ms_time_move, self.depth_engine)
+        mrm = self.engine.bestmove_fen(fen, self.mstime_engine, self.depth_engine)
         rm = mrm.mejorMov()
         rm.cambiaColor(position)
         mv = from_sq + to_sq + (promotion if promotion else "")
@@ -337,7 +337,7 @@ class EngineManager:
     def ac_inicio_limit(self, game):
         # tutor cuando no se quiere que trabaje en background
         self.check_engine()
-        self.engine.ac_inicio_limit(game, self.ms_time_move, self.depth_engine)
+        self.engine.ac_inicio_limit(game, self.mstime_engine, self.depth_engine)
 
     def ac_minimo(self, minTiempo, lockAC):
         self.check_engine()
@@ -357,7 +357,7 @@ class EngineManager:
 
     def ac_final_limit(self):
         self.check_engine()
-        return self.engine.ac_final_limit(self.ms_time_move)
+        return self.engine.ac_final_limit(self.mstime_engine)
 
     def set_option(self, name, value):
         self.check_engine()
@@ -407,14 +407,11 @@ class EngineManager:
                 resp = None
             routine_return(resp)
 
-        if self.ms_time_move or self.depth_engine:
-            self.engine.play_bestmove_game(play_return, game, self.ms_time_move, self.depth_engine)
+        if self.mstime_engine or self.depth_engine:
+            self.engine.play_bestmove_game(play_return, game, self.mstime_engine, self.depth_engine)
 
         else:
-            mseconds_white = int(seconds_white * 1000)
-            mseconds_black = int(seconds_black * 1000)
-            mseconds_move = int(seconds_move * 1000)
-            self.engine.play_bestmove_time(play_return, game, mseconds_white, mseconds_black, mseconds_move)
+            self.engine.play_bestmove_time(play_return, game, seconds_white * 1000, seconds_black * 1000, seconds_move * 1000)
 
     def log_open(self):
         if self.ficheroLog:

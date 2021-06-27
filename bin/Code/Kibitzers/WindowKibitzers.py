@@ -16,7 +16,6 @@ from Code.QT import Delegados
 from Code.QT import FormLayout
 
 
-
 class WKibitzers(QTVarios.WDialogo):
     def __init__(self, w_parent, kibitzers_manager):
         titulo = _("Kibitzers")
@@ -57,9 +56,7 @@ class WKibitzers(QTVarios.WDialogo):
         self.register_splitter(self.splitter, "kibitzers")
 
         o_columns = Columnas.ListaColumnas()
-        o_columns.nueva(
-            "TYPE", "", 30, centered=True, edicion=Delegados.PmIconosBMT(self, dicIconos=self.tipos.dicDelegado())
-        )
+        o_columns.nueva("TYPE", "", 30, centered=True, edicion=Delegados.PmIconosBMT(self, dicIconos=self.tipos.dicDelegado()))
         o_columns.nueva("NOMBRE", _("Kibitzer"), 209)
         self.grid_kibitzers = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid="kib")
         self.grid_kibitzers.tipoLetra(puntos=self.configuration.x_pgn_fontpoints)
@@ -417,12 +414,7 @@ class WKibitzerLive(QTVarios.WDialogo):
         self.li_options = self.leeOpciones()
         self.liOriginal = self.leeOpciones()
 
-        li_acciones = (
-            (_("Save"), Iconos.Grabar(), self.grabar),
-            None,
-            (_("Cancel"), Iconos.Cancelar(), self.reject),
-            None,
-        )
+        li_acciones = ((_("Save"), Iconos.Grabar(), self.grabar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None)
         tb = Controles.TBrutina(self, li_acciones)
 
         o_columns = Columnas.ListaColumnas()

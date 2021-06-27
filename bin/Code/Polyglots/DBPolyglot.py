@@ -33,7 +33,9 @@ class DBPolyglot:
 
     def insert_entry(self, entry):
         sql = "INSERT INTO BOOK( CKEY, MOVE, WEIGHT, SCORE, DEPTH, LEARN ) VALUES( ?, ?, ?, ?, ?, ? );"
-        cursor = self.conexion.execute(sql, (FasterCode.int_str(entry.key), entry.move, entry.weight, entry.score, entry.depth, entry.learn))
+        cursor = self.conexion.execute(
+            sql, (FasterCode.int_str(entry.key), entry.move, entry.weight, entry.score, entry.depth, entry.learn)
+        )
         return cursor.lastrowid
 
     def update_entry(self, rowid, entry):
@@ -134,7 +136,7 @@ class DBPolyglot:
     def get_all(self):
         sql = "SELECT DISTINCT length(CKEY) FROM BOOK"
         cursor = self.conexion.execute(sql)
-        li_length = [ int(x[0]) for x in cursor.fetchall()]
+        li_length = [int(x[0]) for x in cursor.fetchall()]
         li_length.sort()
 
         sql = "SELECT CKEY, MOVE, WEIGHT, SCORE, DEPTH, LEARN FROM BOOK WHERE LENGTH(CKEY) = ? ORDER BY CKEY"
@@ -154,6 +156,7 @@ class DBPolyglot:
 
     def commit(self):
         self.conexion.commit()
+
 
 class IndexPolyglot:
     def __init__(self):
@@ -223,4 +226,3 @@ class IndexPolyglot:
         um.final()
         self._list = li
         return self._list
-

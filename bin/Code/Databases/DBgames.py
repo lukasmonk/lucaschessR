@@ -451,7 +451,7 @@ class DBgames:
         fen, pv = self.read_xpv(raw["XPV"])
         if xpgn:
             if xpgn.startswith(BODY_SAVE):
-                pgn_read = xpgn[len(BODY_SAVE):].strip()
+                pgn_read = xpgn[len(BODY_SAVE) :].strip()
                 if fen:
                     pgn_read = b'[FEN "%s"]\n' % fen.encode() + pgn_read
                 ok, p = Game.pgn_game(pgn_read)
@@ -567,11 +567,7 @@ class DBgames:
                     if n == next_n:
                         if time.time() - t1 > 0.8:
                             if not dlTmp.actualiza(
-                                erroneos + duplicados + importados,
-                                erroneos,
-                                duplicados,
-                                importados,
-                                btell * 100.0 / bsize,
+                                erroneos + duplicados + importados, erroneos, duplicados, importados, btell * 100.0 / bsize
                             ):
                                 break
                             t1 = time.time()
@@ -735,9 +731,7 @@ class DBgames:
         for btell, recno in enumerate(liRecnos):
             if btell == next_n:
                 if time.time() - t1 > 0.9:
-                    if not dlTmp.actualiza(
-                        erroneos + duplicados + importados, erroneos, duplicados, importados, btell * 100.0 / bsize
-                    ):
+                    if not dlTmp.actualiza(erroneos + duplicados + importados, erroneos, duplicados, importados, btell * 100.0 / bsize):
                         break
                     t1 = time.time()
                 next_n = btell + random.randint(1000, 2000)
@@ -979,7 +973,7 @@ def get_random_game():
     return game
 
 
-def autosave(game:Game.Game):
+def autosave(game: Game.Game):
     path_db = Code.configuration.file_autosave()
     exist = os.path.isfile(path_db)
     db = DBgames(path_db)

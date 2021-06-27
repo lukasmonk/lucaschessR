@@ -1,9 +1,10 @@
 import Code.Base.Game  # To prevent recursivity in Variations -> import direct
-from Code import TrListas
+from Code.Config import TrListas
 from Code import Util
 from Code.Base import Position
 from Code.Base.Constantes import *
 from Code.Engines import EngineResponse
+from Code.Themes.Lichess import cook
 
 
 def crea_dic_html():
@@ -323,16 +324,32 @@ class Move:
                 return False, True
         return False, False
 
+    def assign_themes_lichess(self):
+        if self.analysis:
+            for nag in self.li_nags:
+                if nag in (NAG_2, NAG_4, NAG_6):
+                    mrm, pos = self.analysis
+                    rm: EngineResponse.EngineResponse = mrm.li_rm[pos]
+                    li_pv = rm.getPV().split(" ")
+                    if len(li_pv) < 3:
+                        return
+                    pv = " ".join(li_pv[1:])
+                    li_themes = cook.get_tags(self.position.fen(), pv, rm.puntos)
+                    if li_themes:
+                        for theme in li_themes:
+                            self.add_theme(theme)
+                    return
+
 
 def get_game_move(game, position_before, from_sq, to_sq, promotion):
     position = position_before.copia()
 
-    ok, mensError = position.mover(from_sq, to_sq, promotion)
+    ok, mens_error = position.mover(from_sq, to_sq, promotion)
     if ok:
         move = Move(game, position_before, position, from_sq, to_sq, promotion)
         return True, None, move
     else:
-        return False, mensError, None
+        return False, mens_error, None
 
 
 class Variations:

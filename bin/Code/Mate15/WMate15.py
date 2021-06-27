@@ -84,7 +84,7 @@ class WMate15(QTVarios.WDialogo):
         if col == "DATE":
             return Util.dtostr_hm(m15.date)
         elif col == "POS":
-            return "%d" % (m15.pos+1,)
+            return "%d" % (m15.pos + 1,)
         elif col == "INFO":
             return m15.info
         elif col == "TRIES":
@@ -95,7 +95,7 @@ class WMate15(QTVarios.WDialogo):
                 return ""
             else:
                 min_tm = m15.result()
-                return "%.01f\"" % min_tm if min_tm else ""
+                return '%.01f"' % min_tm if min_tm else ""
 
     def closeEvent(self, event):  # Cierre con X
         self.save_video()

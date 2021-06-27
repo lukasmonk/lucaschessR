@@ -1,5 +1,5 @@
 import Code
-from Code import Albums
+from Code.PlayAgainstEngine import Albums
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -290,7 +290,7 @@ class WAtajos(QTVarios.WDialogo):
 
     def grid_dato(self, grid, row, o_column):
         if o_column.key == "KEY":
-            return "%s %d" % (_("Alt"), row+1)
+            return "%s %d" % (_("Alt"), row + 1)
         dic = self.li_favoritos[row]
         opcion = dic["OPCION"]
         if opcion in self.dic_data:
@@ -353,7 +353,7 @@ class WAtajos(QTVarios.WDialogo):
         if fila >= 0:
             self.save_video()
             self.accept()
-            atajos_alt(self.procesador, fila+1)
+            atajos_alt(self.procesador, fila + 1)
 
 
 def atajos(procesador):

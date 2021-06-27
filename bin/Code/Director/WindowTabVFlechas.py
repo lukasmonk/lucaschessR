@@ -54,13 +54,7 @@ class WTV_Flecha(QtWidgets.QDialog):
             li_gen.append((config, regFlecha.name))
 
         # ( "forma", "t", "a" ), # a = abierta -> , c = cerrada la cabeza, p = poligono cuadrado,
-        liFormas = (
-            (_("Opened"), "a"),
-            (_("Head closed"), "c"),
-            (_("Polygon  1"), "1"),
-            (_("Polygon  2"), "2"),
-            (_("Polygon  3"), "3"),
-        )
+        liFormas = ((_("Opened"), "a"), (_("Head closed"), "c"), (_("Polygon  1"), "1"), (_("Polygon  2"), "2"), (_("Polygon  3"), "3"))
         config = FormLayout.Combobox(_("Form"), liFormas)
         li_gen.append((config, regFlecha.forma))
 

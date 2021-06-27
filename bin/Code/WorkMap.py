@@ -4,7 +4,7 @@ import random
 from PySide2 import QtCore
 
 import Code.SQL.Base as SQLBase
-from Code import STS
+from Code.Engines import STS
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
@@ -126,13 +126,7 @@ def ld_countries(mapa):
         ("by", _("Belarus"), ["lv", "ru", "lt", "ua", "pl"], 2571, []),
         ("bz", _("Belize"), ["gt", "mx"], 1500, []),
         ("ca", _("Canada"), ["dk", "us"], 2499, []),
-        (
-            "cd",
-            _("Congo, the Democratic Republic of the"),
-            ["zm", "rw", "tz", "ss", "cg", "bi", "ao", "cf", "ug"],
-            1500,
-            [],
-        ),
+        ("cd", _("Congo, the Democratic Republic of the"), ["zm", "rw", "tz", "ss", "cg", "bi", "ao", "cf", "ug"], 1500, []),
         ("cf", _("Central African Republic"), ["cm", "ss", "cg", "cd", "td", "sd"], 1500, []),
         ("cg", _("Congo"), ["ga", "cd", "cm", "ao", "cf"], 1500, []),
         ("ch", _("Switzerland"), ["fr", "de", "it", "li", "at"], 2504, []),
@@ -367,14 +361,7 @@ def ld_countries(mapa):
 
 class DBWorkMap(SQLBase.DBBase):
     def __init__(self, fichdb):
-        self.trDic = {
-            "mate": _("Mate"),
-            "sts": _("STS"),
-            "basic": _("Basic"),
-            "easy": _("Easy"),
-            "medium": _("Medium"),
-            "hard": _("Hard"),
-        }
+        self.trDic = {"mate": _("Mate"), "sts": _("STS"), "basic": _("Basic"), "easy": _("Easy"), "medium": _("Medium"), "hard": _("Hard")}
 
         SQLBase.DBBase.__init__(self, fichdb)
 
@@ -403,10 +390,7 @@ class DBWorkMap(SQLBase.DBBase):
 
     def releer(self):
         cursor = self.conexion.cursor()
-        cursor.execute(
-            "SELECT ROWID, ACTIVE, DCREATION, DEND, DONE, TIPO, MODEL, INFO "
-            "FROM %s ORDER BY -DCREATION;" % self.tabla
-        )
+        cursor.execute("SELECT ROWID, ACTIVE, DCREATION, DEND, DONE, TIPO, MODEL, INFO " "FROM %s ORDER BY -DCREATION;" % self.tabla)
         lista = cursor.fetchall()
         cursor.close()
         li = []
@@ -426,9 +410,7 @@ class DBWorkMap(SQLBase.DBBase):
 
     def dataActivo(self):
         cursor = self.conexion.cursor()
-        cursor.execute(
-            "SELECT ROWID, DCREATION, DEND, DONE, TIPO, MODEL, INFO, DATA " "FROM %s WHERE ACTIVE=1;" % self.tabla
-        )
+        cursor.execute("SELECT ROWID, DCREATION, DEND, DONE, TIPO, MODEL, INFO, DATA " "FROM %s WHERE ACTIVE=1;" % self.tabla)
         raw = cursor.fetchone()
         cursor.close()
         return raw
@@ -475,9 +457,7 @@ class DBWorkMap(SQLBase.DBBase):
         data = workmap.save()
 
         cursor = self.conexion.cursor()
-        cursor.execute(
-            "UPDATE %s SET DEND=?, DONE=?, INFO=?, DATA=? WHERE ROWID=?;" % self.tabla, (dend, done, info, data, rowid)
-        )
+        cursor.execute("UPDATE %s SET DEND=?, DONE=?, INFO=?, DATA=? WHERE ROWID=?;" % self.tabla, (dend, done, info, data, rowid))
         self.conexion.commit()
         cursor.close()
         self.releer()

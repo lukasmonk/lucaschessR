@@ -3,7 +3,7 @@ from PySide2 import QtCore, QtWidgets
 import Code
 from Code import Util
 from Code import XRun
-from Code.Analysis import WindowAnalysisParam
+from Code.Analysis import WindowAnalysisParam, Histogram
 from Code.Base import Game
 from Code.Board import Board
 from Code.QT import Colocacion
@@ -11,7 +11,6 @@ from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Delegados
 from Code.QT import Grid
-from Code.QT import Histogram
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
@@ -25,10 +24,7 @@ class WAnalisisGraph(QTVarios.WDialogo):
         extparam = "estadisticasv1"
         QTVarios.WDialogo.__init__(self, wowner, titulo, icono, extparam)
         self.setWindowFlags(
-            QtCore.Qt.WindowCloseButtonHint
-            | QtCore.Qt.Dialog
-            | QtCore.Qt.WindowTitleHint
-            | QtCore.Qt.WindowMinimizeButtonHint
+            QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint
         )
 
         self.alm = alm
@@ -83,7 +79,7 @@ class WAnalisisGraph(QTVarios.WDialogo):
 
         # self.capturas = WCapturas.CapturaLista(self, self.board)
         ly_tc = Colocacion.H().control(self.board)
-            # .control(self.capturas)
+        # .control(self.capturas)
 
         self.rbShowValues = Controles.RB(self, _("Values"), rutina=self.cambiadoShow).activa(True)
         self.rbShowElo = Controles.RB(self, _("Elo performance"), rutina=self.cambiadoShow)
@@ -198,14 +194,7 @@ class WAnalisisGraph(QTVarios.WDialogo):
         move = self.dicLiJG[grid.id][row]
         mrm, pos = move.analysis
         self.show_analysis(
-            self.procesador,
-            self.procesador.xtutor,
-            move,
-            self.board.is_white_bottom,
-            999999,
-            pos,
-            main_window=self,
-            must_save=False,
+            self.procesador, self.procesador.xtutor, move, self.board.is_white_bottom, 999999, pos, main_window=self, must_save=False
         )
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
@@ -423,10 +412,7 @@ class WMuestra(QtWidgets.QWidget):
     def jugarPosicion(self):
         position, from_sq, to_sq = self.um.active_base_position()
         game = Game.Game(ini_posicion=position)
-        dic_sended = {
-            "ISWHITE": position.is_white,
-            "GAME": game.save()
-        }
+        dic_sended = {"ISWHITE": position.is_white, "GAME": game.save()}
 
         fichero = Code.configuration.ficheroTemporal("pk")
         Util.save_pickle(fichero, dic_sended)
@@ -504,15 +490,11 @@ class WAnalisis(QTVarios.WDialogo):
 
         self.lbMotor = Controles.LB(self).align_center()
         self.lbTiempo = Controles.LB(self).align_center()
-        self.lbPuntuacion = (
-            Controles.LB(self).align_center().ponTipoLetra(puntos=configuration.x_pgn_fontpoints, peso=75)
-        )
+        self.lbPuntuacion = Controles.LB(self).align_center().ponTipoLetra(puntos=configuration.x_pgn_fontpoints, peso=75)
         self.lbPGN = Controles.LB(self).set_wrap().ponTipoLetra(puntos=configuration.x_pgn_fontpoints).anchoFijo(self.board.ancho)
         self.lbPGN.setStyleSheet("padding: 5px; border:1px solid gray;")
 
-        self.setStyleSheet(
-            "QStatusBar::item { border-style: outset; border: 1px solid LightSlateGray ;}"
-        )
+        self.setStyleSheet("QStatusBar::item { border-style: outset; border: 1px solid LightSlateGray ;}")
 
         liMasAcciones = (("FEN:%s" % _("Copy to clipboard"), "MoverFEN", Iconos.Clipboard()),)
         lytb, self.tb = QTVarios.lyBotonesMovimiento(
@@ -678,14 +660,10 @@ class WAnalisisVariations(QtWidgets.QDialog):
         btTerminar = Controles.PB(self, _("Close"), self.close).ponPlano(False)
         btReset = Controles.PB(self, _("Another change"), oBase.reset).ponIcono(Iconos.MoverLibre()).ponPlano(False)
         liMasAcciones = (("FEN:%s" % _("Copy to clipboard"), "MoverFEN", Iconos.Clipboard()),)
-        lytbTutor, self.tb = QTVarios.lyBotonesMovimiento(
-            self, "", siLibre=max_recursion > 0, liMasAcciones=liMasAcciones
-        )
+        lytbTutor, self.tb = QTVarios.lyBotonesMovimiento(self, "", siLibre=max_recursion > 0, liMasAcciones=liMasAcciones)
         self.max_recursion = max_recursion - 1
 
-        self.seconds, lbSegundos = QTUtil2.spinBoxLB(
-            self, segundosPensando, 1, 999, maxTam=40, etiqueta=_("Second(s)")
-        )
+        self.seconds, lbSegundos = QTUtil2.spinBoxLB(self, segundosPensando, 1, 999, maxTam=40, etiqueta=_("Second(s)"))
 
         # Creamos los layouts
 

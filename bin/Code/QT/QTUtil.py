@@ -64,13 +64,7 @@ def backgroundGUIlight(factor):
     """
     Background por defecto del GUI
     """
-    return (
-        QtWidgets.QApplication.palette()
-        .brush(QtGui.QPalette.Active, QtGui.QPalette.Window)
-        .color()
-        .light(factor)
-        .name()
-    )
+    return QtWidgets.QApplication.palette().brush(QtGui.QPalette.Active, QtGui.QPalette.Window).color().light(factor).name()
 
 
 def refresh_gui():

@@ -1,7 +1,7 @@
 import operator
 
 from Code.QT import Iconos
-from Code import TrListas
+from Code.Config import TrListas
 from Code.SQL import UtilSQL
 import Code
 

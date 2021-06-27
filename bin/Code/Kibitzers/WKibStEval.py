@@ -65,6 +65,7 @@ class WStEval(WKibCommon.WKibCommon):
         if not Util.exist_file(exe):
             QTUtil2.message_error(self, "%s:\n  %s" % (_("Engine not found"), exe))
             import sys
+
             sys.exit()
         args = self.kibitzer.args
         li_uci = self.kibitzer.liUCI
@@ -89,5 +90,3 @@ class WStEval(WKibCommon.WKibCommon):
                 txt = "".join(li)
 
         self.em.set_text(txt)
-
-

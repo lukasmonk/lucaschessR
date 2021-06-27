@@ -262,7 +262,7 @@ class WOpenings(QTVarios.WDialogo):
                 p = Game.Game()
                 p.read_pv(ap.a1h8)
                 ap.a1h8 = self.game.pv()
-                ap.trNombre += " + %s" % (self.game.pgn_translated()[len(p.pgn_translated()) + 1:],)
+                ap.trNombre += " + %s" % (self.game.pgn_translated()[len(p.pgn_translated()) + 1 :],)
 
         ap.pgn = self.game.pgn_translated()
         return ap
@@ -344,7 +344,7 @@ class EntrenamientoOpening(QTVarios.WDialogo):
                 nap = len(ap.pgn)
                 pgn_translated = p.pgn_translated()
                 if len(pgn_translated) > nap:
-                    ap.trNombre += " + %s" % (pgn_translated[nap + 1:],)
+                    ap.trNombre += " + %s" % (pgn_translated[nap + 1 :],)
             ap.pgn = p.pgn_translated()
             li.append(ap)
         return li

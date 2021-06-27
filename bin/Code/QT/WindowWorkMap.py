@@ -1,6 +1,6 @@
 from PySide2 import QtWidgets, QtSvg, QtGui
 
-from Code import TrListas
+from Code.Config import TrListas
 from Code import WorkMap
 from Code.Analysis import Analysis
 from Code.Base import Game, Move, Position
@@ -37,12 +37,7 @@ class WMap(QTVarios.WDialogo):
 
         self.register_grid(self.grid)
 
-        li_acciones = (
-            (_("Close"), Iconos.MainMenu(), self.terminar),
-            None,
-            (_("Play"), Iconos.Empezar(), self.play),
-            None,
-        )
+        li_acciones = ((_("Close"), Iconos.MainMenu(), self.terminar), None, (_("Play"), Iconos.Empezar(), self.play), None)
         tb_work = QTVarios.LCTB(self, li_acciones, icon_size=24)
 
         self.lbInfo = Controles.LB(self)
@@ -126,9 +121,7 @@ class WMap(QTVarios.WDialogo):
                 liR = [(str(x), x) for x in range(1, 100)]
                 config = FormLayout.Combobox(_("Model"), liR)
                 li_gen.append((config, "1"))
-                resultado = FormLayout.fedit(
-                    li_gen, title=_("STS: Strategic Test Suite"), parent=self, anchoMinimo=160, icon=Iconos.Maps()
-                )
+                resultado = FormLayout.fedit(li_gen, title=_("STS: Strategic Test Suite"), parent=self, anchoMinimo=160, icon=Iconos.Maps())
                 if resultado is None:
                     return
                 accion, liResp = resultado
@@ -373,9 +366,7 @@ class WUnSTSMap(QTVarios.WDialogo):
 
     def analizar(self):
         xtutor = self.procesador.XTutor()
-        Analysis.show_analysis(
-            self.procesador, xtutor, self.move, self.position.is_white, 9999999, 1, main_window=self, must_save=False
-        )
+        Analysis.show_analysis(self.procesador, xtutor, self.move, self.position.is_white, 9999999, 1, main_window=self, must_save=False)
 
 
 def train_map(procesador, mapa):

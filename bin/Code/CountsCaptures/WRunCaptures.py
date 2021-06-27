@@ -26,9 +26,9 @@ class WRunCaptures(QTVarios.WDialogo):
         self.board.crea()
 
         # Rotulo informacion
-        self.lb_info_game = Controles.LB(
-            self, self.capture.game.titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")
-        ).ponTipoLetra(puntos=self.configuration.x_pgn_fontpoints)
+        self.lb_info_game = Controles.LB(self, self.capture.game.titulo("DATE", "EVENT", "WHITE", "BLACK", "RESULT")).ponTipoLetra(
+            puntos=self.configuration.x_pgn_fontpoints
+        )
 
         # Movimientos
         self.liwm_captures = []
@@ -55,7 +55,11 @@ class WRunCaptures(QTVarios.WDialogo):
 
         self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).set_wrap()
         self.lb_info = (
-            Controles.LB(self).anchoFijo(254).set_foreground_backgound("white", "#496075").align_center().ponTipoLetra(puntos=self.configuration.x_menu_points)
+            Controles.LB(self)
+            .anchoFijo(254)
+            .set_foreground_backgound("white", "#496075")
+            .align_center()
+            .ponTipoLetra(puntos=self.configuration.x_menu_points)
         )
 
         # Botones
@@ -115,7 +119,14 @@ class WRunCaptures(QTVarios.WDialogo):
     def pon_info_posic(self):
         self.lb_info.set_text(
             "%s: %d + %s: %d<br>%s: %d"
-            % (_("Position"), self.capture.current_posmove, _("Depth"), self.capture.current_depth, _("Total moves"), len(self.capture.game), )
+            % (
+                _("Position"),
+                self.capture.current_posmove,
+                _("Depth"),
+                self.capture.current_depth,
+                _("Total moves"),
+                len(self.capture.game),
+            )
         )
 
     def pulsada_celda(self, celda):
@@ -190,7 +201,7 @@ class WRunCaptures(QTVarios.WDialogo):
                 factor = 1.0 - dif * 0.1
                 if factor < 0.7:
                     factor = 0.7
-                time.sleep(2.6*factor*factor)
+                time.sleep(2.6 * factor * factor)
                 self.board.pon_texto("", 1)
                 QTUtil.refresh_gui()
 
@@ -238,7 +249,7 @@ class WRunCaptures(QTVarios.WDialogo):
 
         if ok:
             self.capture.current_depth += 1
-            if (self.capture.current_posmove + self.capture.current_depth) >= (len(self.capture.game)+1):
+            if (self.capture.current_posmove + self.capture.current_depth) >= (len(self.capture.game) + 1):
                 QTUtil2.message(self, _("Training finished"))
                 self.db_captures.change_count_capture(self.capture)
                 self.terminar()
@@ -252,9 +263,7 @@ class WRunCaptures(QTVarios.WDialogo):
                 if self.capture.current_posmove < 0:
                     self.capture.current_posmove = 0
                 self.capture.current_depth = 0
-                self.lb_result.set_text(
-                    "%s (%d)" % (_("Wrong, return to the last position solved"), self.capture.current_posmove + 1)
-                )
+                self.lb_result.set_text("%s (%d)" % (_("Wrong, return to the last position solved"), self.capture.current_posmove + 1))
                 self.lb_result.set_foreground("red")
             else:
                 self.lb_result.set_text(_("Wrong, you must repeat this position"))

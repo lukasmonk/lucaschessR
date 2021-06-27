@@ -50,9 +50,7 @@ class TabEngine(QtWidgets.QWidget):
         lb_multipv = Controles.LB(self, _("Multi PV") + ": ")
         self.sb_multipv = Controles.SB(self, multipv, 1, 500).tamMaximo(50)
 
-        self.lb_analisis = (
-            Controles.LB(self, "").set_background("#C9D2D7").ponTipoLetra(puntos=configuration.x_pgn_fontpoints)
-        )
+        self.lb_analisis = Controles.LB(self, "").set_background("#C9D2D7").ponTipoLetra(puntos=configuration.x_pgn_fontpoints)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("PDT", _("Evaluation"), 120, centered=True)
@@ -217,9 +215,7 @@ class TabBook(QtWidgets.QWidget):
         delegado = Delegados.EtiquetaPOS(True, siLineas=False) if self.with_figurines else None
         for x in range(20):
             o_columns.nueva(x, "", 80, centered=True, edicion=delegado)
-        self.grid_moves = Grid.Grid(
-            self, o_columns, siSelecFilas=True, siCabeceraMovible=False, siCabeceraVisible=False
-        )
+        self.grid_moves = Grid.Grid(self, o_columns, siSelecFilas=True, siCabeceraMovible=False, siCabeceraVisible=False)
         self.grid_moves.tipoLetra(puntos=configuration.x_pgn_fontpoints)
         self.grid_moves.ponAltoFila(configuration.x_pgn_rowheight)
 
@@ -365,9 +361,7 @@ class TabTree(QtWidgets.QWidget):
         self.tree.setHeaderLabels((_("Moves"), _("Opening")))
 
         bt_act = Controles.PB(self, _("Update"), self.bt_update, plano=False).ponIcono(Iconos.Pelicula_Seguir(), 16)
-        self.lb_analisis = (
-            Controles.LB(self, "").set_background("#C9D2D7").ponTipoLetra(puntos=configuration.x_pgn_fontpoints)
-        )
+        self.lb_analisis = Controles.LB(self, "").set_background("#C9D2D7").ponTipoLetra(puntos=configuration.x_pgn_fontpoints)
         ly_act = Colocacion.H().control(bt_act).control(self.lb_analisis).relleno(1)
 
         layout = Colocacion.V().otro(ly_act).control(self.tree)
@@ -476,7 +470,6 @@ class TabsAnalisis(QtWidgets.QWidget):
         self.tabengine = TabEngine(self, procesador, configuration)
         # self.tabengine.tabButton(0, QtWidgets.QTabBar.RightSide).deleteLater()
         # self.tabengine.tabBar().setTabButton(0, QtWidgets.QTabBar.RightSide, 0)
-
 
         self.li_tabs = [("engine", self.tabengine), ("tree", self.tabtree)]
         self.tabActive = 0

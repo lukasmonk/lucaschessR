@@ -74,12 +74,8 @@ class WManualSave(QTVarios.WDialogo):
         ##
         self.em_solucion = Controles.EM(self, siHTML=False).altoMinimo(40).capturaCambios(self.reset_game)
         ##
-        self.bt_solucion = Controles.PB(self, "   " + _("Save solution"), self.savesolucion, plano=False).ponIcono(
-            Iconos.Grabar(), 24
-        )
-        self.bt_edit = Controles.PB(self, "   " + _("Edit"), self.edit_solucion, plano=False).ponIcono(
-            Iconos.PlayGame()
-        )
+        self.bt_solucion = Controles.PB(self, "   " + _("Save solution"), self.savesolucion, plano=False).ponIcono(Iconos.Grabar(), 24)
+        self.bt_edit = Controles.PB(self, "   " + _("Edit"), self.edit_solucion, plano=False).ponIcono(Iconos.PlayGame())
         ly = Colocacion.V().control(self.em_solucion).control(self.bt_edit)
         gb = Controles.GB(self, _("Solution"), ly)
         ###

@@ -292,9 +292,7 @@ class ManagerEverest(Manager.Manager):
                 self.analizaInicio()
                 um.final()
 
-            w = WindowJuicio.WJuicio(
-                self, self.xanalyzer, self.nombreObj, position, mrm, rmObj, rmUsu, analysis, is_competitive=False
-            )
+            w = WindowJuicio.WJuicio(self, self.xanalyzer, self.nombreObj, position, mrm, rmObj, rmUsu, analysis, is_competitive=False)
             w.exec_()
 
             if not saved:

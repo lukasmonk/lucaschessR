@@ -624,7 +624,9 @@ class Board(QtWidgets.QGraphicsView):
             indicador_menu.tipo = 1
             indicador_menu.sur = indicador.physical_pos.y
             indicador_menu.norte = gap / 2
-            self.indicadorSC_menu = BoardElements.PixmapSC(self.escena, indicador_menu, pixmap=Iconos.pmSettings(), rutina=self.lanzaMenuVisual)
+            self.indicadorSC_menu = BoardElements.PixmapSC(
+                self.escena, indicador_menu, pixmap=Iconos.pmSettings(), rutina=self.lanzaMenuVisual
+            )
             self.indicadorSC_menu.setOpacity(0.50 if self.configuration.x_opacity_tool_board == 10 else 0.01)
 
             if self.siDirectorIcon:
@@ -678,10 +680,10 @@ class Board(QtWidgets.QGraphicsView):
             liKeys.append(("a1 ... h8", _("To indicate origin and destination of a move")))
 
         if hasattr(self.main_window, "manager") and self.main_window.manager:
-            if hasattr(self.main_window.manager, "rightMouse"):
+            if hasattr(self.main_window.manager, "gridRightMouse"):
                 liKeys.append((None, None))
                 liKeys.append(("P", _("Show/Hide PGN information")))
-                liKeys.append((_("ALT") + "-N", _("Activate/Deactivate non distract mode")))
+            liKeys.append((_("ALT") + "-N", _("Activate/Deactivate non distract mode")))
 
             if hasattr(self.main_window.manager, "listHelpTeclado"):
                 liKeys.append((None, None))
@@ -998,7 +1000,12 @@ class Board(QtWidgets.QGraphicsView):
                 for n, (pos, item) in enumerate(self.dicMovibles.items()):
                     if n != last:
                         bd = item.bloqueDatos
-                        if hasattr(bd_last, "tpid") and hasattr(bd, "tpid") and bd_last.tpid == bd.tpid and bd_last.a1h8 in (bd.a1h8, bd.a1h8[2:] + bd.a1h8[:2]):
+                        if (
+                            hasattr(bd_last, "tpid")
+                            and hasattr(bd, "tpid")
+                            and bd_last.tpid == bd.tpid
+                            and bd_last.a1h8 in (bd.a1h8, bd.a1h8[2:] + bd.a1h8[:2])
+                        ):
                             st.add(self.current_graphlive)
                             st.add(item)
                 for item in st:
@@ -1070,7 +1077,7 @@ class Board(QtWidgets.QGraphicsView):
         if a1h8 is None:
             if self.atajosRaton:
                 self.atajosRaton(None)
-            QtWidgets.QGraphicsView.mousePressEvent(self,event)
+            QtWidgets.QGraphicsView.mousePressEvent(self, event)
             return
 
         if self.atajosRaton:
@@ -1821,13 +1828,17 @@ class Board(QtWidgets.QGraphicsView):
         QTUtil.refresh_gui()
 
     def pulsadoNum(self, siIzq, siActivar, number):
-        if not siIzq:  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
+        if (
+            not siIzq
+        ):  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
             return
         if self.exePulsadoNum:
             self.exePulsadoNum(siActivar, int(number))
 
     def pulsadaLetra(self, siIzq, siActivar, letra):
-        if not siIzq:  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
+        if (
+            not siIzq
+        ):  # si es derecho lo dejamos para el menu visual, y el izquierdo solo muestra capturas, si se quieren ver movimientos, que active show candidates
             return
         if self.exePulsadaLetra:
             self.exePulsadaLetra(siActivar, letra)

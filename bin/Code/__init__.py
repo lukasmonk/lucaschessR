@@ -1,5 +1,6 @@
 import sys
 import os
+import ssl
 
 current_dir = os.path.abspath(os.path.realpath(os.path.dirname(sys.argv[0])))
 if current_dir:
@@ -32,9 +33,11 @@ def path_resource(*lista):
 
 
 is_linux = sys.platform.startswith("linux")
-
 is_windows = not is_linux
+
 if is_linux:
+    if not os.environ.get("PYTHONHTTPSVERIFY", "") and getattr(ssl, "_create_unverified_context", None):
+        ssl._create_default_https_context = ssl._create_unverified_context
     startfile = os.system
 else:
     startfile = os.startfile
@@ -74,7 +77,7 @@ def relative_root(path):
 
 
 BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.24"
+VERSION = "R 1.25"
 DEBUG = False
 DEBUG_ENGINE = False
 

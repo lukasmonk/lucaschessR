@@ -203,7 +203,6 @@ class Opening:
                 dbr.close()
                 dbv.close()
 
-
         self.board = None
 
     def open_cache_engines(self):
@@ -592,10 +591,12 @@ class Opening:
     def posPartida(self, game):
         # return siNueva, numlinea, siAppend
         xpv_busca = FasterCode.pv_xpv(game.pv())
+        last_move = game.move(-1)
+        pos = -3 if last_move.promotion else -2
         for n, xpv in enumerate(self.li_xpv):
             if xpv.startswith(xpv_busca):
                 return False, n, False
-            if xpv == xpv_busca[:-2]:
+            if xpv == xpv_busca[:pos]:
                 return False, n, True
         return True, None, None
 
@@ -914,7 +915,7 @@ class Opening:
                     control.liPartidas = []
                     control.with_history = False
 
-        li_games = self.get_all_games() if game is None else [game, ]
+        li_games = self.get_all_games() if game is None else [game]
 
         for game in li_games:
             cp = game.last_position

@@ -1,4 +1,3 @@
-
 def gb_style():
     return """
     QGroupBox {

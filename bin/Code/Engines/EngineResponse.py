@@ -256,7 +256,7 @@ class MultiEngineResponse:
             "depth": self.depth,
             "max_time": self.max_time,
             "max_depth": self.max_depth,
-            "li_rm": [rm.save() for rm in self.li_rm]
+            "li_rm": [rm.save() for rm in self.li_rm],
         }
         return dic
 
@@ -657,9 +657,7 @@ class MultiEngineResponse:
                 move = gameBase.move(num_moves - 3)
                 if hasattr(move, "puntosABS_3"):  # se graban en mejormovajustado
                     puntosPrevios = move.puntosABS_3
-            difpuntos = (
-                rm0.centipawns_abs() - puntosPrevios
-            )  # son puntos ganados por el engine y perdidos por el player
+            difpuntos = rm0.centipawns_abs() - puntosPrevios  # son puntos ganados por el engine y perdidos por el player
             if difpuntos > mindifpuntos:
                 if fdbg:
                     fdbg.write("1. %s : %s %d > %d\n" % (rm0.pv, _("Centipawns lost"), difpuntos, mindifpuntos))
@@ -784,9 +782,7 @@ class MultiEngineResponse:
                         if not cp.is_white:
                             p0 = -p0
                             pZ = -pZ
-                        fdbg.write(
-                            "    %s (%s) : %d -> %d [%d => %d]\n" % (_("Advance"), dpr, xAvPR, rm.puntos, p0, pZ)
-                        )
+                        fdbg.write("    %s (%s) : %d -> %d [%d => %d]\n" % (_("Advance"), dpr, xAvPR, rm.puntos, p0, pZ))
 
             if xJPR:
                 n = True
@@ -844,13 +840,7 @@ class MultiEngineResponse:
             fdbg.write("\n")
             fdbg.close()
 
-        return (
-            una.get("AJUSTARFINAL" if tipo == "F" else "ADJUST", ADJUST_BETTER),
-            mindifpuntos,
-            maxmate,
-            dbg,
-            aterrizaje,
-        )
+        return (una.get("AJUSTARFINAL" if tipo == "F" else "ADJUST", ADJUST_BETTER), mindifpuntos, maxmate, dbg, aterrizaje)
 
     def mejorMovAjustadoNivel(self, nTipo):
         if nTipo == ADJUST_HIGH_LEVEL:
@@ -872,12 +862,7 @@ class MultiEngineResponse:
                 ADJUST_SOMEWHAT_WORSE_LESS_LESS: 5,
             }
         elif nTipo == ADJUST_LOW_LEVEL:
-            dic = {
-                ADJUST_SIMILAR: 25,
-                ADJUST_WORSE: 60,
-                ADJUST_SOMEWHAT_WORSE_LESS: 25,
-                ADJUST_SOMEWHAT_WORSE_LESS_LESS: 10,
-            }
+            dic = {ADJUST_SIMILAR: 25, ADJUST_WORSE: 60, ADJUST_SOMEWHAT_WORSE_LESS: 25, ADJUST_SOMEWHAT_WORSE_LESS_LESS: 10}
         tp = 0
         for k, v in dic.items():
             tp += v
@@ -1009,9 +994,7 @@ class MultiEngineResponse:
             siPersonalidad = nTipo >= 1000  # Necesario para grabar los puntos
 
             if siPersonalidad:
-                nTipo, mindifpuntos, maxmate, dbg, aterrizaje = self.ajustaPersonalidad(
-                    self.liPersonalidades[nTipo - 1000]
-                )
+                nTipo, mindifpuntos, maxmate, dbg, aterrizaje = self.ajustaPersonalidad(self.liPersonalidades[nTipo - 1000])
 
             if nTipo == ADJUST_BETTER:
                 rmSel = self.li_rm[0]

@@ -2,13 +2,12 @@ import locale
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from Code.Config import Configuration
+from Code.Config import Configuration, Usuarios
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code import Usuarios
 from Code import Util
 import Code
 
@@ -83,12 +82,12 @@ def run_gui(procesador):
                 d_with[k] = name, name_with
                 if name_with > mx:
                     mx = name_with
-            mx += space_width*2
+            mx += space_width * 2
 
             for k, name, porc, author in li:
                 name, name_with = d_with[k]
                 resto = mx - name_with
-                name += " " * (resto//space_width) + "by %s" % author
+                name += " " * (resto // space_width) + "by %s" % author
                 if k == lng_default:
                     menu.opcion(k, name, icono=Iconos.AceptarPeque())
                 else:
@@ -167,7 +166,6 @@ def run_gui(procesador):
     app.setEffectEnabled(QtCore.Qt.UI_AnimateMenu)
 
     QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "ChessAlpha2.ttf"))
-    # QtGui.QFontDatabase.addApplicationFont(Code.path_resource("IntFiles", "Inconsolata.ttf"))
 
     if configuration.x_font_family:
         font = Controles.TipoLetra(configuration.x_font_family)

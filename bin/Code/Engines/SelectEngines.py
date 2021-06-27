@@ -4,7 +4,7 @@ import Code
 from Code import Util
 from Code.Engines import EnginesMicElo
 from Code.Engines import Engines
-from Code import ManagerElo
+from Code.Competitions import ManagerElo
 from Code.QT import Iconos
 from Code.QT import QTVarios
 

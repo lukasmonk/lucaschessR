@@ -10,10 +10,7 @@ from Code.Base.Constantes import *
 
 
 def cb_pointofview_options():
-    li_options = [
-        (_("Before current move"), KIB_BEFORE_MOVE),
-        (_("After current move"), KIB_AFTER_MOVE),
-    ]
+    li_options = [(_("Before current move"), KIB_BEFORE_MOVE), (_("After current move"), KIB_AFTER_MOVE)]
     return li_options
 
 
@@ -34,9 +31,7 @@ class Tipos:
         return [(label, key) for key, label, pm in self.li_tipos]
 
     def comboSinIndices(self):
-        return [
-            (label, key) for key, label, pm in self.li_tipos if not (key in (KIB_INDEXES, KIB_GAVIOTA, KIB_POLYGLOT))
-        ]
+        return [(label, key) for key, label, pm in self.li_tipos if not (key in (KIB_INDEXES, KIB_GAVIOTA, KIB_POLYGLOT))]
 
     def texto(self, tipo):
         for tp, nom, pm in self.li_tipos:
@@ -120,8 +115,6 @@ class Kibitzers:
         for num, kib in enumerate(self.lista):
             if kib.huella == huella:
                 return num
-
-
 
     def save(self):
         dic = {"LISTA": [en.save() for en in self.lista], "LASTFOLDER": self.lastfolder}
@@ -214,4 +207,4 @@ class Kibitzers:
 
     def lista_menu(self):
         dIco = Tipos().dicIconos()
-        return [(kib.huella, kib.name,  dIco[kib.tipo]) for kib in self.lista if kib.visible]
+        return [(kib.huella, kib.name, dIco[kib.tipo]) for kib in self.lista if kib.visible]

@@ -90,11 +90,7 @@ class WWashing(QTVarios.WDialogo):
             plant = '<tr><td align="right">%s:</td><td><b>%s</b></td></tr>'
             hints, times, games = self.washing.totals()
             nEngines = self.washing.num_engines()
-            html = '<h2><center>%s: %d %s</center></h2><br><table cellpadding="4">' % (
-                _("Finished"),
-                nEngines,
-                _("engines"),
-            )
+            html = '<h2><center>%s: %d %s</center></h2><br><table cellpadding="4">' % (_("Finished"), nEngines, _("engines"))
             for x in range(3):
                 html += plant
             html += "</table>"
@@ -238,18 +234,14 @@ class WWashing(QTVarios.WDialogo):
                 menu.opcion(fich, fich, Iconos.PuntoRojo())
             resp = menu.lanza()
             if resp:
-                if QTUtil2.pregunta(
-                    self, "%s\n%s" % (_("Current data will be removed and overwritten."), _("Are you sure?"))
-                ):
+                if QTUtil2.pregunta(self, "%s\n%s" % (_("Current data will be removed and overwritten."), _("Are you sure?"))):
                     shutil.copy(os.path.join(self.configuration.carpeta_results, resp + ".wsm"), self.dbwashing.file)
                     self.wreload = True
                     self.save_video()
                     self.accept()
         elif resp.startswith("new_"):
             tactic = resp[4:]
-            if QTUtil2.pregunta(
-                self, "%s\n%s" % (_("Current data will be removed and overwritten."), _("Are you sure?"))
-            ):
+            if QTUtil2.pregunta(self, "%s\n%s" % (_("Current data will be removed and overwritten."), _("Are you sure?"))):
                 self.dbwashing.new(tactic)
                 self.wreload = True
                 self.save_video()

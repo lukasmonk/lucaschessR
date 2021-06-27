@@ -25,9 +25,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
 
         self.list_db = self.index_polyglots.list()
 
-        QTVarios.WDialogo.__init__(
-            self, procesador.main_window, "Polyglot book factory", Iconos.FactoryPolyglot(), "factorypolyglots"
-        )
+        QTVarios.WDialogo.__init__(self, procesador.main_window, "Polyglot book factory", Iconos.FactoryPolyglot(), "factorypolyglots")
 
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("NAME", _("Name"), 240)

@@ -156,7 +156,9 @@ class TallerSonido:
         p = self.p = pyaudio.PyAudio()
 
         # open stream
-        self.stream = p.open(format=p.get_format_from_width(wf.getsampwidth()), channels=wf.getnchannels(), rate=wf.getframerate(), output=True)
+        self.stream = p.open(
+            format=p.get_format_from_width(wf.getsampwidth()), channels=wf.getnchannels(), rate=wf.getframerate(), output=True
+        )
 
     def play(self):
         if self.posFrame >= self.maxFrame:

@@ -4,7 +4,6 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 import Code.Nags.Nags
 from Code.Base import Game, Move
-from Code import TrListas
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
@@ -15,19 +14,10 @@ from Code.Board import WindowColors
 
 from Code.Base.Constantes import *
 
-V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_MAS, V_NEGRAS_MAS_MAS = (
-    0,
-    11,
-    14,
-    15,
-    16,
-    17,
-    18,
-    19,
-)
+V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_MAS, V_NEGRAS_MAS_MAS = (0, 11, 14, 15, 16, 17, 18, 19)
+
 
 class LBKey(Controles.LB):
-
     def mousePressEvent(self, event):
         if event.button() == QtCore.Qt.RightButton:
             if not self.game:
@@ -42,7 +32,6 @@ class LBKey(Controles.LB):
             elif resp == "copy_sel":
                 g = self.game.copia(self.pos_move)
                 QTUtil.ponPortapapeles(g.pgn())
-
 
 
 class BoardLines(QtWidgets.QWidget):
@@ -79,9 +68,7 @@ class BoardLines(QtWidgets.QWidget):
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
         self.lbPGN = LBKey(self).set_wrap()
-        self.lbPGN.setStyleSheet(
-            "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}"
-        )
+        self.lbPGN.setStyleSheet("QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}")
         self.lbPGN.ponFuente(tipoLetra)
         self.lbPGN.setOpenExternalLinks(False)
 
@@ -256,7 +243,6 @@ class BoardLines(QtWidgets.QWidget):
         self.lbPGN.set_text(pgn)
         self.lbPGN.game = self.game
         self.lbPGN.pos_move = pos
-
 
         self.pos_move = pos
 

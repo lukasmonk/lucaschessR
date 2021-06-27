@@ -142,20 +142,8 @@ class WPlayer(QtWidgets.QWidget):
         si_figurines_pgn = self.configuration.x_pgn_withfigurines
         for x in range(1, 50):
             num = (x - 1) * 2
-            o_columns.nueva(
-                str(num),
-                "%d." % x,
-                ancho_col,
-                centered=True,
-                edicion=Delegados.EtiquetaPOS(si_figurines_pgn, siLineas=False),
-            )
-            o_columns.nueva(
-                str(num + 1),
-                "...",
-                ancho_col,
-                centered=True,
-                edicion=Delegados.EtiquetaPOS(si_figurines_pgn, siLineas=False),
-            )
+            o_columns.nueva(str(num), "%d." % x, ancho_col, centered=True, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, siLineas=False))
+            o_columns.nueva(str(num + 1), "...", ancho_col, centered=True, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, siLineas=False))
 
         self.gridMovesWhite = Grid.Grid(self, o_columns, siSelecFilas=True)
         self.gridMovesBlack = Grid.Grid(self, o_columns, siSelecFilas=True)
@@ -177,12 +165,7 @@ class WPlayer(QtWidgets.QWidget):
         tabs.nuevaTab(wblack, _("Black moves"))
 
         # ToolBar
-        liAccionesWork = [
-            ("", Iconos.Usuarios(), self.tw_changeplayer),
-            None,
-            (_("Rebuild"), Iconos.Reindexar(), self.tw_rebuild),
-            None,
-        ]
+        liAccionesWork = [("", Iconos.Usuarios(), self.tw_changeplayer), None, (_("Rebuild"), Iconos.Reindexar(), self.tw_rebuild), None]
 
         self.tbWork = Controles.TBrutina(self, liAccionesWork)
         self.tbWork.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
@@ -191,11 +174,7 @@ class WPlayer(QtWidgets.QWidget):
         layout = Colocacion.V().otro(lyTB).control(tabs).margen(1)
 
         self.setLayout(layout)
-        self.qtColor = (
-            QTUtil.qtColorRGB(221, 255, 221),
-            QTUtil.qtColorRGB(247, 247, 247),
-            QTUtil.qtColorRGB(255, 217, 217),
-        )
+        self.qtColor = (QTUtil.qtColorRGB(221, 255, 221), QTUtil.qtColorRGB(247, 247, 247), QTUtil.qtColorRGB(255, 217, 217))
 
         self.setdbGames(dbGames)
         self.setPlayer(self.leeVariable("PLAYER", ""))

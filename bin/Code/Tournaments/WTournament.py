@@ -58,12 +58,12 @@ class WTournament(QTVarios.WDialogo):
         w = QtWidgets.QWidget()
 
         # Adjudicator
-        lb_resign = Controles.LB(self, "%s (%s): " % (_("Minimum centipawns to assign winner"), "0=%s" %_("Disable")))
+        lb_resign = Controles.LB(self, "%s (%s): " % (_("Minimum centipawns to assign winner"), "0=%s" % _("Disable")))
         self.ed_resign = Controles.ED(self).tipoInt(torneo.resign()).anchoFijo(30)
         bt_resign = Controles.PB(self, "", rutina=self.borra_resign).ponIcono(Iconos.Reciclar())
 
         # Draw-plys
-        lbDrawMinPly = Controles.LB(self, "%s (%s): " % (_("Minimum moves to assign draw"), "0=%s" %_("Disable")))
+        lbDrawMinPly = Controles.LB(self, "%s (%s): " % (_("Minimum moves to assign draw"), "0=%s" % _("Disable")))
         self.sbDrawMinPly = Controles.SB(self, torneo.drawMinPly(), 20, 1000)
         # Draw-puntos
         lb_draw_range = Controles.LB(self, _("Maximum centipawns to assign draw") + ": ")
@@ -105,16 +105,8 @@ class WTournament(QTVarios.WDialogo):
         self.fen = torneo.fen()
         self.btPosicion = Controles.PB(self, " " * 5 + _("Change") + " " * 5, self.posicionEditar).ponPlano(False)
         self.btPosicionQuitar = Controles.PB(self, "", self.posicionQuitar).ponIcono(Iconos.Motor_No())
-        self.btPosicionPegar = (
-            Controles.PB(self, "", self.posicionPegar).ponIcono(Iconos.Pegar16()).ponToolTip(_("Paste FEN position"))
-        )
-        lyFEN = (
-            Colocacion.H()
-            .control(self.btPosicionQuitar)
-            .control(self.btPosicion)
-            .control(self.btPosicionPegar)
-            .relleno()
-        )
+        self.btPosicionPegar = Controles.PB(self, "", self.posicionPegar).ponIcono(Iconos.Pegar16()).ponToolTip(_("Paste FEN position"))
+        lyFEN = Colocacion.H().control(self.btPosicionQuitar).control(self.btPosicion).control(self.btPosicionPegar).relleno()
 
         # Norman Pollock
         lbNorman = Controles.LB(
@@ -210,9 +202,7 @@ class WTournament(QTVarios.WDialogo):
         o_columns.nueva("BLACK", _("Black"), 190, centered=True)
         o_columns.nueva("TIME", _("Time"), 170, centered=True)
         # o_columns.nueva("STATE", _("State"), 190, centered=True)
-        self.gridGamesQueued = Grid.Grid(
-            self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid=GRID_GAMES_QUEUED
-        )
+        self.gridGamesQueued = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid=GRID_GAMES_QUEUED)
         self.register_grid(self.gridGamesQueued)
         # Layout
         layout = Colocacion.V().control(tbEnG).control(self.gridGamesQueued)
@@ -242,9 +232,7 @@ class WTournament(QTVarios.WDialogo):
         o_columns.nueva("BLACK", _("Black"), 190, centered=True)
         o_columns.nueva("TIME", _("Time"), 170, centered=True)
         o_columns.nueva("RESULT", _("Result"), 190, centered=True)
-        self.gridGamesFinished = Grid.Grid(
-            self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid=GRID_GAMES_FINISHED
-        )
+        self.gridGamesFinished = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid=GRID_GAMES_FINISHED)
         self.register_grid(self.gridGamesFinished)
         # Layout
         layout = Colocacion.V().control(tbEnGt).control(self.gridGamesFinished)
@@ -257,8 +245,8 @@ class WTournament(QTVarios.WDialogo):
         w = QtWidgets.QWidget()
 
         # Grid
-        wh = _("W")
-        bl = _("B")
+        wh = _("W.")
+        bl = _("B.")
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUM", _("N."), 35, centered=True)
         o_columns.nueva("ENGINE", _("Engine"), 120, centered=True)

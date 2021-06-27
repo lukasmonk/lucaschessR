@@ -4,7 +4,6 @@ import random
 import Code.Nags.Nags
 from Code import Manager
 from Code.Polyglots import Books
-from Code import TrListas
 from Code.QT import QTUtil2
 from Code.QT import Iconos
 from Code.QT import QTVarios
@@ -96,7 +95,7 @@ class ManagerOpeningEngines(Manager.Manager):
         self.xrival = self.procesador.creaManagerMotor(rival, self.time, None)
         self.xrival.is_white = self.is_engine_side_white
 
-        self.xanalyzer.options(max(self.xtutor.ms_time_move, self.time + 5.0), 0, False)
+        self.xanalyzer.options(max(self.xtutor.mstime_engine, self.time + 5.0), 0, False)
 
         juez = self.configuration.buscaRival(self.trainingEngines["ENGINE_CONTROL"])
         self.xjuez = self.procesador.creaManagerMotor(juez, int(self.trainingEngines["ENGINE_TIME"] * 1000), None)
@@ -224,10 +223,7 @@ class ManagerOpeningEngines(Manager.Manager):
                     self.board.creaFlechaMulti(mv, False)
                 self.board.creaFlechaMulti(move.movimiento(), True)
                 if self.ask_movesdifferent:
-                    mensaje = "%s\n%s" % (
-                        _("This is not the move in the opening lines"),
-                        _("Do you want to go on with this move?"),
-                    )
+                    mensaje = "%s\n%s" % (_("This is not the move in the opening lines"), _("Do you want to go on with this move?"))
                     if not QTUtil2.pregunta(self.main_window, mensaje):
                         self.ponFinJuego()
                         return True
@@ -297,7 +293,7 @@ class ManagerOpeningEngines(Manager.Manager):
             self.ponteEnJugada(move.njg)
             self.mensEspera(siCancelar=True, masTitulo="%d/%d" % (pos, total))
             name = self.xanalyzer.name
-            vtime = self.xanalyzer.ms_time_move
+            vtime = self.xanalyzer.mstime_engine
             depth = self.xanalyzer.depth_engine
             mrm = self.dbop.get_cache_engines(name, vtime, move.fenm2, depth)
             ok = False
@@ -306,9 +302,7 @@ class ManagerOpeningEngines(Manager.Manager):
                 if rm:
                     ok = True
             if not ok:
-                mrm, pos = self.xanalyzer.analysis_move(
-                    move, self.xanalyzer.ms_time_move, self.xanalyzer.depth_engine
-                )
+                mrm, pos = self.xanalyzer.analysis_move(move, self.xanalyzer.mstime_engine, self.xanalyzer.depth_engine)
                 self.dbop.set_cache_engines(name, vtime, move.fenm2, mrm, depth)
 
             move.analysis = mrm, pos
@@ -317,7 +311,6 @@ class ManagerOpeningEngines(Manager.Manager):
                 move_max += 1
 
         return move_max < total  # si todos son lo máximo aunque pierda algo hay que darlo por probado
-
 
     def mensEspera(self, siFinal=False, siCancelar=False, masTitulo=None):
         if siFinal:
@@ -366,7 +359,7 @@ class ManagerOpeningEngines(Manager.Manager):
         def calculaJG(move, siinicio):
             fen = move.position_before.fen() if siinicio else move.position.fen()
             name = self.xjuez.name
-            vtime = self.xjuez.ms_time_move
+            vtime = self.xjuez.mstime_engine
             mrm = self.dbop.get_cache_engines(name, vtime, fen)
             if mrm is None:
                 self.mensEspera()
@@ -487,11 +480,7 @@ class ManagerOpeningEngines(Manager.Manager):
             liMasOpciones.append((None, None, None))
             mens = _("cancel") if self.ask_movesdifferent else _("activate")
             liMasOpciones.append(
-                (
-                    "ask_movesdifferent",
-                    "%s: %s" % (_("Ask when the moves are different from the line"), mens),
-                    Iconos.Pelicula_Seguir(),
-                )
+                ("ask_movesdifferent", "%s: %s" % (_("Ask when the moves are different from the line"), mens), Iconos.Pelicula_Seguir())
             )
             liMasOpciones.append((None, None, True))  # Para salir del submenu
             liMasOpciones.append((None, None, None))
@@ -828,7 +817,9 @@ class ManagerOpeningLines(Manager.Manager):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
-        pvSel = from_sq + to_sq + (promotion if promotion else "")
+        if promotion:
+            pass
+        pvSel = move.movimiento().lower()
         pvObj = self.li_pv[len(self.game)]
 
         if pvSel != pvObj:
@@ -842,9 +833,7 @@ class ManagerOpeningLines(Manager.Manager):
 
             self.errores += 1
             mens = "%s: %d" % (_("Error"), self.errores)
-            QTUtil2.mensajeTemporal(
-                self.main_window, mens, 1.2, physical_pos="ad", background="#FF9B00", pmImagen=Iconos.pmError()
-            )
+            QTUtil2.mensajeTemporal(self.main_window, mens, 1.2, physical_pos="ad", background="#FF9B00", pmImagen=Iconos.pmError())
             self.muestraInformacion()
             self.sigueHumano()
             return False

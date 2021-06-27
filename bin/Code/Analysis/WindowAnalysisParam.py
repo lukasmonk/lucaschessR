@@ -22,11 +22,13 @@ def read_dic_params():
     alm.depth = dic.get("depth", configuration.x_tutor_depth)
     alm.timedepth = dic.get("timedepth", False)
     alm.kblunders = dic.get("kblunders", 50)
+    alm.kblunders_porc = dic.get("kblunders_porc", 0)
     alm.ptbrilliancies = dic.get("ptbrilliancies", 100)
     alm.dpbrilliancies = dic.get("dpbrilliancies", 7)
     alm.from_last_move = dic.get("from_last_move", False)
     alm.multiPV = dic.get("multipv", "PD")
     alm.priority = dic.get("priority", Priorities.priorities.normal)
+    alm.themes_lichess = dic.get("themes_lichess", False)
 
     alm.book_name = dic.get("book_name", None)
 
@@ -65,6 +67,8 @@ def form_blunders_brilliancies(alm, configuration):
     li_blunders.append(
         (FormLayout.Editbox(_("Is considered wrong move when the loss of centipawns is greater than"), tipo=int, ancho=50), alm.kblunders)
     )
+    li_blunders.append((FormLayout.Editbox(_("Minimum difference in %"), tipo=int, ancho=50), alm.kblunders_porc))
+
     li_blunders.append(SEPARADOR)
 
     def file_next(base, ext):
@@ -211,6 +215,8 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
         li_gen.append((config, defecto))
 
+        li_gen.append((_("Automatically assign themes using Lichess/Thibault code") + " (experimental):", alm.themes_lichess))
+
         li_gen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
 
         li_gen.append((_("Start from the end of the game") + ":", alm.from_last_move))
@@ -298,9 +304,10 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
             alm.num_moves = li_gen[7]
             alm.book = li_gen[8]
             alm.book_name = alm.book.name if alm.book else None
-            alm.delete_previous = li_gen[9]
-            alm.from_last_move = li_gen[10]
-            alm.show_graphs = li_gen[11]
+            alm.themes_lichess = li_gen[9]
+            alm.delete_previous = li_gen[10]
+            alm.from_last_move = li_gen[11]
+            alm.show_graphs = li_gen[12]
 
             (
                 alm.include_variations,
@@ -311,7 +318,7 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
                 alm.one_move_variation,
             ) = liVar
 
-            (alm.kblunders, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders) = liBlunders
+            (alm.kblunders, alm.kblunders_porc, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders) = liBlunders
 
             (
                 alm.dpbrilliancies,
@@ -406,6 +413,8 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
     config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
     li_gen.append((config, defecto))
 
+    li_gen.append((_("Automatically assign themes using Lichess/Thibault code") + " (experimental):", alm.themes_lichess))
+
     li_gen.append((_("Start from the end of the game") + ":", alm.from_last_move))
 
     li_gen.append(SEPARADOR)
@@ -465,9 +474,20 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
 
         li_gen, liVar, liBlunders, liBrilliancies = liResp
 
-        alm.engine, vtime, alm.depth, alm.timedepth, alm.multiPV, color, cjug, alm.book, alm.from_last_move, alm.delete_previous, alm.siVariosSeleccionados = (
-            li_gen
-        )
+        (
+            alm.engine,
+            vtime,
+            alm.depth,
+            alm.timedepth,
+            alm.multiPV,
+            color,
+            cjug,
+            alm.book,
+            alm.themes_lichess,
+            alm.from_last_move,
+            alm.delete_previous,
+            alm.siVariosSeleccionados,
+        ) = li_gen
 
         alm.vtime = int(vtime * 1000)
         alm.white = color != "BLACK"
@@ -476,7 +496,7 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         alm.li_players = cjug.upper().split(";") if cjug else None
         alm.book_name = alm.book.name if alm.book else None
 
-        alm.kblunders, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders = liBlunders
+        alm.kblunders, alm.kblunders_porc, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders = liBlunders
 
         alm.include_variations, alm.limiteinclude_variations, alm.best_variation, alm.info_variation, alm.si_pdt, alm.one_move_variation = (
             liVar

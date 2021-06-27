@@ -172,7 +172,10 @@ class WTurnOnLights(QTVarios.WDialogo):
             segs, fecha, time_used, errores, hints = dato
             txt, ico = TurnOnLights.qualification(segs, self.tol.is_calculation_mode())
             menu.opcion(
-                None, "%d-%02d-%02d %02d:%02d %6.02f  %6.02f  %s" % (fecha.year, fecha.month, fecha.day, fecha.hour, fecha.minute, segs, time_used, txt), self.dicIconos[ico]
+                None,
+                "%d-%02d-%02d %02d:%02d %6.02f  %6.02f  %s"
+                % (fecha.year, fecha.month, fecha.day, fecha.hour, fecha.minute, segs, time_used, txt),
+                self.dicIconos[ico],
             )
             tt += time_used
             te += errores

@@ -11,9 +11,9 @@ class GenTry:
         num_ini, num_end = ord(xfrom[1]), ord(xto[1])
 
         li = []
-        for letra in range(letra_ini, letra_end+1):
-            for num in range(num_ini, num_end+1):
-               li.append(chr(letra)+chr(num))
+        for letra in range(letra_ini, letra_end + 1):
+            for num in range(num_ini, num_end + 1):
+                li.append(chr(letra) + chr(num))
         self.li_base = li
         self.pos = -1
         self.li_current = None
@@ -26,10 +26,10 @@ class GenTry:
 
     def next(self):
         self.pos += 1
-        if self.pos >= len(self.li_current)-1:
+        if self.pos >= len(self.li_current) - 1:
             self.gen_new()
             self.pos += 1
-        return self.li_current[self.pos], self.li_current[self.pos+1]
+        return self.li_current[self.pos], self.li_current[self.pos + 1]
 
 
 class CoordinatesBlocks:
@@ -58,11 +58,7 @@ class CoordinatesBlocks:
 
     @property
     def lista_blocks(self):
-        li = (
-            ("a1", "d4"), ("e1", "h4"), ("a5", "d8"), ("e5", "h8"),
-            ("a1", "d8"), ("e1", "h8"), ("a1", "h4"), ("a5", "h8"),
-            ("a1", "h8")
-        )
+        li = (("a1", "d4"), ("e1", "h4"), ("a5", "d8"), ("e5", "h8"), ("a1", "d8"), ("e1", "h8"), ("a1", "h4"), ("a5", "h8"), ("a1", "h8"))
         li_resp = []
         for xfrom, xto in li:
             for side in (WHITE, BLACK):
@@ -107,7 +103,7 @@ class CoordinatesBlocks:
             "min_score": self.min_score,
             "current_block": self.current_block,
             "current_try_in_block": self.current_try_in_block,
-            "current_max_in_block": self.current_max_in_block
+            "current_max_in_block": self.current_max_in_block,
         }
         return dic
 

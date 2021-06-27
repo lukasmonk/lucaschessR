@@ -141,9 +141,7 @@ class WDailyTestBase(QTVarios.WDialogo):
         li_gen.append((config, self.pruebas))
 
         # Fichero
-        config = FormLayout.Fichero(
-            _("File"), "%s (*.fns);;%s PGN (*.pgn)" % (_("List of FENs"), _("File")), False, anchoMinimo=280
-        )
+        config = FormLayout.Fichero(_("File"), "%s (*.fns);;%s PGN (*.pgn)" % (_("List of FENs"), _("File")), False, anchoMinimo=280)
         li_gen.append((config, self.fns))
 
         # Editamos
@@ -189,12 +187,7 @@ class WDailyTestBase(QTVarios.WDialogo):
                 with open(fns, "rt") as f:
                     for linea in f:
                         linea = linea.strip()
-                        if (
-                            linea[0].isalnum()
-                            and linea[-1].isdigit()
-                            and ((" w " in linea) or (" b " in linea))
-                            and linea.count("/") == 7
-                        ):
+                        if linea[0].isalnum() and linea[-1].isdigit() and ((" w " in linea) or (" b " in linea)) and linea.count("/") == 7:
                             li.append(linea)
             if len(li) >= self.pruebas:
                 liR = random.sample(li, self.pruebas)
@@ -370,7 +363,7 @@ class WDailyTest(QTVarios.WDialogo):
         datos = {}
         datos["FECHA"] = hoy
         datos["ENGINE"] = self.xtutor.key
-        datos["TIEMPOJUGADA"] = self.xtutor.ms_time_move
+        datos["TIEMPOJUGADA"] = self.xtutor.mstime_engine
         datos["LIFENS"] = self.liFens
         datos["LIPV"] = self.li_pv
         datos["MPUNTOS"] = mpuntos
@@ -421,7 +414,7 @@ class WDailyTest(QTVarios.WDialogo):
         vtime = time.time() - self.iniTiempo
 
         um = QTUtil2.analizando(self)
-        self.rmr, pos = self.xtutor.analysis_move(self.move, self.xtutor.ms_time_move)
+        self.rmr, pos = self.xtutor.analysis_move(self.move, self.xtutor.mstime_engine)
         self.move.analysis = self.rmr, pos
         um.final()
         pv = self.move.movimiento()
@@ -477,14 +470,7 @@ class WDailyTest(QTVarios.WDialogo):
 
     def analizar(self):
         Analysis.show_analysis(
-            self.procesador,
-            self.xtutor,
-            self.move,
-            self.position.is_white,
-            9999999,
-            1,
-            main_window=self,
-            must_save=False,
+            self.procesador, self.xtutor, self.move, self.position.is_white, 9999999, 1, main_window=self, must_save=False
         )
 
 

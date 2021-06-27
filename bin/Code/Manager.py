@@ -9,7 +9,7 @@ from Code import ControlPGN
 from Code import DGT
 from Code import Util
 from Code import XRun
-from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis
+from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis, Histogram
 from Code.Base import Game, Move, Position
 from Code.Base.Constantes import *
 from Code.Board import BoardTypes
@@ -17,7 +17,6 @@ from Code.Databases import DBgames
 from Code.Kibitzers import Kibitzers
 from Code.Openings import OpeningsStd
 from Code.QT import FormLayout
-from Code.QT import Histogram
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
@@ -26,7 +25,7 @@ from Code.QT import Replay
 from Code.QT import WindowArbol
 from Code.QT import WindowArbolBook
 from Code.QT import WindowSavePGN
-from Code.QT import WindowTutor
+from Code.Tutor import WindowTutor
 
 
 class Manager:
@@ -871,7 +870,8 @@ class Manager:
             max_recursion = 9999
         else:
             if not (
-                self.game_type in [GT_POSITIONS, GT_AGAINST_PGN, GT_AGAINST_ENGINE, GT_AGAINST_GM, GT_ALONE, GT_BOOK, GT_OPENINGS, GT_TACTICS]
+                self.game_type
+                in [GT_POSITIONS, GT_AGAINST_PGN, GT_AGAINST_ENGINE, GT_AGAINST_GM, GT_ALONE, GT_BOOK, GT_OPENINGS, GT_TACTICS]
                 or (self.game_type in [GT_ELO, GT_MICELO] and not self.is_competitive)
             ):
                 if siUltimo or self.hints == 0:
@@ -880,12 +880,12 @@ class Manager:
             else:
                 max_recursion = 9999
         if move.analysis is None:
-            siCancelar = self.xtutor.ms_time_move > 5000 or self.xtutor.depth_engine > 5
+            siCancelar = self.xtutor.mstime_engine > 5000 or self.xtutor.depth_engine > 5
             mens = _("Analyzing the move....")
             me = QTUtil2.mensEspera.start(self.main_window, mens, physical_pos="ad", siCancelar=siCancelar, titCancelar=_("Stop"))
             self.main_window.setDisabled(True)
             if siCancelar:
-                ya_cancelado = [False,]
+                ya_cancelado = [False]
 
                 def test_me(rm):
                     if me.cancelado():
@@ -896,11 +896,11 @@ class Manager:
                         tm = rm.time
                         if tm:
                             tm /= 1000
-                        me.label("%s\n%s: %d %s: %.01f\"" % (mens, _("Depth"),  rm.depth, _("Time"), tm))
+                        me.label('%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm))
                     return True
 
                 self.xanalyzer.set_gui_dispatch(test_me)
-            mrm, pos = self.xanalyzer.analizaJugadaPartida(self.game, pos_jg, self.xtutor.ms_time_move, self.xtutor.depth_engine)
+            mrm, pos = self.xanalyzer.analizaJugadaPartida(self.game, pos_jg, self.xtutor.mstime_engine, self.xtutor.depth_engine)
             move.analysis = mrm, pos
             self.main_window.setDisabled(False)
             me.final()
@@ -1088,7 +1088,9 @@ class Manager:
     def compruebaDGT(self, set_position):
         if self.configuration.x_digital_board:
             if not DGT.activarSegunON_OFF(self.dgt):  # Error
-                QTUtil2.message_error(self.main_window, _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board)
+                QTUtil2.message_error(
+                    self.main_window, _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board
+                )
             else:
                 if set_position:
                     DGT.set_position(self.game)
@@ -1141,7 +1143,11 @@ class Manager:
         self.board.set_raw_last_position(self.game.last_position)
 
     def juegaPorMi(self):
-        if self.plays_instead_of_me_option and self.state == ST_PLAYING and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS)):
+        if (
+            self.plays_instead_of_me_option
+            and self.state == ST_PLAYING
+            and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
+        ):
             if not self.is_finished():
                 mrm = self.analizaTutor(with_cursor=True)
                 rm = mrm.mejorMov()
@@ -1312,7 +1318,9 @@ class Manager:
         liSon.append(separador)
         resultado = FormLayout.fedit(liSon, title=_("Sounds"), parent=self.main_window, anchoMinimo=250, icon=Iconos.S_Play())
         if resultado:
-            self.configuration.x_sound_beep, self.configuration.x_sound_results, self.configuration.x_sound_move, self.configuration.x_sound_our = resultado[1]
+            self.configuration.x_sound_beep, self.configuration.x_sound_results, self.configuration.x_sound_move, self.configuration.x_sound_our = resultado[
+                1
+            ]
             self.configuration.graba()
 
     def utilidades(self, liMasOpciones=None, siArbol=True):
@@ -1340,7 +1348,6 @@ class Manager:
                     # liMasOpciones.append((key, titulo, icono))
                     submenu.opcion(key, label, icono)
             menu.separador()
-
 
         # Grabar
         icoGrabar = Iconos.Grabar()
@@ -1418,7 +1425,11 @@ class Manager:
             menu.separador()
 
         # Juega por mi
-        if self.plays_instead_of_me_option and self.state == ST_PLAYING and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS)):
+        if (
+            self.plays_instead_of_me_option
+            and self.state == ST_PLAYING
+            and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
+        ):
             menu.separador()
             menu.opcion("juegapormi", _("Play instead of me") + "  [^1]", Iconos.JuegaPorMi()),
 
@@ -1464,7 +1475,9 @@ class Manager:
         elif resp.startswith("vol"):
             accion = resp[3:]
             if accion == "fichero":
-                resp = QTUtil2.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
+                resp = QTUtil2.salvaFichero(
+                    self.main_window, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
+                )
                 if resp:
                     self.board.save_as_img(resp, "png")
 
@@ -1543,11 +1556,22 @@ class Manager:
         extension = "lcsb"
         file = self.configuration.x_save_lcsb
         while True:
-            file = QTUtil2.salvaFichero(self.main_window, _("File to save"), file, _("File") + " %s (*.%s)" % (extension, extension), siConfirmarSobreescritura=False)
+            file = QTUtil2.salvaFichero(
+                self.main_window,
+                _("File to save"),
+                file,
+                _("File") + " %s (*.%s)" % (extension, extension),
+                siConfirmarSobreescritura=False,
+            )
             if file:
                 file = str(file)
                 if os.path.isfile(file):
-                    yn = QTUtil2.preguntaCancelar(self.main_window, _X(_("The file %1 already exists, what do you want to do?"), file), si=_("Overwrite"), no=_("Choose another"))
+                    yn = QTUtil2.preguntaCancelar(
+                        self.main_window,
+                        _X(_("The file %1 already exists, what do you want to do?"), file),
+                        si=_("Overwrite"),
+                        no=_("Choose another"),
+                    )
                     if yn is None:
                         break
                     if not yn:
@@ -1574,13 +1598,24 @@ class Manager:
         dato = self.listado("fen")
         if siFichero:
             extension = "fns"
-            resp = QTUtil2.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, _("File") + " %s (*.%s)" % (extension, extension), False)
+            resp = QTUtil2.salvaFichero(
+                self.main_window,
+                _("File to save"),
+                self.configuration.x_save_folder,
+                _("File") + " %s (*.%s)" % (extension, extension),
+                False,
+            )
             if resp:
                 try:
 
                     modo = "w"
                     if Util.exist_file(resp):
-                        yn = QTUtil2.preguntaCancelar(self.main_window, _X(_("The file %1 already exists, what do you want to do?"), resp), si=_("Append"), no=_("Overwrite"))
+                        yn = QTUtil2.preguntaCancelar(
+                            self.main_window,
+                            _X(_("The file %1 already exists, what do you want to do?"), resp),
+                            si=_("Append"),
+                            no=_("Overwrite"),
+                        )
                         if yn is None:
                             return
                         if yn:
@@ -1595,7 +1630,10 @@ class Manager:
                         self.configuration.graba()
                 except:
                     QTUtil.ponPortapapeles(dato)
-                    QTUtil2.message_error(self.main_window, "%s : %s\n\n%s" % (_("Unable to save"), resp, _("It is saved in the clipboard to paste it wherever you want.")))
+                    QTUtil2.message_error(
+                        self.main_window,
+                        "%s : %s\n\n%s" % (_("Unable to save"), resp, _("It is saved in the clipboard to paste it wherever you want.")),
+                    )
 
         else:
             QTUtil.ponPortapapeles(dato)

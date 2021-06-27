@@ -444,4 +444,3 @@ class MainWindow(QTVarios.WDialogo):
 
         Code.configuration.save_video(self.key_video, dic)
         return dic
-

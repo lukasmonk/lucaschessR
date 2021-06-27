@@ -1,7 +1,7 @@
 import FasterCode
 
 from Code.Base.Constantes import FEN_INITIAL
-from Code import TrListas
+from Code.Config import TrListas
 
 
 class Position:
@@ -287,7 +287,9 @@ class Position:
         tp = "w" if self.is_white else "b"
         for c in pgn:
             if c in "NBRQK":
-                li.append('<img src="../Resources/IntFiles/Figs/%s%s.png" width="20" height="20" style="vertical-align:bottom">' % (tp, c.lower()))
+                li.append(
+                    '<img src="../Resources/IntFiles/Figs/%s%s.png" width="20" height="20" style="vertical-align:bottom">' % (tp, c.lower())
+                )
             else:
                 li.append(c)
         return "".join(li)

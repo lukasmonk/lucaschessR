@@ -147,7 +147,7 @@ class WDBAnalisis:
         rotulo = mrm.name
         if alm.vtime:
             secs = alm.vtime / 1000.0
-            rotulo += " %.0f\"" % secs
+            rotulo += ' %.0f"' % secs
         if alm.depth:
             rotulo += " %d^" % alm.depth
 
