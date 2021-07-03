@@ -372,7 +372,7 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
     # MultiPV
     li_gen.append(SEPARADOR)
     li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
-    for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
+    for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), str(x)))
     config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
     li_gen.append((config, alm.multiPV))

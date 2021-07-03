@@ -575,7 +575,7 @@ class WLines(QTVarios.WDialogo):
         if tipo == "pgn":
             self.importarPGN(game)
         elif tipo == "polyglot":
-            self.importarPolyglot(game)
+            self.import_polyglot(game)
         elif tipo == "summary":
             self.importarSummary(game)
         elif tipo == "voyager2":
@@ -604,36 +604,45 @@ class WLines(QTVarios.WDialogo):
             game.read_pv(ap.a1h8)
             self.addPartida(game)
 
-    def importarLeeParam(self, titulo):
+    def import_param_books(self, titulo, with_excltrans):
         dicData = self.dbop.getconfig("IMPORTAR_LEEPARAM")
         if not dicData:
             dicData = {}
-        li_gen = [FormLayout.separador]
 
-        li_gen.append((None, _("Select a maximum number of moves (plies)<br> to consider from each game")))
-        li_gen.append((FormLayout.Spinbox(_("Depth"), 3, 99, 50), dicData.get("DEPTH", 30)))
-        li_gen.append(FormLayout.separador)
+        form = FormLayout.FormLayout(self, titulo, Iconos.Naranja(), anchoMinimo=360)
+        form.separador()
+
+        form.apart(_("Select a maximum number of moves (plies)<br> to consider from each game"))
+        form.spinbox(_("Depth"), 3, 99, 50, dicData.get("DEPTH", 30))
+        form.separador()
 
         li = [(_("Only white best moves"), True), (_("Only black best moves"), False)]
-        config = FormLayout.Combobox(_("Moves"), li)
-        li_gen.append((config, dicData.get("SIWHITE", True)))
-        li_gen.append(FormLayout.separador)
+        form.combobox(_("Moves"), li, dicData.get("SIWHITE", True))
+        form.separador()
 
         li = [(_("Only one best move"), True), (_("All best moves"), False)]
-        config = FormLayout.Combobox(_("Best move"), li)
-        li_gen.append((config, dicData.get("ONLYONE", True)))
-        li_gen.append(FormLayout.separador)
+        form.combobox(_("Best move"), li, dicData.get("ONLYONE", True))
+        form.separador()
 
-        li_gen.append((FormLayout.Spinbox(_("Minimum moves must have each line"), 0, 99, 50), dicData.get("MINMOVES", 0)))
+        form.spinbox(_("Minimum moves must have each line"), 0, 99, 50, dicData.get("MINMOVES", 0))
+        form.separador()
 
-        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=360, icon=Iconos.PuntoNaranja())
+        if with_excltrans:
+            form.checkbox(_("Exclude transpositions"), dicData.get("EXCLTRANSPOSITIONS", True))
+
+        resultado = form.run()
         if resultado:
             accion, liResp = resultado
-            depth, siWhite, onlyone, minMoves = liResp
+            if with_excltrans:
+                depth, siWhite, onlyone, minMoves, excltraspositions = liResp
+                dicData["EXCLTRANSPOSITIONS"] = excltraspositions
+            else:
+                depth, siWhite, onlyone, minMoves = liResp
             dicData["DEPTH"] = depth
             dicData["SIWHITE"] = siWhite
             dicData["ONLYONE"] = onlyone
             dicData["MINMOVES"] = minMoves
+
             self.dbop.setconfig("IMPORTAR_LEEPARAM", dicData)
             self.configuration.write_variables("WBG_MOVES", dicData)
             return dicData
@@ -642,7 +651,7 @@ class WLines(QTVarios.WDialogo):
     def importarSummary(self, game):
         nomfichgames = QTVarios.select_db(self, self.configuration, True, False)
         if nomfichgames:
-            dicData = self.importarLeeParam(_("Database summary"))
+            dicData = self.import_param_books(_("Database summary"), False)
             if dicData:
                 ficheroSummary = nomfichgames + ".st1"
                 depth, siWhite, onlyone, minMoves = (dicData["DEPTH"], dicData["SIWHITE"], dicData["ONLYONE"], dicData["MINMOVES"])
@@ -650,7 +659,7 @@ class WLines(QTVarios.WDialogo):
                 self.glines.refresh()
                 self.glines.gotop()
 
-    def importarPolyglot(self, game):
+    def import_polyglot(self, game):
         list_books = Books.ListBooks()
         list_books.restore_pickle(self.configuration.file_books)
         list_books.check()
@@ -666,17 +675,17 @@ class WLines(QTVarios.WDialogo):
             if book:
                 bookB = book
 
-        li_gen = [FormLayout.separador]
+        form = FormLayout.FormLayout(self, _("Polyglot book"), Iconos.Libros(), anchoMinimo=360)
+        form.separador()
 
         li = [(bookx.name, bookx) for bookx in list_books.lista]
-        config = FormLayout.Combobox(_("Book that plays white side"), li)
-        li_gen.append((config, bookW))
-        li_gen.append(FormLayout.separador)
-        config = FormLayout.Combobox(_("Book that plays black side"), li)
-        li_gen.append((config, bookB))
-        li_gen.append(FormLayout.separador)
+        form.combobox(_("Book that plays white side"), li, bookW)
+        form.separador()
 
-        resultado = FormLayout.fedit(li_gen, title=_("Polyglot book"), parent=self, anchoMinimo=360, icon=Iconos.Libros())
+        form.combobox(_("Book that plays black side"), li, bookB)
+        form.separador()
+
+        resultado = form.run()
         if resultado:
             accion, liResp = resultado
             bookW, bookB = liResp
@@ -689,10 +698,10 @@ class WLines(QTVarios.WDialogo):
         bookB.polyglot()
 
         titulo = bookW.name if bookW == bookB else "%s/%s" % (bookW.name, bookB.name)
-        dicData = self.importarLeeParam(titulo)
+        dicData = self.import_param_books(titulo, True)
         if dicData:
-            depth, siWhite, onlyone, minMoves = (dicData["DEPTH"], dicData["SIWHITE"], dicData["ONLYONE"], dicData["MINMOVES"])
-            self.dbop.importarPolyglot(self, game, bookW, bookB, titulo, depth, siWhite, onlyone, minMoves)
+            depth, siWhite, onlyone, minMoves, excl_transpositions = (dicData["DEPTH"], dicData["SIWHITE"], dicData["ONLYONE"], dicData["MINMOVES"], dicData["EXCLTRANSPOSITIONS"])
+            self.dbop.import_polyglot(self, game, bookW, bookB, titulo, depth, siWhite, onlyone, minMoves, excl_transpositions)
             self.glines.refresh()
             self.glines.gotop()
 

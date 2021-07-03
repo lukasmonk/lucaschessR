@@ -606,7 +606,7 @@ class Procesador:
 
         menu.opcion(self.sonidos, _("Custom sounds"), Iconos.SoundTool())
         menu.separador()
-        menu.opcion(self.setPassword, _("Set password"), Iconos.Password())
+        menu.opcion(self.set_password, _("Set password"), Iconos.Password())
 
         if self.configuration.is_main:
             menu.separador()
@@ -679,10 +679,10 @@ class Procesador:
         w.exec_()
 
     def usuarios(self):
-        WindowUsuarios.editUsuarios(self)
+        WindowUsuarios.edit_users(self)
 
-    def setPassword(self):
-        WindowUsuarios.setPassword(self)
+    def set_password(self):
+        WindowUsuarios.set_password(self)
 
     def trainingMap(self, mapa):
         resp = WindowWorkMap.train_map(self, mapa)
@@ -1025,12 +1025,12 @@ class Procesador:
         self.manager = ManagerSolo.ManagerSolo(self)
         self.manager.start()
 
-    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump, attempts):
+    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump):
         # self.game_type = GT_POSITIONS
         # self.state = ST_PLAYING
         self.manager = ManagerEntPos.ManagerEntPos(self)
         self.manager.set_training(entreno)
-        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump, attempts=attempts)
+        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump)
 
     def playRoute(self, route):
         if route.state == Routes.BETWEEN:

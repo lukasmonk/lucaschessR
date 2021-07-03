@@ -35,7 +35,7 @@ class ManagerEntPos(Manager.Manager):
         db[self.entreno] = data
         db.close()
 
-    def start(self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False, attempts=1):
+    def start(self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False):
         if hasattr(self, "reiniciando"):
             if self.reiniciando:
                 return
@@ -54,7 +54,6 @@ class ManagerEntPos(Manager.Manager):
         self.li_histo = [self.pos_training]
 
         self.hints = 99999
-        self.attempts = attempts
 
         self.line_fns = FNSLine.FNSLine(self.li_trainings[self.pos_training - 1])
 
@@ -185,8 +184,8 @@ class ManagerEntPos(Manager.Manager):
     def help(self):
         if self.is_playing_gameobj():
             move_obj = self.game_obj.move(self.pos_obj)
-            self.current_attempts += 1
-            if self.current_attempts == 1:
+            self.current_helps += 1
+            if self.current_helps == 1:
                 self.board.markPosition(move_obj.from_sq)
             else:
                 self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
@@ -210,7 +209,7 @@ class ManagerEntPos(Manager.Manager):
             pos = self.num_trainings
         self.analiza_stop()
         self.start(
-            pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump, self.attempts
+            pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump
         )
 
     def control_teclado(self, nkey):
@@ -257,7 +256,7 @@ class ManagerEntPos(Manager.Manager):
         self.state = ST_PLAYING
 
         self.human_is_playing = False
-        self.current_attempts = 0
+        self.current_helps = 0
         self.put_view()
 
         is_white = self.game.last_position.is_white
@@ -407,7 +406,6 @@ class ManagerEntPos(Manager.Manager):
         a1h8 = move.movimiento()
         ok = False
         if self.is_playing_gameobj():
-            self.current_attempts += 1
             move_obj = self.game_obj.move(self.pos_obj)
             is_main, is_var = move_obj.test_a1h8(a1h8)
             if is_main:
@@ -418,13 +416,6 @@ class ManagerEntPos(Manager.Manager):
                 for a1h8_m in move.variations.list_movimientos():
                     li_movs.append((a1h8_m[:2], a1h8[2:4], False))
                 self.board.ponFlechasTmp(li_movs)
-            else:
-                if a1h8[:2] != move_obj.from_sq:
-                    if self.attempts and self.current_attempts >= self.attempts:
-                        self.board.markPosition(move_obj.from_sq)
-                else:
-                    if self.attempts and self.current_attempts >= self.attempts:
-                        self.board.ponFlechasTmp(([move_obj.from_sq, move_obj.to_sq, True],))
             if not ok:
                 self.sigueHumano()
                 return False

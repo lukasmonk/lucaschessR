@@ -905,6 +905,19 @@ st_valid = {
     "smotheredMate",
 }
 
+st_not_unique = {
+    "capturingDefender",
+    "forcedMove",
+    "sacrifice",
+    "simplification",
+    "speculation",
+    "threat",
+    "weakSquare",
+    "unsafeSquare",
+    "coercion",
+    "crushing",
+}
+
 
 def get_tags(fen, pvline, cp):
     b = chess.Board(fen)
@@ -923,5 +936,9 @@ def get_tags(fen, pvline, cp):
 
     li = cook(p)
     li_themes = [theme for theme in li if theme in st_valid]
+
+    if len(li_themes) == 1:
+        if li_themes[0] in st_not_unique:
+            li_themes = []
 
     return li_themes

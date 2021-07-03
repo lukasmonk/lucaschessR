@@ -209,9 +209,9 @@ def read_engines(folder_engines):
     cm = mas(
         "stockfish",
         " T. Romstad, M. Costalba, J. Kiiski, G. Linscott",
-        f"13 {t32_64}",
+        f"14 {t32_64}",
         "https://stockfishchess.org/",
-        f"Stockfish-13_x{t32_64}.exe",
+        f"Stockfish-14_x{t32_64}.exe",
         3500,
     )
     cm.ordenUCI("Ponder", "false")

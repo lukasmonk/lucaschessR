@@ -6,9 +6,9 @@
 # ==============================================================================
 
 import sys
-# import warnings
-#
-# warnings.simplefilter("ignore", UserWarning)
+import warnings
+
+warnings.simplefilter("ignore", UserWarning)
 
 n_args = len(sys.argv)
 if n_args == 1:

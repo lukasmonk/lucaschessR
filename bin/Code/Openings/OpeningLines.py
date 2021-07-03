@@ -869,13 +869,13 @@ class Opening:
         self._conexion.commit()
         self.li_xpv.sort()
 
-    def importarPolyglot(self, ventana, game, bookW, bookB, titulo, depth, siWhite, onlyone, minMoves):
+    def import_polyglot(self, ventana, game, bookW, bookB, titulo, depth, siWhite, onlyone, minMoves, excl_transpositions):
         bp = QTUtil2.BarraProgreso1(ventana, titulo, formato1="%m")
         bp.ponTotal(0)
         bp.ponRotulo(_X(_("Reading %1"), "..."))
         bp.mostrar()
 
-        dic_fen = {}
+        st_fenm2 = set()
         set_fen = FasterCode.set_fen
         make_move = FasterCode.make_move
         get_fen = FasterCode.get_fen
@@ -890,6 +890,12 @@ class Opening:
                 return
             if len(lipv_ant) > depth:
                 return
+            if excl_transpositions:
+                fen_m2 = FasterCode.fen_fenm2(fen)
+                if fen_m2 in st_fenm2:
+                    return
+                st_fenm2.add(fen_m2)
+
             siWhite1 = " w " in fen
             book = bookW if siWhite1 else bookB
             li_posible_moves = book.miraListaPV(fen, siWhite1 == siWhite, onlyone=onlyone)

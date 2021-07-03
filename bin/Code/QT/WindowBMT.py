@@ -373,7 +373,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
             if self.historial:
                 reg.HISTORIAL = Util.var2zip(self.historial)
-                reg.REPE = len(reg.HISTORIAL)
+                reg.REPE = len(self.historial)
 
             if self.is_finished:
                 if not self.siTerminadaAntes:

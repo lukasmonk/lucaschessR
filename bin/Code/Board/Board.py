@@ -682,7 +682,7 @@ class Board(QtWidgets.QGraphicsView):
         if hasattr(self.main_window, "manager") and self.main_window.manager:
             if hasattr(self.main_window.manager, "gridRightMouse"):
                 liKeys.append((None, None))
-                liKeys.append(("P", _("Show/Hide PGN information")))
+                liKeys.append((_("ALT") + "-P", _("Show/Hide PGN information")))
             liKeys.append((_("ALT") + "-N", _("Activate/Deactivate non distract mode")))
 
             if hasattr(self.main_window.manager, "listHelpTeclado"):

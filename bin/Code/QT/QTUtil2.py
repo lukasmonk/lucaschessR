@@ -543,10 +543,10 @@ def comboBoxLB(parent, li_options, valor, etiqueta=None):
         return cb
 
 
-def unMomento(owner, mensaje=None):
+def unMomento(owner, mensaje=None, physical_pos=None):
     if mensaje is None:
         mensaje = _("One moment please...")
-    return mensEspera.start(owner, mensaje)
+    return mensEspera.start(owner, mensaje, physical_pos=physical_pos)
 
 
 def analizando(owner):

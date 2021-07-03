@@ -232,6 +232,7 @@ class WPlayer(QtWidgets.QWidget):
         self.gridOpeningBlack.refresh()
         self.gridMovesWhite.refresh()
         self.gridMovesBlack.refresh()
+        self.gridOpeningWhite.setFocus()
 
     def setInfoMove(self, infoMove):
         self.infoMove = infoMove
@@ -284,7 +285,7 @@ class WPlayer(QtWidgets.QWidget):
                 game = Game.Game()
                 game.read_pv(pv)
             self.infoMove.modoPartida(game, len(game) - 1)
-            self.setFocus()
+            grid.setFocus()
 
     def grid_color_fondo(self, grid, nfila, ocol):
         dt = self.dataGrid(grid)
@@ -297,6 +298,22 @@ class WPlayer(QtWidgets.QWidget):
         key = ocol.key + "c"
         color = dt[nfila].get(key)
         return self.qtColor[color] if color is not None else None
+
+    def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
+        if k in (QtCore.Qt.Key_Left, QtCore.Qt.Key_Right):
+            self.infoMove.tecla_pulsada(k)
+            row, col = grid.posActualN()
+            if QtCore.Qt.Key_Right:
+                if col > 0:
+                    col -= 1
+            elif QtCore.Qt.Key_Left:
+                if col < len(grid.columnas().li_columns) - 1:
+                    col += 1
+            grid.goto(row, col)
+        elif k == QtCore.Qt.Key_Home:
+            grid.gotop()
+        elif k == QtCore.Qt.Key_End:
+            grid.gobottom()
 
     def leeVariable(self, var, default=None):
         return self.dbGames.read_config(var, default)
@@ -441,7 +458,7 @@ class WPlayer(QtWidgets.QWidget):
 
         pb.close()
 
-        um = QTUtil2.unMomento(self, _("Working..."))
+        um = QTUtil2.unMomento(self, _("Working..."), physical_pos="ad")
 
         def color3(x, y, z):
             if x > y and x > z:
@@ -610,3 +627,4 @@ class WPlayer(QtWidgets.QWidget):
         self.gridOpeningBlack.gotop()
         self.gridMovesWhite.gotop()
         self.gridMovesBlack.gotop()
+        self.gridOpeningWhite.setFocus()

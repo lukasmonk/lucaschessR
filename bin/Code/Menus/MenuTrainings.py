@@ -434,7 +434,6 @@ class MenuTrainings:
                         data = db[entreno]
                         if type(data) != dict:
                             data = {}
-                        attempts = data.get("ATTEMPTS", 1)
                         db.close()
                     else:
                         db = UtilSQL.DictSQL(self.configuration.file_trainings)
@@ -444,21 +443,20 @@ class MenuTrainings:
                         posUltimo = data.get("POSULTIMO", 1)
                         jump = data.get("SALTA", False)
                         tipo = data.get("TYPE", "s")
-                        attempts = 0  # data.get("ATTEMPTS", 0) # Se mantienen por si alguien se ha aconstumbrado
                         resp = WCompetitionWithTutor.numPosicion(
-                            self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo, attempts
+                            self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo
                         )
                         if resp is None:
                             db.close()
                             return
-                        pos, tipo, jump, attempts = resp
-                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TYPE": tipo, "ATTEMPTS": attempts}
+                        pos, tipo, jump = resp
+                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TYPE": tipo}
                         db.close()
                         if tipo.startswith("r"):
                             if tipo == "rk":
                                 random.seed(pos)
                             random.shuffle(liEntrenamientos)
-                    self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump, attempts)
+                    self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump)
 
                 elif resp == "learnPGN":
                     self.learnPGN()

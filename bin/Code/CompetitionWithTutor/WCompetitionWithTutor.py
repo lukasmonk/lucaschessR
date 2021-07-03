@@ -276,7 +276,7 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         self.accept()
 
 
-def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo, attempts):
+def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo):
     li_gen = [FormLayout.separador]
 
     label = "%s (1..%d)" % (_("Select position"), nFEN)
@@ -291,16 +291,9 @@ def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo, attempts):
 
     li_gen.append((_("Jump to the next after solving") + ":", salta))
 
-    # li_gen.append(FormLayout.separador)
-    #
-    # li_gen.append((FormLayout.Spinbox( "%s (%s): " % (_("Attempts before showing the solution"), "0=%s" %_("Disable")), 0, 99, 50), attempts))
-
     resultado = FormLayout.fedit(li_gen, title=titulo, parent=w_parent, anchoMinimo=200, icon=Iconos.Entrenamiento())
     if resultado:
-        # position, tipo, jump, attempts = resultado[1]
-        # return position, tipo, jump, attempts
         position, tipo, jump = resultado[1]
-        attempts = 0
-        return position, tipo, jump, 0
+        return position, tipo, jump
     else:
         return None

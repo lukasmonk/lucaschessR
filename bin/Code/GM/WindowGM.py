@@ -98,7 +98,7 @@ class WGM(QTVarios.WDialogo):
         self.cbJshow = Controles.CB(self, li_options, True)
         self.lbJmultiPV = Controles.LB2P(self, _("Number of moves evaluated by engine(MultiPV)"))
         li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
-        for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
+        for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 30, 40, 50, 75, 100, 150, 200):
             li.append((str(x), str(x)))
         self.cbJmultiPV = Controles.CB(self, li, "PD")
 

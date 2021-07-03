@@ -454,12 +454,12 @@ class WColores(QTVarios.WDialogo):
         self.lbTamBoard = Controles.LB(self, "%d px" % self.board.width())
 
         # Juntamos
-        lyT = Colocacion.V().control(tb).espacio(15).control(self.board).controli(self.lbTamBoard).relleno(1).margen(3)
+        lyT = Colocacion.V().control(tb).control(self.board).controli(self.lbTamBoard).relleno(1).margen(3)
 
         self.tab = Controles.Tab()
         self.tab.nuevaTab(gbTemas, _("Themes"))
         self.tab.nuevaTab(gbOtros, _("Other options"))
-        ly = Colocacion.H().otro(lyT).control(self.tab)
+        ly = Colocacion.H().otro(lyT).control(self.tab).margen(3)
 
         self.setLayout(ly)
 

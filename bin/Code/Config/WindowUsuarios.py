@@ -1,7 +1,6 @@
 import os
 import shutil
 
-import Code
 from Code.Config import Usuarios
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -19,7 +18,7 @@ class WUsuarios(QTVarios.WDialogo):
 
         self.configuration = procesador.configuration
 
-        self.leeUsuarios()
+        self.liUsuarios = Usuarios.Usuarios().list_users
 
         titulo = _("Users")
         icono = Iconos.Usuarios()
@@ -61,36 +60,15 @@ class WUsuarios(QTVarios.WDialogo):
         if not self.restore_video():
             self.resize(310, 400)
 
-    def leeUsuarios(self):
-        self.liUsuarios = Usuarios.Usuarios().list_users
-        if not self.liUsuarios:
-            usuario = Usuarios.User()
-            usuario.number = 0
-            usuario.password = ""
-            self.liUsuarios = [usuario]
-
-        main = self.liUsuarios[0]
-        main.name = self.configuration.x_player
-        # Para que al pedir la password siempre en el idioma del main en principio solo hace falta el password pero por si acaso se cambia de opinion
-        main.trlucas = Code.lucas_chess
-        main.trusuario = _("User")
-        main.trpassword = _("Password")
-        main.traceptar = _("Accept")
-        main.trcancelar = _("Cancel")
-
     def cancelar(self):
         self.save_video()
         self.reject()
 
     def nuevo(self):
+        st_ya = set(usuario.number for usuario in self.liUsuarios)
 
-        li = []
-        for usuario in self.liUsuarios:
-            li.append(usuario.number)
-
-        # plantilla = self.configuration.carpetaUsers + "/%d"
         number = 1
-        while number in li:  # or os.path.isdir(plantilla % number):
+        while number in st_ya:
             number += 1
 
         usuario = Usuarios.User()
@@ -100,7 +78,7 @@ class WUsuarios(QTVarios.WDialogo):
 
         self.liUsuarios.append(usuario)
         self.grid.refresh()
-        self.grid.goto(len(self.liUsuarios) - 1, 1)
+        self.grid.gotop()
         self.grid.setFocus()
 
     def aceptar(self):
@@ -132,10 +110,11 @@ class WUsuarios(QTVarios.WDialogo):
         if campo == "USUARIO":
             if valor:
                 usuario.name = valor
+                if usuario.number == 0:
+                    self.configuration.set_player(valor)
+                    self.configuration.graba()
             else:
                 QTUtil.beep()
-        # else:
-        #     usuario.password = valor
 
     def grid_dato(self, grid, row, o_column):
         key = o_column.key
@@ -144,39 +123,37 @@ class WUsuarios(QTVarios.WDialogo):
             return str(usuario.number) if usuario.number else "-"
         elif key == "USUARIO":
             return usuario.name
-        # if key == "PASSWORD":
-        #     return "x" * len(usuario.password)
 
 
-def editUsuarios(procesador):
+def edit_users(procesador):
     w = WUsuarios(procesador)
     if w.exec_():
         pass
 
 
-def setPassword(procesador):
+def set_password(procesador):
     configuration = procesador.configuration
 
     npos = 0
     user = configuration.user
-    liUsuarios = Usuarios.Usuarios().list_users
+    li_usuarios = Usuarios.Usuarios().list_users
     if user:
         number = int(user)
-        for n, usu in enumerate(liUsuarios):
+        for n, usu in enumerate(li_usuarios):
             if usu.number == number:
                 npos = n
                 break
         if npos == 0:
             return
     else:
-        if not liUsuarios:
+        if not li_usuarios:
             usuario = Usuarios.User()
             usuario.number = 0
             usuario.password = ""
             usuario.name = configuration.x_player
-            liUsuarios = [usuario]
+            li_usuarios = [usuario]
 
-    usuario = liUsuarios[npos]
+    usuario = li_usuarios[npos]
 
     while True:
         li_gen = [FormLayout.separador]
@@ -207,5 +184,7 @@ def setPassword(procesador):
 
             else:
                 usuario.password = nueva
-                Usuarios.Usuarios().save_list(liUsuarios)
+                Usuarios.Usuarios().save_list(li_usuarios)
                 return
+        else:
+            return

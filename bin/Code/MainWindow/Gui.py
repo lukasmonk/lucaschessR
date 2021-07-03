@@ -1,15 +1,15 @@
 import locale
+import sys
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+import Code
 from Code.Config import Configuration, Usuarios
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code import Util
-import Code
 
 
 def run_gui(procesador):
@@ -17,10 +17,11 @@ def run_gui(procesador):
 
     # Usuarios
     list_users = Usuarios.Usuarios().list_users
-    if list_users:
+    if len(list_users) > 1:
+        main_config = Configuration.Configuration("")
+        main_config.releeTRA()
+
         user = pide_usuario(list_users)
-        if user is None:
-            return
         if user == list_users[0]:
             user = None
     else:
@@ -42,14 +43,11 @@ def run_gui(procesador):
     if not configuration.x_translator:
         if user:
             conf_main = Configuration.Configuration("")
-            ori = conf_main.file_external_engines()
-            conf_main.lee()
-            conf_main.limpia(user.name)
-            conf_main.set_folders()
-            conf_main.graba()
-            procesador.configuration = conf_main
-
-            Util.file_copy(ori, conf_main.file_external_engines())
+            configuration.x_translator = conf_main.x_translator
+            configuration.start()
+            configuration.limpia(user.name)
+            configuration.set_folders()
+            configuration.graba()
 
         else:
             li = configuration.list_translations()
@@ -188,6 +186,8 @@ class WPassword(QtWidgets.QDialog):
         self.setWindowTitle(Code.lucas_chess)
         self.setWindowIcon(Iconos.Aplicacion64())
 
+        self.setFont(Controles.TipoLetra(puntos=14))
+
         self.liUsuarios = liUsuarios
 
         li_options = [(usuario.name, nusuario) for nusuario, usuario in enumerate(liUsuarios)]
@@ -232,23 +232,24 @@ def pide_usuario(liUsuarios):
                 if usuario:
                     break
             else:
+                sys.exit()
                 return None
             intentos -= 1
             if intentos == 0:
                 return None
     else:
-        if len(liUsuarios) == 1:
-            usuario = liUsuarios[0]
+        if len(liUsuarios) <= 1:
+            return None
         else:
             menu = Controles.Menu(None)  # No puede ser LCmenu, ya que todavia no existe la configuration
+            menu.ponFuente(Controles.TipoLetra(puntos=14))
+            menu.opcion(None, _("Select your user"), Iconos.Usuarios())
             menu.separador()
 
             for usuario in liUsuarios:
-                menu.opcion(usuario, usuario.name, Iconos.PuntoNaranja())
+                menu.opcion(usuario, usuario.name, Iconos.Naranja() if usuario.number >0 else Iconos.Verde())
                 menu.separador()
 
             usuario = menu.lanza()
-            if usuario is None:
-                return None
 
     return usuario

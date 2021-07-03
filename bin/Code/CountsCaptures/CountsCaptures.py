@@ -65,9 +65,9 @@ class CountCapture:
         tm = 0.0
         for posmove, depth, ok, tiempo in self.tries:
             tm += tiempo
-        total = self.current_posmove + self.current_depth + 1
-        media = tm / total
-        return '%.01f"/%.f"' % (media, tm)
+        total = self.current_posmove + self.current_depth
+        media = tm / total if total else 0.0
+        return '%.01f"/%.01f"' % (media, tm)
 
     def copy(self):
         capt_copy = CountCapture()

@@ -522,7 +522,7 @@ FILESW=%s:100
                     if nag:
                         move.add_nag(nag)
 
-                if dif > 0 and self.themes_lichess:
+                if self.themes_lichess and (mj.mate != 0 or dif > 0 ):
                     move.assign_themes_lichess()
 
         # Ponemos el texto original en la ultima
