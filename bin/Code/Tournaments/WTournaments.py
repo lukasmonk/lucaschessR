@@ -137,7 +137,7 @@ class WTournaments(QTVarios.WDialogo):
         if row >= 0:
             nom_origen = self.nom_torneo_pos(row)
             nom_destino = self.edit_name(nom_origen)
-            if nom_origen != nom_destino:
+            if nom_destino and nom_origen != nom_destino:
                 path_origen = os.path.join(self.configuration.folder_tournaments(), "%s.mvm" % nom_origen)
                 path_destino = os.path.join(self.configuration.folder_tournaments(), "%s.mvm" % nom_destino)
                 shutil.move(path_origen, path_destino)
@@ -157,7 +157,7 @@ class WTournaments(QTVarios.WDialogo):
         if row >= 0:
             nom_origen = self.nom_torneo_pos(row)
             nom_destino = self.edit_name(nom_origen)
-            if nom_origen != nom_destino:
+            if nom_destino and nom_origen != nom_destino:
                 path_origen = os.path.join(self.configuration.folder_tournaments(), "%s.mvm" % nom_origen)
                 path_destino = os.path.join(self.configuration.folder_tournaments(), "%s.mvm" % nom_destino)
                 shutil.copy(path_origen, path_destino)

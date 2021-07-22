@@ -492,6 +492,8 @@ class WPanelDirector(QTVarios.WDialogo):
         key = col.key
         if key == "INFO":
             tarea = self.guion.tarea(row)
+            if tarea is None:
+                return
             sc = self.guion.itemTarea(row)
             if sc:
                 if tarea.tp() == TabVisual.TP_SVG:
@@ -766,9 +768,10 @@ class WPanelDirector(QTVarios.WDialogo):
     def cierraRecursos(self):
         if self.guion is not None:
             self.guion.cierraPizarra()
-            self.dbConfig["SELECTBANDA"] = self.selectBanda.guardar()
-            self.dbConfig["SELECTBANDANUM"] = self.selectBanda.numSeleccionada()
-            self.dbConfig["SAVEWHENFINISHED"] = self.chbSaveWhenFinished.valor()
+            if not self.dbConfig.is_closed():
+                self.dbConfig["SELECTBANDA"] = self.selectBanda.guardar()
+                self.dbConfig["SELECTBANDANUM"] = self.selectBanda.numSeleccionada()
+                self.dbConfig["SAVEWHENFINISHED"] = self.chbSaveWhenFinished.valor()
             self.dbManager.close()
 
             self.save_video()

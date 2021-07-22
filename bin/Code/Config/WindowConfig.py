@@ -99,7 +99,13 @@ def options(parent, configuration):
     drap_v = {}
     for x in drap:
         drap_v[drap[x]] = x
-    form.dial("%s (%s=1)" % (_("Speed"), _("Default")), 1, len(drap), drap_v.get(configuration.x_pieces_speed, 100), siporc=False)
+    form.dial(
+        "%s (%s=1)" % (_("Speed"), _("Default")),
+        1,
+        len(drap),
+        drap_v.get(configuration.x_pieces_speed, 100),
+        siporc=False,
+    )
     form.separador()
 
     li_mouse_sh = [
@@ -128,6 +134,7 @@ def options(parent, configuration):
             (_("None"), ""),
             (_("DGT") + x, "DGT-gon"),
             (_("Certabo") + x, "Certabo"),
+            ("%s (%s) %s" % (_("Certabo"), _("Bluetooth"), x), "CertaboBT"),
             (_("Millennium") + x, "Millennium"),
             (_("Novag Citrine") + x, "Citrine"),
             (_("Novag UCB") + x, "Novag UCB"),
@@ -244,7 +251,22 @@ def options(parent, configuration):
 
         por_defecto = li_asp[0]
         if por_defecto:
-            li_asp = "", 11, False, 11, False, QtCore.Qt.ToolButtonTextUnderIcon, 283, 22, 10, False, True, True, False, 10
+            li_asp = (
+                "",
+                11,
+                False,
+                11,
+                False,
+                QtCore.Qt.ToolButtonTextUnderIcon,
+                283,
+                22,
+                10,
+                False,
+                True,
+                True,
+                False,
+                10,
+            )
         else:
             del li_asp[0]
         (
@@ -268,7 +290,12 @@ def options(parent, configuration):
 
         configuration.set_tipoIconos(qt_iconstb)
 
-        (configuration.x_sound_beep, configuration.x_sound_results, configuration.x_sound_move, configuration.x_sound_our) = li_son
+        (
+            configuration.x_sound_beep,
+            configuration.x_sound_results,
+            configuration.x_sound_move,
+            configuration.x_sound_our,
+        ) = li_son
 
         (
             configuration.x_tutor_clave,
@@ -286,7 +313,13 @@ def options(parent, configuration):
         configuration.x_tutor_mstime = int(tiempoTutor * 1000)
         configuration.x_engine_notbackground = not workinbackground
 
-        (configuration.x_elo, configuration.x_michelo, configuration.x_fics, configuration.x_fide, configuration.x_lichess) = li_nc
+        (
+            configuration.x_elo,
+            configuration.x_michelo,
+            configuration.x_fics,
+            configuration.x_fide,
+            configuration.x_lichess,
+        ) = li_nc
 
         (
             configuration.x_show_effects,

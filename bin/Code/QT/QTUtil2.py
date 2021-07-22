@@ -1,3 +1,4 @@
+import time
 from PySide2 import QtCore, QtWidgets
 
 import Code
@@ -291,6 +292,7 @@ class BarraProgreso2(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self, owner)
 
         self.owner = owner
+        self.is_closed = False
 
         # self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
@@ -332,7 +334,9 @@ class BarraProgreso2(QtWidgets.QDialog):
         return self
 
     def cerrar(self):
-        self.reject()
+        if not self.is_closed:
+            self.reject()
+            self.is_closed = True
         QTUtil.refresh_gui()
 
     def cancelar(self):
@@ -604,6 +608,33 @@ def message_in_point(owner, mens, titulo, point):
 
 def message_bold(owner, mens, titulo=None):
     message(owner, mens, titulo=titulo, si_bold=True)
+
+
+class QWMessage(QtWidgets.QWidget):
+    def __init__(self, owner, message):
+        QtWidgets.QWidget.__init__(self, owner)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
+
+        lb = Controles.LB(self, message)
+        lb.setFont(Controles.TipoLetra(puntos=Code.configuration.x_menu_points, peso=300))
+        titulo = _("Message")
+        self.setWindowTitle(titulo)
+        bt = Controles.PB(self, _("Continue"), self.continuar, plano=False)
+        layout = Colocacion.V().control(lb).espacio(20).control(bt)
+        self.setLayout(layout)
+        self.activo = True
+
+    def continuar(self):
+        self.close()
+        self.activo = False
+
+
+def menssage_nomodal(owner, message):
+    w = QWMessage(owner, message)
+    w.show()
+    while w.activo:
+        QTUtil.refresh_gui()
+        time.sleep(0.1)
 
 
 def pregunta(parent, mens, label_yes=None, label_no=None, si_top=False, px=None, py=None):

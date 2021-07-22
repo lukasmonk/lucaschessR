@@ -67,11 +67,11 @@ class Game:
 
     def tag_timestart(self):
         t = Util.today()
-        self.set_tag("TimeStart", str(t)[:19])
+        self.set_tag("TimeStart", str(t)[:19].replace("-", "."))
 
     def tag_timeend(self):
         t = Util.today()
-        self.set_tag("TimeEnd", str(t)[:19])
+        self.set_tag("TimeEnd", str(t)[:19].replace("-", "."))
 
     @property
     def last_position(self):
@@ -519,6 +519,26 @@ class Game:
             pv_previo += move.movimiento() + " "
             li_pvc.append(pv_previo.strip())
         return li_pvc
+
+    def all_comments(self, with_variations):
+        dic = {}
+        for move in self.li_moves:
+            if with_variations != NONE and move.variations:
+                is_w = move.is_white()
+                if (with_variations == ALL) or (is_w and with_variations == ONLY_WHITE) or (not is_w and with_variations == ONLY_BLACK):
+                    for variation in move.variations.li_variations:
+                        dicv = variation.all_comments(with_variations)
+                        if dicv:
+                            dic.update(dicv)
+            if move.comment or move.li_nags:
+                fenm2 = move.position.fenm2()
+                d = {}
+                if move.comment:
+                    d["C"] = move.comment
+                if move.li_nags:
+                    d["N"] = move.li_nags
+                dic[fenm2] = d
+        return dic
 
     def lipv(self):
         return [move.movimiento() for move in self.li_moves]

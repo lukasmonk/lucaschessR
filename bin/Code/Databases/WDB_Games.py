@@ -46,7 +46,7 @@ class WGames(QtWidgets.QWidget):
 
         self.si_select = si_select
 
-        self.temporary = wb_database.temporary
+        self.is_temporary = wb_database.is_temporary
         self.changes = False
 
         self.terminado = False  # singleShot
@@ -305,7 +305,7 @@ class WGames(QtWidgets.QWidget):
         self.tw_terminar()
 
     def tw_terminar(self):
-        if self.temporary and self.changes:
+        if self.is_temporary and self.changes:
             if QTUtil2.pregunta(self, _("Changes have been made, do you want to export them to a PGN file?")):
                 self.tw_exportar_pgn(False)
         self.terminado = True
@@ -594,8 +594,9 @@ class WGames(QtWidgets.QWidget):
     def tw_configure(self):
         menu = QTVarios.LCMenu(self)
 
-        menu.opcion(self.tw_options, _("Database options"), Iconos.Opciones())
-        menu.separador()
+        if not self.is_temporary:
+            menu.opcion(self.tw_options, _("Database options"), Iconos.Opciones())
+            menu.separador()
 
         menu.opcion(self.tw_tags, _("Tags"), Iconos.Tags())
         menu.separador()
@@ -874,7 +875,14 @@ class WGames(QtWidgets.QWidget):
             tmpBP.ponRotulo(2, _("Moves"))
             tmpBP.mostrar()
 
+            if alm.num_moves:
+                lni = Util.ListaNumerosImpresion(alm.num_moves).selected(range(400))
+            else:
+                lni = None
+
             ap = Analysis.AnalyzeGame(self.procesador, alm, True)
+
+            ap.cached_begin()
 
             for n in range(nregs):
 
@@ -889,10 +897,13 @@ class WGames(QtWidgets.QWidget):
                 game = self.dbGames.read_game_recno(n)
                 self.grid.goto(n, 0)
 
+                ap.li_selected = lni[:] if lni else None
                 ap.xprocesa(game, tmpBP)
 
                 self.dbGames.save_game_recno(n, game)
                 self.changes = True
+
+            ap.cached_end()
 
             if not tmpBP.is_canceled():
                 ap.terminar(True)
@@ -1307,10 +1318,10 @@ def modify_database(owner, configuration, db):
         "FILEPATH": db.nom_fichero,
         "EXTERNAL_FOLDER": db.external_folder,
         "SUMMARY_DEPTH": db.depth_stat(),
-        "ALLOWS_DUPLICATES": db.read_config("ALLOWS_DUPLICATES", False),
+        "ALLOWS_DUPLICATES": db.read_config("ALLOWS_DUPLICATES", True),
         "ALLOWS_POSITIONS": db.read_config("ALLOWS_POSITIONS", True),
         "ALLOWS_COMPLETE_GAMES": db.read_config("ALLOWS_COMPLETE_GAMES", True),
-        "ALLOWS_ZERO_MOVES": db.read_config("ALLOWS_ZERO_MOVES", False),
+        "ALLOWS_ZERO_MOVES": db.read_config("ALLOWS_ZERO_MOVES", True),
     }
     w = WOptionsDatabase(owner, configuration, dic_data)
     if w.exec_():

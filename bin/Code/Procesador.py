@@ -45,6 +45,7 @@ from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import Delegados
 from Code.Databases import WindowDatabase, WDB_Games, DBgames
 from Code.QT import WindowManualSave
 from Code.Kibitzers import KibitzersManager
@@ -380,6 +381,7 @@ class Procesador:
     def albumAnimales(self, animal):
         albumes = Albums.AlbumesAnimales()
         album = albumes.get_album(animal)
+        album.event = _("Album of animals")
         album.test_finished()
         cromo, siRebuild = WindowAlbumes.eligeCromo(self.main_window, self, album)
         if cromo is None:
@@ -394,6 +396,7 @@ class Procesador:
     def albumVehicles(self, character):
         albumes = Albums.AlbumesVehicles()
         album = albumes.get_album(character)
+        album.event = _("Album of vehicles")
         album.test_finished()
         cromo, siRebuild = WindowAlbumes.eligeCromo(self.main_window, self, album)
         if cromo is None:
@@ -696,7 +699,7 @@ class Procesador:
             self.type_play = GT_BOOK
             self.estado = ST_PLAYING
             self.gestor = ManagerTrainBooks.ManagerTrainBooks(self)
-            self.gestor.start(w.book_player, w.player_highest, w.book_rival, w.rival_resp, w.is_white)
+            self.gestor.start(w.book_player, w.player_highest, w.book_rival, w.rival_resp, w.is_white, w.show_menu)
 
     def menu_tools(self):
         resp = BasicMenus.menu_tools(self)
@@ -814,7 +817,7 @@ class Procesador:
         self.database(file)
         self.run_action(TB_QUIT)
 
-    def database(self, accion, dbpath, temporary=False):
+    def database(self, accion, dbpath, is_temporary=False):
         if accion == "M":
             if Code.is_windows:
                 os.startfile(self.configuration.folder_databases())
@@ -836,12 +839,13 @@ class Procesador:
 
         if accion == "R":
             self.configuration.set_last_database(Util.relative_path(dbpath))
-            w = WindowDatabase.WBDatabase(self.main_window, self, dbpath, temporary, False)
+            w = WindowDatabase.WBDatabase(self.main_window, self, dbpath, is_temporary, False)
             if self.main_window:
                 if w.exec_():
                     if w.reiniciar:
                         self.database("R", self.configuration.get_last_database())
             else:
+                Delegados.generaPM(w.infoMove.board.piezas)
                 w.show()
 
     def manual_save(self):
@@ -907,7 +911,7 @@ class Procesador:
             db.close()
             dlTmp.close()
 
-        self.database("R", file_db, temporary=True)
+        self.database("R", file_db, is_temporary=True)
 
     def visorPGN(self):
         path = QTVarios.select_pgn(self.main_window)

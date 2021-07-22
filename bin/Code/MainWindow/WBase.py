@@ -397,6 +397,11 @@ class WBase(QtWidgets.QWidget):
                 else:
                     if not siW:
                         mate = -mate
+                    if (mate > 1) and siW:
+                        mate -= 1
+                    elif (mate < -1) and not siW:
+                        mate += 1
+
                     info = "(M%+d)" % mate
             else:
                 pts = rm.puntos

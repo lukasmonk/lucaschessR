@@ -57,9 +57,11 @@ class DBPlayGame(UtilSQL.DictSQL):
 
     def label(self, num):
         r = self.leeRegistro(num)
+        game = Game.Game()
+        game.restore(r["GAME"])
 
         def x(k):
-            return r.get(k, "")
+            return game.get_tag(k)
 
         date = x("DATE").replace(".?", "").replace("?", "")
         return "%s-%s : %s %s %s" % (x("WHITE"), x("BLACK"), date, x("EVENT"), x("SITE"))

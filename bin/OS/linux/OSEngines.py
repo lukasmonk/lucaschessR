@@ -22,14 +22,7 @@ def read_engines(folder_engines):
     bmi2 = "-bmi2" if FasterCode.bmi2() else ""
 
     for level in range(1100, 2000, 100):
-        cm = mas(
-            "maia-%d" % level,
-            "Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang + LcZero team",
-            "%d" % level,
-            "https://maiachess.com/",
-            "Lc0-0.27.0",
-            level,
-        )
+        cm = mas("maia-%d" % level, "Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang + LcZero team", "%d" % level, "https://maiachess.com/", "Lc0-0.27.0", level)
         cm.ordenUCI("WeightsFile", "maia-%d.pb.gz" % level)
         cm.path_exe = os.path.join(folder_engines, "maia", "Lc0-0.27.0")
         cm.name = "maia-%d" % level
@@ -42,14 +35,7 @@ def read_engines(folder_engines):
     cm.ordenUCI("Threads", "2")
     cm.ponMultiPV(20, 500)
 
-    cm = mas(
-        "stockfish",
-        "Tord Romstad, Marco Costalba, Joona Kiiski",
-        f"14{bmi2}",
-        "http://stockfishchess.org/",
-        f"Stockfish_14_x64{bmi2}",
-        3551,
-    )
+    cm = mas("stockfish", "Tord Romstad, Marco Costalba, Joona Kiiski", f"14{bmi2}", "http://stockfishchess.org/", f"Stockfish_14_x64{bmi2}", 3551)
     cm.ordenUCI("Hash", "64")
     cm.ordenUCI("Threads", "2")
     cm.ponMultiPV(20, 500)
@@ -71,14 +57,7 @@ def read_engines(folder_engines):
 
     mas("beef", "Jonathan Tseng", "0.36", "https://github.com/jtseng20/Beef", "Beef-0.36", 3097)
 
-    cm = mas(
-        "cassandre",
-        "Jean-Francois Romang), Raphael Grundrich, Thomas Adolph, Chad Koch",
-        "0.24",
-        "https://sourceforge.net/projects/cassandre/",
-        "Cassandre-0.24",
-        1140,
-    )
+    cm = mas("cassandre", "Jean-Francois Romang), Raphael Grundrich, Thomas Adolph, Chad Koch", "0.24", "https://sourceforge.net/projects/cassandre/", "Cassandre-0.24", 1140)
 
     mas("ceechess", "Tom Reinitz", "1.3.2", "https://github.com/bctboi23/CeeChess", "CeeChess-1.3.2", 2268)
 
@@ -113,14 +92,7 @@ def read_engines(folder_engines):
 
     mas("fruit", "Fabien Letouzey", "2.1", "http://www.fruitchess.com/", "Fruit-2.1", 2784)
 
-    mas(
-        "gambitfruit",
-        "Ryan Benitez, Thomas Gaksch and Fabien Letouzey",
-        "1.0 Beta 4bx",
-        "https://github.com/lazydroid/gambit-fruit",
-        "gfruit",
-        2750,
-    )
+    mas("gambitfruit", "Ryan Benitez, Thomas Gaksch and Fabien Letouzey", "1.0 Beta 4bx", "https://github.com/lazydroid/gambit-fruit", "gfruit", 2750)
 
     mas("gaviota", "Miguel Ballicora", "0.84", "https://sites.google.com/site/gaviotachessengine/Home", "Gaviota-0.84", 2638)
 
@@ -130,7 +102,9 @@ def read_engines(folder_engines):
 
     mas("goldfish", "Bendik Samseth", "1.13.0", "https://github.com/bsamseth/Goldfish", "Goldfish-1.13.0", 2050)
 
-    mas("greko", "Vladimir Medvedev", "2020.03", "http://greko.su/index_en.html", "GreKo-2020.03", 2480)
+    mas("greko", "Vladimir Medvedev", "2020.03", "http://greko.su/index_en.html", "GreKo-2020.03", 2580)
+
+    mas("greko98", "Vladimir Medvedev", "9.8", "http://sourceforge.net/projects/greko", "GreKo-98", 2500)
 
     mas("gunborg", "Torbjorn Nilsson", "1.35", "https://github.com/torgnil/gunborg", "Gunborg-1.35", 2086)
 
@@ -150,14 +124,7 @@ def read_engines(folder_engines):
 
     mas("monolith", "Jonas Mayr", "2.01", "https://github.com/cimarronOST/Monolith", "Monolith-2.01", 3003)
 
-    mas(
-        "monochrome",
-        "Dan Ravensloft, formerly Matthew Brades (England), Manik Charan (India), George Koskeridis, Robert Taylor",
-        "",
-        "https://github.com/cpirc/Monochrome",
-        "Monochrome",
-        1601,
-    )
+    mas("monochrome", "Dan Ravensloft, formerly Matthew Brades (England), Manik Charan (India), George Koskeridis, Robert Taylor", "", "https://github.com/cpirc/Monochrome", "Monochrome", 1601)
 
     mas("octochess", "Tim Kosse", "r5190", "http://octochess.org/", "Octochess-r5190", 2771)  # New build
 
@@ -189,14 +156,7 @@ def read_engines(folder_engines):
 
     mas("texel", "Peter Österlund", "1.06", "http://web.comhem.se/petero2home/javachess/index.html#texel", "Texel-1.06", 2900)
 
-    cm = mas(
-        "toga",
-        "WHMoweryJr,Thomas Gaksch,Fabien Letouzey",
-        "deepTogaNPS 1.9.6",
-        "http://www.computerchess.info/tdbb/phpBB3/viewtopic.php?f=9&t=357",
-        "DeepToga1.9.6nps",
-        2843,
-    )
+    cm = mas("toga", "WHMoweryJr,Thomas Gaksch,Fabien Letouzey", "deepTogaNPS 1.9.6", "http://www.computerchess.info/tdbb/phpBB3/viewtopic.php?f=9&t=357", "DeepToga1.9.6nps", 2843)
     cm.ponMultiPV(20, 40)
 
     mas("tucano", "Alcides Schulz", "9.00", "https://sites.google.com/site/tucanochess", "Tucano-9.00", 2940)

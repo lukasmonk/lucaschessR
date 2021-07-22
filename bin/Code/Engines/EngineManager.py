@@ -5,6 +5,7 @@ import FasterCode
 import Code
 from Code.Engines import Priorities, EngineResponse, EngineRunDirect, EngineRun
 from Code.Base.Constantes import ADJUST_SELECTED_BY_PLAYER
+from Code.SQL import UtilSQL
 
 
 class ListEngineManagers:
@@ -64,6 +65,8 @@ class EngineManager:
         self.ficheroLog = None
 
         self.direct = direct
+
+        self.cache_analysis = None
 
         Code.list_engine_managers.append(self)
 
@@ -277,9 +280,24 @@ class EngineManager:
 
         return mrm, pos
 
-    def analizaJugadaPartida(
-        self, game, njg, vtime, depth=0, brDepth=5, brPuntos=50, stability=False, st_centipawns=0, st_depths=0, st_timelimit=0
-    ):
+    def analysis_cached_begin(self):
+        self.cache_analysis = UtilSQL.DictBig()
+
+    def analysis_cached_end(self):
+        self.cache_analysis.close()
+
+    def analizaJugadaPartida(self, game, njg, vtime, depth=0, brDepth=5, brPuntos=50, stability=False, st_centipawns=0, st_depths=0, st_timelimit=0):
+        if self.cache_analysis is not None:
+            move = game.move(njg)
+            key = move.position_before.fenm2() + move.movimiento()
+            if key in self.cache_analysis:
+                return self.cache_analysis[key]
+        resp = self.analizaJugadaPartidaRaw(game, njg, vtime, depth, brDepth, brPuntos, stability, st_centipawns, st_depths, st_timelimit)
+        if self.cache_analysis is not None:
+            self.cache_analysis[key] = resp
+        return resp
+
+    def analizaJugadaPartidaRaw(self, game, njg, vtime, depth, brDepth, brPuntos, stability, st_centipawns, st_depths, st_timelimit):
         self.check_engine()
         if stability:
             mrm = self.engine.analysis_stable(game, njg, vtime, depth, True, st_centipawns, st_depths, st_timelimit)

@@ -13,7 +13,7 @@ from Code import Util
 
 
 class WBooksTrain(QTVarios.WDialogo):
-    ISWHITE, BOOK_PLAYER, BOOK_RIVAL, ALWAYS_HIGHEST, RESP_RIVAL = range(5)
+    ISWHITE, BOOK_PLAYER, BOOK_RIVAL, ALWAYS_HIGHEST, RESP_RIVAL, SHOW_MENU = range(6)
 
     def __init__(self, procesador):
         w_parent = procesador.main_window
@@ -96,10 +96,13 @@ class WBooksTrain(QTVarios.WDialogo):
         ly = Colocacion.V().controlc(self.cb_rival).espacio(10).controlc(self.cb_resp_rival)
         gb_rival = Controles.GB(self, _("Rival book"), ly).ponFuente(flb)
 
+        self.chb_showmenu = Controles.CHB(self, _("Display a menu of alternatives if move is invalid"), dic_data.get(self.SHOW_MENU, True))
+
         vlayout = Colocacion.V()
         vlayout.control(gb_side).espacio(5)
         vlayout.control(gb_player).espacio(5)
         vlayout.control(gb_rival).espacio(5)
+        vlayout.control(self.chb_showmenu).espacio(5)
         vlayout.margen(20)
 
         layout = Colocacion.V().control(tb).otro(vlayout).margen(3)
@@ -114,6 +117,7 @@ class WBooksTrain(QTVarios.WDialogo):
         self.player_highest = self.chb_highest.valor()
         self.book_rival = self.cb_rival.valor()
         self.rival_resp = self.cb_resp_rival.valor()
+        self.show_menu = self.chb_showmenu.valor()
         self.save()
 
         self.save_video()
@@ -159,6 +163,7 @@ class WBooksTrain(QTVarios.WDialogo):
             self.ALWAYS_HIGHEST: self.player_highest,
             self.BOOK_RIVAL: self.book_rival.name,
             self.RESP_RIVAL: self.rival_resp,
+            self.SHOW_MENU: self.show_menu,
         }
         Util.save_pickle(self.configuration.file_train_books, dic)
 

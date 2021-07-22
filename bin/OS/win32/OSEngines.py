@@ -123,7 +123,7 @@ def read_engines(folder_engines):
 
     mas("amyan", "Antonio Dieguez R.", "1.62", "http://www.pincha.cl/amyan/amyane.html", "amyan.exe", 2545)
 
-    cm = mas("hamsters", "Alessandro Scotti", "0.5", "https://chessprogramming.wikispaces.com/Alessandro+Scotti", "Hamsters.exe", 2487)
+    cm = mas("hamsters", "Alessandro Scotti", "0.5", "https://walkofmind.com/programming/chess/hamsters.htm", "Hamsters.exe", 2487)
     cm.ordenUCI("OwnBook", "false")
     cm.removeLog("problem_log.txt")
 

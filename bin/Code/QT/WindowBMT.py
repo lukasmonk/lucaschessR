@@ -114,7 +114,10 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
         self.iniTiempo = None
         self.antTxtSegundos = ""
-        self.pts_tolerance = 0
+
+        dic_var = self.configuration.read_variables("BMT_OPTIONS")
+
+        self.pts_tolerance = dic_var.get("PTS_TOLERANCE", 0)
 
         self.game = Game.Game()
         self.siMostrarPGN = False
@@ -281,23 +284,18 @@ class WEntrenarBMT(QTVarios.WDialogo):
         self.buscaPrimero(pos)
 
     def opciones(self):
-        # Se pide name y extra
-        li_gen = [(None, None)]
-
-        # # Nombre del entrenamiento
-        li_gen.append(
-            (
-                FormLayout.Editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50),
-                self.pts_tolerance,
-            )
-        )
-
-        titulo = "Training settings"
-        resultado = FormLayout.fedit(li_gen, title=titulo, parent=self, anchoMinimo=560, icon=Iconos.Opciones())
+        dic_var = self.configuration.read_variables("BMT_OPTIONS")
+        form = FormLayout.FormLayout(self, "Training settings", Iconos.Opciones(), anchoMinimo=500)
+        form.separador()
+        form.editbox(_("Tolerance: How many centipawns below the best move are accepted"), tipo=int, ancho=50, init_value=self.pts_tolerance)
+        resultado = form.run()
         if not resultado:
             return
         accion, li_gen = resultado
         self.pts_tolerance = li_gen[0]
+        dic_var = self.configuration.read_variables("BMT_OPTIONS")
+        dic_var["PTS_TOLERANCE"] = self.pts_tolerance
+        self.configuration.write_variables("BMT_OPTIONS", dic_var)
 
     def abandonar(self):
         self.bmt_uno.puntos = 0

@@ -158,7 +158,7 @@ class WAbout(QtWidgets.QDialog):
 #                 with open(r".\OS\linux\OSEngines.py", "rt", encoding="utf-8") as flnx:
 #                     for linea in flnx:
 #                         linea = linea.strip()
-#                         if linea.startswith("cm = mas("):
+#                         if linea.startswith("cm = mas(") or linea.startswith("mas("):
 #                             lir = linea.split('"')
 #                             x, alias, x, autor, x, version, x, url, x, nombre, x = lir
 #                             if alias == "Maia-%d":
@@ -189,7 +189,7 @@ class WAbout(QtWidgets.QDialog):
 #         li.append("{% endblock contenido %}")
 #
 #         q.write("\n".join(li))
-
+#
 
 class WInfo(QtWidgets.QDialog):
     def __init__(self, wparent, titulo, head, txt, min_tam, pm_icon):

@@ -56,7 +56,7 @@ class Themes:
             "dovetailMate": _("Dovetail mate"),
             "hookMate": _("Hook mate"),
             "kingsideAttack": _("King side attack"),
-            "queensideAttack": _("Qeen side attack"),
+            "queensideAttack": _("Queen side attack"),
             "smotheredMate": _("Smothered mate"),
         }
 

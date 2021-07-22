@@ -195,22 +195,22 @@ class ManagerGM(Manager.Manager):
         siRival = is_white == self.is_engine_side_white
 
         if self.jugInicial > 1:
-            siJugInicial = (len(self.game) / 2 + 1) <= self.jugInicial
+            si_jug_inicial = len(self.game) < (self.jugInicial-1)*2
         else:
-            siJugInicial = False
+            si_jug_inicial = False
 
-        liAlternativas = self.motorGM.alternativas()
-        nliAlternativas = len(liAlternativas)
+        li_alternativas = self.motorGM.alternativas()
+        nli_alternativas = len(li_alternativas)
 
         # Movimiento automatico
-        if siJugInicial or self.on_opening or self.on_bypass_book:
+        if si_jug_inicial or self.on_opening or self.on_bypass_book:
             siBuscar = True
             if self.on_opening:
                 li_pv = self.opening.a1h8.split(" ")
                 nj = len(self.game)
                 if len(li_pv) > nj:
                     move = li_pv[nj]
-                    if move in liAlternativas:
+                    if move in li_alternativas:
                         siBuscar = False
                     else:
                         self.on_opening = False
@@ -223,13 +223,13 @@ class ManagerGM(Manager.Manager):
                     liN = []
                     for from_sq, to_sq, promotion, pgn, peso in li_moves:
                         move = from_sq + to_sq + promotion
-                        if move in liAlternativas:
+                        if move in li_alternativas:
                             liN.append(move)
                     if liN:
                         siBuscar = False
-                        nliAlternativas = len(liN)
-                        if nliAlternativas > 1:
-                            pos = random.randint(0, nliAlternativas - 1)
+                        nli_alternativas = len(liN)
+                        if nli_alternativas > 1:
+                            pos = random.randint(0, nli_alternativas - 1)
                             move = liN[pos]
                         else:
                             move = liN[0]
@@ -237,13 +237,13 @@ class ManagerGM(Manager.Manager):
                         self.on_bypass_book = None
 
             if siBuscar:
-                if siJugInicial:
+                if si_jug_inicial:
                     siBuscar = False
-                    if nliAlternativas > 1:
-                        pos = random.randint(0, nliAlternativas - 1)
-                        move = liAlternativas[pos]
-                    elif nliAlternativas == 1:
-                        move = liAlternativas[0]
+                    if nli_alternativas > 1:
+                        pos = random.randint(0, nli_alternativas - 1)
+                        move = li_alternativas[pos]
+                    elif nli_alternativas == 1:
+                        move = li_alternativas[0]
 
             if not siBuscar:
                 self.play_rival(move)
@@ -251,16 +251,16 @@ class ManagerGM(Manager.Manager):
                 return
 
         if siRival:
-            if nliAlternativas > 1:
+            if nli_alternativas > 1:
                 if self.select_rival_move:
                     li_moves = self.motorGM.get_moves_txt(self.game.last_position, False)
                     from_sq, to_sq, promotion = WindowGM.select_move(self, li_moves, False)
                     move = from_sq + to_sq + promotion
                 else:
-                    pos = random.randint(0, nliAlternativas - 1)
-                    move = liAlternativas[pos]
+                    pos = random.randint(0, nli_alternativas - 1)
+                    move = li_alternativas[pos]
             else:
-                move = liAlternativas[0]
+                move = li_alternativas[0]
 
             self.play_rival(move)
             self.play_next_move()

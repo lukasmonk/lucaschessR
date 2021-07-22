@@ -65,7 +65,12 @@ def form_blunders_brilliancies(alm, configuration):
     li_blunders = [SEPARADOR]
 
     li_blunders.append(
-        (FormLayout.Editbox(_("Is considered wrong move when the loss of centipawns is greater than"), tipo=int, ancho=50), alm.kblunders)
+        (
+            FormLayout.Editbox(
+                _("Is considered wrong move when the loss of centipawns is greater than"), tipo=int, ancho=50
+            ),
+            alm.kblunders,
+        )
     )
     li_blunders.append((FormLayout.Editbox(_("Minimum difference in %"), tipo=int, ancho=50), alm.kblunders_porc))
 
@@ -81,7 +86,9 @@ def form_blunders_brilliancies(alm, configuration):
     config = FormLayout.Editbox(_("Tactics name"), rx="[^\\:/|?*^%><()]*")
     li_blunders.append((config, ""))
 
-    config = FormLayout.Fichero(_("PGN Format"), "%s (*.pgn)" % _("PGN Format"), True, anchoMinimo=280, ficheroDefecto=path_pgn)
+    config = FormLayout.Fichero(
+        _("PGN Format"), "%s (*.pgn)" % _("PGN Format"), True, anchoMinimo=280, ficheroDefecto=path_pgn
+    )
     li_blunders.append((config, ""))
 
     li_blunders.append((_("Also add complete game to PGN") + ":", False))
@@ -103,10 +110,14 @@ def form_blunders_brilliancies(alm, configuration):
 
     li_brilliancies.append((None, _("Generate a training file with these moves")))
 
-    config = FormLayout.Fichero(_("List of FENs"), "%s (*.fns)" % _("List of FENs"), True, anchoMinimo=280, ficheroDefecto=path_fns)
+    config = FormLayout.Fichero(
+        _("List of FENs"), "%s (*.fns)" % _("List of FENs"), True, anchoMinimo=280, ficheroDefecto=path_fns
+    )
     li_brilliancies.append((config, ""))
 
-    config = FormLayout.Fichero(_("PGN Format"), "%s (*.pgn)" % _("PGN Format"), True, anchoMinimo=280, ficheroDefecto=path_pgn)
+    config = FormLayout.Fichero(
+        _("PGN Format"), "%s (*.pgn)" % _("PGN Format"), True, anchoMinimo=280, ficheroDefecto=path_pgn
+    )
     li_brilliancies.append((config, ""))
 
     li_brilliancies.append((_("Also add complete game to PGN"), False))
@@ -198,7 +209,9 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
             color = "BOTH"
         li_gen.append((config, color))
 
-        config = FormLayout.Editbox('<div align="right">' + _("Moves") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx="[0-9,\-,\,]*")
+        config = FormLayout.Editbox(
+            '<div align="right">' + _("Moves") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx="[0-9,\-,\,]*"
+        )
         li_gen.append((config, ""))
 
         fvar = configuration.file_books
@@ -215,7 +228,9 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
         li_gen.append((config, defecto))
 
-        li_gen.append((_("Automatically assign themes using Lichess/Thibault code") + " (experimental):", alm.themes_lichess))
+        li_gen.append(
+            (_("Automatically assign themes using Lichess/Thibault code") + " (experimental):", alm.themes_lichess)
+        )
 
         li_gen.append((_("Redo any existing prior analysis (if they exist)") + ":", alm.delete_previous))
 
@@ -232,7 +247,9 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         liST.append(SEPARADOR)
         liST.append((FormLayout.Spinbox(_("Last depths to control same best move"), 2, 10, 40), alm.st_depths))
         liST.append(SEPARADOR)
-        liST.append((FormLayout.Spinbox(_("Maximum difference among last evaluations"), 0, 99999, 60), alm.st_centipawns))
+        liST.append(
+            (FormLayout.Spinbox(_("Maximum difference among last evaluations"), 0, 99999, 60), alm.st_centipawns)
+        )
         liST.append(SEPARADOR)
         liST.append((FormLayout.Spinbox(_("Additional time limit"), 0, 99999, 60), alm.st_timelimit))
 
@@ -279,7 +296,12 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
                 QTUtil.refresh_gui()
 
     resultado = FormLayout.fedit(
-        lista, title=_("Analysis Configuration"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones(), dispatch=dispatchR
+        lista,
+        title=_("Analysis Configuration"),
+        parent=parent,
+        anchoMinimo=460,
+        icon=Iconos.Opciones(),
+        dispatch=dispatchR,
     )
 
     if resultado:
@@ -318,7 +340,14 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
                 alm.one_move_variation,
             ) = liVar
 
-            (alm.kblunders, alm.kblunders_porc, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders) = liBlunders
+            (
+                alm.kblunders,
+                alm.kblunders_porc,
+                alm.tacticblunders,
+                alm.pgnblunders,
+                alm.oriblunders,
+                alm.bmtblunders,
+            ) = liBlunders
 
             (
                 alm.dpbrilliancies,
@@ -399,13 +428,21 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         )
     )
 
+    config = FormLayout.Editbox(
+        '<div align="right">' + _("Moves") + "<br>" + _("By example:") + " -5,8-12,14,19-", rx="[0-9,\-,\,]*"
+    )
+    li_gen.append((config, ""))
+
     fvar = configuration.file_books
     list_books = Books.ListBooks()
     list_books.restore_pickle(fvar)
     # Comprobamos que todos esten accesibles
     list_books.check()
-    defecto = list_books.lista[0]
     li = [("--", None)]
+    if alm.book_name is None:
+        defecto = None
+    else:
+        defecto = list_books.lista[0]
     for book in list_books.lista:
         if book.name == alm.book_name:
             defecto = book
@@ -413,7 +450,9 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
     config = FormLayout.Combobox(_("Do not scan the opening moves based on book"), li)
     li_gen.append((config, defecto))
 
-    li_gen.append((_("Automatically assign themes using Lichess/Thibault code") + " (experimental):", alm.themes_lichess))
+    li_gen.append(
+        (_("Automatically assign themes using Lichess/Thibault code") + " (experimental):", alm.themes_lichess)
+    )
 
     li_gen.append((_("Start from the end of the game") + ":", alm.from_last_move))
 
@@ -482,6 +521,7 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
             alm.multiPV,
             color,
             cjug,
+            alm.num_moves,
             alm.book,
             alm.themes_lichess,
             alm.from_last_move,
@@ -496,7 +536,9 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         alm.li_players = cjug.upper().split(";") if cjug else None
         alm.book_name = alm.book.name if alm.book else None
 
-        alm.kblunders, alm.kblunders_porc, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders = liBlunders
+        alm.kblunders, alm.kblunders_porc, alm.tacticblunders, alm.pgnblunders, alm.oriblunders, alm.bmtblunders = (
+            liBlunders
+        )
 
         alm.include_variations, alm.limiteinclude_variations, alm.best_variation, alm.info_variation, alm.si_pdt, alm.one_move_variation = (
             liVar

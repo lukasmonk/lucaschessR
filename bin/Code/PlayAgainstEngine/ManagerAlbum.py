@@ -53,6 +53,7 @@ class ManagerAlbum(Manager.Manager):
         other = self.cromo.name
         w, b = (player, other) if self.human_side else (_F(other), player)
 
+        self.game.set_tag("Event", album.event)
         self.game.set_tag("White", w)
         self.game.set_tag("Black", b)
 

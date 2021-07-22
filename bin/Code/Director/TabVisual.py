@@ -589,7 +589,13 @@ class Guion:
         return self.liGTareas[nTarea].id()
 
     def tarea(self, nTarea):
-        return self.liGTareas[nTarea]
+        nlig_tareas = len(self.liGTareas)
+        if nlig_tareas == 0:
+            return None
+        if nTarea < 0:
+            return self.liGTareas[nTarea] if nlig_tareas >= abs(nTarea) else None
+        else:
+            return self.liGTareas[nTarea] if nTarea < nlig_tareas else None
 
     def borraRepeticionUltima(self):
         len_li = len(self.liGTareas)

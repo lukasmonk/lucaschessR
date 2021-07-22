@@ -30,6 +30,7 @@ echo ">> Glaurung" && chmod 755 ./Engines/glaurung/Glaurung-2.2
 echo ">> Godel" && chmod 755 ./Engines/godel/Godel-7.0
 echo ">> Goldfish" && chmod 755 ./Engines/goldfish/Goldfish-1.13.0
 echo ">> Greko" && chmod 755 ./Engines/greko/GreKo-2020.03
+echo ">> Greko-98" && chmod 755 ./Engines/greko98/GreKo-98
 echo ">> Gunborg" && chmod 755 ./Engines/gunborg/Gunborg-1.35
 echo ">> Hactar" && chmod 755 ./Engines/hactar/Hactar-0.9.0
 echo ">> Igel" && chmod 755 ./Engines/igel/Igel-3.0.0

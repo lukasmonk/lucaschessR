@@ -79,6 +79,7 @@ class ManagerWashingReplay(Manager.Manager):
         w, b = (player, other) if self.human_side else (other, player)
         self.game.set_tag("White", w)
         self.game.set_tag("Black", b)
+        self.game.tag_timestart()
         QTUtil.refresh_gui()
 
         self.check_boards_setposition()
@@ -495,8 +496,10 @@ class ManagerWashingCreate(Manager.Manager):
             player = self.configuration.nom_player()
             other = self.xrival.name
             w, b = (player, other) if self.human_side else (other, player)
+            self.game.set_tag("Event", _("The Washing Machine"))
             self.game.set_tag("White", w)
             self.game.set_tag("Black", b)
+            self.game.tag_timestart()
 
         self.check_boards_setposition()
 
@@ -784,6 +787,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.main_window.pon_toolbar(li_options)
         self.remove_hints()
 
+        self.game.set_tag("HintsUsed", self.engine.current_hints)
         self.autosave()
         if player_win:
             self.saveGame(True)

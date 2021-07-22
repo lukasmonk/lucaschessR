@@ -8,11 +8,11 @@ from Code.Databases import WDB_Games, WDB_Summary, WDB_Players, WDB_InfoMove, DB
 
 
 class WBDatabase(QTVarios.WDialogo):
-    def __init__(self, w_parent, procesador, file_database, temporary, si_select):
-        self.temporary = temporary
+    def __init__(self, w_parent, procesador, file_database, is_temporary, si_select):
+        self.is_temporary = is_temporary
         icono = Iconos.Database()
         extparam = "databases"
-        titulo = _("Temporary database") if self.temporary else _("Database")
+        titulo = _("Temporary database") if self.is_temporary else _("Database")
         QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
         self.owner = w_parent
 
@@ -51,7 +51,7 @@ class WBDatabase(QTVarios.WDialogo):
             self.tab.nuevaTab(self.wplayer, _("Players"))
         self.tab.ponTipoLetra(puntos=procesador.configuration.x_tb_fontpoints)
 
-        if self.owner and not self.temporary:
+        if self.owner and not self.is_temporary:
             liAccionesWork = [(_("Select other"), Iconos.Database(), self.tw_select_other)]
             self.tbWork = QTVarios.LCTB(self, liAccionesWork, icon_size=20)
             self.tbWork.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
@@ -151,7 +151,7 @@ class WBDatabase(QTVarios.WDialogo):
             self.wsummary.setdbGames(self.dbGames)
             self.wsummary.actualizaPV("")
         self.wgames.actualiza(True)
-        if self.temporary:
+        if self.is_temporary:
             self.wgames.adjustSize()
 
     def salvar(self):

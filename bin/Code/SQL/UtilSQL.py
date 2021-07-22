@@ -46,6 +46,8 @@ class DictSQL(object):
         return key in self.li_keys
 
     def __setitem__(self, key, obj):
+        if not self.conexion:
+            return
         dato = pickle.dumps(obj)
         si_ya_esta = key in self.li_keys
         if si_ya_esta:
@@ -85,6 +87,9 @@ class DictSQL(object):
 
     def __len__(self):
         return len(self.li_keys)
+
+    def is_closed(self):
+        return self.conexion is None
 
     def close(self):
         if self.conexion:
@@ -401,17 +406,21 @@ class RowidReader:
         else:
             sql += " ORDER BY ROWID"
         cursor = conexion.cursor()
-        cursor.execute(sql)
-        ch = random.randint(1000, 3000)
-        while not self.stop:
-            li = cursor.fetchmany(ch)
-            if li:
-                self.lock.acquire()
-                self.li_row_ids.extend([x[0] for x in li])
-                self.lock.release()
-            if len(li) < ch:
-                break
-            ch = self.chunk
+        try:
+            cursor.execute(sql)
+            ch = random.randint(1000, 3000)
+            while not self.stop:
+                li = cursor.fetchmany(ch)
+                if li:
+                    self.lock.acquire()
+                    self.li_row_ids.extend([x[0] for x in li])
+                    self.lock.release()
+                if len(li) < ch:
+                    break
+                ch = self.chunk
+        except sqlite3.OperationalError:
+            pass
+
         cursor.close()
         conexion.close()
         self.running = False

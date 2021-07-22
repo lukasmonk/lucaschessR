@@ -8,7 +8,7 @@ from Code.Base.Constantes import *
 
 
 class ManagerTrainBooks(Manager.Manager):
-    def start(self, book_player, player_highest, book_rival, resp_rival, is_white):
+    def start(self, book_player, player_highest, book_rival, resp_rival, is_white, show_menu):
         self.type_play = GT_BOOK
 
         self.hints = 9999  # Para que analice sin problemas
@@ -19,12 +19,13 @@ class ManagerTrainBooks(Manager.Manager):
         self.book_rival = book_rival
         self.book_rival.polyglot()
         self.resp_rival = resp_rival
+        self.show_menu = show_menu
 
         self.aciertos = 0
         self.movimientos = 0
         self.sumar_aciertos = True
 
-        self.li_reinit = book_player, player_highest, book_rival, resp_rival, is_white
+        self.li_reinit = book_player, player_highest, book_rival, resp_rival, is_white, show_menu
 
         self.human_side = is_white
         self.is_book_side_white = not is_white
@@ -86,8 +87,8 @@ class ManagerTrainBooks(Manager.Manager):
 
     def reiniciar(self):
         self.game.reset()
-        book_player, player_highest, book_rival, resp_rival, is_white = self.li_reinit
-        self.start(book_player, player_highest, book_rival, resp_rival, is_white)
+        book_player, player_highest, book_rival, resp_rival, is_white, show_menu = self.li_reinit
+        self.start(book_player, player_highest, book_rival, resp_rival, is_white, show_menu)
 
     def siguienteJugada(self):
         if self.state == ST_ENDGAME:
@@ -203,8 +204,11 @@ class ManagerTrainBooks(Manager.Manager):
                     opacity = 1.0 if p == paux else max(p, 0.25)
                 self.board.creaFlechaMulti(jug[0] + jug[1], siMain=simain, opacity=opacity)
 
-            resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
-            self.board.remove_arrows()
+            if self.show_menu:
+                resp = WindowBooks.eligeJugadaBooks(self.main_window, self.list_moves, self.human_side, siSelectSiempre=False)
+                self.board.remove_arrows()
+            else:
+                resp = None
             if resp is None:
                 self.sumar_aciertos = False
                 self.sigueHumano()

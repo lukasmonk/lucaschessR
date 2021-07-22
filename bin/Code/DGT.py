@@ -115,6 +115,8 @@ def activar():
             path_so = os.path.join(path, "libdgt.so")
         elif Code.configuration.x_digital_board == "Certabo":
             path_so = os.path.join(path, "libcer.so")
+        elif Code.configuration.x_digital_board == "CertaboBT":
+            path_so = os.path.join(path, "libcerBT.so")
         elif Code.configuration.x_digital_board == "Millennium":
             path_so = os.path.join(path, "libmcl.so")
         elif Code.configuration.x_digital_board == "Citrine":
@@ -122,7 +124,15 @@ def activar():
         else:
             path_so = os.path.join(path, "libucb.so")
         if os.path.isfile(path_so):
-            dgt = ctypes.CDLL(path_so)
+            try:
+                dgt = ctypes.CDLL(path_so)
+            except:
+                dgt = None
+                from Code.QT import QTUtil2
+                QTUtil2.message(None, """It is not possible to install the driver for the board, one way to solve the problem is to install the libraries:
+ sudo apt install libqt5pas1
+ or
+ sudo dnf install qt5pas-devel""")
 
     else:
         functype = ctypes.WINFUNCTYPE

@@ -72,7 +72,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.hints:
                 self.xtutor.check_engine()
             self.xrival.check_engine()
-            self.start_message()
+            if Code.dgt and Code.is_linux:
+                self.start_message_nomodal()   #problema con eboard
+            else:
+                self.start_message()
 
         self.play_next_move()
 

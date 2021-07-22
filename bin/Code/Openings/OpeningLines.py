@@ -775,11 +775,13 @@ class Opening:
 
             conexion.close()
 
-    def importarPGN(self, owner, gamebase, ficheroPGN, maxDepth, variations):
+    def importarPGN(self, owner, gamebase, ficheroPGN, maxDepth, with_variations, with_comments):
 
         dlTmp = QTUtil2.BarraProgreso(owner, _("Import"), _("Working..."), Util.filesize(ficheroPGN)).mostrar()
 
         self.saveHistory(_("Import"), _("PGN with variations"), os.path.basename(ficheroPGN))
+
+        dic_comments = {}
 
         cursor = self._conexion.cursor()
 
@@ -791,7 +793,7 @@ class Opening:
         for n, (nbytes, game) in enumerate(Game.read_games(ficheroPGN)):
             dlTmp.pon(nbytes)
 
-            li_pv = game.all_pv("", variations)
+            li_pv = game.all_pv("", with_variations)
             for pv in li_pv:
                 li = pv.split(" ")[:maxDepth]
                 pv = " ".join(li)
@@ -814,6 +816,21 @@ class Opening:
                         cursor.execute(sql_insert, (xpv,))
                         self.li_xpv.append(xpv)
 
+            if with_comments:
+                dic_comments_game = game.all_comments(with_variations)
+                for fenm2, dic in dic_comments_game.items():
+                    d = self.getfenvalue(fenm2)
+                    if "C" in dic:
+                        d["COMENTARIO"] = dic["C"]
+                    if "N" in dic:
+                        for nag in dic["N"]:
+                            if nag in (11, 14, 15, 16, 17, 18, 19):
+                                d["VENTAJA"] = nag
+                            elif 0 < nag < 7:
+                                d["VALORACION"] = nag
+                    if d:
+                        dic_comments[fenm2] =  d
+
             if n % 50:
                 self._conexion.commit()
 
@@ -821,6 +838,13 @@ class Opening:
         self.li_xpv.sort()
         self._conexion.commit()
         dlTmp.cerrar()
+        if with_comments and dic_comments:
+            self.db_fenvalues.set_faster_mode()
+            um = QTUtil2.unMomento(owner)
+            for fenm2, dic_comments_game in dic_comments.items():
+                self.setfenvalue(fenm2, dic_comments_game)
+            self.db_fenvalues.set_normal_mode()
+            um.final()
 
     def guardaPartidas(self, label, liPartidas, minMoves=0, with_history=True):
         if with_history:
@@ -1004,8 +1028,9 @@ class Opening:
             if xpv.startswith(xpvbase) and len(xpv) > tambase:
                 if not (xpv in self.li_xpv):
                     lista.append(xpv)
-        otra.close()
         self.guardaLiXPV("%s,%s" % (_("Other opening lines"), otra.title), lista)
+        self.db_fenvalues.copy_from(otra.db_fenvalues)
+        otra.close()
 
     def exportarPGN(self, ws, result):
         liTags = [["Event", self.title.replace('"', "")], ["Site", ""], ["Date", Util.today().strftime("%Y-%m-%d")]]

@@ -192,7 +192,7 @@ class WWashing(QTVarios.WDialogo):
         submenu = menu.submenu(_("Export to"), Iconos.DatabaseMas())
         submenu.opcion("save_pgn", _("A PGN file"), Iconos.FichPGN())
         submenu.separador()
-        menuDB = submenu.submenu(_("Into a database"), Iconos.DatabaseMas())
+        menuDB = submenu.submenu(_("Database"), Iconos.DatabaseMas())
         QTVarios.menuDB(menuDB, self.configuration, True, indicador_previo="dbf_")  # , remove_autosave=True)
         submenu.separador()
 

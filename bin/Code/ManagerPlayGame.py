@@ -66,7 +66,10 @@ class ManagerPlayGame(Manager.Manager):
         self.play_next_move()
 
     def ponPuntos(self):
-        self.set_label2("%s : <b>%d (%d)</b>" % (_("Score"), self.puntos, -self.puntosMax))
+        self.set_label2(
+            '%s:<table border="1" cellpadding="5" cellspacing="0" style="margin-left:60px"><tr><td>%s</td><td><b>%d</b></td></tr><tr><td>%s</td><td><b>%d</b></td></tr></table>'
+            % (_("Score in relation to"), self.nombreObj, self.puntos, self.xanalyzer.name, -self.puntosMax)
+        )
 
     def run_action(self, key):
         if key == TB_CLOSE:

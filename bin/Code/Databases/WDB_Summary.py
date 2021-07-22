@@ -262,11 +262,10 @@ class WSummary(QtWidgets.QWidget):
                 self.cambiaInfoMove()
 
     def reindexar(self, depth=None):
-        if depth is None:
-            if not QTUtil2.pregunta(self, _("Do you want to rebuild stats?")):
-                return
+        if depth is None or self.wb_database.is_temporary:
+            # if not QTUtil2.pregunta(self, _("Do you want to rebuild stats?")):
+            #     return
 
-            # Select depth
             li_gen = [(None, None)]
             li_gen.append((None, _("Select the number of moves <br> for each game to be considered")))
             li_gen.append((None, None))
@@ -278,9 +277,9 @@ class WSummary(QtWidgets.QWidget):
             if resultado is None:
                 return None
 
-            accion, liResp = resultado
+            accion, li_resp = resultado
 
-            depth = liResp[0]
+            depth = li_resp[0]
 
         self.RECCOUNT = 0
 

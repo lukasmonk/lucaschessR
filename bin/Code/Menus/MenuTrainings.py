@@ -502,6 +502,7 @@ class MenuTrainings:
                     mem.lanza(abs(resp) - 100)
 
     def tacticas(self, tipo, name, carpeta, ini):
+        dic_training = TrListas.dicTraining()
         um = self.procesador.unMomento()
         tacticas = Tactics.Tactics(tipo, name, carpeta, ini)
         liMenus = tacticas.listaMenus()
@@ -523,10 +524,11 @@ class MenuTrainings:
                     for x in range(len(lista) - 1):
                         t += "|%s" % lista[x]
                         if not (t in dmenu):
-                            dmenu[t] = actmenu.submenu(_SP(lista[x]), nico.otro())
+                            v_trad = dic_training.get(lista[x], lista[x])
+                            dmenu[t] = actmenu.submenu(v_trad, nico.otro())
                             actmenu.separador()
                         actmenu = dmenu[t]
-                actmenu.opcion(valor, _SP(lista[-1]), nico.otro())
+                actmenu.opcion(valor, dic_training.get(lista[-1], lista[-1]), nico.otro())
                 actmenu.separador()
             um.final()
             resp = menu.lanza()
@@ -656,6 +658,8 @@ class MenuTrainings:
             icono = Iconos.TOLline()
             li_tam_blocks = None
             one_line = True
+        else:
+            return
 
         resp = WindowTurnOnLights.windowTurnOnLigths(self.procesador, name, title, icono, folder, li_tam_blocks, one_line)
         if resp:

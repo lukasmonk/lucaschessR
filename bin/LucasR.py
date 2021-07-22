@@ -10,6 +10,8 @@ import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 
+# sys.argv.append(r"c:\lucaschess\_DATABASE\40h\gm1830.pgn")
+
 n_args = len(sys.argv)
 if n_args == 1:
     import Code.Base.Init

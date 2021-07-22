@@ -1,11 +1,12 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
+from Code import DGT
+from Code.MainWindow import WInformation, WBase
 from Code.QT import Colocacion
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.MainWindow import WInformation, WBase
 
 
 class EstadoWindow:
@@ -43,7 +44,9 @@ class MainWindow(QTVarios.WDialogo):
         self.timer = None
         self.siTrabajando = False
 
-        self.cursorthinking = QtGui.QCursor(Iconos.pmThinking() if self.manager.configuration.x_cursor_thinking else QtCore.Qt.BlankCursor)
+        self.cursorthinking = QtGui.QCursor(
+            Iconos.pmThinking() if self.manager.configuration.x_cursor_thinking else QtCore.Qt.BlankCursor
+        )
         self.cursorthinking_rival = QtGui.QCursor(Iconos.pmConnected())
         self.onTop = False
 
@@ -143,6 +146,9 @@ class MainWindow(QTVarios.WDialogo):
             self.showNormal()
 
     def procesosFinales(self):
+        if Code.dgt:
+            DGT.desactivar()
+
         self.board.cierraGuion()
         self.board.terminar()
 
@@ -210,7 +216,12 @@ class MainWindow(QTVarios.WDialogo):
                 # self.ajustaTam()
 
     def show_variations(self, titulo):
-        flags = QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowMinimizeButtonHint | QtCore.Qt.WindowMaximizeButtonHint
+        flags = (
+            QtCore.Qt.Dialog
+            | QtCore.Qt.WindowTitleHint
+            | QtCore.Qt.WindowMinimizeButtonHint
+            | QtCore.Qt.WindowMaximizeButtonHint
+        )
 
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | flags)
 

@@ -72,6 +72,9 @@ class FormLayout:
     def edit(self, label: str, init_value: str):
         self.eddefault(label, init_value)
 
+    def editbox(self, label, ancho=None, rx=None, tipo=str, siPassword=False, alto=1, decimales=1, init_value=None):
+        self.li_gen.append((Editbox(label, ancho, rx, tipo, siPassword, alto, decimales), init_value))
+
     def combobox(self, label, lista, init_value, is_editable=False, tooltip=None):
         self.li_gen.append((Combobox(label, lista, is_editable, tooltip), init_value))
 

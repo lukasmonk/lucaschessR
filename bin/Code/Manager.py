@@ -716,6 +716,7 @@ class Manager:
                         self.game.set_tag("HintsUsed", str(usado))
 
             self.game.tag_timeend()
+            self.game.set_extend_tags()
             DBgames.autosave(self.game)
 
     def ponCapPorDefecto(self):
@@ -1374,7 +1375,7 @@ class Manager:
 
         menuSave.separador()
 
-        menuDB = menuSave.submenu(_("Into a database"), Iconos.DatabaseMas())
+        menuDB = menuSave.submenu(_("A database"), Iconos.DatabaseMas())
         QTVarios.menuDB(menuDB, self.configuration, True, indicador_previo="dbf_")  # , remove_autosave=True)
         menuSave.separador()
 
@@ -1431,7 +1432,7 @@ class Manager:
             and (self.hints or self.game_type in (GT_AGAINST_ENGINE, GT_ALONE, GT_POSITIONS, GT_TACTICS))
         ):
             menu.separador()
-            menu.opcion("juegapormi", _("Play instead of me") + "  [^1]", Iconos.JuegaPorMi()),
+            menu.opcion("juegapormi", _("Play instead of me") + "  [%s 1]" % _("CTRL"), Iconos.JuegaPorMi()),
 
         # Arbol de movimientos
         if siArbol:
@@ -1839,6 +1840,10 @@ class Manager:
     def start_message(self):
         mensaje = _("Press the continue button to start.")
         self.mensaje(mensaje)
+
+    def start_message_nomodal(self):
+        mensaje = _("Press the continue button to start.")
+        QTUtil2.menssage_nomodal(self.main_window, mensaje)
 
     def player_has_moved_base(self, from_sq, to_sq, promotion=""):
         if self.board.variation_history is not None:

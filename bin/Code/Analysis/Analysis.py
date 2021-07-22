@@ -93,6 +93,12 @@ class AnalyzeGame:
         self.from_last_move = alm.from_last_move
         self.delete_previous = alm.delete_previous
 
+    def cached_begin(self):
+        self.xmanager.analysis_cached_begin()
+
+    def cached_end(self):
+        self.xmanager.analysis_cached_end()
+
     def terminar_bmt(self, bmt_lista, name):
         """
         Si se estan creando registros para el entrenamiento BMT (Best move Training), al final hay que grabarlos

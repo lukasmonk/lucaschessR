@@ -556,6 +556,8 @@ class WorkMap:
             li = [self.dic[iso] for iso in self.dic[self.current].border]
         else:
             li = [v for k, v in self.dic.items()]
+        for alm in li:
+            alm.name = _F(alm.name)
         self.listaGrid = sorted(li, key=lambda alm: alm.name)
 
     def setWidget(self, widget):

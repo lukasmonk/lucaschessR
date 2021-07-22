@@ -192,6 +192,11 @@ class EngineResponse:
                 return ""
             if not self.is_white:
                 mt = -mt
+            if (mt > 1) and self.is_white:
+                mt -= 1
+            elif (mt < -1) and not self.is_white:
+                mt += 1
+
             return "M%+d" % mt
         else:
             pts = self.puntos

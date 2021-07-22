@@ -3,8 +3,6 @@ import os.path
 import copy
 import operator
 
-import FasterCode
-
 from PySide2 import QtCore, QtWidgets
 
 from Code import Util
@@ -58,7 +56,7 @@ class WLines(QTVarios.WDialogo):
             (_("Train"), Iconos.Study(), self.train),
             None,
         )
-        self.tb = QTVarios.LCTB(self, li_acciones, icon_size=20)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("LINE", _("Line"), 35, edicion=Delegados.EtiquetaPOS(False, True))
@@ -182,7 +180,7 @@ class WLines(QTVarios.WDialogo):
         li_gen.append((config, dicVar.get("DEPTH", self.configuration.x_tutor_depth)))
 
         li = [(_("Maximum"), 0)]
-        for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
+        for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 30, 40, 50, 75, 100, 150, 200):
             li.append((str(x), x))
         config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
         li_gen.append((config, dicVar.get("MULTIPV", self.configuration.x_tutor_multipv)))
@@ -709,34 +707,38 @@ class WLines(QTVarios.WDialogo):
         previo = self.configuration.read_variables("OPENINGLINES")
         carpeta = previo.get("CARPETAPGN", "")
 
-        ficheroPGN = QTUtil2.leeFichero(self, carpeta, "%s (*.pgn)" % _("PGN Format"), titulo=_("File to import"))
-        if not ficheroPGN:
+        fichero_pgn = QTUtil2.leeFichero(self, carpeta, "%s (*.pgn)" % _("PGN Format"), titulo=_("File to import"))
+        if not fichero_pgn:
             return
-        previo["CARPETAPGN"] = os.path.dirname(ficheroPGN)
+        previo["CARPETAPGN"] = os.path.dirname(fichero_pgn)
 
-        li_gen = [(None, None)]
+        form = FormLayout.FormLayout(self, os.path.basename(fichero_pgn), Iconos.PGN_Importar(), anchoMinimo=460)
+        form.separador()
 
-        li_gen.append((None, _("Select a maximum number of moves (plies)<br> to consider from each game")))
+        form.apart(_("Select a maximum number of moves (plies)<br> to consider from each game"))
 
-        li_gen.append((FormLayout.Spinbox(_("Depth"), 3, 999, 50), previo.get("IPGN_DEPTH", 30)))
-        li_gen.append((None, None))
+        form.spinbox(_("Depth"), 3, 999, 50, previo.get("IPGN_DEPTH", 30))
+        form.separador()
 
         liVariations = ((_("All"), ALL), (_("None"), NONE), (_("White"), ONLY_WHITE), (_("Black"), ONLY_BLACK))
-        config = FormLayout.Combobox(_("Include variations"), liVariations)
-        li_gen.append((config, previo.get("IPGN_VARIATIONSMODE", "A")))
-        li_gen.append((None, None))
+        form.combobox(_("Include variations"), liVariations, previo.get("IPGN_VARIATIONSMODE", "A"))
+        form.separador()
 
-        resultado = FormLayout.fedit(li_gen, title=os.path.basename(ficheroPGN), parent=self, anchoMinimo=460, icon=Iconos.PuntoNaranja())
+        form.checkbox(_("Include comments"), previo.get("IPGN_COMMENTS", False))
+        form.separador()
+
+        resultado = form.run()
 
         if resultado:
             accion, liResp = resultado
             previo["IPGN_DEPTH"] = depth = liResp[0]
             previo["IPGN_VARIATIONSMODE"] = variations = liResp[1]
+            previo["IPGN_COMMENTS"] = comments = liResp[2]
+            self.configuration.write_variables("OPENINGLINES", previo)
 
-            self.dbop.importarPGN(self, game, ficheroPGN, depth, variations)
+            self.dbop.importarPGN(self, game, fichero_pgn, depth, variations, comments)
             self.glines.refresh()
             self.glines.gotop()
-            self.configuration.write_variables("OPENINGLINES", previo)
 
     def grid_color_fondo(self, grid, row, o_column):
         col = o_column.key
@@ -980,18 +982,31 @@ class WLines(QTVarios.WDialogo):
         um.final()
 
     def remove_worst(self):
-        # color + time
-        li_gen = [FormLayout.separador]
+        form = FormLayout.FormLayout(self, _("Remove worst lines"), Iconos.OpeningLines())
+        form.separador()
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK")]
-        config = FormLayout.Combobox(_("Side"), liJ)
-        li_gen.append((config, "WHITE"))
-        li_gen.append((_("Duration of engine analysis (secs)") + ":", float(self.configuration.x_tutor_mstime / 1000.0)))
-        resultado = FormLayout.fedit(li_gen, title=_("Remove worst lines"), parent=self, icon=Iconos.OpeningLines())
+        form.combobox(_("Side"), liJ, "WHITE")
+        form.separador()
+
+        list_books = Books.ListBooks()
+        list_books.restore_pickle(self.configuration.file_books)
+        list_books.check()
+        libooks = [(bookx.name, bookx) for bookx in list_books.lista]
+        libooks.insert(0, ("--", None))
+        form.combobox(_("Book"), libooks, None)
+        form.separador()
+
+        form.float(_("Duration of engine analysis (secs)"), float(self.configuration.x_tutor_mstime / 1000.0))
+        form.separador()
+
+        resultado = form.run()
         if resultado:
-            color, segs = resultado[1]
+            color, book, segs = resultado[1]
             ms = int(segs * 1000)
             if ms == 0:
                 return
+            if book:
+                book.polyglot()
             si_white = color == "WHITE"
             dic = self.dbop.dicRepeFen(si_white)
             mensaje = _("Move") + "  %d/" + str(len(dic))
@@ -1004,7 +1019,6 @@ class WLines(QTVarios.WDialogo):
             ok = True
 
             for n, fen in enumerate(dic, 1):
-
                 if tmpBP.is_canceled():
                     ok = False
                     break
@@ -1012,29 +1026,31 @@ class WLines(QTVarios.WDialogo):
                 tmpBP.inc()
                 tmpBP.mensaje(mensaje % n)
 
-                max_puntos = -999999
-                max_pv = None
-                dicPV = dic[fen]
-                for pv in dicPV:
-                    if tmpBP.is_canceled():
-                        ok = False
-                        break
-                    FasterCode.set_fen(fen)
-                    FasterCode.move_pv(pv[:2], pv[2:4], pv[4:])
+                dic_a1h8 = dic[fen]
+                st_a1h8 = set(dic_a1h8.keys())
+                li = []
+                if book:
+                    li_moves = book.get_list_moves(fen)
+                    if li_moves:
+                        # (from_sq, to_sq, promotion, "%-5s -%7.02f%% -%7d" % (pgn, pc, w), 1.0 * w / maxim))
+                        li = [(m[0]+m[1]+m[2], m[4]) for m in li_moves if m[0]+m[1]+m[2] in st_a1h8]
+                        if li:
+                            li.sort(key=lambda x: x[1], reverse=True)
+                            st_ya = set(x[0] for x in li)
+                            for a1h8 in st_a1h8:
+                                if a1h8 not in st_ya:
+                                    li.append((a1h8, 0))
+
+                if len(li) == 0:
                     mrm = xmanager.analiza(fen)
-                    rm = mrm.mejorMov()
-                    pts = rm.centipawns_abs()
-                    if not si_white:
-                        pts = -pts
-                    if pts > max_puntos:
-                        max_puntos = pts
-                        if max_pv:
-                            for nl in dicPV[max_pv]:
-                                st_borrar.add(nl)
-                        max_pv = pv
-                    else:
-                        for nl in dicPV[pv]:
-                            st_borrar.add(nl)
+                    for a1h8 in dic_a1h8:
+                        rm, pos = mrm.buscaRM(a1h8)
+                        li.append((a1h8, pos))
+                    li.sort(key=lambda x:x[1])
+
+                for a1h8, pos in li[1:]:
+                    for num_linea in dic_a1h8[a1h8]:
+                        st_borrar.add(num_linea)
 
             tmpBP.cerrar()
 
