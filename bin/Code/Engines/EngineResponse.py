@@ -135,34 +135,39 @@ class EngineResponse:
         else:
             return self.texto()
 
-    def texto_tutor(self):
-        if self.mate and -1 <= self.mate <= 1:
+    # def texto_tutor(self):
+    #     if self.mate and -1 <= self.mate <= 1:
+    #         d = {True: _("White mates in %1"), False: _("Black mates in %1")}
+    #         if self.mate > 0:
+    #             t = self.is_white
+    #         else:
+    #             t = not self.is_white
+    #         return _X(d[t], str(abs(self.mate)))
+    #     else:
+    #         return self.texto()
+    #
+    def texto(self):
+        if self.mate:
+            mt = self.mate
+            if -1 <= mt <= 1:
+                d = {True: _("White is in checkmate"), False: _("Black is in checkmate")}
+                if mt == -1:
+                    t = self.is_white
+                else:
+                    t = not self.is_white
+                return d[t]
+            if not self.is_white:
+                mt = -mt
+            if (mt > 1) and self.is_white:
+                mt -= 1
+            elif (mt < -1) and not self.is_white:
+                mt += 1
             d = {True: _("White mates in %1"), False: _("Black mates in %1")}
             if self.mate > 0:
                 t = self.is_white
             else:
                 t = not self.is_white
-            return _X(d[t], str(abs(self.mate)))
-        else:
-            return self.texto()
-
-    def texto(self):
-        if self.mate:
-            if -1 <= self.mate <= 1:
-                d = {True: _("White is in checkmate"), False: _("Black is in checkmate")}
-                if self.mate == -1:
-                    t = self.is_white
-                else:
-                    t = not self.is_white
-                return d[t]
-
-            else:
-                d = {True: _("White mates in %1"), False: _("Black mates in %1")}
-                if self.mate > 0:
-                    t = self.is_white
-                else:
-                    t = not self.is_white
-                return _X(d[t], str(abs(self.mate)))
+            return _X(d[t], str(abs(mt)))
 
         else:
             pt = self.puntos

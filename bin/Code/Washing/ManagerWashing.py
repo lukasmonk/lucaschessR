@@ -787,7 +787,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.main_window.pon_toolbar(li_options)
         self.remove_hints()
 
-        self.game.set_tag("HintsUsed", self.engine.current_hints)
+        self.game.set_tag("HintsUsed", self.engine.hints_current)
         self.autosave()
         if player_win:
             self.saveGame(True)

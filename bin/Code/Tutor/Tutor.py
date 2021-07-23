@@ -64,11 +64,10 @@ class Tutor:
         self.list_rm = self.do_lirm(posUsuario)  # rm,name
 
         # Creamos la ventana
-
         siRival = self.rm_rival and " " in self.rm_rival.getPV()
 
         self.liApPosibles = liApPosibles
-        in_the_opening = not (liApPosibles is None)
+        in_the_opening = liApPosibles and len(liApPosibles) > 1
         if in_the_opening:
             siRival = False
 
@@ -82,7 +81,7 @@ class Tutor:
         self.posUsuario = 0
         self.max_user = len(self.gameUsuario.li_moves)
         self.boardUsuario.set_position(self.move.position)
-        w.ponPuntuacionUsuario(self.rmUsuario.texto_tutor())
+        w.ponPuntuacionUsuario(self.rmUsuario.texto())
 
         if siRival:
             self.rm_rival.cambiaColor()
@@ -318,8 +317,9 @@ class Tutor:
     def cambiarOpening(self, number):
         self.gameOpenings = Game.Game(self.last_position)
         self.gameOpenings.read_pv(self.liApPosibles[number].a1h8)
-        self.boardOpenings.set_position(self.gameOpenings.move(0).position)
         self.maxOpening = len(self.gameOpenings)
+        if self.maxOpening > 0:
+            self.boardOpenings.set_position(self.gameOpenings.move(0).position)
         self.mueveOpening(si_inicio=True)
 
     def opcionesOpenings(self):

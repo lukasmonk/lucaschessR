@@ -192,6 +192,8 @@ class ListaOpeningsStd:
         game.pending_opening = False  # No hay ninguna aplicable
 
     def list_possible_openings(self, game, si_todas=False):
+        if not game.siFenInicial():
+            return []
         a1h8 = ""
         for move in game.li_moves:
             a1h8 += " " + move.movimiento()
