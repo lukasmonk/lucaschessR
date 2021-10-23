@@ -1,4 +1,4 @@
-from Code.Config import TrListas
+from Code.Translations import TrListas
 from Code.Base import Position
 from Code.QT import Colocacion
 from Code.QT import Columnas

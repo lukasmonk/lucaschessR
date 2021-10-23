@@ -1,7 +1,7 @@
 import FasterCode
 
 from Code.Base.Constantes import FEN_INITIAL
-from Code.Config import TrListas
+from Code.Translations import TrListas
 
 
 class Position:

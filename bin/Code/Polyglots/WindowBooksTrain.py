@@ -1,15 +1,13 @@
 import os
 
-from PySide2 import QtCore, QtWidgets
-
 import Code
+from Code import Util
 from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
-from Code import Util
 
 
 class WBooksTrain(QTVarios.WDialogo):
@@ -34,7 +32,7 @@ class WBooksTrain(QTVarios.WDialogo):
 
         # Toolbar
         liAcciones = [(_("Accept"), Iconos.Aceptar(), self.aceptar), None, (_("Cancel"), Iconos.Cancelar(), self.cancelar), None]
-        tb = Controles.TBrutina(self, liAcciones)
+        tb = QTVarios.LCTB(self, liAcciones)
 
         # Side
         self.rb_white = Controles.RB(self, _("White"))
@@ -97,6 +95,9 @@ class WBooksTrain(QTVarios.WDialogo):
         gb_rival = Controles.GB(self, _("Rival book"), ly).ponFuente(flb)
 
         self.chb_showmenu = Controles.CHB(self, _("Display a menu of alternatives if move is invalid"), dic_data.get(self.SHOW_MENU, True))
+        if Code.configuration.x_digital_board:
+            self.chb_showmenu.ponValor(False)
+            self.chb_showmenu.hide()
 
         vlayout = Colocacion.V()
         vlayout.control(gb_side).espacio(5)
@@ -128,7 +129,7 @@ class WBooksTrain(QTVarios.WDialogo):
         self.reject()
 
     def nuevo(self):
-        fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
+        fbin = SelectFiles.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             nombre = os.path.basename(fbin)[:-4]

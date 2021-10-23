@@ -24,6 +24,7 @@ class RunSound:
         Code.runSound = self
         self.replay = None
         self.replayBeep = None
+        self.replayError = None
 
     def compruebaReplay(self):
         if self.replay is None:
@@ -48,6 +49,17 @@ class RunSound:
 
     def playZeitnot(self):
         self.playClave("ZEITNOT")
+
+    def playError(self):
+        if self.replayError is None:
+            db = UtilSQL.DictSQL(Code.configuration.file_sounds(), "general")
+            keys = db.keys()
+            self.replayError = "ERROR" in keys
+
+        if self.replayError:
+            self.playClave("ERROR", False)
+        else:
+            QTUtil.beep()
 
     def playBeep(self):
         if self.replayBeep is None:

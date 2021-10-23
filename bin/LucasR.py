@@ -4,13 +4,11 @@
 # Blog : http://lucaschess.blogspot.com
 # Licence : GPL 3.0
 # ==============================================================================
-
 import sys
 import warnings
 
 warnings.simplefilter("ignore", UserWarning)
 
-# sys.argv.append(r"c:\lucaschess\_DATABASE\40h\gm1830.pgn")
 
 n_args = len(sys.argv)
 if n_args == 1:

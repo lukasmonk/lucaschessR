@@ -2,23 +2,21 @@ import os
 import random
 
 import FasterCode
-
 from PySide2 import QtSvg, QtCore
 
 import Code
-from Code import Everest
-from Code.Base import Game
+from Code import Util
 from Code.Databases import DBgames
-from Code.SQL import Base
+from Code.Expeditions import Everest
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
+from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import FormLayout
-from Code import Util
+from Code.QT import SelectFiles
 
 
 class WNewExpedition(QTVarios.WDialogo):
@@ -99,7 +97,7 @@ class WNewExpedition(QTVarios.WDialogo):
             self.sbtries_max.ponValor(tries_min)
 
     def mas(self):
-        path_pgn = QTVarios.select_pgn(self)
+        path_pgn = SelectFiles.select_pgn(self)
         if not path_pgn:
             return
 
@@ -119,33 +117,27 @@ class WNewExpedition(QTVarios.WDialogo):
         plant = ""
         shuffle = False
         reverse = False
-        todos = range(1, nreccount + 1)
+        todos = list(range(1, nreccount + 1))
         li_regs = []
         max_moves = 0
         while True:
-            sep = FormLayout.separador
-            li_gen = []
-            li_gen.append((None, "%s: %d" % (_("Total games"), nreccount)))
-            li_gen.append(sep)
-            config = FormLayout.Editbox(
-                _("Select games") + "<br>" + _("By example:") + " -5,7-9,14,19-" + "<br>" + _("Empty means all games"), rx="[0-9,\-,\,]*"
+            form = FormLayout.FormLayout(self, _("Select games"), Iconos.Opciones(), anchoMinimo=200)
+            form.apart_np("%s: %d" % (_("Total games"), nreccount))
+            form.editbox(_("Select games"), rx="[0-9,\-,\,]*", init_value=plant)
+            form.apart_simple_np(
+                "%s  -5,7-9,14,19-<br>%s<br>%s"
+                % (_("By example:"), _("Number of games must be in range 12-500"), _("Empty means all games"))
             )
-            li_gen.append((config, plant))
+            form.separador()
+            form.checkbox(_("Shuffle"), shuffle)
 
-            li_gen.append(sep)
+            form.separador()
+            form.checkbox(_("Reverse"), reverse)
 
-            li_gen.append((_("Shuffle") + ":", shuffle))
+            form.separador()
+            form.spinbox(_("Max. plies"), 0, 999, 50, 0)
 
-            li_gen.append(sep)
-
-            li_gen.append((_("Reverse") + ":", reverse))
-
-            li_gen.append(sep)
-
-            config = FormLayout.Spinbox(_("Max moves"), 0, 999, 50)
-            li_gen.append((config, 0))
-
-            resultado = FormLayout.fedit(li_gen, title=_("Select games"), parent=self, anchoMinimo=200, icon=Iconos.Opciones())
+            resultado = form.run()
             if resultado:
                 accion, liResp = resultado
                 plant, shuffle, reverse, max_moves = liResp
@@ -209,7 +201,12 @@ class WExpedition(QTVarios.WDialogo):
         wsvg.setFixedSize(762, int(762.0 * 520.0 / 1172.0))
         lySVG = Colocacion.H().relleno(1).control(wsvg).relleno(1)
 
-        li_acciones = ((_("Climb"), Iconos.Empezar(), self.climb), None, (_("Close"), Iconos.MainMenu(), self.cancel), None)
+        li_acciones = (
+            (_("Climb"), Iconos.Empezar(), self.climb),
+            None,
+            (_("Close"), Iconos.MainMenu(), self.cancel),
+            None,
+        )
         tb = Controles.TBrutina(self, li_acciones).vertical()
         if self.current is None:
             tb.setAccionVisible(self.climb, False)
@@ -217,7 +214,9 @@ class WExpedition(QTVarios.WDialogo):
         lyRot = Colocacion.H()
         for elem in label:
             lb_rotulo = Controles.LB(self, elem).align_center()
-            lb_rotulo.setStyleSheet("QWidget { border-style: groove; border-width: 2px; border-color: LightSlateGray ;}")
+            lb_rotulo.setStyleSheet(
+                "QWidget { border-style: groove; border-width: 2px; border-color: LightSlateGray ;}"
+            )
             lb_rotulo.ponTipoLetra(puntos=12, peso=700)
             lyRot.control(lb_rotulo)
 
@@ -242,7 +241,8 @@ class WExpedition(QTVarios.WDialogo):
 
         self.setLayout(ly)
 
-        self.restore_video(siTam=True, anchoDefecto=784, altoDefecto=670)
+        self.register_grid(grid)
+        self.restore_video(anchoDefecto=784, altoDefecto=670)
 
     def grid_num_datos(self, grid):
         return 12
@@ -296,7 +296,9 @@ class WExpedition(QTVarios.WDialogo):
 class WEverest(QTVarios.WDialogo):
     def __init__(self, procesador):
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Expeditions to the Everest"), Iconos.Trekking(), "everestBase")
+        QTVarios.WDialogo.__init__(
+            self, procesador.main_window, _("Expeditions to the Everest"), Iconos.Trekking(), "everestBase"
+        )
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -335,7 +337,7 @@ class WEverest(QTVarios.WDialogo):
         self.setLayout(ly)
 
         self.register_grid(self.grid)
-        self.restore_video(siTam=False)
+        self.restore_video()
 
         self.grid.gotop()
 

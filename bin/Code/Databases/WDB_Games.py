@@ -4,12 +4,12 @@ import time
 
 from PySide2 import QtWidgets, QtCore
 
+import Code
 import Code.Openings.WindowOpenings as WindowOpenings
-from Code.Config import TrListas
 from Code import Util
 from Code.Analysis import Analysis, WindowAnalysisParam
 from Code.Base import Game
-from Code.Base.Constantes import *
+from Code.Base.Constantes import WHITE, BLACK
 from Code.Databases import DBgames, WDB_Utils
 from Code.GM import GM
 from Code.Openings import OpeningsStd
@@ -24,10 +24,12 @@ from Code.QT import GridEditCols
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import SelectFiles
 from Code.QT import WindowPlayGame
 from Code.QT import WindowSavePGN
 from Code.SQL import UtilSQL
 from Code.Themes import WDB_Theme_Analysis
+from Code.Translations import TrListas
 
 
 class WGames(QtWidgets.QWidget):
@@ -60,7 +62,7 @@ class WGames(QtWidgets.QWidget):
 
         # Grid
         o_columns = self.lista_columnas()
-        self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True, xid="wgames")
+        self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, altoFila=24, siSeleccionMultiple=True, xid="wgames")
 
         # Status bar
         self.status = QtWidgets.QStatusBar(self)
@@ -544,7 +546,7 @@ class WGames(QtWidgets.QWidget):
             if not QTUtil2.pregunta(self, _("Do you want to delete all selected records?")):
                 return
 
-            um = QTUtil2.unMomento(self)
+            um = QTUtil2.unMomento(self, _("Working..."))
             self.changes = True
             self.dbGames.remove_list_recnos(li)
             self.summaryActivo["games"] -= len(li)
@@ -561,6 +563,8 @@ class WGames(QtWidgets.QWidget):
         menu.separador()
         menu.opcion(self.tw_importar_DB, _("From other database"), Iconos.Database())
         menu.separador()
+        if self.dbGames.allows_positions and (self.dbGames.reccount() == 0 or not self.dbGames.allows_duplicates):
+            menu.opcion(self.tw_importar_lichess, _("From the Lichess Puzzle Database"), Iconos.Lichess())
         resp = menu.lanza()
         if resp:
             resp()
@@ -577,14 +581,18 @@ class WGames(QtWidgets.QWidget):
         submenu.opcion((self.tw_exportar_pgn, False), _("All registers"), Iconos.PuntoVerde())
         if li_sel:
             submenu.separador()
-            submenu.opcion((self.tw_exportar_pgn, True), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul())
+            submenu.opcion(
+                (self.tw_exportar_pgn, True), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul()
+            )
 
         menu.separador()
         submenu = menu.submenu(_("To other database"), Iconos.Database())
         submenu.opcion((self.tw_exportar_db, li_all), _("All registers"), Iconos.PuntoVerde())
         if li_sel:
             submenu.separador()
-            submenu.opcion((self.tw_exportar_db, li_sel), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul())
+            submenu.opcion(
+                (self.tw_exportar_db, li_sel), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul()
+            )
 
         resp = menu.lanza()
         if resp:
@@ -637,7 +645,7 @@ class WGames(QtWidgets.QWidget):
         # Comprobamos depth
         new_depth = dic_data["SUMMARY_DEPTH"]
         if new_depth != self.dbGames.depth_stat():
-            self.wsummary.reindexar(new_depth)
+            self.wsummary.reindexar_question(new_depth, False)
             self.dbGames.save_config("SUMMARY_DEPTH", new_depth)
 
         # Si ha cambiado la localización, se cierra, se mueve y se reabre en la nueva
@@ -700,15 +708,15 @@ class WGames(QtWidgets.QWidget):
             self.grid.releerColumnas()
 
     def readVarsConfig(self):
-        showAllways = self.dbGames.read_config("GRAPHICS_SHOW_ALLWAYS")
+        show_allways = self.dbGames.read_config("GRAPHICS_SHOW_ALLWAYS")
         specific = self.dbGames.read_config("GRAPHICS_SPECIFIC")
-        return showAllways, specific
+        return show_allways, specific
 
     def graphicBoardReset(self):
-        showAllways, specific = self.readVarsConfig()
+        show_allways, specific = self.readVarsConfig()
         fichGraphic = self.dbGames.nom_fichero if specific else None
         self.infoMove.board.dbvisual_set_file(fichGraphic)
-        self.infoMove.board.dbvisual_set_show_allways(showAllways)
+        self.infoMove.board.dbvisual_set_show_allways(show_allways)
 
     def tw_dir_show_yes(self):
         self.dbGames.save_config("GRAPHICS_SHOW_ALLWAYS", True)
@@ -781,7 +789,13 @@ class WGames(QtWidgets.QWidget):
             form.combobox(_("Which side"), li, side)
             form.separador()
 
-            li = [(_("Any"), None), (_("Win"), ("Win")), (_("Win+Draw"), "Win+Draw"), (_("Lost"), "Lost"), (_("Lost+Draw"), "Lost+Draw")]
+            li = [
+                (_("Any"), None),
+                (_("Win"), ("Win")),
+                (_("Win+Draw"), "Win+Draw"),
+                (_("Lost"), "Lost"),
+                (_("Lost+Draw"), "Lost+Draw"),
+            ]
             form.combobox(_("Result"), li, result)
             form.separador()
 
@@ -837,11 +851,15 @@ class WGames(QtWidgets.QWidget):
             return
 
     def tw_uti_tactic(self):
-        def rutinaDatos(recno):
+        def rutinaDatos(recno, skip_first):
             dic = {}
             for key in self.dbGames.li_fields:
                 dic[key] = self.dbGames.field(recno, key)
             p = self.dbGames.read_game_recno(recno)
+            if skip_first:
+                dic["PGN_REAL"] = p.pgn()
+                p.skip_first()
+                dic["FEN"] = p.get_tag("FEN")
             dic["PGN"] = p.pgn()
             dic["PLIES"] = len(p)
             return dic
@@ -861,7 +879,9 @@ class WGames(QtWidgets.QWidget):
         liSeleccionadas = self.grid.recnosSeleccionados()
         nSeleccionadas = len(liSeleccionadas)
 
-        alm = WindowAnalysisParam.massive_analysis_parameters(self, self.configuration, nSeleccionadas > 1, siDatabase=True)
+        alm = WindowAnalysisParam.massive_analysis_parameters(
+            self, self.configuration, nSeleccionadas > 1, siDatabase=True
+        )
         if alm:
 
             if alm.siVariosSeleccionados:
@@ -876,7 +896,7 @@ class WGames(QtWidgets.QWidget):
             tmpBP.mostrar()
 
             if alm.num_moves:
-                lni = Util.ListaNumerosImpresion(alm.num_moves).selected(range(400))
+                lni = Util.ListaNumerosImpresion(alm.num_moves)
             else:
                 lni = None
 
@@ -896,8 +916,20 @@ class WGames(QtWidgets.QWidget):
 
                 game = self.dbGames.read_game_recno(n)
                 self.grid.goto(n, 0)
-
-                ap.li_selected = lni[:] if lni else None
+                #
+                if lni:
+                    n_movs = len(game)
+                    li_movs = []
+                    if n_movs:
+                        for nmov in range(n_movs):
+                            nmove = nmov // 2 + 1
+                            if lni.siEsta(nmove):
+                                li_movs.append(nmov)
+                    ap.li_selected = li_movs
+                    if len(li_movs) == 0:
+                        continue
+                else:
+                    ap.li_selected = None
                 ap.xprocesa(game, tmpBP)
 
                 self.dbGames.save_game_recno(n, game)
@@ -936,6 +968,7 @@ class WGames(QtWidgets.QWidget):
                         liNoCreados.append(alm.bmtbrilliancies)
                 if liCreados:
                     WDB_Utils.mensajeEntrenamientos(self, liCreados, liNoCreados)
+                    self.procesador.entrenamientos.rehaz()
 
             else:
                 ap.terminar(False)
@@ -975,11 +1008,15 @@ class WGames(QtWidgets.QWidget):
         dltmp = PolyglotImportExports.ImportarPGNDB(self, titulo)
         dltmp.show()
 
-        ok = PolyglotImportExports.add_db(self.dbGames, plies, st_results, st_side, ru, time.time, 1.2, dltmp.dispatch, fsum)
+        ok = PolyglotImportExports.add_db(
+            self.dbGames, plies, st_results, st_side, ru, time.time, 1.2, dltmp.dispatch, fsum
+        )
         dltmp.close()
 
         if ok:
-            PolyglotImportExports.create_bin_from_dbbig(self, path_bin, db, min_games, min_score, calc_weight, save_score)
+            PolyglotImportExports.create_bin_from_dbbig(
+                self, path_bin, db, min_games, min_score, calc_weight, save_score
+            )
 
     def tw_exportar_db(self, lista):
         dbpath = QTVarios.select_db(self, self.configuration, False, True)
@@ -1034,7 +1071,7 @@ class WGames(QtWidgets.QWidget):
                 ws.close()
 
     def tw_importar_PGN(self):
-        files = QTVarios.select_pgns(self)
+        files = SelectFiles.select_pgns(self)
         if not files:
             return None
 
@@ -1068,6 +1105,133 @@ class WGames(QtWidgets.QWidget):
         self.actualiza(True)
         if self.wsummary:
             self.wsummary.reset()
+
+    def tw_importar_lichess(self):
+        mens_base = _("You must follow the next steps")
+        mens_puzzles = _("Download the puzzles in csv format from LiChess website")
+        link_puzzles = "https://database.lichess.org/#puzzles"
+
+        mens_7z = _("Uncompress this file with a tool like 7z")
+        link_7z = "https://www.7-zip.org/"
+        mens_unzip = _("Uncompress this file")
+
+        mens_eco = _(
+            "If you want to include a field with the opening, you have to download and unzip in the same folder as the puzzle file, the file indicated below"
+        )
+        link_eco = (
+            "https://sourceforge.net/projects/lucaschessr/files/Version_R1/lichess_db_puzzle_pv_id.eval.bz2/download"
+        )
+        idea = _("Original idea and more information")
+        link_idea = "https://cshancock.netlify.app/post/2021-06-23-lichess-puzzles-by-eco"
+
+        mensaje = "%s:" % mens_base
+        mensaje += "<ol>"
+
+        mensaje += "<li>%s" % mens_puzzles
+        mensaje += '<ul><li><a href="%s">%s</a></li></ul>' % (link_puzzles, link_puzzles)
+        mensaje += "</li>"
+
+        if Code.is_windows:
+            mensaje += "<li>%s" % mens_7z
+            mensaje += '<ul><li><a href="%s">%s</a></li></ul>' % (link_7z, link_7z)
+            mensaje += "</li>"
+        else:
+            mensaje += "<li>%s</li>" % mens_unzip
+
+        mensaje += "<li>%s" % mens_eco
+        mensaje += '<ul>'
+        mensaje += '<li><a href="%s">%s</a></li>' % (link_eco, link_eco)
+        mensaje += '<li>%s: <a href="%s">%s</a></li>' % (idea, link_idea, link_idea)
+        mensaje += '</ul>'
+        mensaje += "</li>"
+
+        mensaje += "</ol>"
+        mensaje += "<br>%s" % _("The import takes a long time.")
+
+        if not QTUtil2.pregunta(
+            self,
+            mensaje,
+            label_yes=_("Continue"),
+            label_no=_("Cancel"),
+        ):
+            return
+
+        path = SelectFiles.leeFichero(
+            self, self.configuration.carpetaBase, "csv", _("From the Lichess Puzzle Database")
+        )
+        if not path:
+            return
+
+        tam = Util.filesize(path)
+        if tam < 10:
+            return
+
+        dic_gid_pv = {}
+        path_eco = os.path.join(os.path.dirname(path), "lichess_db_puzzle_pv_id.eval")
+        if Util.exist_file(path_eco):
+            um = QTUtil2.unMomento(self, _("Working..."))
+            with open(path_eco, "rt") as f:
+                dic_pv_id = eval(f.read())
+            for pv, li_gids in dic_pv_id.items():
+                g = Game.pv_game(None, pv)
+                for gid in li_gids:
+                    dic_gid_pv[gid] = g.opening
+            um.final()
+
+        def url_id(url):
+            li = url.split("/")
+            key = li[-1]
+            if "black" in key:
+                key = li[-2]
+            if "#" in key:
+                key = key.split("#")[0]
+            return key
+
+        with open(path, "rt") as f:
+            pb = QTUtil2.BarraProgreso1(self, _("Importing"), formato1="%p%")
+            pb.setFocus()
+            pb.ponTotal(tam)
+            pb.show()
+            line = f.readline()
+            n = 1
+            g = Game.Game()
+            while line:
+                line = line.strip()
+                if line:
+                    puzzleid, fen, moves, rating, ratingdeviation, popularity, nbplays, themes, gameurl = line.split(
+                        ","
+                    )
+                    g.li_moves = []
+                    g.li_tags = []
+                    g.set_fen(fen)
+                    g.read_pv(moves)
+                    g.set_tag("Site", "LiChess")
+                    g.set_tag("Event", "Puzzle %s" % puzzleid)
+                    g.set_tag("Rating", rating)
+                    g.set_tag("RatingDeviation", ratingdeviation)
+                    g.set_tag("Popularity", popularity)
+                    g.set_tag("NBPlays", nbplays)
+                    g.set_tag("Themes", themes)
+                    g.set_tag("GameURL", gameurl)
+                    if dic_gid_pv:
+                        gid = url_id(gameurl)
+                        opening = dic_gid_pv.get(gid)
+                        if opening:
+                            g.set_tag("ECO", opening.eco)
+                            g.set_tag("Opening", opening.trNombre)
+                    self.dbGames.insert(g, with_commit=(n % 1000) == 0)
+                if n % 10 == 0:
+                    pb.pon(f.tell())
+                    if pb.is_canceled():
+                        break
+                line = f.readline()
+                n += 1
+            pb.cerrar()
+        self.dbGames.commit()
+        self.changes = True
+
+        self.rehaz_columnas()
+        self.actualiza(True)
 
 
 class WOptionsDatabase(QtWidgets.QDialog):
@@ -1119,12 +1283,18 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         lb_group = Controles.LB2P(self, _("Group"))
         self.ed_group = Controles.ED(self, group).controlrx(valid_rx)
-        self.bt_group = Controles.PB(self, "", self.mira_group).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
-        ly_group = Colocacion.H().control(lb_group).control(self.ed_group).espacio(-10).control(self.bt_group).relleno(1)
+        self.bt_group = (
+            Controles.PB(self, "", self.mira_group).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
+        )
+        ly_group = (
+            Colocacion.H().control(lb_group).control(self.ed_group).espacio(-10).control(self.bt_group).relleno(1)
+        )
 
         lb_subgroup_l1 = Controles.LB2P(self, _("Subgroup"))
         self.ed_subgroup_l1 = Controles.ED(self, subgroup1).controlrx(valid_rx)
-        self.bt_subgroup_l1 = Controles.PB(self, "", self.mira_subgroup_l1).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
+        self.bt_subgroup_l1 = (
+            Controles.PB(self, "", self.mira_subgroup_l1).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
+        )
         ly_subgroup_l1 = (
             Colocacion.H()
             .espacio(40)
@@ -1137,7 +1307,9 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         lb_subgroup_l2 = Controles.LB2P(self, "%s → %s" % (_("Subgroup"), _("Subgroup")))
         self.ed_subgroup_l2 = Controles.ED(self, subgroup2).controlrx(valid_rx)
-        self.bt_subgroup_l2 = Controles.PB(self, "", self.mira_subgroup_l2).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
+        self.bt_subgroup_l2 = (
+            Controles.PB(self, "", self.mira_subgroup_l2).ponIcono(Iconos.BuscarC(), 16).ponToolTip(_("Group lists"))
+        )
         ly_subgroup_l2 = (
             Colocacion.H()
             .espacio(40)
@@ -1160,7 +1332,9 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.external_folder = d_str("EXTERNAL_FOLDER")
         lb_external = Controles.LB2P(self, _("Store in an external folder"))
         self.bt_external = Controles.PB(self, self.external_folder, self.select_external, False)
-        self.bt_external.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding))
+        self.bt_external.setSizePolicy(
+            QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        )
         ly_external = Colocacion.H().control(lb_external).control(self.bt_external)
 
         self.chb_complete = Controles.CHB(self, _("Allow complete games"), d_true("ALLOWS_COMPLETE_GAMES"))
@@ -1177,7 +1351,12 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         gb_restrictions = Controles.GB(self, _("Import restrictions"), ly_res)
 
-        li_acciones = [(_("Save"), Iconos.Aceptar(), self.save), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None]
+        li_acciones = [
+            (_("Save"), Iconos.Aceptar(), self.save),
+            None,
+            (_("Cancel"), Iconos.Cancelar(), self.reject),
+            None,
+        ]
         self.tb = QTVarios.LCTB(self, li_acciones)
 
         x0 = 16
@@ -1194,12 +1373,14 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.ed_name.setFocus()
 
     def select_external(self):
-        folder = QTUtil2.leeCarpeta(self, self.external_folder, _("Use an external folder"))
+        folder = SelectFiles.get_existing_directory(self, self.external_folder, _("Use an external folder"))
         if folder:
             folder = os.path.realpath(folder)
             default = os.path.realpath(self.configuration.folder_databases())
             if folder.startswith(default):
-                QTUtil2.message_error(self, "%s:\n%s\n\n%s" % (_("The folder must be outside the default folder"), default, folder))
+                QTUtil2.message_error(
+                    self, "%s:\n%s\n\n%s" % (_("The folder must be outside the default folder"), default, folder)
+                )
                 return
             self.external_folder = folder
 
@@ -1343,7 +1524,13 @@ class WTags(QTVarios.WDialogo):
 
         self.li_data = []
         for tag in li_basetags:
-            dic = {"KEY": tag, "LABEL": dcabs.get(tag, Util.primera_mayuscula(tag)), "ACTION": "-", "VALUE": "", "NEW": False}
+            dic = {
+                "KEY": tag,
+                "LABEL": dcabs.get(tag, Util.primera_mayuscula(tag)),
+                "ACTION": "-",
+                "VALUE": "",
+                "NEW": False,
+            }
             dic["PREV_LABEL"] = dic["KEY"]
             self.li_data.append(dic)
 

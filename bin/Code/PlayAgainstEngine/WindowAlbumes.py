@@ -1,4 +1,5 @@
 from PySide2 import QtGui
+
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos

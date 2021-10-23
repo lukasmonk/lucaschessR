@@ -1,13 +1,13 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from Code.QT import QTVarios
-from Code.QT import Iconos
-from Code.QT import Grid
-from Code.QT import Columnas
 from Code.QT import Colocacion
-from Code.QT import FormLayout
-from Code.QT import QTUtil2
+from Code.QT import Columnas
 from Code.QT import Delegados
+from Code.QT import FormLayout
+from Code.QT import Grid
+from Code.QT import Iconos
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
 
 
 class EditCols(QtWidgets.QDialog):

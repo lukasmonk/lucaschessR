@@ -5,16 +5,31 @@ from PySide2.QtCore import Qt
 import Code
 from Code import FNSLine
 from Code import Manager
-from Code.Config import TrListas
-from Code.Tutor import Tutor
 from Code import Util
 from Code.Base import Game, Move
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_CHANGE,
+    TB_CONTINUE,
+    TB_HELP,
+    TB_NEXT,
+    TB_PGN_LABELS,
+    TB_PREVIOUS,
+    TB_UTILITIES,
+    GT_POSITIONS,
+)
+from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.SQL import UtilSQL
+from Code.Translations import TrListas
+from Code.Tutor import Tutor
 
 
 class ManagerEntPos(Manager.Manager):
@@ -347,7 +362,7 @@ class ManagerEntPos(Manager.Manager):
             if self.is_analyzing:
                 self.xtutor.stop()
             return
-        estado = self.is_analyzing
+        # estado = self.is_analyzing
         self.is_analyzing = False
         if self.is_analyzed_by_tutor:
             return
@@ -417,6 +432,7 @@ class ManagerEntPos(Manager.Manager):
                     li_movs.append((a1h8_m[:2], a1h8[2:4], False))
                 self.board.ponFlechasTmp(li_movs)
             if not ok:
+                self.beepError()
                 self.sigueHumano()
                 return False
 
@@ -492,7 +508,6 @@ class ManagerEntPos(Manager.Manager):
             nom_dir = nom % n
         nom_ini = os.path.join(nom_dir, "Config.ini")
         nom_tactic = "TACTIC1"
-        nom_dir_tac = self.configuration.folder_tactics()
         Util.create_folder(nom_dir)
         nom_fns = os.path.join(nom_dir, "Puzzles.fns")
 

@@ -1,5 +1,4 @@
 import FasterCode
-
 from PySide2 import QtWidgets, QtCore
 
 from Code.Base import Game
@@ -7,12 +6,12 @@ from Code.Openings import OpeningsStd
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
+from Code.QT import Delegados
+from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import FormLayout
-from Code.QT import Delegados
 from Code.QT import QTVarios
 
 OPENINGS_WHITE, OPENINGS_BLACK, MOVES_WHITE, MOVES_BLACK = range(4)
@@ -167,7 +166,7 @@ class WPlayer(QtWidgets.QWidget):
         # ToolBar
         liAccionesWork = [("", Iconos.Usuarios(), self.tw_changeplayer), None, (_("Rebuild"), Iconos.Reindexar(), self.tw_rebuild), None]
 
-        self.tbWork = Controles.TBrutina(self, liAccionesWork)
+        self.tbWork = QTVarios.LCTB(self, liAccionesWork)
         self.tbWork.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
 
         lyTB = Colocacion.H().control(self.tbWork)

@@ -2,7 +2,7 @@ import copy
 import time
 
 from Code.Board import BoardTypes
-from Code.Config import TrListas
+from Code.Translations import TrListas
 from Code import Util
 from Code.SQL import UtilSQL
 import Code
@@ -694,7 +694,7 @@ class Guion:
 
     def recupera(self):
         fenm2 = self.board.last_position.fenm2()
-        lista = self.board.dbVisual_lista(fenm2)
+        lista = self.board.dbvisual_list(fenm2)
         self.liGTareas = []
         stPrevios = self.recuperaMoviblesBoard()
         if lista is not None:
@@ -727,11 +727,11 @@ class Guion:
 
 
 class DBManagerVisual:
-    def __init__(self, file, showAllways=False, saveAllways=False):
+    def __init__(self, file, show_allways=False, saveAllways=False):
         self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = None
-        self._showAllways = showAllways
+        self._show_allways = show_allways
         self._saveAllways = saveAllways
-        self.setFichero(file)
+        self.set_file(file)
 
     def saveMoviblesBoard(self, board):
         fenm2 = board.lastFenM2
@@ -750,23 +750,23 @@ class DBManagerVisual:
         guion.recuperaMoviblesBoard()
         self.dbFEN[fenm2] = guion.guarda()
 
-    def saveAllways(self, yesno=None):
+    def save_allways(self, yesno=None):
         if yesno is not None:
             self._saveAllways = yesno
         return self._saveAllways
 
-    def showAllways(self, yesno=None):
+    def show_allways(self, yesno=None):
         if yesno is not None:
-            self._showAllways = yesno
-        return self._showAllways
+            self._show_allways = yesno
+        return self._show_allways
 
-    def getConfig(self, key, default=None):
-        return self.dbConfig.get(key, default)
+    # def getConfig(self, key, default=None):
+    #     return self.dbConfig.get(key, default)
 
-    def setConfig(self, key, value):
-        self.dbConfig[key] = value
+    # def setConfig(self, key, value):
+    #     self.dbConfig[key] = value
 
-    def setFichero(self, file):
+    def set_file(self, file):
         self.close()
         self._fichero = file if file is not None else Code.configuration.ficheroRecursos
         if not Util.exist_file(self._fichero):
@@ -803,7 +803,6 @@ class DBManagerVisual:
     def dbConfig(self):
         if self._dbConfig is None:
             self._dbConfig = UtilSQL.DictSQL(self._fichero, tabla="Config")
-            li = self.dbConfig["SELECTBANDA"]
         return self._dbConfig
 
     @property

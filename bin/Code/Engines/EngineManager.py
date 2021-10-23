@@ -77,6 +77,8 @@ class EngineManager:
         self.mstime_engine = mstime_engine
         self.depth_engine = depth_engine
         self.num_multipv = self.confMotor.multiPV if siMultiPV else 0
+        if self.engine:
+            self.update_multipv(self.num_multipv)
 
         if self.key in ("daydreamer", "cinnamon") and depth_engine and depth_engine == 1:
             self.depth_engine = 2
@@ -102,31 +104,36 @@ class EngineManager:
         self.num_multipv = 0
 
     def set_multipv(self, num_multipv):
-        if type(num_multipv) == str:
-            self.confMotor.update_multipv(num_multipv)
-            num_multipv = self.confMotor.multiPV
-        self.num_multipv = num_multipv
+        self.confMotor.update_multipv(num_multipv)
+        self.num_multipv = self.confMotor.multiPV
 
     def remove_gui_dispatch(self):
         if self.engine:
             self.engine.gui_dispatch = None
 
-    def check_engine(self, num_multipv=0):
+    def check_engine(self):
         if self.engine is not None:
             return False
-        if self.num_multipv:
-            self.num_multipv = min(self.num_multipv, self.confMotor.maxMultiPV)
+        self.set_multipv(self.num_multipv)
 
         exe = self.confMotor.ejecutable()
         args = self.confMotor.argumentos()
         liUCI = self.confMotor.liUCI
 
-        if self.direct:
-            self.engine = EngineRunDirect.DirectEngine(
-                self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog
-            )
-        elif self.name.lower().startswith("maia"):
+        maia_level = None
+        if self.name.lower().startswith("maia") or "lc0" in self.name.lower():
+            for comando, valor in liUCI:
+                if comando == "WeightsFile":
+                    if valor.startswith("maia"):
+                        maia_level = int(valor[5:9])
+                        break
+
+        if maia_level:
             self.engine = EngineRun.MaiaEngine(
+                self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog, level=maia_level
+            )
+        elif self.direct:
+            self.engine = EngineRunDirect.DirectEngine(
                 self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog
             )
         else:
@@ -287,6 +294,7 @@ class EngineManager:
         self.cache_analysis.close()
 
     def analizaJugadaPartida(self, game, njg, vtime, depth=0, brDepth=5, brPuntos=50, stability=False, st_centipawns=0, st_depths=0, st_timelimit=0):
+        self.check_engine()
         if self.cache_analysis is not None:
             move = game.move(njg)
             key = move.position_before.fenm2() + move.movimiento()

@@ -4,10 +4,10 @@ from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
 from Code import Util
-from Code.QT import QTUtil
-from Code.QT import QTUtil2
-from Code.QT import QTVarios
 from Code.QT import Iconos
+from Code.QT import QTUtil
+from Code.QT import QTVarios
+from Code.QT import SelectFiles
 
 
 class HSerie:
@@ -418,7 +418,7 @@ class Histogram(QtWidgets.QGraphicsView):
                     QTUtil.ponPortapapeles(pm, tipo="p")
                 else:
                     configuration = Code.configuration
-                    path = QTUtil2.salvaFichero(self, _("File to save"), configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
+                    path = SelectFiles.salvaFichero(self, _("File to save"), configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
                     if path:
                         pm.save(path, "png")
                         configuration.x_save_folder = os.path.dirname(path)

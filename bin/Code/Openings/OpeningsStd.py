@@ -3,7 +3,7 @@ import FasterCode
 from operator import attrgetter
 
 import Code
-from Code.Config import TrListas
+from Code.Translations import TrListas
 from Code import Util
 
 

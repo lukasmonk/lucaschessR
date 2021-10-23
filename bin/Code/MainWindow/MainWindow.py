@@ -97,10 +97,10 @@ class MainWindow(QTVarios.WDialogo):
         self.signal_notify.emit()
 
     def closeEvent(self, event):  # Cierre con X
-        self.board.cierraGuion()
-        self.save_video()
+        self.procesosFinales()
         if not self.manager.finalX0():
             event.ignore()
+
 
     def onTopWindow(self):
         self.onTop = not self.onTop
@@ -151,11 +151,6 @@ class MainWindow(QTVarios.WDialogo):
 
         self.board.cierraGuion()
         self.board.terminar()
-
-    def closeEvent(self, event):  # Cierre con X
-        self.procesosFinales()
-        if not self.manager.finalX0():
-            event.ignore()
 
     def set_manager_active(self, manager):
         self.manager = manager

@@ -5,7 +5,9 @@ import time
 
 import FasterCode
 
+from Code import Util
 from Code.Base import Position
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -13,9 +15,7 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
 from Code.SQL import Base
-from Code import Util
 
 
 class HorsesHistorico:
@@ -137,7 +137,7 @@ class WHorsesBase(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         # Colocamos
         lyTB = Colocacion.H().control(self.tb).margen(0)
@@ -222,7 +222,7 @@ class WHorses(QTVarios.WDialogo):
             None,
             (_("Help"), Iconos.AyudaGR(), self.ayuda),
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         # Layout
         lyInfo = Colocacion.H().control(self.lbInformacion).relleno().control(self.lbMoves)

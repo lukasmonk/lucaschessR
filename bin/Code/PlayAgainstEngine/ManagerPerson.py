@@ -1,8 +1,21 @@
+from Code import Util
+from Code.Base.Constantes import (
+    ST_PLAYING,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_CANCEL,
+    TB_PAUSE,
+    TB_RESIGN,
+    TB_UTILITIES,
+    GT_AGAINST_CHILD_ENGINE,
+    WHITE,
+    BLACK,
+)
 from Code.Openings import Opening
 from Code.PlayAgainstEngine import ManagerPlayAgainstEngine
 from Code.QT import Iconos
-from Code import Util
-from Code.Base.Constantes import *
 
 
 class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):

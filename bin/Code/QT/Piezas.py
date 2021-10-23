@@ -4,14 +4,18 @@ import shutil
 
 from PySide2 import QtCore, QtGui, QtSvg
 
+import Code
+from Code.Base.Constantes import (
+    BLINDFOLD_CONFIG,
+    BLINDFOLD_WHITE,
+    BLINDFOLD_BLACK
+)
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code.Config import TrListas
-import Code
-from Code.Base.Constantes import *
+from Code.Translations import TrListas
 
 
 class ConjuntoPiezas:

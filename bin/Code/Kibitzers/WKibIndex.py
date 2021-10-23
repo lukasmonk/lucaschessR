@@ -1,10 +1,10 @@
-from PySide2 import QtCore, QtGui, QtWidgets
-
 import FasterCode
+from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
 from Code.Analysis import AnalysisIndexes
-from Code.Base import Game, Position
+from Code.Base import Game
+from Code.Board import Board
 from Code.Engines import EngineRun
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -14,7 +14,6 @@ from Code.QT import Iconos
 from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.Board import Board
 from Code.QT import Voyager
 
 
@@ -343,7 +342,7 @@ class WKibIndex(QtWidgets.QDialog):
     def set_position(self):
         resp = Voyager.voyager_position(self, self.game.last_position)
         if resp is not None:
-            game = Game.Game(ini_posicion=resp)
+            game = Game.Game(first_position=resp)
             self.orden_game(game)
 
     def reset(self):

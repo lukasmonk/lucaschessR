@@ -3,13 +3,18 @@ import time
 
 from PySide2 import QtCore
 
-from Code import BMT
+from Code.TrainBMT import BMT
 from Code import ControlPGN
-from Code.Config import TrListas
 from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    GT_BMT,
+    GO_BACK,
+    GO_END,
+    GO_FORWARD,
+    GO_START,
+)
 from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -19,8 +24,9 @@ from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
+from Code.Translations import TrListas
 
 
 class WHistorialBMT(QTVarios.WDialogo):
@@ -518,7 +524,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
 
     def teclaPulsada(self, tipo, tecla):
         if self.siMostrarPGN:
-            dic = QTUtil2.dicTeclas()
+            dic = QTUtil2.dic_keys()
             if tecla in dic:
                 self.mueveJugada(dic[tecla])
         if tecla == 82 and tipo == "V":  # R = resign
@@ -1435,7 +1441,7 @@ class WBMT(QTVarios.WDialogo):
         um.final()
 
     def cambiar(self):
-        fbmt = QTUtil2.salvaFichero(
+        fbmt = SelectFiles.salvaFichero(
             self,
             _("Select/create another file of training"),
             self.configuration.ficheroBMT,
@@ -1465,7 +1471,7 @@ class WBMT(QTVarios.WDialogo):
             regActual = dbf.registroActual()
             carpeta = "%s/%s.bm1" % (os.path.dirname(self.configuration.ficheroBMT), dbf.NOMBRE)  # @Lucas: ya tienes este cambio
             filtro = _("File") + " bm1 (*.bm1)"
-            fbm1 = QTUtil2.salvaFichero(self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True)
+            fbm1 = SelectFiles.salvaFichero(self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True)
             if fbm1:
                 if siLimpiar:
                     regActual.ESTADO = "0"
@@ -1520,7 +1526,7 @@ class WBMT(QTVarios.WDialogo):
     def importar(self):
         carpeta = os.path.dirname(self.configuration.ficheroBMT)
         filtro = _("File") + " bm1 (*.bm1)"
-        fbm1 = QTUtil2.leeFichero(self, carpeta, filtro, titulo=_("Import a training"))
+        fbm1 = SelectFiles.leeFichero(self, carpeta, filtro, titulo=_("Import a training"))
         if fbm1:
 
             reg = Util.restore_pickle(fbm1)

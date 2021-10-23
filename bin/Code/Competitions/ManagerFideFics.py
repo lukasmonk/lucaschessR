@@ -5,16 +5,32 @@ import random
 import FasterCode
 
 import Code
-from Code.Openings import Opening
-from Code import Manager
-from Code.Base import Game
 from Code import Adjournments
-from Code.QT import WindowJuicio
-from Code.QT import QTUtil2
-from Code.SQL import Base
+from Code import Manager
 from Code import Util
+from Code.Base import Game
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    RS_WIN_PLAYER,
+    RS_WIN_OPPONENT,
+    RS_DRAW,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_CANCEL,
+    TB_RESIGN,
+    TB_UTILITIES,
+    GT_FICS,
+    GT_FIDE,
+    GT_LICHESS,
+    GO_END,
+)
+from Code.Openings import Opening
+from Code.QT import QTUtil2
+from Code.QT import WindowJuicio
+from Code.SQL import Base
 from Code.SQL import UtilSQL
-from Code.Base.Constantes import *
 
 
 class ManagerFideFics(Manager.Manager):
@@ -176,7 +192,12 @@ class ManagerFideFics(Manager.Manager):
 
     def adjourn(self):
         if len(self.game) > 0 and QTUtil2.pregunta(self.main_window, _("Do you want to adjourn the game?")):
-            dic = {"IDGAME": self.id_game, "POSJUGADAOBJ": self.posJugadaObj, "GAME_SAVE": self.game.save(), "PUNTOS": self.puntos}
+            dic = {
+                "IDGAME": self.id_game,
+                "POSJUGADAOBJ": self.posJugadaObj,
+                "GAME_SAVE": self.game.save(),
+                "PUNTOS": self.puntos,
+            }
 
             with Adjournments.Adjournments() as adj:
                 adj.add(self.game_type, dic, self._titulo)

@@ -673,7 +673,8 @@ class DBgames:
                         conexion.commit()
                         if self.with_db_stat:
                             self.db_stat.commit()
-
+            if dlTmp.is_canceled:
+                break
         dlTmp.actualiza(erroneos + duplicados + importados, erroneos, duplicados, importados, 100.00)
         dlTmp.ponSaving()
 
@@ -693,8 +694,6 @@ class DBgames:
 
     def append_db(self, db, liRecnos, dlTmp):
         erroneos = duplicados = importados = 0
-
-        xtime = time.time()
 
         allows_fen = self.allows_positions
         allows_complete_game = self.allows_complete_game

@@ -497,4 +497,4 @@ class STS:
             f.write("%s\n" % ";".join(li))
         f.close()
 
-        os.startfile(fich)
+        Code.startfile(fich)

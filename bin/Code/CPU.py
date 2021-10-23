@@ -1,9 +1,8 @@
 import collections
 import time
 
-from PySide2 import QtCore
+from PySide2 import QtCore, QtWidgets
 
-from Code.QT import QTUtil
 from Code.MainWindow import Tareas
 
 
@@ -11,7 +10,7 @@ class CPU:
     def __init__(self, main_window):
         self.main_window = main_window
         self.board = main_window.board
-        self.junks = 1000.0 / 36.0
+        self.ms_step = 10
         self.reset()
 
     def reset(self):
@@ -50,13 +49,13 @@ class CPU:
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
+    def borraPiezaSecs(self, a1h8, seconds):
+        tarea = Tareas.TareaBorraPiezaSecs(a1h8, seconds)
+        tarea.enlaza(self)
+        return self.masTarea(tarea, 0, False)
+
     def cambiaPieza(self, a1h8, pieza, padre=0, siExclusiva=False):
         tarea = Tareas.TareaCambiaPieza(a1h8, pieza)
-        tarea.enlaza(self)
-        return self.masTarea(tarea, padre, siExclusiva)
-
-    def muevePiezaLI(self, lista, seconds=1.0, padre=0, siExclusiva=False):
-        tarea = Tareas.TareaMuevePiezaLI(lista, seconds)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
@@ -71,7 +70,7 @@ class CPU:
             del self.timer
         self.timer = QtCore.QTimer(self.main_window)
         self.timer.timeout.connect(self.run)
-        self.timer.start(self.junks)
+        self.timer.start(self.ms_step)
 
     def stop(self):
         if self.timer:
@@ -82,10 +81,9 @@ class CPU:
 
     def runLineal(self):
         self.start()
-
         while self.dicTareas:
-            time.sleep(0.01)
-            QTUtil.refresh_gui()
+             time.sleep(self.ms_step/1000.0)
+             QtWidgets.QApplication.processEvents()
 
     def run(self):
         li = sorted(self.dicTareas.keys())
@@ -112,3 +110,5 @@ class CPU:
 
         if len(self.dicTareas) == 0:
             self.stop()
+        QtWidgets.QApplication.processEvents()
+

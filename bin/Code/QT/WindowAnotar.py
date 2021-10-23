@@ -1,13 +1,11 @@
 from Code.Base import Game
-
-from Code.SQL import UtilSQL
 from Code.QT import Colocacion
 from Code.QT import Columnas
-from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.SQL import UtilSQL
 
 
 class WAnotar(QTVarios.WDialogo):
@@ -42,7 +40,7 @@ class WAnotar(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
         )
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         ly = Colocacion.V().control(tb).control(self.glista).margen(4)
 

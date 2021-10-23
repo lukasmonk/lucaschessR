@@ -40,6 +40,9 @@ if is_linux:
         ssl._create_default_https_context = ssl._create_unverified_context
     startfile = os.system
 else:
+    if not sys.argv[0].endswith(".py"):
+        os.environ["QT_PLUGIN_PATH"] = os.path.join(current_dir, "extlibs", "PySide2", "plugins")
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(current_dir, "extlibs", "PySide2", "plugins", "platform")
     startfile = os.startfile
 
 dgt = None
@@ -77,7 +80,7 @@ def relative_root(path):
 
 
 BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R 1.27a"
+VERSION = "R 1.28"
 DEBUG = False
 DEBUG_ENGINE = False
 

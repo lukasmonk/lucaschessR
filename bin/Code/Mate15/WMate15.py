@@ -37,7 +37,7 @@ class WMate15(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
         )
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         ly = Colocacion.V().control(tb).control(self.glista).margen(4)
 

@@ -1,14 +1,24 @@
-import time
 import random
+import time
 
 import Code
 from Code import Manager
-from Code.Base import Game, Move, Position
-from Code.QT import QTVarios
-from Code.QT import QTUtil2
-from Code.QT import Iconos
 from Code import Util
-from Code.Base.Constantes import *
+from Code.Base import Game, Move, Position
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_HELP,
+    TB_LEVEL,
+    TB_QUIT,
+    TB_RESIGN,
+)
+from Code.QT import Iconos
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
 
 
 class PositionMate:

@@ -1,10 +1,10 @@
 from PySide2 import QtWidgets, QtCore
 
+from Code.Databases import WDB_Games, WDB_Summary, WDB_Players, WDB_InfoMove, DBgames
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code.Databases import WDB_Games, WDB_Summary, WDB_Players, WDB_InfoMove, DBgames, WDB_Analysis
 
 
 class WBDatabase(QTVarios.WDialogo):

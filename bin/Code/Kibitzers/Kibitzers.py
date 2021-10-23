@@ -1,12 +1,22 @@
 from PySide2 import QtGui
 
-from Code import Util
-from Code.Engines import Engines
 import Code
+from Code import Util
+from Code.Base.Constantes import (
+    KIB_GAVIOTA,
+    KIB_INDEXES,
+    KIB_POLYGLOT,
+    KIB_AFTER_MOVE,
+    KIB_THREATS,
+    KIB_BEFORE_MOVE,
+    KIB_CANDIDATES,
+    KIB_BESTMOVE_ONELINE,
+    KIB_BESTMOVE,
+    KIB_STOCKFISH,
+)
+from Code.Engines import Engines
 from Code.Engines import Priorities
 from Code.QT import Iconos
-
-from Code.Base.Constantes import *
 
 
 def cb_pointofview_options():
@@ -31,7 +41,9 @@ class Tipos:
         return [(label, key) for key, label, pm in self.li_tipos]
 
     def comboSinIndices(self):
-        return [(label, key) for key, label, pm in self.li_tipos if not (key in (KIB_INDEXES, KIB_GAVIOTA, KIB_POLYGLOT))]
+        return [
+            (label, key) for key, label, pm in self.li_tipos if not (key in (KIB_INDEXES, KIB_GAVIOTA, KIB_POLYGLOT))
+        ]
 
     def texto(self, tipo):
         for tp, nom, pm in self.li_tipos:

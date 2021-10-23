@@ -2,18 +2,19 @@ import os
 
 from PySide2 import QtWidgets
 
-from Code.Kibitzers import Kibitzers
 from Code.Engines import Priorities
+from Code.Kibitzers import Kibitzers
 from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
-from Code.QT import Grid
-from Code.QT import Iconos
-from Code.QT import QTVarios
-from Code.QT import QTUtil2
 from Code.QT import Delegados
 from Code.QT import FormLayout
+from Code.QT import Grid
+from Code.QT import Iconos
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
+from Code.QT import SelectFiles
 
 
 class WKibitzers(QTVarios.WDialogo):
@@ -50,7 +51,7 @@ class WKibitzers(QTVarios.WDialogo):
             (_("External engines"), Iconos.Motores(), self.ext_engines),
             None,
         )
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         self.splitter = QtWidgets.QSplitter(self)
         self.register_splitter(self.splitter, "kibitzers")
@@ -235,7 +236,7 @@ class WKibitzers(QTVarios.WDialogo):
                 self.polyglot_install(list_books)
 
     def polyglot_install(self, list_books):
-        fbin = QTUtil2.leeFichero(self, list_books.path, "bin", titulo=_("Polyglot book"))
+        fbin = SelectFiles.leeFichero(self, list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
             list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
@@ -415,7 +416,7 @@ class WKibitzerLive(QTVarios.WDialogo):
         self.liOriginal = self.leeOpciones()
 
         li_acciones = ((_("Save"), Iconos.Grabar(), self.grabar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None)
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("CAMPO", _("Label"), 152, siDerecha=True)

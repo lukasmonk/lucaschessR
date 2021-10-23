@@ -3,16 +3,16 @@ import time
 from PySide2 import QtGui
 
 import Code
-from Code.TurnOnLights import TurnOnLights
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import QTVarios
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
+from Code.QT import QTVarios
+from Code.TurnOnLights import TurnOnLights
 
 
 class WTurnOnLights(QTVarios.WDialogo):

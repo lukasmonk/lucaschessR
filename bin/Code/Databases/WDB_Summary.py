@@ -1,7 +1,8 @@
 from PySide2 import QtWidgets
 
-from Code.Openings import OpeningsStd
 from Code.Base import Game
+from Code.Databases import WDB_Analysis
+from Code.Openings import OpeningsStd
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -12,7 +13,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Databases import WDB_Analysis
 
 
 class WSummary(QtWidgets.QWidget):
@@ -261,13 +261,16 @@ class WSummary(QtWidgets.QWidget):
                 self.actualizaPV(pv)
                 self.cambiaInfoMove()
 
-    def reindexar(self, depth=None):
-        if depth is None or self.wb_database.is_temporary:
+    def reindexar(self):
+        return self.reindexar_question(self.dbGames.depth_stat(), True)
+
+    def reindexar_question(self, depth, question):
+        if question or self.wb_database.is_temporary:
             # if not QTUtil2.pregunta(self, _("Do you want to rebuild stats?")):
             #     return
 
             li_gen = [(None, None)]
-            li_gen.append((None, _("Select the number of moves <br> for each game to be considered")))
+            li_gen.append((None, _("Select the number of half-moves <br> for each game to be considered")))
             li_gen.append((None, None))
 
             config = FormLayout.Spinbox(_("Depth"), 0, 255, 50)

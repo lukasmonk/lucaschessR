@@ -6,12 +6,13 @@ def gb_style():
         border: 1px solid gray;
         border-radius: 3px;
         padding: 18px;
-        margin-top: 5ex; /* leave space at the top for the title */
+        margin-top: 15px; /* leave space at the top for the title */
     }
     QGroupBox::title {
         subcontrol-origin: margin;
         subcontrol-position: top left; /* position at the top center */
         padding: 8px;
+        margin-top: 2px;
         border: 1px solid gray;
      }
 """

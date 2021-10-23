@@ -2,14 +2,14 @@ import os
 
 from PySide2 import QtCore, QtGui, QtWidgets, QtSvg
 
+import Code
+from Code import Util
 from Code.QT import Colocacion
 from Code.QT import Controles
+from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import FormLayout
-from Code import Util
-import Code
 
 
 class WDialogo(QtWidgets.QDialog):
@@ -55,28 +55,16 @@ class WDialogo(QtWidgets.QDialog):
     def restore_dicvideo(self):
         return Code.configuration.restore_video(self.key_video)
 
-    def restore_video(self, siTam=True, anchoDefecto=None, altoDefecto=None, dicDef=None):
+    def restore_video(self, siTam=True, anchoDefecto=None, altoDefecto=None, dicDef=None, shrink=False):
         dic = self.restore_dicvideo()
         if not dic:
             dic = dicDef
-        wE, hE = QTUtil.tamEscritorio()
+
+        if QtWidgets.QDesktopWidget().screenCount() > 1:
+            wE = hE = 1024*1024
+        else:
+            wE, hE = QTUtil.tamEscritorio()
         if dic:
-            if "_POSICION_" in dic:
-                x, y = dic["_POSICION_"].split(",")
-                x = int(x)
-                y = int(y)
-                if not (0 <= x <= (wE - 50)):
-                    x = 0
-                if not (0 <= y <= (hE - 50)):
-                    y = 0
-                self.move(x, y)
-            for grid in self.liGrids:
-                grid.restore_video(dic)
-                grid.releerColumnas()
-            for sp, name in self.liSplitters:
-                k = "SP_%s" % name
-                if k in dic:
-                    sp.setSizes(dic[k])
             if siTam:
                 if not ("_SIZE_" in dic):
                     w, h = self.width(), self.height()
@@ -96,6 +84,24 @@ class WDialogo(QtWidgets.QDialog):
                 elif h < 20:
                     h = 20
                 self.resize(w, h)
+            for grid in self.liGrids:
+                grid.restore_video(dic)
+                grid.releerColumnas()
+            for sp, name in self.liSplitters:
+                k = "SP_%s" % name
+                if k in dic:
+                    sp.setSizes(dic[k])
+            if shrink:
+                QTUtil.shrink(self)
+            if "_POSICION_" in dic:
+                x, y = dic["_POSICION_"].split(",")
+                x = int(x)
+                y = int(y)
+                if not (0 <= x <= (wE - 50)):
+                    x = 0
+                if not (0 <= y <= (hE - 50)):
+                    y = 0
+                self.move(x, y)
             return True
         else:
             if anchoDefecto or altoDefecto:
@@ -512,6 +518,14 @@ def rondoColores(shuffle=True):
     return nico
 
 
+def rondoFolders(shuffle=True):
+    nico = Util.Rondo(Iconos.FolderAnil(), Iconos.FolderBlack(), Iconos.FolderBlue(), Iconos.FolderGreen(),
+                      Iconos.FolderMagenta(), Iconos.FolderRed())
+    if shuffle:
+        nico.shuffle()
+    return nico
+
+
 class LCMenu(Controles.Menu):
     def __init__(self, parent, puntos=None):
         configuration = Code.configuration
@@ -519,6 +533,16 @@ class LCMenu(Controles.Menu):
             puntos = configuration.x_menu_points
         bold = configuration.x_menu_bold
         Controles.Menu.__init__(self, parent, puntos=puntos, siBold=bold)
+
+    def opcion(self, key, label, icono=None, is_disabled=False, tipoLetra=None, siChecked=False, toolTip: str = ""):
+        if icono is None:
+            icono = Iconos.Empty()
+
+        Controles.Menu.opcion(self, key, label, icono, is_disabled, tipoLetra, siChecked, toolTip)
+
+    def separador_blank(self):
+        self.opcion(None, "")
+
 
 
 class LCMenuRondo(LCMenu):
@@ -760,36 +784,6 @@ class MensajeFide(QtWidgets.QDialog):
             self.accept()
         self.siFinalizado = True
         QTUtil.refresh_gui()
-
-
-def select_pgn(wowner):
-    configuration = Code.configuration
-    path = QTUtil2.leeFichero(wowner, configuration.pgn_folder(), "pgn")
-    if path:
-        carpeta, file = os.path.split(path)
-        configuration.save_pgn_folder(carpeta)
-    return path
-
-
-def select_pgns(wowner):
-    configuration = Code.configuration
-    files = QTUtil2.leeFicheros(wowner, configuration.pgn_folder(), "pgn")
-    if files:
-        path = files[0]
-        carpeta, file = os.path.split(path)
-        configuration.save_pgn_folder(carpeta)
-    return files
-
-
-def select_ext(wowner, ext):
-    configuration = Code.configuration
-    path = QTUtil2.leeFichero(wowner, configuration.x_save_folder, ext)
-    if path:
-        carpeta, file = os.path.split(path)
-        if configuration.x_save_folder != carpeta:
-            configuration.x_save_folder = carpeta
-            configuration.graba()
-    return path
 
 
 def list_irina():

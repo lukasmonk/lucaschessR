@@ -1,19 +1,19 @@
-import os
 import encodings
+import os
+
 from PySide2 import QtWidgets, QtCore
 
-from Code.QT import Voyager
 from Code.Base import Game, Position
-
-from Code.QT import Colocacion
-from Code.QT import Controles
-from Code.QT import Iconos
-from Code.QT import QTVarios
 from Code.Board import Board
+from Code.QT import Colocacion
 from Code.QT import Columnas
-from Code.QT import Grid
+from Code.QT import Controles
 from Code.QT import Delegados
-from Code.QT import QTUtil2
+from Code.QT import Grid
+from Code.QT import Iconos
+from Code.QT import QTUtil2, SelectFiles
+from Code.QT import QTVarios
+from Code.QT import Voyager
 
 
 class WManualSave(QTVarios.WDialogo):
@@ -287,7 +287,7 @@ class WManualSave(QTVarios.WDialogo):
 
     def pgn_select(self):
         dirSalvados = self.configuration.x_save_folder
-        path = QTUtil2.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PGN (*.pgn)", False)
+        path = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PGN (*.pgn)", False)
         if path:
             carpeta, file = os.path.split(path)
             if carpeta != self.configuration.x_save_folder:
@@ -304,7 +304,7 @@ class WManualSave(QTVarios.WDialogo):
 
     def fns_select(self):
         dir_inicial = self.configuration.personal_training_folder if self.fns is None else os.path.dirname(self.fns)
-        path = QTUtil2.salvaFichero(self, _("File to save"), dir_inicial, _("File") + " FNS (*.fns)", False)
+        path = SelectFiles.salvaFichero(self, _("File to save"), dir_inicial, _("File") + " FNS (*.fns)", False)
         if path:
             self.fns = path
             self.bt_fns.set_text(path)

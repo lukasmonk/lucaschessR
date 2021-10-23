@@ -2,19 +2,20 @@ import os.path
 import random
 import time
 
+from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Move, Position, Game
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import WindowPotencia
+from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import Util
+from Code.QT import WindowPotencia
 from Code.SQL import UtilSQL
 
 
@@ -257,7 +258,7 @@ class WDailyTest(QTVarios.WDialogo):
         self.setLayout(ly)
 
         self.position = Position.Position()
-        self.restore_video()
+        self.restore_video(shrink=True)
 
         self.play_next_move()
 
@@ -294,6 +295,7 @@ class WDailyTest(QTVarios.WDialogo):
         self.tb.update()
 
     def play_next_move(self):
+        QTUtil.shrink(self)
         self.pon_toolbar(["abandonar"])
 
         if self.juego == self.nFens:
@@ -401,7 +403,7 @@ class WDailyTest(QTVarios.WDialogo):
         if promotion:
             movimiento += promotion
 
-        game = Game.Game(ini_posicion=self.position)
+        game = Game.Game(first_position=self.position)
         ok, mens, self.move = Move.get_game_move(game, self.position, from_sq, to_sq, promotion)
         if ok:
             self.board.set_position(self.move.position)

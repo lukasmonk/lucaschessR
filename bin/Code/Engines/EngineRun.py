@@ -1,20 +1,19 @@
-import sys
-import signal
-
 import os
-import time
-import subprocess
-import threading
-import psutil
 import random
+import signal
+import subprocess
+import sys
+import threading
+import time
 
+import psutil
 from PySide2 import QtCore
 
 import Code
-from Code.Engines import Priorities
-from Code.Engines import EngineResponse
-from Code.Polyglots import Books
 from Code import Util
+from Code.Engines import EngineResponse
+from Code.Engines import Priorities
+from Code.Polyglots import Books
 from Code.QT import QTUtil2
 
 
@@ -143,9 +142,10 @@ class RunEngine:
     def xstdout_thread_base(self, stdout, lock):
         try:
             while self.working:
-                line = stdout.readline().decode()
+                line = stdout.readline()
                 if not line:
                     break
+                line = str(line, "latin-1", "ignore")
                 lock.acquire()
                 self.liBuffer.append(line)
                 if self.direct_dispatch:
@@ -163,10 +163,11 @@ class RunEngine:
     def xstdout_thread_debug(self, stdout, lock):
         try:
             while self.working:
-                line = stdout.readline().decode()
+                line = stdout.readline()
                 if not line:
                     break
-                xpr(self.name, line)
+                line = str(line, "latin-1", "ignore")
+                prlk(self.name, line)
                 lock.acquire()
                 self.liBuffer.append(line)
                 if self.direct_dispatch:
@@ -189,7 +190,9 @@ class RunEngine:
         curdir = os.path.abspath(os.curdir)  # problem with "." as curdir
         os.chdir(self.direxe)  # to fix problems with non ascii folders
 
-        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo)
+        self.process = subprocess.Popen(
+            self.args, stdout=subprocess.PIPE, stdin=subprocess.PIPE, startupinfo=startupinfo
+        )
         os.chdir(curdir)
 
         self.pid = self.process.pid
@@ -596,11 +599,11 @@ class RunEngine:
 
 
 class MaiaEngine(RunEngine):
-    def __init__(self, name, exe, liOpcionesUCI=None, num_multipv=0, priority=None, args=None, log=None):
+    def __init__(self, name, exe, liOpcionesUCI=None, num_multipv=0, priority=None, args=None, log=None, level=0):
         RunEngine.__init__(self, name, exe, liOpcionesUCI, num_multipv, priority, args, log)
         self.stopping = False
+        self.level = level
 
-        level = int(name[5:])
         book_name = "1100-1500.bin" if level <= 1500 else "1600-1900.bin"
         book_path = os.path.join(os.path.dirname(exe), book_name)
         self.book = Books.Book("P", book_name, book_path, True)
@@ -613,8 +616,11 @@ class MaiaEngine(RunEngine):
         self.book_select.extend(["ap"] * ap)
         self.book_select.extend(["au"] * au)
 
+        dic_nodes = {1100: 1, 1200: 3, 1300: 6, 1400: 16, 1500: 39, 1600: 98, 1700: 244, 1800: 610, 1900: 1526}
+        self.nodes = dic_nodes.get(level, 1)
+
     def simulate_time(self, ms_time):
-        if ms_time:
+        if ms_time and ms_time > 0:
             tini = time.time()
             while not (self.stopping or (time.time() - tini) * 1000 > ms_time):
                 QtCore.QCoreApplication.processEvents()
@@ -624,7 +630,7 @@ class MaiaEngine(RunEngine):
     def seek_bestmove(self, max_time, max_depth, is_savelines):
         tini = time.time()
         self.stopping = False
-        env = "go nodes 1"
+        env = "go nodes %d" % self.nodes
         ms_time = 10000
         if max_time:
             ms_time = max_time + 3000
@@ -647,7 +653,7 @@ class MaiaEngine(RunEngine):
     def seek_bestmove_time(self, time_white, time_black, inc_time_move):
         tini = time.time()
         self.stopping = False
-        env = "go nodes 1"
+        env = "go nodes %d" % self.nodes
         max_time = time_white if self.is_white else time_black
 
         self.reset()
@@ -663,7 +669,7 @@ class MaiaEngine(RunEngine):
 
     def play_bestmove_time(self, play_return, game, time_white, time_black, inc_time_move):
         self.stopping = False
-        env = "go nodes 1"
+        env = "go nodes %d" % self.nodes
         max_time = time_white if self.is_white else time_black
         if time_white > 60000 and time_black > 60000:
             time_simulate = min(time_white / 40, random.randint(1000, 15000))
@@ -673,7 +679,7 @@ class MaiaEngine(RunEngine):
 
     def play_bestmove_game(self, play_return, game, max_time, max_depth):
         self.stopping = False
-        env = "go nodes 1"
+        env = "go nodes %d" % self.nodes
         time_simulate = max_time
         self.play_with_return_maia(play_return, game, env, max_time, max_depth, time_simulate)
 
@@ -683,9 +689,9 @@ class MaiaEngine(RunEngine):
             if time_simulate:
                 time_simulate /= 3
         else:
-            self.mrm.setTimeDepth(max_time, max_depth)
+            self.mrm.setTimeDepth(max_time, 1)
             self.set_game_position(game)
-            self.work_bestmove(line, 5000)
+            self.work_bestmove(line, 25000)
             self.mrm.ordena()
         self.simulate_time(time_simulate)
         play_return(self.mrm)

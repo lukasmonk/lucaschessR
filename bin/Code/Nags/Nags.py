@@ -1,9 +1,11 @@
-import os
 import collections
+import os
 
 import Code
+from Code.Base.Constantes import (
+    dicHTMLnags,
+)
 from Code.QT import QTVarios
-from Code.Base.Constantes import *
 
 
 class Nags:

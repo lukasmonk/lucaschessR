@@ -3,10 +3,11 @@ import shutil
 import sqlite3
 
 import FasterCode
+
 import Code
-from Code.SQL import UtilSQL
 from Code import Util
 from Code.QT import QTUtil2
+from Code.SQL import UtilSQL
 
 
 class DBPolyglot:
@@ -181,12 +182,12 @@ class IndexPolyglot:
             if entry_file.name.lower().endswith(".dbbin") or entry_file.name.lower().endswith(".mkbin"):  # antiguo
                 st_antiguos.add(entry_file.path[:-5])
         for st_antiguo in st_antiguos:
-            with DBPolyglot(st_antiguo + "lcbin") as db:
+            with DBPolyglot(st_antiguo + "lcbin"):
                 pass
         um.final()
 
     def update_soft(self):
-        changed = False
+        # changed = False
         li_resp = []
         for entry_file in os.scandir(self.folder):
             if not (entry_file.is_file()) or not entry_file.name.endswith("lcbin"):

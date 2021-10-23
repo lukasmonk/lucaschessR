@@ -7,11 +7,37 @@ import Code
 from Code import Adjournments
 from Code import DGT
 from Code import Manager
-from Code.Tutor import Tutor
 from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game, Move, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_CANCEL,
+    TB_CONTINUE,
+    TB_DRAW,
+    TB_HELP_TO_MOVE,
+    TB_PAUSE,
+    TB_QUIT,
+    TB_RESIGN,
+    TB_STOP,
+    TB_UTILITIES,
+    GT_AGAINST_ENGINE,
+    RESULT_WIN_BLACK,
+    RESULT_WIN_WHITE,
+    TERMINATION_RESIGN,
+    TERMINATION_WIN_ON_TIME,
+    WHITE,
+    BLACK,
+    ADJUST_BETTER,
+    ADJUST_SELECTED_BY_PLAYER,
+    ST_PAUSE
+)
 from Code.Engines import EngineResponse, SelectEngines
 from Code.Openings import Opening
 from Code.PlayAgainstEngine import WPlayAgainstEngine, Personalities
@@ -20,6 +46,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.Tutor import Tutor
 
 
 class ManagerPlayAgainstEngine(Manager.Manager):
@@ -65,6 +92,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     toolbar_state = None
     premove = None
     last_time_show_arrows = None
+    rival_is_thinking = False
 
     def start(self, dic_var):
         self.base_inicio(dic_var)
@@ -87,6 +115,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.game_type = GT_AGAINST_ENGINE
 
         self.human_is_playing = False
+        self.rival_is_thinking = False
         self.plays_instead_of_me_option = True
         self.state = ST_PLAYING
         self.is_analyzing = False
@@ -408,7 +437,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.rendirse()
 
         elif key == TB_DRAW:
-            self.tablasPlayer()
+            if self.tablasPlayer():
+                self.muestra_resultado()
 
         elif key == TB_TAKEBACK:
             self.takeback()
@@ -556,6 +586,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.xrival.check_engine()
             self.start_message()
 
+        self.pgnRefresh(not self.is_engine_side_white)
         self.play_next_move()
 
     def xpause(self):
@@ -645,7 +676,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def takeback(self):
         if len(self.game):
-            self.analizaTerminar()
+            if self.is_analyzing:
+                self.is_analyzing = False
+                self.xtutor.stop()
             if self.hints:
                 self.hints -= 1
                 self.tutor_con_flechas = self.nArrowsTt > 0 and self.hints > 0
@@ -684,6 +717,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.state = ST_PLAYING
 
         self.human_is_playing = False
+        self.rival_is_thinking = False
         self.put_view()
 
         is_white = self.game.is_white()
@@ -739,7 +773,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             return
         if self.is_analyzed_by_tutor:
             return
-        estado = self.is_analyzing
+        # estado = self.is_analyzing
         self.is_analyzing = False
         if not self.tutor_con_flechas:
             if self.is_analyzed_by_tutor or not self.is_tutor_enabled or self.ayudas_iniciales <= 0:
@@ -829,6 +863,12 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.reloj_start(True)
         self.timekeeper.start()
         self.human_is_playing = True
+        last_position = self.game.last_position
+        si_changed, from_sq, to_sq = self.board.piece_out_position(last_position)
+        if si_changed:
+            self.board.set_position(last_position)
+            if from_sq:
+                self.premove = from_sq, to_sq
         if self.premove:
             from_sq, to_sq = self.premove
             promotion = "q" if self.game.last_position.siPeonCoronando(from_sq, to_sq) else None
@@ -848,6 +888,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.reloj_start(False)
         self.timekeeper.start()
         self.human_is_playing = False
+        self.rival_is_thinking = True
         self.rm_rival = None
         self.pon_toolbar()
         if not self.is_tutor_enabled:
@@ -917,6 +958,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.play_rival(self.main_window.dato_notify)
 
     def play_rival(self, rm_rival):
+        self.rival_is_thinking = False
         self.reloj_stop(False)
         self.thinking(False)
         time_s = self.timekeeper.stop()
@@ -924,8 +966,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
         if self.state in (ST_ENDGAME, ST_PAUSE):
             return self.state == ST_ENDGAME
+        with_cache = True
         if self.nAjustarFuerza == ADJUST_SELECTED_BY_PLAYER and hasattr(rm_rival, "li_rm"):
             rm_rival = self.ajustaPlayer(rm_rival)
+            with_cache = False
 
         self.lirm_engine.append(rm_rival)
         if not self.valoraRMrival():
@@ -940,9 +984,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
 
-            if self.siTiempo:
-                move.cacheTime = self.vtime[self.is_engine_side_white].save()
-            self.cache[fen_ultimo] = move
+            if with_cache:
+                if self.siTiempo:
+                    move.cacheTime = self.vtime[self.is_engine_side_white].save()
+                self.cache[fen_ultimo] = move
             self.play_next_move()
             return True
 
@@ -996,7 +1041,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         return Manager.Manager.juegaPorMi(self)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
-        if not self.human_is_playing:
+        if self.rival_is_thinking:
             return self.check_premove(from_sq, to_sq)
         move = self.check_human_move(from_sq, to_sq, promotion, not self.is_tutor_enabled)
         if not move:

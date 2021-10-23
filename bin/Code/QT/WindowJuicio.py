@@ -1,7 +1,9 @@
 from PySide2 import QtCore, QtWidgets
 
+from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -10,8 +12,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import Util
 
 
 class WJuicio(QTVarios.WDialogo):

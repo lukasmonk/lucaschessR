@@ -5,7 +5,9 @@ import time
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
-from Code.SQL import UtilSQL
+from Code import Util
+from Code.Board import BoardElements, BoardTypes
+from Code.Translations import TrListas
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -14,10 +16,9 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import BoardElements, BoardTypes
+from Code.QT import SelectFiles
+from Code.SQL import UtilSQL
 from Code.Sound import Sound
-from Code.Config import TrListas
-from Code import Util
 
 
 class MesaSonido(QtWidgets.QGraphicsView):
@@ -326,7 +327,7 @@ class WEdicionSonido(QTVarios.WDialogo):
 
     def wav(self):
         carpeta = Util.restore_pickle(self.confich)
-        file = QTUtil2.leeFichero(self, carpeta, "wav")
+        file = SelectFiles.leeFichero(self, carpeta, "wav")
         if file:
             carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
@@ -339,7 +340,7 @@ class WEdicionSonido(QTVarios.WDialogo):
     def grabar(self):
         carpeta = Util.restore_pickle(self.confich)
         filtro = _("File") + " wav (*.wav)"
-        file = QTUtil2.salvaFichero(self, _("Save wav"), carpeta, filtro, siConfirmarSobreescritura=True)
+        file = SelectFiles.salvaFichero(self, _("Save wav"), carpeta, filtro, siConfirmarSobreescritura=True)
         if file:
             carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
@@ -543,11 +544,11 @@ class WSonidos(QTVarios.WDialogo):
 
         self.liSonidos.append([None, "", None])
         self.liSonidos.append(["ZEITNOT", _("Zeitnot"), None])
+        self.liSonidos.append(["ERROR", _("Error"), None])
 
         # for c in "abcdefgh":
         # for f in "12345678":
         # self.liSonidos.append( [ c+f, c+f, None ] )
-
 
 class WSonidosGuion(QTVarios.WDialogo):
     def __init__(self, owner, db):

@@ -1,25 +1,25 @@
 import random
 import time
-import FasterCode
 
+import FasterCode
 from PySide2 import QtWidgets, QtCore
 
 from Code.Base import Game, Move
-from Code.QT import Colocacion
-from Code.QT import Controles
-from Code.QT import Columnas
-from Code.QT import Grid
-from Code.QT import Iconos
-from Code.QT import QTVarios
 from Code.Board import Board
-from Code.QT import QTUtil
-from Code.QT import QTUtil2
-from Code.QT import Voyager
-from Code.QT import FormLayout
 from Code.Databases import DBgames
 from Code.Endings import EndingsGTB
 from Code.Endings import LibChess
-
+from Code.QT import Colocacion
+from Code.QT import Columnas
+from Code.QT import Controles
+from Code.QT import FormLayout
+from Code.QT import Grid
+from Code.QT import Iconos
+from Code.QT import QTUtil
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
+from Code.QT import SelectFiles
+from Code.QT import Voyager
 
 PLAY_STOP, PLAY_NEXT_SOLVED, PLAY_NEXT_BESTMOVES = range(3)
 
@@ -293,7 +293,6 @@ class WEndingsGTB(QTVarios.WDialogo):
                 return ""
             if key == "MATE":
                 tok = self.db.current_fen_field(row, "TRIES_OK")
-                tr = self.db.current_fen_field(row, "TRIES")
                 if data == 0:
                     return _("Draw")
                 else:
@@ -583,7 +582,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             QTUtil2.message_error(self, _("Nothing to import"))
 
     def import_pgn(self):
-        li_path_pgn = QTVarios.select_pgns(self)
+        li_path_pgn = SelectFiles.select_pgns(self)
         if not li_path_pgn:
             return
         um = QTUtil2.unMomento(self, _("Working..."))
@@ -631,7 +630,7 @@ class WEndingsGTB(QTVarios.WDialogo):
             self.board.activate_side(self.game.last_position.is_white)
 
     def import_fns(self):
-        path_fich = QTUtil2.leeFichero(self, "", "*")
+        path_fich = SelectFiles.leeFichero(self, "", "*")
         if path_fich:
             um = QTUtil2.unMomento(self, _("Working..."))
             li_fens = []

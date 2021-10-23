@@ -1,17 +1,17 @@
+import struct
+
+import psutil
 from PySide2 import QtCore, QtGui, QtWidgets
 
-import struct
-import psutil
-
-from Code.Base import Game, Position
 import Code
+from Code.Base import Game
 from Code.Engines import EngineRun
+from Code.Kibitzers import WindowKibitzers
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.Kibitzers import WindowKibitzers
 
 
 class EDP(Controles.ED):
@@ -113,7 +113,7 @@ class WKibLinea(QtWidgets.QDialog):
                 rm = mrm.rmBest()
                 if rm and rm.depth > self.depth:
                     self.depth = rm.depth
-                    game = Game.Game(ini_posicion=self.game.last_position)
+                    game = Game.Game(first_position=self.game.last_position)
                     game.read_pv(rm.pv)
                     if len(game):
                         self.em.ponHtml("[%02d] %s | %s" % (rm.depth, rm.abrTexto(), game.pgnBaseRAW()))

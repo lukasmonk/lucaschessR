@@ -1,10 +1,19 @@
 import time
 
-from Code import Util
-from Code.SQL import UtilSQL
 from Code import Manager
+from Code import Util
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_CANCEL,
+    TB_UTILITIES,
+    GT_NOTE_DOWN,
+)
 from Code.QT import QTVarios
-from Code.Base.Constantes import *
+from Code.SQL import UtilSQL
 
 
 class ManagerAnotar(Manager.Manager):
@@ -149,7 +158,7 @@ class ManagerAnotar(Manager.Manager):
         if numjug > 0:
             self.set_label2(
                 '%s: <b>%d</b><br>%s: %0.2f"<br>%s: <b>%d</b><br>%s: <b>%d</b>'
-                % (_("Moves"), numjug, _("Average time"), self.vtime / numjug, _("Errors"), self.errores, _("Hints"), self.ayudas_recibidas)
+                % (_("Half-moves"), numjug, _("Average time"), self.vtime / numjug, _("Errors"), self.errores, _("Hints"), self.ayudas_recibidas)
             )
             if numjug > 2:
                 db = UtilSQL.DictSQL(self.configuration.ficheroAnotar)

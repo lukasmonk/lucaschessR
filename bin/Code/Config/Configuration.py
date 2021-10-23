@@ -7,10 +7,11 @@ from PySide2.QtCore import Qt
 
 import Code
 from Code.Board import ConfBoards
-from Code.Config import Translate, TrListas
+from Code.Translations import Translate, TrListas
 from Code import Util
 from Code.QT import QTUtil
 from Code.SQL import UtilSQL
+from Code.Engines import Priorities
 from Code.Base.Constantes import MENU_PLAY_BOTH, POS_TUTOR_HORIZONTAL
 
 import OSEngines  # in OS folder
@@ -181,6 +182,8 @@ class Configuration:
         self.x_style = "WindowsVista" if Code.is_windows else "Fusion"
         self.x_tutor_view = POS_TUTOR_HORIZONTAL
 
+        self.x_enable_highdpiscaling = True
+
         self.x_show_effects = False
         self.x_pieces_speed = 100
         self.x_save_tutor_variations = True
@@ -216,9 +219,9 @@ class Configuration:
         self.x_pgn_selbackground = None
         self.x_pgn_headerbackground = None
 
-        self.x_pgn_width = 400
+        self.x_pgn_width = 348
         self.x_pgn_fontpoints = 11
-        self.x_pgn_rowheight = 28
+        self.x_pgn_rowheight = 24
         self.x_pgn_withfigurines = True
 
         self.x_pgn_english = False
@@ -245,11 +248,13 @@ class Configuration:
         self.x_tutor_difporc = 0
         self.x_tutor_mstime = 3000
         self.x_tutor_depth = 0
+        self.x_tutor_priority = Priorities.priorities.low
 
         self.x_sound_beep = False
         self.x_sound_our = False
         self.x_sound_move = False
         self.x_sound_results = False
+        self.x_sound_error = False
 
         self.x_interval_replay = 1400
 

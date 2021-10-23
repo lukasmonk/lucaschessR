@@ -3,24 +3,36 @@ import time
 
 from PySide2 import QtWidgets
 
-from Code.Config import Configuration
-
+import Code
 from Code import Util
 from Code.Base import Game
-from Code.Openings import OpeningsStd
+from Code.Base.Constantes import (
+    KIB_GAVIOTA,
+    KIBRUN_GAME,
+    KIBRUN_STOP,
+    KIBRUN_CLOSE,
+    KIB_BEFORE_MOVE,
+    KIB_BESTMOVE,
+    KIB_BESTMOVE_ONELINE,
+    KIB_CANDIDATES,
+    KIB_INDEXES,
+    KIB_POLYGLOT,
+    KIB_STOCKFISH,
+    KIB_THREATS,
+    KIBRUN_CONFIGURATION,
+)
+from Code.Config import Configuration
 from Code.Engines import Priorities
-from Code.SQL import UtilSQL
-import Code
 from Code.Kibitzers import Kibitzers
-from Code.Kibitzers import WKibEngine
-from Code.Kibitzers import WKibLinea
 from Code.Kibitzers import WKibBooks
-from Code.Kibitzers import WKibIndex
-from Code.Kibitzers import WKibStEval
+from Code.Kibitzers import WKibEngine
 from Code.Kibitzers import WKibGaviota
+from Code.Kibitzers import WKibIndex
+from Code.Kibitzers import WKibLinea
+from Code.Kibitzers import WKibStEval
+from Code.Openings import OpeningsStd
 from Code.QT import QTUtil
-
-from Code.Base.Constantes import *
+from Code.SQL import UtilSQL
 
 
 class Orden:
@@ -99,7 +111,7 @@ class CPU:
             if self.tipo == KIB_THREATS:
                 last_position = game.last_position
                 last_position.is_white = not last_position.is_white
-                game_thread = Game.Game(ini_posicion=last_position)
+                game_thread = Game.Game(first_position=last_position)
                 self.ventana.orden_game(game_thread)
             else:
                 self.ventana.orden_game(game)

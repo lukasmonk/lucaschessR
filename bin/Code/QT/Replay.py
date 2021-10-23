@@ -1,5 +1,13 @@
 import Code
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    TB_CONTINUE_REPLAY,
+    TB_END_REPLAY,
+    TB_FAST_REPLAY,
+    TB_PAUSE_REPLAY,
+    TB_PGN_REPLAY,
+    TB_REPEAT_REPLAY,
+    TB_SLOW_REPLAY,
+)
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil
@@ -123,24 +131,23 @@ class Replay:
         # primero los movimientos
         for movim in liMovs:
             if movim[0] == "m":
+                from_sq, to_sq = movim[1], movim[2]
                 if secs is None:
-                    from_sq, to_sq = movim[1], movim[2]
                     dc = ord(from_sq[0]) - ord(to_sq[0])
                     df = int(from_sq[1]) - int(to_sq[1])
                     # Maxima distancia = 9.9 ( 9,89... sqrt(7**2+7**2)) = 4 seconds
                     dist = (dc ** 2 + df ** 2) ** 0.5
                     rp = self.rapidez if self.rapidez > 1.0 else 1.0
                     secs = 4.0 * dist / (9.9 * rp)
-                cpu.muevePieza(movim[1], movim[2], siExclusiva=False, seconds=secs)
-
+                cpu.muevePieza(from_sq, to_sq, secs)
+        # return
         if secs is None:
             secs = 1.0
 
         # segundo los borrados
         for movim in liMovs:
             if movim[0] == "b":
-                n = cpu.duerme(secs * 0.80)
-                cpu.borraPieza(movim[1], padre=n)
+                cpu.borraPiezaSecs(movim[1], secs)
 
         # tercero los cambios
         for movim in liMovs:

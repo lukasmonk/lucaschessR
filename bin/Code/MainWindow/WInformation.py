@@ -39,6 +39,10 @@ class Information(QtWidgets.QWidget):
         tb = QTVarios.LCTB(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
         ly_rating.control(tb)
 
+        self.lb_cpws_lost = Controles.LB(self).ponFuente(font_bold).set_wrap()
+        self.lb_cpws_lost.hide()
+        self.lb_cpws_lost.setStyleSheet("*{ border: 1px solid lightgray; padding:2px; background: #f7f2f0}")
+        ly_rating.control(self.lb_cpws_lost)
         self.lb_rating = Controles.LB(self).ponFuente(font_bold).set_wrap()
         self.lb_rating.hide()
         self.lb_rating.setStyleSheet("*{ border: 1px solid lightgray; padding:2px; background: #f7f2f0}")
@@ -92,6 +96,16 @@ class Information(QtWidgets.QWidget):
         self.lb_theme.set_text(str_themes)
         self.lb_theme.setVisible(len(str_themes) > 0)
 
+    def show_cpws_lost(self):
+        visible = False
+        if self.move:
+            cpws_lost = self.move.get_points_lost()
+            if cpws_lost is not None and cpws_lost > 0:
+                str_cpws_lost = "%.02f %s" % (cpws_lost/100.0, _("pawns lost"))
+                self.lb_cpws_lost.set_text(str_cpws_lost)
+                visible = True
+        self.lb_cpws_lost.setVisible(visible)
+
     def edit_rating(self, event=None):
         if event:
             event.ignore()
@@ -124,6 +138,7 @@ class Information(QtWidgets.QWidget):
 
         self.show_themes()
         self.show_rating()
+        self.show_cpws_lost()
         if is_move:
             self.gb_comments.set_text(_("Comments"))
             if opening:
@@ -136,7 +151,6 @@ class Information(QtWidgets.QWidget):
 
             self.comment.set_text(move.comment)
             self.variantes.set_move(move)
-            pts_lost = move.get_points_lost()
             num_moves, nj, row, is_white = self.w_parent.manager.jugadaActual()
 
         else:
@@ -316,7 +330,7 @@ class WVariations(QtWidgets.QWidget):
                 number = -1
 
         if number == -1:
-            game = Game.Game(ini_posicion=self.move.position_before)
+            game = Game.Game(first_position=self.move.position_before)
 
         change_game = Variations.edit_variation(
             Code.procesador, game, with_engine_active=with_engine_active, is_white_bottom=self.get_board().is_white_bottom

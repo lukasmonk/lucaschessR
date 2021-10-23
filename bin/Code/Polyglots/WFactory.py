@@ -1,18 +1,18 @@
+import datetime
 import os
 import os.path
-import datetime
 import shutil
 
 import Code
 from Code import Util
+from Code.Polyglots import DBPolyglot, WPolyglot
 from Code.QT import Colocacion
 from Code.QT import Columnas
+from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import FormLayout
-from Code.Polyglots import DBPolyglot, WPolyglot
 
 
 class WFactoryPolyglots(QTVarios.WDialogo):
@@ -92,7 +92,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
     def new(self):
         path = self.get_new_path("")
         if path:
-            with DBPolyglot.DBPolyglot(path) as db:  # To create the file
+            with DBPolyglot.DBPolyglot(path):  # To create the file
                 pass
             self.update(soft=True)
             self.run_edit(path)

@@ -1,7 +1,16 @@
 from Code import Manager
 from Code import Util
 from Code.Base import Move
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_RESIGN,
+    TB_UTILITIES,
+    GT_RESISTANCE,
+)
 from Code.QT import QTUtil2
 
 
@@ -78,7 +87,7 @@ class ManagerResistance(Manager.Manager):
         self.set_label1(label)
 
     def ponRotuloActual(self):
-        label = "<b>%s</b>: %d" % (_("Moves"), self.movimientos)
+        label = "<b>%s</b>: %d" % (_("Half-moves"), self.movimientos)
 
         color = "black"
         if self.puntosRival != 0:

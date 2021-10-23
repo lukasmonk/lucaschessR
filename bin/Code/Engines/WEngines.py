@@ -5,19 +5,20 @@ import random
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
-from Code.Polyglots import Books
+from Code import Util
 from Code.Engines import Engines
 from Code.Engines import EnginesMicElo
+from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
+from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import FormLayout
-from Code import Util
+from Code.QT import SelectFiles
 
 
 class WEngines(QTVarios.WDialogo):
@@ -265,28 +266,28 @@ class WEngine(QtWidgets.QDialog):
         # Toolbar
         tb = QTUtil2.tbAcceptCancel(self)
 
-        lbAlias = Controles.LB2P(self, _("Alias"))
+        lb_alias = Controles.LB2P(self, _("Alias"))
         self.edAlias = Controles.ED(self, engine.key).anchoMinimo(360)
 
-        lbNombre = Controles.LB2P(self, _("Name"))
+        lb_nombre = Controles.LB2P(self, _("Name"))
         self.edNombre = Controles.ED(self, engine.name).anchoMinimo(360)
 
-        lbInfo = Controles.LB(self, _("Information") + ": ")
+        lb_info = Controles.LB(self, _("Information") + ": ")
         self.emInfo = Controles.EM(self, engine.id_info, siHTML=False).anchoMinimo(360).altoFijo(60)
 
-        lbElo = Controles.LB(self, "ELO: ")
+        lb_elo = Controles.LB(self, "ELO: ")
         self.sbElo = Controles.SB(self, engine.elo, 0, 4000)
 
-        lbExe = Controles.LB(self, "%s: %s" % (_("File"), Util.relative_path(engine.path_exe)))
+        lb_exe = Controles.LB(self, "%s: %s" % (_("File"), Util.relative_path(engine.path_exe)))
 
         if siTorneo:
-            lbDepth = Controles.LB(self, _("Maximum depth") + ": ")
+            lb_depth = Controles.LB(self, _("Maximum depth") + ": ")
             self.sbDepth = Controles.SB(self, engine.depth, 0, 50)
 
-            lbTime = Controles.LB(self, _("Maximum seconds to think") + ": ")
-            self.sbTime = Controles.SB(self, engine.time, 0, 9999)
+            lb_time = Controles.LB(self, _("Maximum seconds to think") + ": ")
+            self.edTime = Controles.ED(self, "").ponFloat(engine.time).anchoFijo(60).align_right()
 
-            lbBook = Controles.LB(self, _("Opening book") + ": ")
+            lb_book = Controles.LB(self, _("Opening book") + ": ")
             fvar = Code.configuration.file_books
             self.list_books = Books.ListBooks()
             self.list_books.restore_pickle(fvar)
@@ -296,24 +297,24 @@ class WEngine(QtWidgets.QDialog):
             li.insert(0, ("* " + _("None"), "-"))
             li.insert(0, ("* " + _("Default"), "*"))
             self.cbBooks = Controles.CB(self, li, engine.book)
-            btNuevoBook = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), icon_size=16)
+            bt_nuevo_book = Controles.PB(self, "", self.nuevoBook, plano=False).ponIcono(Iconos.Nuevo(), icon_size=16)
             # # Respuesta rival
             li = ((_("Uniform random"), "au"), (_("Proportional random"), "ap"), (_("Always the highest percentage"), "mp"))
             self.cbBooksRR = QTUtil2.comboBoxLB(self, li, engine.bookRR)
-            lyBook = Colocacion.H().control(lbBook).control(self.cbBooks).control(self.cbBooksRR).control(btNuevoBook).relleno()
-            lyDT = Colocacion.H().control(lbDepth).control(self.sbDepth).espacio(40).control(lbTime).control(self.sbTime).relleno()
-            lyTorneo = Colocacion.V().otro(lyDT).otro(lyBook)
+            ly_book = Colocacion.H().control(lb_book).control(self.cbBooks).control(self.cbBooksRR).control(bt_nuevo_book).relleno()
+            ly_dt = Colocacion.H().control(lb_depth).control(self.sbDepth).espacio(40).control(lb_time).control(self.edTime).relleno()
+            ly_torneo = Colocacion.V().otro(ly_dt).otro(ly_book)
 
         # Layout
         ly = Colocacion.G()
-        ly.controld(lbAlias, 0, 0).control(self.edAlias, 0, 1)
-        ly.controld(lbNombre, 1, 0).control(self.edNombre, 1, 1)
-        ly.controld(lbInfo, 2, 0).control(self.emInfo, 2, 1)
-        ly.controld(lbElo, 3, 0).control(self.sbElo, 3, 1)
-        ly.control(lbExe, 4, 0, 1, 2)
+        ly.controld(lb_alias, 0, 0).control(self.edAlias, 0, 1)
+        ly.controld(lb_nombre, 1, 0).control(self.edNombre, 1, 1)
+        ly.controld(lb_info, 2, 0).control(self.emInfo, 2, 1)
+        ly.controld(lb_elo, 3, 0).control(self.sbElo, 3, 1)
+        ly.control(lb_exe, 4, 0, 1, 2)
 
         if siTorneo:
-            ly.otro(lyTorneo, 5, 0, 1, 2)
+            ly.otro(ly_torneo, 5, 0, 1, 2)
 
         layout = Colocacion.V().control(tb).espacio(30).otro(ly).control(scrollArea)
         self.setLayout(layout)
@@ -321,7 +322,7 @@ class WEngine(QtWidgets.QDialog):
         self.edAlias.setFocus()
 
     def nuevoBook(self):
-        fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
+        fbin = SelectFiles.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
@@ -355,7 +356,7 @@ class WEngine(QtWidgets.QDialog):
 
         if self.siTorneo:
             self.motorExterno.depth = self.sbDepth.valor()
-            self.motorExterno.time = self.sbTime.valor()
+            self.motorExterno.time = self.edTime.textoFloat()
             pbook = self.cbBooks.valor()
             self.motorExterno.book = pbook
             self.motorExterno.bookRR = self.cbBooksRR.valor()
@@ -437,7 +438,7 @@ def selectEngine(wowner):
     # Pedimos el ejecutable
     folderEngines = Code.configuration.read_variables("FOLDER_ENGINES")
     extension = "%s EXE (*.exe)" if Code.is_windows else "%s (*)"
-    exeMotor = QTUtil2.leeFichero(wowner, folderEngines if folderEngines else ".", extension % _("File"), _("Engine"))
+    exeMotor = SelectFiles.leeFichero(wowner, folderEngines if folderEngines else ".", extension % _("File"), _("Engine"))
     if not exeMotor:
         return None
     folderEngines = Util.relative_path(os.path.dirname(exeMotor))

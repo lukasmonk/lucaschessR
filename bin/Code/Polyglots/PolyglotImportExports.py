@@ -1,23 +1,27 @@
-import os
 import math
+import os
 import time
-import shutil
 
 import FasterCode
 from PySide2 import QtCore, QtWidgets
 
 from Code import Util
-from Code.SQL import UtilSQL
+from Code.Base.Constantes import (
+    CALCWEIGHT_NUMGAMES,
+    CALCWEIGHT_SCORE,
+    FEN_INITIAL,
+    CALCWEIGHT_NUMGAMES_SCORE,
+)
 from Code.Databases import DBgames
 from Code.QT import Colocacion
 from Code.QT import Controles
+from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import FormLayout
-
-from Code.Base.Constantes import *
+from Code.QT import SelectFiles
+from Code.SQL import UtilSQL
 
 
 class PolyglotExport:
@@ -124,7 +128,7 @@ class PolyglotImport:
 
         folder = dic.get("FOLDER_BIN", "")
 
-        path_bin = QTUtil2.leeFichero(self.wpolyglot, folder, "bin", titulo=_("Polyglot bin file name"))
+        path_bin = SelectFiles.leeFichero(self.wpolyglot, folder, "bin", titulo=_("Polyglot bin file name"))
         if not path_bin:
             return
 
@@ -190,7 +194,7 @@ class PolyglotImport:
         self.merge(db, min_games, min_score, calc_weight, save_score, collisions)
 
     def import_pgn(self):
-        li_path_pgn = QTVarios.select_pgns(self.wpolyglot)
+        li_path_pgn = SelectFiles.select_pgns(self.wpolyglot)
         if not li_path_pgn:
             return
         titulo = "%s %d %s" % (_("Import"), len(li_path_pgn), _("PGN"))
@@ -238,10 +242,10 @@ class PolyglotImport:
                         break
 
                 result = bdCab.get(b"RESULT", b"*")
-                if not (result in st_results):
-                    continue
                 if result == b"*":
                     result = bunknown_convert
+                if not (result in st_results):
+                    continue
 
                 if result == b"1-0":
                     pw = 2
@@ -459,7 +463,7 @@ def import_polyglot_config(owner, configuration, titulo, with_collisions):
     form = FormLayout.FormLayout(owner, titulo, Iconos.Import8(), anchoMinimo=440)
     form.separador()
 
-    form.spinbox(_("Maximum half moves (plies)"), 1, 999, 60, dic.get("PLIES", 50))
+    form.spinbox(_("Maximum half-moves (plies)"), 1, 999, 60, dic.get("PLIES", 50))
     form.separador()
 
     li_options = (("%s + %s" % (_("White"), _("Black")), {True, False}), (_("White"), {True}), (_("Black"), {False}))

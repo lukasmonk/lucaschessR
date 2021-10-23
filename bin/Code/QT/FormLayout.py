@@ -34,12 +34,12 @@ import os
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+from Code import Util
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil2
-from Code import Util
-
+from Code.QT import SelectFiles
 
 separador = (None, None)
 SPINBOX, COMBOBOX, COLORBOX, DIAL, EDITBOX, FICHERO, CARPETA, FONTCOMBOBOX, CHSPINBOX = range(9)
@@ -110,6 +110,9 @@ class FormLayout:
 
     def apart_simple(self, title):
         self.li_gen.append((None, "$" + title + ":"))
+
+    def apart_simple_np(self, title):
+        self.li_gen.append((None, "$" + title))
 
     def add_tab(self, title):
         self.li_tabs.append((self.li_gen, title, ""))
@@ -247,9 +250,9 @@ class BotonFichero(QtWidgets.QPushButton):
         fbusca = self.file if self.file else self.ficheroDefecto
         filtro = self.extension if "(" in self.extension else (_("File") + " %s (*.%s)" % (self.extension, self.extension))
         if self.siSave:
-            resp = QTUtil2.salvaFichero(self, titulo, fbusca, filtro)
+            resp = SelectFiles.salvaFichero(self, titulo, fbusca, filtro)
         else:
-            resp = QTUtil2.leeFichero(self, fbusca, self.extension, titulo=titulo)
+            resp = SelectFiles.leeFichero(self, fbusca, self.extension, titulo=titulo)
         if resp:
             self.ponFichero(resp)
 
@@ -329,7 +332,7 @@ class LBotonCarpeta(QtWidgets.QHBoxLayout):
         self.addWidget(btCancelar)
 
     def cambiarCarpeta(self):
-        carpeta = QTUtil2.leeCarpeta(self.parent, self.carpeta, self.config.label)
+        carpeta = SelectFiles.get_existing_directory(self.parent, self.carpeta, self.config.label)
         if carpeta:
             self.carpeta = os.path.abspath(carpeta)
             self.boton.set_text(carpeta)

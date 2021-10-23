@@ -2,17 +2,26 @@ import copy
 import random
 
 import Code
-from Code.Openings import Opening
-from Code.GM import GM
-from Code import Manager
 from Code import Adjournments
-from Code.Base import Move
-from Code.GM import WindowGM
-from Code.QT import WindowJuicio
-from Code.QT import QTUtil2
+from Code import Manager
 from Code import Util
+from Code.Base import Move
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    GT_AGAINST_GM,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_UTILITIES,
+)
+from Code.GM import GM
+from Code.GM import WindowGM
+from Code.Openings import Opening
+from Code.QT import QTUtil2
+from Code.QT import WindowJuicio
 from Code.SQL import UtilSQL
-from Code.Base.Constantes import *
 
 
 class ManagerGM(Manager.Manager):
@@ -316,10 +325,6 @@ class ManagerGM(Manager.Manager):
         if siAnalizaJuez:
             um = QTUtil2.analizando(self.main_window)
             mrm = self.analizaMinimo(self.vtime * 100)
-
-            import time
-
-            t = time.time()
 
             rmUsu, nada = mrm.buscaRM(jgUsu.movimiento())
             if rmUsu is None:

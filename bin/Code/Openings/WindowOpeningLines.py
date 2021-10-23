@@ -6,16 +6,16 @@ from PySide2 import QtWidgets
 import Code
 from Code import Util
 from Code.Base import Game
+from Code.Openings import WindowOpenings, OpeningLines
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
-from Code.QT import Grid
-from Code.QT import Iconos
-from Code.Openings import WindowOpenings, OpeningLines
-from Code.QT import QTUtil2
-from Code.QT import QTVarios
 from Code.QT import Delegados
 from Code.QT import FormLayout
+from Code.QT import Grid
+from Code.QT import Iconos
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
 
 
 class WOpeningLines(QTVarios.WDialogo):
@@ -94,6 +94,7 @@ class WOpeningLines(QTVarios.WDialogo):
 
         self.wtrain.setVisible(False)
         self.glista.gotop()
+        self.glista.setFocus()
 
     def getTitulo(self):
         return "%s [%s]" % (_("Opening lines"), Code.relative_root(self.listaOpenings.folder))
@@ -129,7 +130,7 @@ class WOpeningLines(QTVarios.WDialogo):
         base = self.configuration.folder_base_openings
         li = [x for x in os.listdir(base) if os.path.isdir(os.path.join(base, x))]
         menu = QTVarios.LCMenu(self)
-        rondo = QTVarios.rondoPuntos()
+        rondo = QTVarios.rondoFolders()
         menu.opcion("", _("Home folder"), Iconos.Home())
         menu.separador()
         for x in li:
@@ -143,7 +144,7 @@ class WOpeningLines(QTVarios.WDialogo):
         resp = menu.lanza()
         if resp is not None:
             if resp == ":m":
-                os.startfile(base)
+                Code.startfile(base)
                 return
 
             elif resp == ":n":
@@ -302,8 +303,10 @@ class WOpeningLines(QTVarios.WDialogo):
         ok_eng = False
         if row >= 0:
             op = self.listaOpenings[row]
-            ok_ssp = op.get("withtrainings", False)
-            ok_eng = op.get("withtrainings_engines", False)
+            num = op["lines"]
+            num = int(num) if num else 0
+            ok_ssp = op.get("withtrainings", False) and num > 0
+            ok_eng = op.get("withtrainings_engines", False) and num > 0
 
         if ok_ssp or ok_eng:
             self.wtrain.setVisible(True)

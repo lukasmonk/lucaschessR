@@ -1,7 +1,5 @@
 import time
 
-from PySide2 import QtCore
-
 import FasterCode
 
 import Code
@@ -33,27 +31,33 @@ class WRunCaptures(QTVarios.WDialogo):
         # Movimientos
         self.liwm_captures = []
         ly = Colocacion.G().margen(4)
+        self.visible_captures = 8
         for i in range(16):
             f = i // 2
             c = i % 2
             wm = WRunCommon.WEdMove(self)
             self.liwm_captures.append(wm)
             ly.control(wm, f, c)
+            if i >= self.visible_captures:
+                wm.hide()
 
         self.gb_captures = Controles.GB(self, _("Captures"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=750))
 
         self.liwm_threats = []
         ly = Colocacion.G().margen(4)
+        self.visible_threats = 8
         for i in range(16):
             f = i // 2
             c = i % 2
             wm = WRunCommon.WEdMove(self)
             self.liwm_threats.append(wm)
             ly.control(wm, f, c)
+            if i >= self.visible_threats:
+                wm.hide()
 
         self.gb_threats = Controles.GB(self, _("Threats"), ly).ponFuente(Controles.TipoLetra(puntos=10, peso=750))
 
-        self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).altoFijo(32).set_wrap()
+        self.lb_result = Controles.LB(self).ponTipoLetra(puntos=10, peso=500).anchoFijo(254).set_wrap()
         self.lb_info = (
             Controles.LB(self)
             .anchoFijo(254)
@@ -70,7 +74,7 @@ class WRunCaptures(QTVarios.WDialogo):
             (_("Check"), Iconos.Check(), self.check),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
-        self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, icon_size=32)
+        self.tb = QTVarios.LCTB(self, li_acciones, icon_size=32)
         self.show_tb(self.terminar, self.begin)
 
         ly_right = (
@@ -133,6 +137,7 @@ class WRunCaptures(QTVarios.WDialogo):
         if self.ultimaCelda:
             self.ultimaCelda.set_text(celda)
 
+            self.test_celdas()
             ucld = self.ultimaCelda
             for liwm in (self.liwm_captures, self.liwm_threats):
                 for num, wm in enumerate(liwm):
@@ -149,6 +154,35 @@ class WRunCaptures(QTVarios.WDialogo):
                         wm.activa()
                         self.ultimaCelda = wm.origen
                         return
+
+    def test_celdas(self):
+        if len(self.liwm_captures[self.visible_captures-1].movimiento()) == 4:
+            complete = True
+            for num, wm in enumerate(self.liwm_captures):
+                if num >= self.visible_captures:
+                    break
+                if len(wm.movimiento()) != 4:
+                    complete = False
+                    break
+            if complete:
+                self.visible_captures += 2
+                for num, wm in enumerate(self.liwm_captures):
+                    if num < self.visible_captures:
+                        if not wm.isVisible():
+                            wm.setVisible(True)
+        if len(self.liwm_threats[self.visible_threats-1].movimiento()) == 4:
+            complete = True
+            for num, wm in enumerate(self.liwm_threats):
+                if num >= self.visible_threats:
+                    break
+                if len(wm.movimiento()) != 4:
+                    complete = False
+                    break
+            if complete:
+                self.visible_threats += 2
+                for num, wm in enumerate(self.liwm_threats):
+                    if num < self.visible_threats:
+                        wm.show()
 
     def ponUltimaCelda(self, wmcelda):
         self.ultimaCelda = wmcelda

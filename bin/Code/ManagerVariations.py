@@ -1,8 +1,20 @@
 from Code import Manager
 from Code import Util
 from Code.Base import Move
+from Code.Base.Constantes import (
+    GT_ALONE,
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_ACCEPT,
+    TB_CANCEL,
+    TB_UTILITIES,
+    GO_START,
+    ADJUST_BETTER,
+)
 from Code.QT import Iconos
-from Code.Base.Constantes import *
 
 
 class ManagerVariations(Manager.Manager):
@@ -194,7 +206,9 @@ class ManagerVariations(Manager.Manager):
             self.thinking(True)
             rm = self.xrival.play_game(self.game, nAjustado=self.xrival.nAjustarFuerza)
             if rm.from_sq:
-                ok, self.error, move = Move.get_game_move(self.game, self.game.last_position, rm.from_sq, rm.to_sq, rm.promotion)
+                ok, self.error, move = Move.get_game_move(
+                    self.game, self.game.last_position, rm.from_sq, rm.to_sq, rm.promotion
+                )
                 self.add_move(move)
                 self.move_the_pieces(move.liMovs)
             self.thinking(False)
@@ -215,7 +229,9 @@ class ManagerVariations(Manager.Manager):
 
         import Code.PlayAgainstEngine.WPlayAgainstEngine as WindowEntMaq
 
-        dic = self.dicRival = WindowEntMaq.cambioRival(self.main_window, self.configuration, dicBase, siManagerSolo=True)
+        dic = self.dicRival = WindowEntMaq.cambioRival(
+            self.main_window, self.configuration, dicBase, siManagerSolo=True
+        )
 
         if dic:
             self.ponRival(dic)

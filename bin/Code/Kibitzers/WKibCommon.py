@@ -169,7 +169,7 @@ class WKibCommon(QtWidgets.QDialog):
     def set_position(self):
         resp = Voyager.voyager_position(self, self.game.last_position)
         if resp is not None:
-            game = Game.Game(ini_posicion=resp)
+            game = Game.Game(first_position=resp)
             self.orden_game(game)
 
     def color(self):

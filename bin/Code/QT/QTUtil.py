@@ -53,6 +53,7 @@ def beep():
     QtWidgets.QApplication.beep()
 
 
+
 def backgroundGUI():
     """
     Background por defecto del GUI
@@ -125,7 +126,7 @@ def centraWindow(window):
 def escondeWindow(window):
     pos = window.pos()
     screen = QtWidgets.QDesktopWidget().screenGeometry()
-    window.move(screen.width() * 2, 0)
+    window.move(screen.width() * 10, 0)
     return pos
 
 
@@ -136,7 +137,7 @@ class EscondeWindow:
     def __enter__(self):
         self.pos = self.window.pos()
         screen = QtWidgets.QDesktopWidget().screenGeometry()
-        self.window.move(screen.width() * 2, 0)
+        self.window.move(screen.width() * 10, 0)
         return self
 
     def __exit__(self, type, value, traceback):

@@ -1,14 +1,24 @@
 import copy
 import time
 
-from Code import Util
-from Code.Openings import Opening
-from Code.Base import Game
 from Code import Manager
-from Code.QT import WindowJuicio
+from Code import Util
+from Code.Base import Game
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    RS_WIN_PLAYER,
+    RS_WIN_OPPONENT,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_CANCEL,
+    TB_UTILITIES,
+)
+from Code.Openings import Opening
 from Code.QT import QTUtil2
+from Code.QT import WindowJuicio
 from Code.QT import WindowPlayGame
-from Code.Base.Constantes import *
 
 
 class ManagerPlayGame(Manager.Manager):

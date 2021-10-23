@@ -59,7 +59,7 @@ class WControl(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.remove),
             None,
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         # Colocamos
         ly = Colocacion.V().control(self.tb).control(self.ghistorico).margen(3)

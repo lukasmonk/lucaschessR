@@ -1,9 +1,24 @@
 import FasterCode
 
 from Code import Manager
-from Code.Config import TrListas
 from Code.Base import Game, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    GT_ALONE,
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_CANCEL,
+    TB_END_GAME,
+    TB_NEXT,
+    TB_PGN_LABELS,
+    TB_PREVIOUS,
+    TB_SAVE,
+    TB_UTILITIES,
+    ADJUST_BETTER,
+)
 from Code.PlayAgainstEngine import WPlayAgainstEngine
 from Code.QT import Controles
 from Code.QT import Iconos
@@ -12,6 +27,7 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import Voyager
 from Code.QT import WindowPgnTags
+from Code.Translations import TrListas
 
 
 class ManagerGame(Manager.Manager):
@@ -70,7 +86,7 @@ class ManagerGame(Manager.Manager):
             pos = li.index(TB_PGN_LABELS)
             li.insert(pos, TB_NEXT)
             li.insert(pos, TB_PREVIOUS)
-        tb = self.main_window.pon_toolbar(li)
+        self.main_window.pon_toolbar(li)
         if self.with_previous_next:
             if_previous, if_next = self.with_previous_next("with_previous_next", self.game)
             self.main_window.enable_option_toolbar(TB_PREVIOUS, if_previous)
@@ -87,7 +103,9 @@ class ManagerGame(Manager.Manager):
                 black = valor
             elif key == "RESULT":
                 result = valor
-        self.set_label1("%s : <b>%s</b><br>%s : <b>%s</b>" % (_("White"), white, _("Black"), black) if white and black else "")
+        self.set_label1(
+            "%s : <b>%s</b><br>%s : <b>%s</b>" % (_("White"), white, _("Black"), black) if white and black else ""
+        )
         self.set_label2("%s : <b>%s</b>" % (_("Result"), result) if result else "")
 
     def reiniciar(self):
@@ -218,7 +236,9 @@ class ManagerGame(Manager.Manager):
                     cp = Position.Position()
                     cp.read_fen(fen_despues)
                     self.game.set_position(cp)
-                    self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+                    self.start(
+                        self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine
+                    )
 
             self.put_information()
             if not self.changed:
@@ -257,8 +277,6 @@ class ManagerGame(Manager.Manager):
             self.editEtiquetasPGN()
 
     def configure_gs(self):
-        sep = (None, None, None)
-
         li_mas_opciones = [("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion())]
 
         resp = self.configurar(li_mas_opciones, siCambioTutor=True, siSonidos=True)
@@ -321,7 +339,9 @@ class ManagerGame(Manager.Manager):
                     ini_position = self.game.first_position
                     if new_position and new_position != ini_position:
                         self.game.set_position(new_position)
-                        self.start(self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine)
+                        self.start(
+                            self.game, self.is_complete, self.only_consult, self.with_previous_next, self.save_routine
+                        )
                         self.changed = True
                         self.put_toolbar()
 
@@ -361,7 +381,9 @@ class ManagerGame(Manager.Manager):
         if texto:
             ok, game = Game.pgn_game(texto)
             if not ok:
-                QTUtil2.message_error(self.main_window, _("The text from the clipboard does not contain a chess game in PGN format"))
+                QTUtil2.message_error(
+                    self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
+                )
                 return
             self.replace_game(game)
 
@@ -379,7 +401,9 @@ class ManagerGame(Manager.Manager):
         else:
             dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
-        dic = self.dicRival = WPlayAgainstEngine.cambioRival(self.main_window, self.configuration, dicBase, siManagerSolo=True)
+        dic = self.dicRival = WPlayAgainstEngine.cambioRival(
+            self.main_window, self.configuration, dicBase, siManagerSolo=True
+        )
 
         if dic:
             for k, v in dic.items():

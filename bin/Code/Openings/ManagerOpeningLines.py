@@ -1,17 +1,31 @@
-import time
 import random
+import time
 
 import Code.Nags.Nags
 from Code import Manager
-from Code.Polyglots import Books
-from Code.QT import QTUtil2
-from Code.QT import Iconos
-from Code.QT import QTVarios
 from Code import Util
-from Code.Openings import OpeningLines
-from Code.Engines import EngineResponse
 from Code.Base import Game, Move, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_HELP,
+    TB_NEXT,
+    TB_REPEAT,
+    TB_RESIGN,
+    TB_UTILITIES,
+    GOOD_MOVE,
+    GT_OPENING_LINES,
+    QUESTIONABLE_MOVE,
+)
+from Code.Engines import EngineResponse
+from Code.Openings import OpeningLines
+from Code.Polyglots import Books
+from Code.QT import Iconos
+from Code.QT import QTUtil2
+from Code.QT import QTVarios
 
 
 class ManagerOpeningEngines(Manager.Manager):
@@ -95,7 +109,7 @@ class ManagerOpeningEngines(Manager.Manager):
         self.xrival = self.procesador.creaManagerMotor(rival, self.time, None)
         self.xrival.is_white = self.is_engine_side_white
 
-        self.xanalyzer.options(max(self.xtutor.mstime_engine, self.time + 5.0), 0, False)
+        self.xanalyzer.options(max(self.xtutor.mstime_engine, self.time + 5.0), 0, True)
 
         juez = self.configuration.buscaRival(self.trainingEngines["ENGINE_CONTROL"])
         self.xjuez = self.procesador.creaManagerMotor(juez, int(self.trainingEngines["ENGINE_TIME"] * 1000), None)
@@ -223,7 +237,10 @@ class ManagerOpeningEngines(Manager.Manager):
                     self.board.creaFlechaMulti(mv, False)
                 self.board.creaFlechaMulti(move.movimiento(), True)
                 if self.ask_movesdifferent:
-                    mensaje = "%s\n%s" % (_("This is not the move in the opening lines"), _("Do you want to go on with this move?"))
+                    mensaje = "%s\n%s" % (
+                        _("This is not the move in the opening lines"),
+                        _("Do you want to go on with this move?"),
+                    )
                     if not QTUtil2.pregunta(self.main_window, mensaje):
                         self.ponFinJuego()
                         return True
@@ -480,7 +497,11 @@ class ManagerOpeningEngines(Manager.Manager):
             liMasOpciones.append((None, None, None))
             mens = _("cancel") if self.ask_movesdifferent else _("activate")
             liMasOpciones.append(
-                ("ask_movesdifferent", "%s: %s" % (_("Ask when the moves are different from the line"), mens), Iconos.Pelicula_Seguir())
+                (
+                    "ask_movesdifferent",
+                    "%s: %s" % (_("Ask when the moves are different from the line"), mens),
+                    Iconos.Pelicula_Seguir(),
+                )
             )
             liMasOpciones.append((None, None, True))  # Para salir del submenu
             liMasOpciones.append((None, None, None))
@@ -691,7 +712,7 @@ class ManagerOpeningLines(Manager.Manager):
         if is_complete:
             if sinError:
                 self.game_info["NOERROR"] += 1
-                noError = self.game_info["NOERROR"]
+                # noError = self.game_info["NOERROR"]
                 if self.modo == "sequential":
                     # salto = 2 ** (noError + 1)
                     # numGames = len(self.liGames)
@@ -833,7 +854,9 @@ class ManagerOpeningLines(Manager.Manager):
 
             self.errores += 1
             mens = "%s: %d" % (_("Error"), self.errores)
-            QTUtil2.mensajeTemporal(self.main_window, mens, 1.2, physical_pos="ad", background="#FF9B00", pmImagen=Iconos.pmError())
+            QTUtil2.mensajeTemporal(
+                self.main_window, mens, 1.2, physical_pos="ad", background="#FF9B00", pmImagen=Iconos.pmError()
+            )
             self.muestraInformacion()
             self.sigueHumano()
             return False
@@ -901,7 +924,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         cp = Position.Position()
         cp.read_fen(self.trposition["FENM2"] + " 0 1")
 
-        self.game = Game.Game(ini_posicion=cp)
+        self.game = Game.Game(first_position=cp)
 
         self.hints = 9999  # Para que analice sin problemas
 

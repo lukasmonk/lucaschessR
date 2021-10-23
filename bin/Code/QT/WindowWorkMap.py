@@ -1,10 +1,10 @@
 from PySide2 import QtWidgets, QtSvg, QtGui
 
-from Code.Config import TrListas
 from Code import WorkMap
 from Code.Analysis import Analysis
 from Code.Base import Game, Move, Position
 from Code.Board import Board
+from Code.Translations import TrListas
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles

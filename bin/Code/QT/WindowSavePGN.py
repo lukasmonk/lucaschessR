@@ -12,9 +12,9 @@ from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
-from Code.Config import TrListas
+from Code.Translations import TrListas
 from Code import Util
 
 
@@ -67,7 +67,7 @@ class WBaseSave(QtWidgets.QWidget):
             if not os.path.isdir(last_dir):
                 last_dir = ""
 
-        fich = QTUtil2.leeCreaFichero(self, last_dir, "pgn")
+        fich = SelectFiles.leeCreaFichero(self, last_dir, "pgn")
         if fich:
             if not fich.lower().endswith(".pgn"):
                 fich += ".pgn"
@@ -139,7 +139,7 @@ class WBaseSave(QtWidgets.QWidget):
                     boxrooms.delete(ntras)
 
             elif op == 1:
-                resp = QTUtil2.salvaFichero(
+                resp = SelectFiles.salvaFichero(
                     self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", _("File") + " pgn (*.pgn)", False
                 )
                 if resp:
@@ -286,7 +286,7 @@ class WSave(QTVarios.WDialogo):
 
         if not last_dir:
             last_dir = self.configuration.carpeta
-        fich = QTUtil2.leeCreaFichero(self, last_dir, "pgn")
+        fich = SelectFiles.leeCreaFichero(self, last_dir, "pgn")
         if fich:
             if not fich.lower().endswith(".pgn"):
                 fich += ".pgn"
@@ -353,7 +353,7 @@ class WSave(QTVarios.WDialogo):
                     boxrooms.delete(ntras)
 
             elif op == 1:
-                resp = QTUtil2.salvaFichero(
+                resp = SelectFiles.salvaFichero(
                     self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", _("File") + " pgn (*.pgn)", False
                 )
                 if resp:

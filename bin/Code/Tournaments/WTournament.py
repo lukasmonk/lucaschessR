@@ -1,27 +1,28 @@
 import os
 
 from PySide2 import QtWidgets, QtCore
-from Code.Base.Constantes import FEN_INITIAL
 
+import Code
+from Code import Util
+from Code import XRun
 from Code.Base import Game, Position
-from Code.Polyglots import Books
-from Code.Engines import Engines, WEngines
+from Code.Base.Constantes import FEN_INITIAL
 from Code.Databases import DBgames, WDB_Games
+from Code.Engines import Engines, WEngines
+from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import WindowSavePGN
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Tournaments import Tournament
-from Code import Util
-import Code
-from Code import XRun
+from Code.QT import SelectFiles
 from Code.QT import Voyager
+from Code.QT import WindowSavePGN
+from Code.Tournaments import Tournament
 
 GRID_ALIAS, GRID_VALUES, GRID_GAMES_QUEUED, GRID_GAMES_FINISHED, GRID_RESULTS = range(5)
 
@@ -64,7 +65,7 @@ class WTournament(QTVarios.WDialogo):
 
         # Draw-plys
         lbDrawMinPly = Controles.LB(self, "%s (%s): " % (_("Minimum moves to assign draw"), "0=%s" % _("Disable")))
-        self.sbDrawMinPly = Controles.SB(self, torneo.drawMinPly(), 20, 1000)
+        self.ed_draw_min_ply = Controles.ED(self).ponInt(torneo.drawMinPly()).anchoFijo(30).align_right()
         # Draw-puntos
         lb_draw_range = Controles.LB(self, _("Maximum centipawns to assign draw") + ": ")
         self.ed_draw_range = Controles.ED(self).tipoInt(torneo.drawRange()).anchoFijo(30)
@@ -121,8 +122,8 @@ class WTournament(QTVarios.WDialogo):
         ly_res = Colocacion.H().control(self.ed_resign).control(bt_resign).relleno()
         ly_dra = Colocacion.H().control(self.ed_draw_range).control(bt_draw_range).relleno()
         layout.controld(lb_resign, 0, 0).otro(ly_res, 0, 1)
-        layout.controld(lbDrawMinPly, 1, 0).control(self.sbDrawMinPly, 1, 1)
-        layout.controld(lb_draw_range, 2, 0).otro(ly_dra, 2, 1)
+        layout.controld(lb_draw_range, 1, 0).otro(ly_dra, 1, 1)
+        layout.controld(lbDrawMinPly, 2, 0).control(self.ed_draw_min_ply, 2, 1)
         layout.controld(lbBook, 3, 0).otro(lyBook, 3, 1)
         layout.controld(lbBookDepth, 4, 0).control(self.sbBookDepth, 4, 1)
         layout.controld(lbFEN, 5, 0).otro(lyFEN, 5, 1)
@@ -338,6 +339,7 @@ class WTournament(QTVarios.WDialogo):
     def borra_draw_range(self):
         previo = self.ed_draw_range.textoInt()
         self.ed_draw_range.tipoInt(0 if previo else 10)
+        self.ed_draw_min_ply.tipoInt(0 if previo else 50)
 
     def muestraPosicion(self):
         if self.fen:
@@ -378,7 +380,7 @@ class WTournament(QTVarios.WDialogo):
                 pass
 
     def nuevoBook(self):
-        fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
+        fbin = SelectFiles.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]
@@ -547,7 +549,7 @@ class WTournament(QTVarios.WDialogo):
         if self.torneo:
             changed = (
                 self.torneo.resign() != self.ed_resign.textoInt()
-                or self.torneo.drawMinPly() != self.sbDrawMinPly.valor()
+                or self.torneo.drawMinPly() != self.ed_draw_min_ply.textoInt()
                 or self.torneo.drawRange() != self.ed_draw_range.textoInt()
                 or self.torneo.fen() != self.fen
                 or self.torneo.norman() != self.chbNorman.valor()
@@ -575,7 +577,7 @@ class WTournament(QTVarios.WDialogo):
     def grabar(self):
         if self.torneo:
             self.torneo.resign(self.ed_resign.textoInt())
-            self.torneo.drawMinPly(self.sbDrawMinPly.valor())
+            self.torneo.drawMinPly(self.ed_draw_min_ply.textoInt())
             self.torneo.drawRange(self.ed_draw_range.textoInt())
             self.torneo.fen(self.fen)
             self.torneo.norman(self.chbNorman.valor())
@@ -588,7 +590,7 @@ class WTournament(QTVarios.WDialogo):
 
     def enNuevo(self):
         # Pedimos el ejecutable
-        exeMotor = QTUtil2.leeFichero(self, self.torneo.ultCarpetaEngines(), "*", _("Engine"))
+        exeMotor = SelectFiles.leeFichero(self, self.torneo.ultCarpetaEngines(), "*", _("Engine"))
         if not exeMotor:
             return
         self.torneo.ultCarpetaEngines(os.path.dirname(exeMotor))

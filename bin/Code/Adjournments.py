@@ -1,7 +1,7 @@
 import Code
 from Code import Util
-from Code.SQL import UtilSQL
 from Code.QT import QTUtil2
+from Code.SQL import UtilSQL
 
 
 class Adjournments:

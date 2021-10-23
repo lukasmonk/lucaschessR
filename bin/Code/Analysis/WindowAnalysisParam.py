@@ -1,11 +1,11 @@
 import Code
+from Code import Util
+from Code.Engines import Priorities
 from Code.Polyglots import Books
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code import Util
-from Code.Engines import Priorities
 
 SEPARADOR = FormLayout.separador
 
@@ -26,7 +26,7 @@ def read_dic_params():
     alm.ptbrilliancies = dic.get("ptbrilliancies", 100)
     alm.dpbrilliancies = dic.get("dpbrilliancies", 7)
     alm.from_last_move = dic.get("from_last_move", False)
-    alm.multiPV = dic.get("multipv", "PD")
+    alm.multiPV = dic.get("multiPV", "PD")
     alm.priority = dic.get("priority", Priorities.priorities.normal)
     alm.themes_lichess = dic.get("themes_lichess", False)
 
@@ -185,7 +185,7 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
     li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
     for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), str(x)))
-    config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
+    config = FormLayout.Combobox(_("Number of half-moves evaluated by engine(MultiPV)"), li)
     li_gen.append((config, alm.multiPV))
 
     # Priority
@@ -403,7 +403,7 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
     li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
     for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), str(x)))
-    config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
+    config = FormLayout.Combobox(_("Number of half-moves evaluated by engine(MultiPV)"), li)
     li_gen.append((config, alm.multiPV))
     li_gen.append(SEPARADOR)
 

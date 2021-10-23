@@ -3,6 +3,9 @@ import os
 
 from PySide2 import QtCore, QtWidgets
 
+import Code
+from Code import Util
+from Code.Board import Board, BoardTypes
 from Code.Director import TabVisual
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -13,9 +16,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board, BoardTypes
-from Code import Util
-import Code
+from Code.QT import SelectFiles
 
 estrellaSVG = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
@@ -291,7 +292,7 @@ class WTV_SVGs(QTVarios.WDialogo):
             return
 
         if resp == "@":
-            file = QTUtil2.leeFichero(self, "imgs", "svg", titulo=_("Image"))
+            file = SelectFiles.leeFichero(self, "imgs", "svg", titulo=_("Image"))
             if not file:
                 return
         else:

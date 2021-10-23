@@ -1,5 +1,6 @@
 from PySide2 import QtWidgets
 
+from Code import Util
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -8,7 +9,6 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import Util
 
 
 def consultaHistorico(main_window, tactica, icono):

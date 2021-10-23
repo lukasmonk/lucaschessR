@@ -9,7 +9,7 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code import Util
 
@@ -36,7 +36,7 @@ class WBooksCrear(QtWidgets.QDialog):
 
         lbFichero = Controles.LB(self, _("Book to create") + ":").ponFuente(f)
         self.btFichero = Controles.PB(self, "", self.buscaFichero, False).anchoMinimo(450).ponFuente(f)
-        lbMaxPly = Controles.LB(self, _("Maximum no. half moves (ply)") + ":").ponFuente(f)
+        lbMaxPly = Controles.LB(self, _("Maximum half-moves (plies)") + ":").ponFuente(f)
         self.sbMaxPly = Controles.SB(self, 0, 0, 999).tamMaximo(50)
         lbMinGame = Controles.LB(self, _("Minimum number of games") + ":").ponFuente(f)
         self.sbMinGame = Controles.SB(self, 3, 1, 999).tamMaximo(50)
@@ -67,7 +67,7 @@ class WBooksCrear(QtWidgets.QDialog):
     def buscaFichero(self):
 
         # Libros
-        fbin = QTUtil2.salvaFichero(self, _("Polyglot book"), self.list_books.path, _("File") + " %s (*.%s)" % ("bin", "bin"))
+        fbin = SelectFiles.salvaFichero(self, _("Polyglot book"), self.list_books.path, _("File") + " %s (*.%s)" % ("bin", "bin"))
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             self.file = fbin

@@ -1,6 +1,24 @@
 import Code
 from Code import Util
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    GT_ALONE,
+    ST_ENDGAME,
+    ST_PLAYING,
+    GT_AGAINST_PGN,
+    GT_ROUTES,
+    GT_TURN_ON_LIGHTS,
+    GT_NOTE_DOWN,
+    GT_AGAINST_GM,
+    GT_FICS,
+    GT_FIDE,
+    RS_WIN_PLAYER,
+    RS_WIN_OPPONENT,
+    RS_DRAW,
+    GT_BOOK,
+    GT_RESISTANCE,
+    GT_ELO,
+    GT_MICELO
+)
 
 
 class ControlPGN:

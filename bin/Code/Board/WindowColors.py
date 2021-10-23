@@ -3,19 +3,20 @@ import os
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+import Code
 import Code.Nags.Nags
+from Code import Util
 from Code.Base import Position
+from Code.Board import Board, BoardArrows, ConfBoards
+from Code.Director import WindowTabVFlechas
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.Director import WindowTabVFlechas
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board, BoardArrows, ConfBoards
-from Code import Util
-import Code
+from Code.QT import SelectFiles
 
 
 class BotonTema(QtWidgets.QPushButton):
@@ -128,7 +129,7 @@ class BotonImagen(Colocacion.H):
         configuration = Code.configuration
         dic = configuration.read_variables("WindowColores")
         folder_prev = dic.get("PNGfolder", "")
-        resp = QTUtil2.leeFichero(self.parent, folder_prev, "%s PNG (*.png)" % _("File"))
+        resp = SelectFiles.leeFichero(self.parent, folder_prev, "%s PNG (*.png)" % _("File"))
         if resp:
             folder = os.path.dirname(resp)
             if folder_prev != folder:
@@ -591,7 +592,7 @@ class WColores(QTVarios.WDialogo):
         dr = self.configuration.read_variables("PCOLORES")
         dirBase = dr["DIRBASE"] if dr else ""
 
-        fich = QTUtil2.leeFichero(self, dirBase, "lktheme3")
+        fich = SelectFiles.leeFichero(self, dirBase, "lktheme3")
         if fich:
             dr["DIRBASE"] = os.path.dirname(fich)
             self.configuration.write_variables("PCOLORES", dr)
@@ -609,7 +610,7 @@ class WColores(QTVarios.WDialogo):
     def exportar(self):
         dr = self.configuration.read_variables("PCOLORES")
         dirBase = dr["DIRBASE"] if dr else ""
-        fich = QTUtil2.salvaFichero(self, _("Colors"), dirBase, "*.lktheme3", True)
+        fich = SelectFiles.salvaFichero(self, _("Colors"), dirBase, "*.lktheme3", True)
         if fich:
             dr["DIRBASE"] = os.path.dirname(fich)
             self.configuration.write_variables("PCOLORES", dr)

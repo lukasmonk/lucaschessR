@@ -1,23 +1,23 @@
+import struct
+
+import psutil
 from PySide2 import QtCore
 
-import struct
-import psutil
-
-from Code.Base import Game
 import Code
 from Code import Util
+from Code.Base import Game
 from Code.Engines import EngineRun
 from Code.Kibitzers import Kibitzers
+from Code.Kibitzers import WKibCommon
+from Code.Kibitzers import WindowKibitzers
 from Code.QT import Colocacion
-from Code.QT import Delegados
 from Code.QT import Columnas
 from Code.QT import Controles
+from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.Kibitzers import WindowKibitzers
-from Code.Kibitzers import WKibCommon
 
 
 class WKibEngine(WKibCommon.WKibCommon):
@@ -105,7 +105,7 @@ class WKibEngine(WKibCommon.WKibCommon):
                             self.li_moves = self.li_moves[:128]
 
                     # TODO mirar si es de posicion previa o porterior
-                    game = Game.Game(ini_posicion=self.game.last_position)
+                    game = Game.Game(first_position=self.game.last_position)
                     game.read_pv(rm.pv)
                     if len(game):
                         self.board.remove_arrows()
@@ -164,7 +164,7 @@ class WKibEngine(WKibCommon.WKibCommon):
             return rm.abrTextoBase()
 
         elif key == "BESTMOVE":
-            p = Game.Game(ini_posicion=self.game.last_position)
+            p = Game.Game(first_position=self.game.last_position)
             p.read_pv(rm.pv)
             pgn = p.pgnBaseRAW() if self.with_figurines else p.pgn_translated()
             li = pgn.split(" ")
@@ -185,7 +185,7 @@ class WKibEngine(WKibCommon.WKibCommon):
             return "%d" % rm.depth
 
         else:
-            p = Game.Game(ini_posicion=self.game.last_position)
+            p = Game.Game(first_position=self.game.last_position)
             p.read_pv(rm.pv)
             li = p.pgn_translated().split(" ")
             if ".." in li[0]:

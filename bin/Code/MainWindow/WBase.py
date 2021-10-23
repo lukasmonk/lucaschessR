@@ -1,7 +1,64 @@
 from PySide2 import QtCore, QtWidgets
 
 import Code
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_ACCEPT,
+    TB_ADJOURN,
+    TB_Adjournments,
+    TB_BOXROOMS_PGN,
+    TB_CANCEL,
+    TB_CHANGE,
+    TB_COMPETE,
+    TB_CONTINUE,
+    TB_CONTINUE_REPLAY,
+    TB_DRAW,
+    TB_END_GAME,
+    TB_END_REPLAY,
+    TB_FAST_REPLAY,
+    TB_FILE,
+    TB_HELP,
+    TB_HELP_TO_MOVE,
+    TB_INFORMATION,
+    TB_LEVEL,
+    TB_MY_GAMES,
+    TB_NEXT,
+    TB_OPEN,
+    TB_OPTIONS,
+    TB_OTHER_GAME,
+    TB_PASTE_PGN,
+    TB_PAUSE,
+    TB_PAUSE_REPLAY,
+    TB_PGN_LABELS,
+    TB_PGN_REPLAY,
+    TB_PLAY,
+    TB_PREVIOUS,
+    TB_QUIT,
+    TB_READ_PGN,
+    TB_REPEAT,
+    TB_REPEAT_REPLAY,
+    TB_RESIGN,
+    TB_SAVE,
+    TB_SAVE_AS,
+    TB_SEND,
+    TB_SHOW_TEXT,
+    TB_SLOW_REPLAY,
+    TB_STOP,
+    TB_TOOLS,
+    TB_TRAIN,
+    TB_UTILITIES,
+    TB_VARIATIONS,
+    NAG_0,
+    NAG_1,
+    NAG_2,
+    NAG_3,
+    NAG_4,
+    NAG_5,
+    NAG_6,
+)
 from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -174,8 +231,12 @@ class WBase(QtWidgets.QWidget):
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 52, centered=True)
         si_figurines_pgn = configuration.x_pgn_withfigurines
-        o_columns.nueva("WHITE", _("White"), with_each_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None))
-        o_columns.nueva("BLACK", _("Black"), with_each_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None))
+        o_columns.nueva(
+            "WHITE", _("White"), with_each_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
+        )
+        o_columns.nueva(
+            "BLACK", _("Black"), with_each_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
+        )
         self.pgn = Grid.Grid(self, o_columns, siCabeceraMovible=False)
         self.pgn.setMinimumWidth(width_pgn)
         self.pgn.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -186,9 +247,7 @@ class WBase(QtWidgets.QWidget):
         # # Blancas y negras
         f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels + 2, peso=75)
         self.lb_player_white = Controles.LB(self).anchoFijo(nAnchoLabels).align_center().ponFuente(f).set_wrap()
-        style = (
-            "QWidget { border-style: groove; border-width: 2px; border-color: Gray; padding: 4px 4px 4px 4px;background-color:%s;color:%s;}"
-        )
+        style = "QWidget { border-style: groove; border-width: 2px; border-color: Gray; padding: 4px 4px 4px 4px;background-color:%s;color:%s;}"
         self.lb_player_white.setStyleSheet(style % ("white", "black"))
 
         self.lb_player_black = Controles.LB(self).anchoFijo(nAnchoLabels).align_center().ponFuente(f).set_wrap()
@@ -459,7 +518,7 @@ class WBase(QtWidgets.QWidget):
             return
         self.procesandoEventos = True
 
-        dic = QTUtil2.dicTeclas()
+        dic = QTUtil2.dic_keys()
         if tecla in dic:
             if hasattr(self.manager, "mueveJugada"):
                 self.manager.mueveJugada(dic[tecla])

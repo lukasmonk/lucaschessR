@@ -1,11 +1,11 @@
-from PySide2 import QtWidgets, QtCore
+from PySide2 import QtWidgets
 
+from Code.Base import Game
 from Code.QT import Colocacion
 from Code.QT import Columnas
+from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTVarios
-from Code.QT import Grid
-from Code.Base import Game
 from Code.Themes import Themes
 
 

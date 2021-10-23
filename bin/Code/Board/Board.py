@@ -1,30 +1,34 @@
-import webbrowser
-
-import FasterCode
-
-from io import BytesIO
-
 import collections
 import copy
 import os
+import webbrowser
+from io import BytesIO
 
+import FasterCode
 from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import Qt
 
+import Code
+import Code.Board.WindowColors as WindowColores
+from Code import Util
+from Code.Base.Constantes import (
+    TB_TAKEBACK,
+    BLINDFOLD_CONFIG,
+    ZVALUE_PIECE,
+    BLINDFOLD_BLACK,
+    BLINDFOLD_WHITE,
+    BLINDFOLD_ALL,
+)
+from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows
+from Code.Director import TabVisual, WindowDirector
 from Code.QT import Colocacion
 from Code.QT import Controles
+from Code.QT import Delegados
 from Code.QT import Iconos
 from Code.QT import Piezas
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
-from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows
-from Code.QT import Delegados
-from Code.Director import TabVisual, WindowDirector
-from Code import Util
-import Code
-from Code.Base.Constantes import *
-import Code.Board.WindowColors as WindowColores
 
 
 class RegKB:
@@ -37,7 +41,11 @@ class Board(QtWidgets.QGraphicsView):
     def __init__(self, parent, config_board, siMenuVisual=True, siDirector=True):
         super(Board, self).__init__(None)
 
-        self.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform)
+        self.setRenderHints(
+            QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing | QtGui.QPainter.SmoothPixmapTransform
+        )
+        self.setViewportUpdateMode(QtWidgets.QGraphicsView.BoundingRectViewportUpdate)
+        self.setCacheMode(QtWidgets.QGraphicsView.CacheBackground)
         self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setDragMode(self.NoDrag)
@@ -59,7 +67,9 @@ class Board(QtWidgets.QGraphicsView):
         self.dirvisual = None
         self.guion = None
         self.lastFenM2 = ""
-        self.dbVisual = TabVisual.DBManagerVisual(self.configuration.ficheroRecursos, False)
+        self.dbVisual = TabVisual.DBManagerVisual(
+            self.configuration.ficheroRecursos, show_allways=self.configuration.x_director_icon == False
+        )
 
         self.current_graphlive = None
         self.dic_graphlive = None
@@ -150,7 +160,9 @@ class Board(QtWidgets.QGraphicsView):
 
             # ALT-J Save image to file (CTRL->no border)
             elif key == Qt.Key_J:
-                path = QTUtil2.salvaFichero(self, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
+                path = SelectFiles.salvaFichero(
+                    self, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
+                )
                 if path:
                     self.save_as_img(path, "png", is_ctrl=is_ctrl, is_alt=is_alt)
                     self.configuration.x_save_folder = os.path.dirname(path)
@@ -164,7 +176,11 @@ class Board(QtWidgets.QGraphicsView):
             elif key == Qt.Key_L:
                 webbrowser.open("https://lichess.org/analysis/standard/" + self.last_position.fen())
 
-            elif hasattr(self.main_window, "manager") and self.main_window.manager and key in (Qt.Key_P, Qt.Key_N, Qt.Key_C):
+            elif (
+                hasattr(self.main_window, "manager")
+                and self.main_window.manager
+                and key in (Qt.Key_P, Qt.Key_N, Qt.Key_C)
+            ):
                 # P -> show information
                 if key == Qt.Key_P and hasattr(self.main_window.manager, "pgnInformacion"):
                     self.main_window.manager.pgnInformacion()
@@ -192,7 +208,6 @@ class Board(QtWidgets.QGraphicsView):
             if len(self.cad_buffer) >= 2:
                 FasterCode.set_fen(self.last_position.fen())
                 li = FasterCode.get_exmoves()
-                ok_ini = False
                 busca = self.cad_buffer.lower()
 
                 exmove_ok = None
@@ -435,10 +450,12 @@ class Board(QtWidgets.QGraphicsView):
             else:
                 cajon = BoardTypes.Caja()
                 cajon.colorRelleno = self.colorExterior
-        self.ancho = ancho = cajon.physical_pos.alto = cajon.physical_pos.ancho = self.width_square * 8 + self.margenCentro * 2 + 4
+        self.ancho = ancho = cajon.physical_pos.alto = cajon.physical_pos.ancho = (
+            self.width_square * 8 + self.margenCentro * 2 + self.tamFrontera * 2 + 4
+        )
         cajon.physical_pos.orden = 1
         cajon.tipo = QtCore.Qt.NoPen
-        self.setFixedSize(ancho + 4, ancho + 4)
+        self.setFixedSize(ancho, ancho)
         if is_png:
             self.cajonSC = BoardElements.PixmapSC(self.escena, cajon)
         else:
@@ -465,8 +482,10 @@ class Board(QtWidgets.QGraphicsView):
         # Frontera
         base_casillas_f = BoardTypes.Caja()
         base_casillas_f.grosor = self.tamFrontera
-        base_casillas_f.physical_pos.x = base_casillas_f.physical_pos.y = self.margenCentro + 1
-        base_casillas_f.physical_pos.alto = base_casillas_f.physical_pos.ancho = self.width_square * 8 + self.tamFrontera
+        base_casillas_f.physical_pos.x = base_casillas_f.physical_pos.y = self.margenCentro + self.tamFrontera
+        base_casillas_f.physical_pos.alto = base_casillas_f.physical_pos.ancho = (
+            self.width_square * 8 + self.tamFrontera
+        )
         base_casillas_f.physical_pos.orden = 3
         base_casillas_f.colorRelleno = -1
         base_casillas_f.color = self.colorFrontera
@@ -497,8 +516,8 @@ class Board(QtWidgets.QGraphicsView):
                     k = self.margenCentro + 2
                     if y % 2 == tipo:
                         k += self.width_square
-                    una.physical_pos.x = k + x * 2 * self.width_square
-                    una.physical_pos.y = self.margenCentro + 2 + y * self.width_square
+                    una.physical_pos.x = k + x * 2 * self.width_square + self.tamFrontera - 1
+                    una.physical_pos.y = self.margenCentro + 2 + y * self.width_square + self.tamFrontera - 1
                     if with_pixmap:
                         casillaSC = BoardElements.PixmapSC(self.escena, una, pixmap=pixmap)
                         pixmap = casillaSC.pixmap
@@ -528,7 +547,9 @@ class Board(QtWidgets.QGraphicsView):
             pCasillas = baseCasillas.physical_pos
             pFrontera = base_casillas_f.physical_pos
             gapCasilla = (self.width_square - anchoTexto) / 2
-            sep = self.margenCentro * self.config_board.sepLetras() * 38 / 50000  # ancho = 38 -> sep = 5 -> sepLetras = 100
+            sep = (
+                self.margenCentro * self.config_board.sepLetras() * 38 / 50000
+            )  # ancho = 38 -> sep = 5 -> sepLetras = 100
 
             def norm(x):
                 if x < 0:
@@ -611,11 +632,11 @@ class Board(QtWidgets.QGraphicsView):
         self.scriptSC_menu = None
         if self.siMenuVisual:
             indicador_menu = BoardTypes.Imagen()
-            indicador_menu.physical_pos.x = pFrontera.x - ancho
+            indicador_menu.physical_pos.x = 2
             if self.configuration.x_position_tool_board == "B":
-                indicador_menu.physical_pos.y = pFrontera.y + pFrontera.alto + 2 * gap
+                indicador_menu.physical_pos.y = self.ancho - 24
             else:
-                indicador_menu.physical_pos.y = 0
+                indicador_menu.physical_pos.y = 2
 
             indicador_menu.physical_pos.ancho = indicador_menu.physical_pos.alto = ancho - 2 * gap
             indicador_menu.physical_pos.orden = 2
@@ -644,11 +665,15 @@ class Board(QtWidgets.QGraphicsView):
                 script.tipo = 1
                 script.sur = indicador.physical_pos.y
                 script.norte = gap / 2
-                self.scriptSC_menu = BoardElements.PixmapSC(self.escena, script, pixmap=Iconos.pmLampara(), rutina=self.lanzaGuion)
+                self.scriptSC_menu = BoardElements.PixmapSC(
+                    self.escena, script, pixmap=Iconos.pmLampara(), rutina=self.lanzaGuion
+                )
                 self.scriptSC_menu.hide()
                 self.scriptSC_menu.setOpacity(0.70)
 
         self.init_kb_buffer()
+
+        self.setSceneRect(0, 0, self.ancho, self.ancho)
 
     def setAcceptDropPGNs(self, rutinaDropsPGN):
         self.baseCasillasSC.setAcceptDrops(rutinaDropsPGN is not None)
@@ -670,10 +695,16 @@ class Board(QtWidgets.QGraphicsView):
             (_("CTRL") + " C", _("Copy FEN to clipboard")),
             (_("ALT") + " I", _("Copy board as image to clipboard")),
             (_("CTRL") + " I", _("Copy board as image to clipboard") + " (%s)" % _("without border")),
-            (_("CTRL") + "+" + _("ALT") + " I", _("Copy board as image to clipboard") + " (%s)" % _("without coordinates")),
+            (
+                _("CTRL") + "+" + _("ALT") + " I",
+                _("Copy board as image to clipboard") + " (%s)" % _("without coordinates"),
+            ),
             (_("ALT") + " J", _("Copy board as image to a file")),
             (_("CTRL") + " J", _("Copy board as image to a file") + " (%s)" % _("without border")),
-            (_("CTRL") + "+" + _("ALT") + " J", _("Copy board as image to a file") + " (%s)" % _("without coordinates")),
+            (
+                _("CTRL") + "+" + _("ALT") + " J",
+                _("Copy board as image to a file") + " (%s)" % _("without coordinates"),
+            ),
         ]
         if self.pieces_are_active:
             liKeys.append((None, None))
@@ -787,11 +818,12 @@ class Board(QtWidgets.QGraphicsView):
 
         elif resp.startswith("def_"):
             if resp.endswith("todo"):
-                self.config_board = self.configuration.resetConfBoard(self.config_board.id(), self.config_board.anchoPieza())
+                self.config_board = self.configuration.resetConfBoard(
+                    self.config_board.id(), self.config_board.anchoPieza()
+                )
                 if self.config_board.is_base:
                     nom_pieces_ori = self.config_board.nomPiezas()
-                    Code.todasPiezas.saveAllPNG(nom_pieces_ori, 30)  # reset IntFiles/Figs
-                    Delegados.generaPM(self.piezas)
+                    self.cambiaPiezas(nom_pieces_ori)
                 self.reset(self.config_board)
 
     def lanzaDirector(self):
@@ -831,22 +863,27 @@ class Board(QtWidgets.QGraphicsView):
         self.config_board.guardaEnDisco()
         ap, apc = self.pieces_are_active, self.side_pieces_active
         siFlecha = self.flechaSC is not None
+        atajosRaton = self.atajosRaton
 
         self.crea()
         if ap:
             self.activate_side(apc)
             self.set_side_indicator(apc)
 
+        self.atajosRaton = atajosRaton
+
         if siFlecha:
-            # self.put_arrow_sc( self.ultMovFlecha[0], self.ultMovFlecha[1])
             self.resetFlechaSC()
 
         self.init_kb_buffer()
 
         if self.config_board.is_base:
             nom_pieces_ori = self.config_board.nomPiezas()
-            Code.todasPiezas.saveAllPNG(nom_pieces_ori, 30)  # reset IntFiles/Figs
+            Code.todasPiezas.saveAllPNG(nom_pieces_ori, 30)
             Delegados.generaPM(self.piezas)
+            self.main_window.pgnRefresh()
+            if hasattr(self.main_window.manager, "put_view"):
+                self.main_window.manager.put_view()
 
     def ponColores(self, liTemas, resp):
         if resp.startswith("tt_"):
@@ -923,7 +960,17 @@ class Board(QtWidgets.QGraphicsView):
         self.current_graphlive.update()
 
     def readGraphLive(self):
-        rel = {0: "MR", 1: "ALTMR", 2: "SHIFTMR", 3: "CTRLMR", 4: "CTRLALTMR", 5: "CTRLSHIFTMR", 6: "MR1", 7: "ALTMR1", 8: "SHIFTMR1"}
+        rel = {
+            0: "MR",
+            1: "ALTMR",
+            2: "SHIFTMR",
+            3: "CTRLMR",
+            4: "CTRLALTMR",
+            5: "CTRLSHIFTMR",
+            6: "MR1",
+            7: "ALTMR1",
+            8: "SHIFTMR1",
+        }
         dic = {}
         db = self.dbVisual
         li = self.dbVisual.dbConfig["SELECTBANDA"]
@@ -1096,7 +1143,9 @@ class Board(QtWidgets.QGraphicsView):
         if not hasattr(self, "dicXML"):
 
             def lee(fich):
-                with open(Code.path_resource("IntFiles/Svg", "%s.svg" % fich), "rt", encoding="utf-8", errors="ignore") as f:
+                with open(
+                    Code.path_resource("IntFiles/Svg", "%s.svg" % fich), "rt", encoding="utf-8", errors="ignore"
+                ) as f:
                     resp = f.read()
                 return resp
 
@@ -1191,21 +1240,21 @@ class Board(QtWidgets.QGraphicsView):
         self.init_kb_buffer()
 
     def dbvisual_set_file(self, file):
-        self.dbVisual.setFichero(file)
+        self.dbVisual.set_file(file)
 
     def dbvisual_set_show_allways(self, ok):
-        self.dbVisual.showAllways(ok)
+        self.dbVisual.show_allways(ok)
 
-    def dbVisual_setSaveAllways(self, ok):
-        self.dbVisual.saveAllways(ok)
+    def dbvisual_set_save_allways(self, ok):
+        self.dbVisual.save_allways(ok)
 
-    def dbVisual_close(self):
+    def dbvisual_close(self):
         self.dbVisual.close()
 
-    def dbVisual_contiene(self, fenm2):
+    def dbvisual_contains(self, fenm2):
         return fenm2 in self.dbVisual.dbFEN and len(self.dbVisual.dbFEN[fenm2]) > 0
 
-    def dbVisual_lista(self, fenm2):
+    def dbvisual_list(self, fenm2):
         return self.dbVisual.dbFEN[fenm2]
 
     def dbVisual_save(self, fenm2, lista):
@@ -1220,7 +1269,7 @@ class Board(QtWidgets.QGraphicsView):
         alm.guion = self.guion
         alm.lastFenM2 = self.lastFenM2
         alm.nomdbVisual = self.dbVisual.file
-        alm.dbVisual_showAllways = self.dbVisual.showAllways()
+        alm.dbVisual_show_allways = self.dbVisual.show_allways()
 
     def restoreVisual(self):
         alm = self.almSaveVisual
@@ -1230,21 +1279,21 @@ class Board(QtWidgets.QGraphicsView):
         self.dirvisual = alm.dirvisual
         self.guion = alm.guion
         self.lastFenM2 = alm.lastFenM2
-        self.dbVisual.setFichero(alm.nomdbVisual)
-        self.dbVisual.showAllways(alm.dbVisual_showAllways)
+        self.dbVisual.set_file(alm.nomdbVisual)
+        self.dbVisual.show_allways(alm.dbVisual_show_allways)
 
     def set_last_position(self, position):
         self.init_kb_buffer()
         self.cierraGuion()
         self.last_position = position
-        if self.siDirectorIcon or self.dbVisual.showAllways():
+        if self.siDirectorIcon or self.dbVisual.show_allways():
             fenm2 = position.fenm2()
             if self.lastFenM2 != fenm2:
                 self.lastFenM2 = fenm2
-                if self.dbVisual_contiene(fenm2):
+                if self.dbvisual_contains(fenm2):
                     if self.siDirectorIcon:
                         self.scriptSC_menu.show()
-                    if self.dbVisual.showAllways():
+                    if self.dbVisual.show_allways():
                         self.lanzaGuion()
                 elif self.siDirectorIcon:
                     self.scriptSC_menu.hide()
@@ -1256,7 +1305,7 @@ class Board(QtWidgets.QGraphicsView):
     def set_position(self, position, siBorraMoviblesAhora=True, variation_history=None):
         if self.dirvisual:
             self.dirvisual.cambiadaPosicionAntes()
-        elif self.dbVisual.saveAllways():
+        elif self.dbVisual.save_allways():
             self.dbVisual.saveMoviblesBoard(self)
 
         if self.si_borraMovibles and siBorraMoviblesAhora:
@@ -1470,6 +1519,28 @@ class Board(QtWidgets.QGraphicsView):
             piezaSC.update()
             self.escena.update()
 
+    # def muevePieza_timed(self, from_a1h8, to_a1h8, seconds):
+    #     npieza = self.buscaPieza(from_a1h8)
+    #     if npieza >= 0:
+    #         def a1h8_xy(a1h8):
+    #             row = int(a1h8[1])
+    #             column = ord(a1h8[0]) - 96
+    #             x = self.columna2punto(column)
+    #             y = self.fila2punto(row)
+    #             return x, y
+    #
+    #         piezaSC = self.liPiezas[npieza][1]
+    #         anim = QtCore.QPropertyAnimation(piezaSC, b"geometry")
+    #         anim.setDuration(seconds*1000)
+    #         # anim.setStartValue(QtCore.QRect(150, 30, 100, 100))
+    #         r: QtCore.QRectF = QtCore.QRectF(piezaSC.rect)
+    #         x, y = a1h8_xy(to_a1h8)
+    #         r.moveLeft(x)
+    #         r.moveBottom(y)
+    #
+    #         anim.setEndValue(r)
+    #         anim.start()
+
     def set_piece_again(self, posA1H8):
         npieza = self.buscaPieza(posA1H8)
         if npieza >= 0:
@@ -1577,6 +1648,34 @@ class Board(QtWidgets.QGraphicsView):
         piezaSC.update()
         self.escena.update()
         QTUtil.refresh_gui()
+
+    def xy_a1h8(self, x, y):
+        cy = self.punto2fila(y)
+        cx = self.punto2columna(x)
+        return self.num2alg(cy, cx)
+
+    def a1h8_xy(self, a1h8):
+        cx, cy = self.alg2num(a1h8)
+        return self.columna2punto(cx), self.fila2punto(cy)
+
+    def piece_out_position(self, position):
+        si_changed = False
+        for una in self.liPiezas:
+            pieza, piezaSC, is_active = una
+            if position.is_white == pieza.isupper():
+                x = piezaSC.x()
+                y = piezaSC.y()
+                if int(x) != piezaSC.bloquePieza.physical_pos.x or int(y) != piezaSC.bloquePieza.physical_pos.y:
+                    si_changed = True
+                    cy = self.punto2fila(y)
+                    cx = self.punto2columna(x)
+                    to_sq = self.num2alg(cy, cx)
+                    cy = self.punto2fila(piezaSC.bloquePieza.physical_pos.y)
+                    cx = self.punto2columna(piezaSC.bloquePieza.physical_pos.x)
+                    from_sq = self.num2alg(cy, cx)
+                    if to_sq != from_sq:
+                        return si_changed, from_sq, to_sq
+        return si_changed, None, None
 
     def set_side_indicator(self, is_white):
         bd = self.side_indicator_sc.bloqueDatos
@@ -1864,13 +1963,13 @@ class Board(QtWidgets.QGraphicsView):
             if is_ctrl and not is_alt:
                 x = self.tamFrontera
                 y = self.tamFrontera
-                w -= self.tamFrontera * 2 + 2
-                h -= self.tamFrontera * 2 + 2
+                w -= self.tamFrontera * 2
+                h -= self.tamFrontera * 2
             elif is_alt and is_ctrl:
-                x += self.margenCentro
-                y += self.margenCentro
-                w -= self.margenCentro * 2
-                h -= self.margenCentro * 2
+                x += self.margenCentro + self.tamFrontera
+                y += self.margenCentro + self.tamFrontera
+                w -= self.margenCentro * 2 + self.tamFrontera * 2
+                h -= self.margenCentro * 2 + self.tamFrontera * 2
             pm = QtGui.QPixmap.grabWidget(self, x, y, w, h)
         if file is None:
             QTUtil.ponPortapapeles(pm, tipo="p")
@@ -2054,6 +2153,9 @@ class Board(QtWidgets.QGraphicsView):
 
     def dispatchSize(self, rutinaControl):
         self._dispatchSize = rutinaControl
+
+    # def boundingRect(self):
+    #     return QtCore.QRect(0, 0, self.ancho, self.ancho)
 
     def fen_active(self):
         li = []

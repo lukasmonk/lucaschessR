@@ -5,7 +5,7 @@ import random
 import Code
 from Code.Base import Game
 from Code import Util
-from Code.Config import TrListas
+from Code.Translations import TrListas
 
 
 class Reg:

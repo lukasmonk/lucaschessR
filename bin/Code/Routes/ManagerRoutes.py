@@ -3,16 +3,26 @@ import time
 
 import FasterCode
 
-from Code import Util
-from Code.Polyglots import Books
+import Code
 from Code import Manager
-from Code.Endings import LibChess
+from Code import Util
 from Code.Base import Game, Move, Position
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_HELP,
+    TB_NEXT,
+    TB_UTILITIES,
+    GT_ROUTES,
+)
+from Code.Endings import LibChess
+from Code.Polyglots import Books
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.Routes import Routes
-import Code
-from Code.Base.Constantes import *
 
 
 class GR_Engine:

@@ -1,4 +1,7 @@
+from Code import Util
 from Code.Base import Game
+from Code.Translations import TrListas
+from Code.Databases import WindowDatabase
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -6,10 +9,7 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Config import TrListas
-from Code import Util
 from Code.SQL import UtilSQL
-from Code.Databases import WindowDatabase
 
 
 class DBPlayGame(UtilSQL.DictSQL):
@@ -125,9 +125,7 @@ class WPlayGameBase(QTVarios.WDialogo):
     def grid_dato(self, grid, row, o_column):
         col = o_column.key
         reg = self.db.leeRegistro(row)
-        if "CACHE" in reg:
-            dic_tags = reg["CACHE"]
-        else:
+        if not ("CACHE" in reg):
             game = Game.Game()
             game.restore(reg["GAME"])
             reg["CACHE"] = {k: game.get_tag(k) for k in self.li_keys}

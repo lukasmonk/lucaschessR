@@ -1,13 +1,13 @@
-from PySide2 import QtCore, QtGui
+from PySide2 import QtCore
 
+from Code.Kibitzers import WKibCommon
 from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
+from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import Delegados
-from Code.Kibitzers import WKibCommon
 
 
 class WPolyglot(WKibCommon.WKibCommon):

@@ -4,8 +4,8 @@ import time
 import Code
 from Code import Util
 from Code.Base import Position
-from Code.QT import Iconos
 from Code.QT import Controles
+from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 

@@ -3,7 +3,7 @@ import os
 from PySide2 import QtWidgets, QtCore, QtGui
 
 from Code import Util
-from Code.Config import TrListas
+from Code.Translations import TrListas
 from Code.Director import TabVisual, WindowTab, WindowTabVFlechas, WindowTabVMarcos, WindowTabVMarkers, WindowTabVSVGs
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -13,7 +13,7 @@ from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.Board import BoardTypes
 
@@ -355,12 +355,12 @@ class WPanelDirector(QTVarios.WDialogo):
     def gfile(self):
         self.test_siGrabar()
         path = self.configuration.ficheroFEN
-        fich = QTUtil2.leeCreaFichero(self, path, "dbl")
+        fich = SelectFiles.leeCreaFichero(self, path, "dbl")
         if fich:
             self.configuration.ficheroFEN = Util.relative_path(fich)
             self.configuration.graba()
 
-            self.board.dbVisual_close()
+            self.board.dbvisual_close()
 
             # self.board.borraMovibles()
             self.guion.cierraPizarra()
@@ -681,7 +681,7 @@ class WPanelDirector(QTVarios.WDialogo):
 
     def grabarFichero(self):
         dirSalvados = self.configuration.x_save_folder
-        resp = QTUtil2.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PNG (*.png)", False)
+        resp = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PNG (*.png)", False)
         if resp:
             self.board.save_as_img(resp, "png")
             txt = resp

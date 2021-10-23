@@ -1,10 +1,10 @@
 import Code.Base.Game  # To prevent recursivity in Variations -> import direct
-from Code.Config import TrListas
 from Code import Util
 from Code.Base import Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import NAG_4, NAG_6, NAG_2, html_nag_txt
 from Code.Engines import EngineResponse
 from Code.Themes.Lichess import cook
+from Code.Translations import TrListas
 
 
 def crea_dic_html():
@@ -39,7 +39,9 @@ class Move:
         self.time_ms = ms
 
     def only_has_move(self) -> bool:
-        return not (self.variations or self.comment or len(self.li_nags) > 0 or self.analysis or len(self.li_themes) > 0)
+        return not (
+            self.variations or self.comment or len(self.li_nags) > 0 or self.analysis or len(self.li_themes) > 0
+        )
 
     @property
     def get_themes(self) -> []:
@@ -108,6 +110,9 @@ class Move:
 
     def del_comment(self):
         self.comment = ""
+
+    def add_comment(self, comment):
+        self.comment = comment
 
     def del_analysis(self):
         self.analysis = None
@@ -322,6 +327,11 @@ class Move:
         for variation in self.variations.li_variations:
             if variation.move(0) == a1h8:
                 return False, True
+        if self.position.is_mate():
+            position = self.position_before.copia()
+            position.moverPV(a1h8)
+            if position.is_mate():
+                return True, False
         return False, False
 
     def assign_themes_lichess(self):
@@ -431,7 +441,9 @@ class Variations:
             pv_base = self.move_base
             for rm in mrm.li_rm:
                 if rm.movimiento() != pv_base:
-                    self.analisis2variantesUno(tmp_game, rm, eti_t, almVariations.one_move_variation, almVariations.si_pdt)
+                    self.analisis2variantesUno(
+                        tmp_game, rm, eti_t, almVariations.one_move_variation, almVariations.si_pdt
+                    )
                     break
         else:
             for rm in mrm.li_rm:
@@ -443,9 +455,6 @@ class Variations:
         move = tmp_game.move(0)
         puntuacion = rm.abrTextoPDT() if si_pdt else rm.abrTexto()
         move.comment = "%s%s" % (puntuacion, eti_t)
-
-        li = tmp_game.li_moves[0] if si_un_move else tmp_game.li_moves
-
         gm = tmp_game.copia(0 if si_un_move else None)
         self.li_variations.append(gm)
 

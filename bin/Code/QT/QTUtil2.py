@@ -1,72 +1,26 @@
 import time
+
 from PySide2 import QtCore, QtWidgets
 
 import Code
+from Code.Base.Constantes import (
+    GO_BACK,
+    GO_END,
+    GO_FORWARD,
+    GO_START,
+    ZVALUE_PIECE,
+    ZVALUE_PIECE_MOVING
+)
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.Base.Constantes import *
+from Code.QT import QTVarios
 
 
-def dicTeclas():
+def dic_keys():
     dic = {16777234: GO_BACK, 16777236: GO_FORWARD, 16777235: GO_BACK, 16777237: GO_FORWARD, 16777232: GO_START, 16777233: GO_END}
     return dic
-
-
-def leeCarpeta(owner, carpeta, titulo=None):
-    if titulo is None:
-        titulo = _("Open Directory")
-    return QtWidgets.QFileDialog.getExistingDirectory(
-        owner, titulo, carpeta, QtWidgets.QFileDialog.ShowDirsOnly | QtWidgets.QFileDialog.DontResolveSymlinks
-    )
-
-
-def _lfTituloFiltro(extension, titulo):
-    if titulo is None:
-        titulo = _("File")
-    if " " in extension:
-        filtro = extension
-    else:
-        pathext = "*.%s" % extension
-        if extension == "*" and Code.is_linux:
-            pathext = "*"
-        filtro = _("File") + " %s (%s)" % (extension, pathext)
-    return titulo, filtro
-
-
-def leeFichero(owner, carpeta, extension, titulo=None):
-    titulo, filtro = _lfTituloFiltro(extension, titulo)
-    resp = QtWidgets.QFileDialog.getOpenFileName(owner, titulo, carpeta, filtro)
-    return resp[0] if resp else None
-
-
-def leeFicheros(owner, carpeta, extension, titulo=None):
-    titulo, filtro = _lfTituloFiltro(extension, titulo)
-    resp = QtWidgets.QFileDialog.getOpenFileNames(owner, titulo, carpeta, filtro)
-    return resp[0] if resp else None
-
-
-def creaFichero(owner, carpeta, extension, titulo=None):
-    titulo, filtro = _lfTituloFiltro(extension, titulo)
-    resp = QtWidgets.QFileDialog.getSaveFileName(owner, titulo, carpeta, filtro)
-    return resp[0] if resp else None
-
-
-def leeCreaFichero(owner, carpeta, extension, titulo=None):
-    titulo, filtro = _lfTituloFiltro(extension, titulo)
-    resp = QtWidgets.QFileDialog.getSaveFileName(owner, titulo, carpeta, filtro, options=QtWidgets.QFileDialog.DontConfirmOverwrite)
-    return resp[0] if resp else None
-
-
-def salvaFichero(main_window, titulo, carpeta, filtro, siConfirmarSobreescritura=True):
-    if siConfirmarSobreescritura:
-        resp = QtWidgets.QFileDialog.getSaveFileName(main_window, titulo, carpeta, filtro)
-    else:
-        resp = QtWidgets.QFileDialog.getSaveFileName(
-            main_window, titulo, carpeta, filtro, options=QtWidgets.QFileDialog.DontConfirmOverwrite
-        )
-    return resp[0] if resp else resp
 
 
 class MensEspera(QtWidgets.QWidget):
@@ -84,14 +38,12 @@ class MensEspera(QtWidgets.QWidget):
         pmImagen=None,
         puntos=12,
         conImagen=True,
+        siParentNone=False
     ):
 
-        assert parent is not None
+        super(MensEspera, self).__init__(None if siParentNone else parent)  # No se indica parent cuando le afecta el disable general, cuando se analiza posicion por ejemplo
 
-        # super(MensEspera, self).__init__(parent)
-        super(MensEspera, self).__init__(None)
-
-        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint)
+        self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
         self.setStyleSheet("QWidget, QLabel { background: %s }" % background)
         if conImagen:
             lbi = QtWidgets.QLabel(self)
@@ -170,8 +122,8 @@ class MensEspera(QtWidgets.QWidget):
             x = v.x() + (v.width() - s.width()) // 2
             y = v.y() + (v.height() - s.height()) // 2
 
-        # p = self.parent().mapToGlobal(QtCore.QPoint(x,y))
-        p = QtCore.QPoint(x, y)
+        # p = self.owner.mapToGlobal(QtCore.QPoint(x,y))
+        p = QtCore.QPoint(x,y)
         self.move(p)
         QTUtil.refresh_gui()
         return self
@@ -202,6 +154,7 @@ class ControlMensEspera:
         pmImagen=None,
         puntos=11,
         conImagen=True,
+        siParentNone=False
     ):
         # QTUtil.refresh_gui()
         if self.me:
@@ -209,7 +162,7 @@ class ControlMensEspera:
         if background is None:
             background = "#D3E3EC"
         self.me = MensEspera(
-            parent, mensaje, siCancelar, siMuestraYa, opacity, physical_pos, fixedSize, titCancelar, background, pmImagen, puntos, conImagen
+            parent, mensaje, siCancelar, siMuestraYa, opacity, physical_pos, fixedSize, titCancelar, background, pmImagen, puntos, conImagen, siParentNone=siParentNone
         )
         QTUtil.refresh_gui()
         return self
@@ -496,7 +449,7 @@ def tbAcceptCancel(parent, if_default=False, siReject=True):
         li_acciones.append((_("Default"), Iconos.Defecto(), parent.defecto))
     li_acciones.append(None)
 
-    return Controles.TBrutina(parent, li_acciones)
+    return QTVarios.LCTB(parent, li_acciones)
 
 
 def tiposDeLineas():

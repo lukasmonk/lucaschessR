@@ -1,10 +1,21 @@
 import random
 
 from Code import Manager
+from Code import DGT
 from Code.Base import Move
-from Code.Polyglots import WindowBooks
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    GT_BOOK,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_HELP,
+    TB_UTILITIES,
+)
 from Code.Engines import EngineResponse
-from Code.Base.Constantes import *
+from Code.Polyglots import WindowBooks
 
 
 class ManagerTrainBooks(Manager.Manager):
@@ -188,6 +199,7 @@ class ManagerTrainBooks(Manager.Manager):
                 found = False
 
         if not found:
+            DGT.set_position(self.game)
             self.board.set_position(self.game.last_position)
 
             main = self.list_moves[0][4]

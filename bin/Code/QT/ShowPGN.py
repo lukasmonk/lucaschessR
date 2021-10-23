@@ -2,7 +2,7 @@ import PySide2.QtGui
 from PySide2 import QtWidgets, QtCore
 
 from Code.Base import Move, Game
-from Code.QT import Controles, Colocacion, QTVarios, Iconos, QTUtil2
+from Code.QT import Controles, Colocacion, QTVarios, Iconos
 
 
 class LBPGN(Controles.LB):
@@ -91,11 +91,11 @@ class ShowPGN(QtWidgets.QScrollArea):
                 return
 
     def right_click(self, lb_sender):
-        num_lb = None
-        for num, lb in enumerate(self.li_variations):
-            if lb == lb_sender:
-                num_lb = num
-                break
+        # num_lb = None
+        # for num, lb in enumerate(self.li_variations):
+        #     if lb == lb_sender:
+        #         num_lb = num
+        #         break
         menu = QTVarios.LCMenu(self)
         menu.opcion("remove_line", _("Remove line"), Iconos.DeleteRow())
         if self.selected_link and self.selected_link in lb_sender.text():  # move selected in variation

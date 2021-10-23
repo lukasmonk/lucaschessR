@@ -1,12 +1,14 @@
 import os
 import sys
-import Code
-from Code import Util
-from Code import Procesador
-from Code.Sound import Sound
-from Code.MainWindow import Gui
 
-from Code.Base.Constantes import *
+import Code
+from Code import Procesador
+from Code import Util
+from Code.Base.Constantes import (
+    OUT_REINIT,
+)
+from Code.MainWindow import Gui
+from Code.Sound import Sound
 
 
 def init():

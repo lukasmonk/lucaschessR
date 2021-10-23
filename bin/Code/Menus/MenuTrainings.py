@@ -3,34 +3,41 @@ import random
 import shutil
 
 import Code
+from Code import ManagerFindAllMoves
+from Code import ManagerMate
+from Code import Memory
+from Code import Util
+from Code.Base.Constantes import (
+    ST_PLAYING,
+    GT_AGAINST_GM,
+    TACTICS_BASIC,
+    TACTICS_PERSONAL,
+    GT_TURN_ON_LIGHTS,
+    GT_TACTICS,
+)
+from Code.CompetitionWithTutor import CompetitionWithTutor, WCompetitionWithTutor
+from Code.Coordinates import WCoordinatesBlocks, WCoordinatesBasic
+from Code.CountsCaptures import WCountsCaptures
+from Code.Expeditions import WindowEverest
+from Code.GM import ManagerGM, WindowGM
+from Code.Mate15 import WMate15
+from Code.QT import Controles
+from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import Controles
-from Code.Config import TrListas
-from Code import Util
-from Code.SQL import UtilSQL
-from Code.Base.Constantes import *
-from Code.Resistence import Resistance, ManagerResistance, WindowResistance
-from Code import ManagerFindAllMoves
-from Code.TurnOnLights import ManagerTurnOnLights, WindowTurnOnLights
-from Code.GM import ManagerGM, WindowGM
-from Code import ManagerMate
-from Code.TurnOnLights import TurnOnLights
-from Code import Memory
-from Code.CompetitionWithTutor import CompetitionWithTutor, WCompetitionWithTutor
-from Code.QT import Iconos
-from Code.QT import WindowBMT
+from Code.TrainBMT import WindowBMT
 from Code.QT import WindowDailyTest
-from Code.QT import WindowEverest
 from Code.QT import WindowHorses
 from Code.QT import WindowLearnPGN
 from Code.QT import WindowPotencia
 from Code.QT import WindowPuente
 from Code.QT import WindowVisualiza
-from Code.CountsCaptures import WCountsCaptures
+from Code.Resistence import Resistance, ManagerResistance, WindowResistance
+from Code.SQL import UtilSQL
 from Code.Tactics import Tactics, ManagerTactics, WindowTactics
-from Code.Mate15 import WMate15
-from Code.Coordinates import WCoordinatesBlocks, WCoordinatesBasic
+from Code.Translations import TrListas
+from Code.TurnOnLights import ManagerTurnOnLights, WindowTurnOnLights
+from Code.TurnOnLights import TurnOnLights
 
 
 class TrainingFNS:

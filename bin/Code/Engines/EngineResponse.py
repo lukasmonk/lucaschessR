@@ -1,8 +1,11 @@
 import random
 
 from Code.Base import Game, Position
-from Code.Base.Constantes import *
-
+from Code.Base.Constantes import (
+    ADJUST_BETTER, ADJUST_WORST_MOVE, ADJUST_WORSE, ADJUST_SOMEWHAT_WORSE_LESS_LESS, ADJUST_SOMEWHAT_WORSE_LESS,
+    ADJUST_SOMEWHAT_BETTER_MORE_MORE, ADJUST_SOMEWHAT_BETTER_MORE, ADJUST_SOMEWHAT_BETTER, ADJUST_SIMILAR,
+    ADJUST_LOW_LEVEL, ADJUST_INTERMEDIATE_LEVEL, ADJUST_HIGH_LEVEL
+)
 
 class EngineResponse:
     def __init__(self, name, si_blancas):

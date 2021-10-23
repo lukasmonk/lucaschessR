@@ -1,11 +1,13 @@
-import os, time
+import os
+import time
 
 from PIL import Image
 from PySide2 import QtCore, QtGui, QtWidgets
 
-from Code.Base import Game, Move, Position
-from Code import Util
 import Code
+from Code import Util
+from Code.Base import Game, Move, Position
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -16,7 +18,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
 from Code.QT import Scanner
 
 MODO_POSICION, MODO_PARTIDA = range(2)
@@ -817,7 +818,7 @@ def voyager_position(wowner, position, si_esconde: bool = True, wownerowner=None
         pos = QTUtil.escondeWindow(wowner)
         if wownerowner:
             pos_ownerowner = QTUtil.escondeWindow(wownerowner)
-    game = Game.Game(ini_posicion=position)
+    game = Game.Game(first_position=position)
     dlg = Voyager(wowner, False, game)
     resp = dlg.resultado if dlg.exec_() else None
     if si_esconde:

@@ -2,28 +2,32 @@ import os
 
 from PySide2 import QtCore, QtWidgets
 
-from Code import Util
-from Code.SQL import UtilSQL
-from Code.Polyglots import Books
-from Code.Base import Position
-from Code.PlayAgainstEngine import Personalities
 from Code import DGT
+from Code import Util
+from Code.Base import Position
+from Code.Base.Constantes import (
+    FEN_INITIAL,
+    ADJUST_BETTER,
+    ADJUST_HIGH_LEVEL,
+)
+from Code.Engines import WEngines, SelectEngines
+from Code.Openings import WindowOpenings
+from Code.PlayAgainstEngine import Personalities
+from Code.Polyglots import Books
 from Code.QT import Colocacion
+from Code.QT import Columnas
 from Code.QT import Common
 from Code.QT import Controles
-from Code.QT import FormLayout
-from Code.QT import Iconos
-from Code.Openings import WindowOpenings
-from Code.Engines import WEngines, SelectEngines
-from Code.Tutor import WindowTutor
-from Code.QT import QTUtil
-from Code.QT import QTUtil2
-from Code.QT import QTVarios
-from Code.QT import Grid
-from Code.QT import Columnas
-from Code.QT import Voyager
 from Code.QT import Delegados
-from Code.Base.Constantes import *
+from Code.QT import FormLayout
+from Code.QT import Grid
+from Code.QT import Iconos
+from Code.QT import QTUtil
+from Code.QT import QTUtil2, SelectFiles
+from Code.QT import QTVarios
+from Code.QT import Voyager
+from Code.SQL import UtilSQL
+from Code.Tutor import WindowTutor
 
 
 class WPlayAgainstEngine(QTVarios.WDialogo):
@@ -85,11 +89,9 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
 
         gb_style = Common.gb_style()
 
-        def _label(ly_g, txt, xlayout, rutinaCHB=None, siCheck: object = False):
+        def _label(ly_g, txt, xlayout, checkable: object = False):
             groupbox = Controles.GB(self, txt, xlayout)
-            if rutinaCHB:
-                groupbox.to_connect(rutinaCHB)
-            elif siCheck:
+            if checkable:
                 groupbox.setCheckable(True)
                 groupbox.setChecked(False)
 
@@ -256,7 +258,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         lyH3 = Colocacion.H()
         lyH3.control(self.lbZeitnot).control(self.edZeitnot).relleno()
         ly = Colocacion.V().otro(lyH).otro(lyH2).otro(lyH3)
-        self.chbTiempo = _label(lyG, _("Activate the time control"), ly, siCheck=True)
+        self.chbTiempo = _label(lyG, _("Activate the time control"), ly, checkable=True)
 
         nueva_tab(lyG, _("Time"))
 
@@ -310,7 +312,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             .control(self.lbDepthBookR)
             .control(self.edDepthBookR)
         )
-        self.chbBookR = _label(lyG, "%s: %s" % (_("Activate book"), _("Opponent")), hbox, siCheck=True)
+        self.chbBookR = _label(lyG, "%s: %s" % (_("Activate book"), _("Opponent")), hbox, checkable=True)
 
         ## Player
         self.cbBooksP = QTUtil2.comboBoxLB(self, li_books, libInicial).ponFuente(font)
@@ -318,9 +320,12 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         self.lbDepthBookP = Controles.LB2P(self, _("Max depth")).ponFuente(font)
         self.edDepthBookP = Controles.ED(self).ponFuente(font).tipoInt(0).anchoFijo(30)
         hbox = (
-            Colocacion.H().control(self.cbBooksP).control(self.btNuevoBookP).relleno().control(self.lbDepthBookP).control(self.edDepthBookP)
+            Colocacion.H().control(self.cbBooksP)
+                .control(self.btNuevoBookP).relleno()
+                .control(self.lbDepthBookP)
+                .control(self.edDepthBookP)
         )
-        self.chbBookP = _label(lyG, "%s: %s" % (_("Activate book"), self.configuration.nom_player()), hbox, siCheck=True)
+        self.chbBookP = _label(lyG, "%s: %s" % (_("Activate book"), self.configuration.nom_player()), hbox, checkable=True)
 
         nueva_tab(lyG, _("Initial moves"))
 
@@ -383,7 +388,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         # self.ayudasCambiado()
         self.ponRival()
 
-        self.restore_video()
+        self.restore_video(shrink=True)
 
     def grid_num_datos(self, grid):
         return len(self.rival.li_uci_options_editable()) if self.tab_advanced_active else 0
@@ -870,7 +875,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
             self.motores.rehazMotoresExternos()
 
     def nuevoBook(self):
-        fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
+        fbin = SelectFiles.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
         if fbin:
             self.list_books.path = os.path.dirname(fbin)
             name = os.path.basename(fbin)[:-4]

@@ -2,15 +2,15 @@ import os
 
 from PySide2 import QtWidgets, QtCore
 
-from Code.Polyglots import Books
+import Code
 from Code.Base import Game, Position
+from Code.Board import Board
+from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
-from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-import Code
+from Code.QT import SelectFiles
 
 
 class UnMove:
@@ -465,7 +465,7 @@ class WindowArbolBook(QTVarios.WDialogo):
             if orden == "x":
                 self.cambiaLibro(book)
             elif orden == "n":
-                fbin = QTUtil2.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
+                fbin = SelectFiles.leeFichero(self, self.list_books.path, "bin", titulo=_("Polyglot book"))
                 if fbin:
                     self.list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]

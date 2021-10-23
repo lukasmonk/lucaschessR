@@ -2,13 +2,23 @@ import time
 
 from PySide2.QtCore import Qt
 
-from Code.Tactics import Tactics
 from Code import Manager
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_CHANGE,
+    TB_NEXT,
+    TB_UTILITIES,
+    GT_TACTICS,
+)
 from Code.CompetitionWithTutor import WCompetitionWithTutor
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.Base.Constantes import *
+from Code.Tactics import Tactics
 
 
 class ManagerTactics(Manager.Manager):
@@ -229,6 +239,7 @@ class ManagerTactics(Manager.Manager):
                     self.board.markPosition(move_obj.from_sq)
                     if self.num_bad_tries > 6:
                         self.board.creaFlechaTmp(move_obj.from_sq, move_obj.to_sq, True)
+            self.beepError()
             self.sigueHumano()
             return False
 

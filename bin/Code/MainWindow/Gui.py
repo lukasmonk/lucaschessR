@@ -13,12 +13,17 @@ from Code.QT import QTVarios
 
 
 def run_gui(procesador):
+    main_config = Configuration.Configuration("")
+    main_config.lee()
+    if main_config.x_enable_highdpiscaling:
+        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
+        QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)
+
     app = QtWidgets.QApplication([])
 
     # Usuarios
     list_users = Usuarios.Usuarios().list_users
     if len(list_users) > 1:
-        main_config = Configuration.Configuration("")
         main_config.releeTRA()
 
         user = pide_usuario(list_users)

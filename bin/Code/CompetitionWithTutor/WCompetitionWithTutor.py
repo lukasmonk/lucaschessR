@@ -1,13 +1,12 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
+from Code.About import About
 from Code.CompetitionWithTutor import CompetitionWithTutor
-
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.About import About
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios

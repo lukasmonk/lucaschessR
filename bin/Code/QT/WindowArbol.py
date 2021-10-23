@@ -7,7 +7,15 @@ import Code
 import Code.Nags.Nags
 from Code.Analysis import WindowAnalysisParam
 from Code.Base import Game, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    GOOD_MOVE,
+    VERY_GOOD_MOVE,
+    NO_RATING,
+    SPECULATIVE_MOVE,
+    QUESTIONABLE_MOVE,
+    BAD_MOVE,
+    VERY_POOR_MOVE,
+)
 from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -430,7 +438,12 @@ class TreeMoves(QtWidgets.QTreeWidget):
         import Code.Variations as Variations
 
         Variations.edit_variation_moves(
-            self.procesador, wowner, board.is_white_bottom, fen, lineaPGN, titulo=mov.titulo + " - " + mov.etiPuntos(True)
+            self.procesador,
+            wowner,
+            board.is_white_bottom,
+            fen,
+            lineaPGN,
+            titulo=mov.titulo + " - " + mov.etiPuntos(True),
         )
 
     def mostrarOcultar(self, item, mov):
@@ -744,7 +757,13 @@ class WindowArbol(QTVarios.WDialogo):
 
         self.restore_video(anchoDefecto=869 - 242 + anchoBoard)
         if not dicVideo:
-            dicVideo = {"TREE_3": 27, "SPLITTER": [260 - 242 + anchoBoard, 617], "TREE_1": 49, "TREE_2": 383, "TREE_4": 25}
+            dicVideo = {
+                "TREE_3": 27,
+                "SPLITTER": [260 - 242 + anchoBoard, 617],
+                "TREE_1": 49,
+                "TREE_2": 383,
+                "TREE_4": 25,
+            }
         sz = dicVideo.get("SPLITTER", None)
         if sz:
             self.splitter.setSizes(sz)

@@ -1,13 +1,13 @@
 from PySide2 import QtCore
 
 import Code
+from Code import Util
 from Code.Engines import EngineRun
+from Code.Kibitzers import WKibCommon
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil2
-from Code import Util
-from Code.Kibitzers import WKibCommon
 
 
 class WStEval(WKibCommon.WKibCommon):

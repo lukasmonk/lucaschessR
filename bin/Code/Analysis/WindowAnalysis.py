@@ -411,7 +411,7 @@ class WMuestra(QtWidgets.QWidget):
 
     def jugarPosicion(self):
         position, from_sq, to_sq = self.um.active_base_position()
-        game = Game.Game(ini_posicion=position)
+        game = Game.Game(first_position=position)
         dic_sended = {"ISWHITE": position.is_white, "GAME": game.save()}
 
         fichero = Code.configuration.ficheroTemporal("pk")

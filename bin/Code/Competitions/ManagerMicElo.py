@@ -1,18 +1,35 @@
 import datetime
 import random
 
-from Code.Engines import Engines
-from Code.Polyglots import Books
-from Code import DGT
-from Code.Engines import EnginesMicElo, EngineResponse
-from Code import Manager
-from Code.Base import Move
-from Code.QT import QTUtil2, QTUtil
-from Code import Util
-from Code import Adjournments
-from Code.SQL import UtilSQL
 import Code
-from Code.Base.Constantes import *
+from Code import Adjournments
+from Code import DGT
+from Code import Manager
+from Code import Util
+from Code.Base import Move
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    RS_WIN_PLAYER,
+    RS_WIN_OPPONENT,
+    RS_DRAW,
+    GT_MICELO,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_CANCEL,
+    TB_DRAW,
+    TB_RESIGN,
+    TB_UTILITIES,
+    TERMINATION_RESIGN,
+    WHITE,
+    BLACK,
+)
+from Code.Engines import Engines
+from Code.Engines import EnginesMicElo, EngineResponse
+from Code.Polyglots import Books
+from Code.QT import QTUtil2, QTUtil
+from Code.SQL import UtilSQL
 
 
 class DicMicElos:
@@ -196,7 +213,6 @@ class ManagerMicElo(Manager.Manager):
         tpBL = self.vtime[True].etiqueta()
         tpNG = self.vtime[False].etiqueta()
         self.rival = self.engine_rival.alias + " (%d)" % self.engine_rival.elo
-        player = self.configuration.x_player + " (%d)" % self.configuration.miceloActivo()
         white_name, black_name = self.configuration.nom_player(), self.engine_rival.alias
         white_elo, black_elo = self.configuration.miceloActivo(), self.engine_rival.elo
         if self.is_engine_side_white:
@@ -346,8 +362,6 @@ class ManagerMicElo(Manager.Manager):
         self.human_is_playing = False
         self.put_view()
         is_white = self.game.last_position.is_white
-
-        num_moves = len(self.game)
 
         if self.game.is_finished():
             self.show_result()

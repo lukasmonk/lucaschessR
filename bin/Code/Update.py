@@ -3,8 +3,8 @@ import urllib.request
 import zipfile
 
 import Code
-from Code.QT import QTUtil2
 from Code import Util
+from Code.QT import QTUtil2
 
 WEBUPDATES = "https://lucaschess.pythonanywhere.com/static/updater/updates_%s.txt" % ("win32" if Code.is_windows else "linux")
 

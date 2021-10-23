@@ -1,7 +1,12 @@
 from PySide2 import QtCore
 
 import Code
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    POS_TUTOR_HORIZONTAL,
+    POS_TUTOR_HORIZONTAL_1_2,
+    POS_TUTOR_HORIZONTAL_2_1,
+    POS_TUTOR_VERTICAL,
+)
 from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -82,7 +87,9 @@ class WindowTutor(QTVarios.WDialogo):
             self.lbTutorPuntuacion.setEnabled(True)
 
         lyUsuario = Colocacion.V().relleno().control(self.lbUsuarioPuntuacion).relleno()
-        gbUsuario = Controles.GB(self, _("Your move"), lyUsuario).ponFuente(f).align_center().to_connect(self.elegirUsuario)
+        gbUsuario = (
+            Controles.GB(self, _("Your move"), lyUsuario).ponFuente(f).align_center().to_connect(self.elegirUsuario)
+        )
         self.lbUsuarioPuntuacion.setEnabled(True)
         btLibros = Controles.PB(self, _("Consult a book"), self.consultaLibro).ponPlano(False)
 
@@ -112,7 +119,9 @@ class WindowTutor(QTVarios.WDialogo):
 
         layout = Colocacion.G()
         layout.controlc(gbTutor, 0, 0).controlc(self.boardTutor, 1, 0).otro(lytbtutor, 2, 0).otroc(lyRM, 3, 0)
-        layout.controlc(gbUsuario, fu, cu).controlc(self.boardUsuario, fu + 1, cu).otro(lytbuser, fu + 2, cu).controlc(btLibros, fu + 3, cu)
+        layout.controlc(gbUsuario, fu, cu).controlc(self.boardUsuario, fu + 1, cu).otro(lytbuser, fu + 2, cu).controlc(
+            btLibros, fu + 3, cu
+        )
         if siRival:
             layout.controlc(gbRival, fr, cr).controlc(self.boardRival, fr + 1, cr).otro(lytbRival, fr + 2, cr)
         elif siOpenings:
@@ -204,15 +213,19 @@ def cambioTutor(parent, configuration):
     li = [(_("Maximum"), 0)]
     for x in (1, 3, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200):
         li.append((str(x), x))
-    config = FormLayout.Combobox(_("Number of moves evaluated by engine(MultiPV)"), li)
+    config = FormLayout.Combobox(_("Number of half-moves evaluated by engine(MultiPV)"), li)
     li_gen.append((config, configuration.x_tutor_multipv))
 
     li_gen.append((None, _("Sensitivity")))
-    li_gen.append((FormLayout.Spinbox(_("Minimum difference in centipawns"), 0, 1000, 70), configuration.x_tutor_difpoints))
+    li_gen.append(
+        (FormLayout.Spinbox(_("Minimum difference in centipawns"), 0, 1000, 70), configuration.x_tutor_difpoints)
+    )
     li_gen.append((FormLayout.Spinbox(_("Minimum difference in %"), 0, 1000, 70), configuration.x_tutor_difporc))
 
     # Editamos
-    resultado = FormLayout.fedit(li_gen, title=_("Tutor change"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones())
+    resultado = FormLayout.fedit(
+        li_gen, title=_("Tutor change"), parent=parent, anchoMinimo=460, icon=Iconos.Opciones()
+    )
 
     if resultado:
         claveMotor, vtime, depth, multiPV, difpts, difporc = resultado[1]

@@ -2,12 +2,13 @@ import base64
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+from Code.Base.Constantes import ZVALUE_PIECE, ZVALUE_PIECE_MOVING
 from Code.QT import Controles
 from Code.QT import QTUtil
-from Code.Base.Constantes import *
 
 
 class BloqueSC(QtWidgets.QGraphicsItem):
+    # class BloqueSC(QtWidgets.QGraphicsObject):
     def __init__(self, escena, physical_pos):
 
         super(BloqueSC, self).__init__()
@@ -173,8 +174,13 @@ class PiezaSC(BloqueSC):
 
         self.bloqueDatos = self.bloquePieza = bloquePieza
 
+        # self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QtWidgets.QGraphicsItem.ItemIgnoresTransformations, True)
+
         pz = bloquePieza.pieza
         self.pixmap = board.piezas.render(pz)
+
+        self.ini_pos = None
 
         self.pmRect = QtCore.QRectF(0, 0, physical_pos.ancho, physical_pos.ancho)
         self.is_active = False
@@ -187,9 +193,12 @@ class PiezaSC(BloqueSC):
 
         self.dispatchMove = None
 
+        self.setCacheMode(QtWidgets.QGraphicsItem.DeviceCoordinateCache)
+
     def rehazPosicion(self):
         physical_pos = self.bloquePieza.physical_pos
         self.setPos(physical_pos.x, physical_pos.y)
+        self.update()
 
     def paint(self, painter, option, widget):
         self.pixmap.render(painter, self.rect)
@@ -211,13 +220,28 @@ class PiezaSC(BloqueSC):
 
     def mousePressEvent(self, event):
         if self.dragable:
-            QtWidgets.QGraphicsItem.mousePressEvent(self, event)
+            self.ini_pos = event.scenePos()
+
             self.setZValue(ZVALUE_PIECE_MOVING)
             self.setCursor(QtCore.Qt.ClosedHandCursor)
             if self.dispatchMove:
                 self.dispatchMove()
+            QtWidgets.QGraphicsItem.mousePressEvent(self, event)
         else:
             event.ignore()
+
+    def mouseMoveEvent(self, event):
+        if self.dragable:
+            current_pos = event.scenePos()
+            dx = current_pos.x() - self.ini_pos.x()
+            dy = current_pos.y() - self.ini_pos.y()
+            physical_pos = self.bloquePieza.physical_pos
+            punto = QtCore.QPointF(dx + physical_pos.x, dy + physical_pos.y)
+            self.setPos(punto)
+            self.update()
+            event.ignore()
+        else:
+            QtWidgets.QGraphicsItem.mouseMoveEvent(self, event)
 
     def setDispatchMove(self, rutina):
         self.dispatchMove = rutina

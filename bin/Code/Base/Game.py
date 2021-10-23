@@ -3,18 +3,59 @@ import FasterCode
 import Code
 from Code import Util
 from Code.Base import Move, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    RESULT_DRAW,
+    RESULT_UNKNOWN,
+    RESULT_WIN_BLACK,
+    RESULT_WIN_WHITE,
+    OPENING,
+    FEN_INITIAL,
+    TERMINATION_MATE,
+    TERMINATION_ADJUDICATION,
+    TERMINATION_DRAW_AGREEMENT,
+    TERMINATION_DRAW_50,
+    TERMINATION_DRAW_MATERIAL,
+    TERMINATION_DRAW_REPETITION,
+    TERMINATION_DRAW_STALEMATE,
+    TERMINATION_RESIGN,
+    TERMINATION_UNKNOWN,
+    TERMINATION_WIN_ON_TIME,
+    STANDARD_TAGS,
+    NONE,
+    ALL,
+    ONLY_BLACK,
+    ONLY_WHITE,
+    MIDDLEGAME,
+    ENDGAME,
+    ALLGAME,
+    WHITE,
+    BLACK,
+    BEEP_DRAW,
+    BEEP_DRAW_50,
+    BEEP_DRAW_MATERIAL,
+    BEEP_DRAW_REPETITION,
+    BEEP_WIN_OPPONENT,
+    BEEP_WIN_OPPONENT_TIME,
+    BEEP_WIN_PLAYER,
+    BEEP_WIN_PLAYER_TIME,
+    NAG_1,
+    NAG_2,
+    NAG_3,
+    NAG_4,
+    NAG_5,
+    NAG_6,
+)
 from Code.Openings import OpeningsStd, Opening
 
 
 class Game:
-    def __init__(self, ini_posicion=None, fen=None, li_tags=None):
+    def __init__(self, first_position=None, fen=None, li_tags=None):
         self.first_comment = ""
         self.li_tags = li_tags if li_tags else []
         if fen:
             self.set_fen(fen)
         else:
-            self.set_position(ini_posicion)
+            self.set_position(first_position)
 
     def reset(self):
         self.set_position(self.first_position)
@@ -239,7 +280,9 @@ class Game:
         move = self.move(-1)
         if move.position.is_finished():
             if move.is_check:
-                self.set_termination(TERMINATION_MATE, RESULT_WIN_WHITE if move.position_before.is_white else RESULT_WIN_BLACK)
+                self.set_termination(
+                    TERMINATION_MATE, RESULT_WIN_WHITE if move.position_before.is_white else RESULT_WIN_BLACK
+                )
             else:
                 self.set_termination(TERMINATION_DRAW_STALEMATE, RESULT_DRAW)
 
@@ -302,7 +345,13 @@ class Game:
         position = self.last_position
         pv = []
         for mov in lipv:
-            if len(mov) >= 4 and mov[0] in "abcdefgh" and mov[1] in "12345678" and mov[2] in "abcdefgh" and mov[3] in "12345678":
+            if (
+                len(mov) >= 4
+                and mov[0] in "abcdefgh"
+                and mov[1] in "12345678"
+                and mov[2] in "abcdefgh"
+                and mov[3] in "12345678"
+            ):
                 pv.append(mov)
             else:
                 break
@@ -513,7 +562,11 @@ class Game:
         for move in self.li_moves:
             if with_variations != NONE and move.variations:
                 is_w = move.is_white()
-                if (with_variations == ALL) or (is_w and with_variations == ONLY_WHITE) or (not is_w and with_variations == ONLY_BLACK):
+                if (
+                    (with_variations == ALL)
+                    or (is_w and with_variations == ONLY_WHITE)
+                    or (not is_w and with_variations == ONLY_BLACK)
+                ):
                     for variation in move.variations.li_variations:
                         li_pvc.extend(variation.all_pv(pv_previo.strip(), with_variations))
             pv_previo += move.movimiento() + " "
@@ -525,7 +578,11 @@ class Game:
         for move in self.li_moves:
             if with_variations != NONE and move.variations:
                 is_w = move.is_white()
-                if (with_variations == ALL) or (is_w and with_variations == ONLY_WHITE) or (not is_w and with_variations == ONLY_BLACK):
+                if (
+                    (with_variations == ALL)
+                    or (is_w and with_variations == ONLY_WHITE)
+                    or (not is_w and with_variations == ONLY_BLACK)
+                ):
                     for variation in move.variations.li_variations:
                         dicv = variation.all_comments(with_variations)
                         if dicv:
@@ -824,7 +881,9 @@ class Game:
         mensaje = ""
         beep = None
         player_lost = False
-        if (self.result == RESULT_WIN_WHITE and player_side == WHITE) or (self.result == RESULT_WIN_BLACK and player_side == BLACK):
+        if (self.result == RESULT_WIN_WHITE and player_side == WHITE) or (
+            self.result == RESULT_WIN_BLACK and player_side == BLACK
+        ):
             if nom_other:
                 mensaje = _X(_("Congratulations you have won against %1."), nom_other)
             else:
@@ -834,7 +893,9 @@ class Game:
             else:
                 beep = BEEP_WIN_PLAYER
 
-        elif (self.result == RESULT_WIN_WHITE and player_side == BLACK) or (self.result == RESULT_WIN_BLACK and player_side == WHITE):
+        elif (self.result == RESULT_WIN_WHITE and player_side == BLACK) or (
+            self.result == RESULT_WIN_BLACK and player_side == WHITE
+        ):
             player_lost = True
             if nom_other:
                 mensaje = _X(_("Unfortunately you have lost against %1"), nom_other)
@@ -893,6 +954,15 @@ class Game:
                 g.read_pv(pv)
         return g
 
+    def skip_first(self):
+        if len(self.li_moves) == 0:
+            return
+        move0 = self.li_moves[0]
+        self.li_moves = self.li_moves[1:]
+        self.first_position = move0.position
+        fen_inicial = self.first_position.fen()
+        self.set_tag("FEN", fen_inicial)
+
 
 def pv_san(fen, pv):
     p = Game(fen=fen)
@@ -908,9 +978,10 @@ def pv_pgn(fen, pv):
 
 
 def pv_game(fen, pv):
-    p = Game(fen=fen)
-    p.read_pv(pv)
-    return p
+    g = Game(fen=fen)
+    g.read_pv(pv)
+    g.assign_opening()
+    return g
 
 
 def lipv_lipgn(lipv):
@@ -939,7 +1010,18 @@ def pgn_game(pgn):
         return False, game
 
     si_fen = False
-    dic_nags = {"!": NAG_1, "?": NAG_2, "!!": NAG_3, "‼": NAG_3, "??": NAG_4, "⁇": NAG_4, "!?": NAG_5, "⁉": NAG_5, "?!": NAG_6, "⁈": NAG_6}
+    dic_nags = {
+        "!": NAG_1,
+        "?": NAG_2,
+        "!!": NAG_3,
+        "‼": NAG_3,
+        "??": NAG_4,
+        "⁇": NAG_4,
+        "!?": NAG_5,
+        "⁉": NAG_5,
+        "?!": NAG_6,
+        "⁈": NAG_6,
+    }
     FasterCode.set_init_fen()
     for elem in li:
         key = elem[0] if elem else ""

@@ -24,7 +24,7 @@ import Code
 
 class ControlGrid(QtCore.QAbstractTableModel):
     """
-    Modelo de datos asociado al grid, y que realiza todo el trabajo asignado por QT.
+    Modelo de datos asociado al grid, y que realiza xtodo el trabajo asignado por QT.
     """
 
     def __init__(self, grid, w_parent, oColumnasR):
@@ -220,7 +220,7 @@ class Grid(QtWidgets.QTableView):
         w_parent,
         o_columns,
         dicVideo=None,
-        altoFila=20,
+        altoFila=24,
         siSelecFilas=False,
         siSeleccionMultiple=False,
         siLineas=True,
@@ -282,10 +282,7 @@ class Grid(QtWidgets.QTableView):
         if not siCabeceraVisible:
             hh.setVisible(False)
 
-        vh = self.verticalHeader()
-        vh.setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
-        vh.setDefaultSectionSize(altoFila)
-        vh.setVisible(False)
+        self.ponAltoFila(altoFila)
 
         self.seleccionaFilas(siSelecFilas, siSeleccionMultiple)
 

@@ -1,8 +1,8 @@
 import Code
-from Code.SQL import UtilSQL
-from Code.Kibitzers import WindowKibitzers
 from Code import XRun
-from Code.Base.Constantes import *
+from Code.Base.Constantes import KIBRUN_GAME, KIBRUN_CLOSE, KIBRUN_STOP, KIBRUN_CONFIGURATION
+from Code.Kibitzers import WindowKibitzers
+from Code.SQL import UtilSQL
 
 
 class Manager:

@@ -45,7 +45,7 @@ class WNags(QTVarios.WDialogo):
         o_columns.nueva("TITLE", "", 240)
 
         self.o_columnas = o_columns
-        self.grid = Grid.Grid(self, o_columns, siEditable=True, altoCabecera=3)
+        self.grid = Grid.Grid(self, o_columns, siEditable=True, altoCabecera=4)
         font = Controles.TipoLetra(puntos=Code.configuration.x_pgn_fontpoints)
         self.grid.ponFuente(font)
 

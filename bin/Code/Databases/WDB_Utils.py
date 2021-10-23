@@ -4,6 +4,7 @@ import time
 from PySide2 import QtCore, QtWidgets
 
 import Code
+from Code import Util
 from Code.Base.Constantes import FEN_INITIAL
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -12,7 +13,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
-from Code import Util
 
 
 class WFiltrar(QtWidgets.QDialog):
@@ -327,15 +327,20 @@ def mensajeEntrenamientos(owner, liCreados, liNoCreados):
 
 
 def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
+    nregs = len(li_registros)
 
     form = FormLayout.FormLayout(wowner, _("Create tactics training"), Iconos.Tacticas())
 
+    form.apart_simple_np("%s: %d" % (_("Number of positions"), nregs))
     form.separador()
     form.edit(_("Name"), name)
 
     form.separador()
     li_j = [(_("Default"), 0), (_("White"), 1), (_("Black"), 2)]
     form.combobox(_("Point of view"), li_j, 0)
+
+    form.separador()
+    form.checkbox(_("Skip the first move"), False)
 
     resultado = form.run()
 
@@ -348,6 +353,7 @@ def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
     if not menuname:
         return
     pointview = str(li_gen[1])
+    skip_first = li_gen[2]
 
     rest_dir = Util.valid_filename(menuname)
     nom_dir = os.path.join(Code.configuration.folder_tactics(), rest_dir)
@@ -367,7 +373,6 @@ def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
                 break
         nom_tactic = "TACTIC%d" % n
     else:
-        nom_dir_tac = Code.configuration.folder_tactics()
         Util.create_folder(nom_dir)
         nom_tactic = "TACTIC1"
         dic_ini = {}
@@ -382,7 +387,6 @@ def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
     # Se crea el file con los puzzles
     f = open(nom_fns, "wt", encoding="utf-8", errors="ignore")
 
-    nregs = len(li_registros)
     tmp_bp = QTUtil2.BarraProgreso(wowner, menuname, "%s: %d" % (_("Games"), nregs), nregs)
     tmp_bp.mostrar()
 
@@ -402,7 +406,7 @@ def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
 
         recno = li_registros[n]
 
-        dic_valores = rutina_datos(recno)
+        dic_valores = rutina_datos(recno, skip_first)
         plies = dic_valores["PLIES"]
         if plies == 0:
             continue
@@ -431,6 +435,8 @@ def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
         event = xdic("EVENT")
         site = xdic("SITE")
         date = xdic("DATE")
+        gameurl = xdic("GAMEURL")
+        themes = xdic("THEMES")
         if site == event:
             es = event
         else:
@@ -444,18 +450,28 @@ def create_tactics(procesador, wowner, li_registros, rutina_datos, name):
         white = xdic("WHITE")
         black = xdic("BLACK")
         wb = ("%s-%s" % (white, black)).strip("-")
-        titulo = ""
-        if es:
-            titulo += "<br>%s" % es
-        if wb:
-            titulo += "<br>%s" % wb
 
+        li_titulo = []
+
+        def add_titulo(txt):
+            if txt:
+                li_titulo.append(txt)
+
+        add_titulo(es)
+        add_titulo(wb)
+        add_titulo(themes)
+        if gameurl:
+            add_titulo("<a href=\"%s\">%s</a>" % (gameurl, gameurl))
         for other in ("TASK", "SOURCE"):
             v = xdic(other)
-            if v:
-                titulo += "<br>%s" % v
+            add_titulo(v)
+        titulo = "<br>".join(li_titulo)
 
-        txt = fen + "|%s|%s\n" % (titulo, num_moves)
+        if skip_first:
+            pgn_real = dic_valores["PGN_REAL"].replace("\n", " ").replace("\r", " ")
+            txt = fen + "|%s|%s|%s\n" % (titulo, num_moves, pgn_real)
+        else:
+            txt = fen + "|%s|%s\n" % (titulo, num_moves)
 
         f.write(txt)
 

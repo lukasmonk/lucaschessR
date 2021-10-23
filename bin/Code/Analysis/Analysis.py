@@ -1,17 +1,16 @@
 import copy
 import os
-
 from typing import List, Tuple
 
+from Code.TrainBMT import BMT
+from Code import Util
 from Code.Analysis import AnalysisIndexes, WindowAnalysisParam, WindowAnalysis
-from Code import BMT
 from Code.Base import Game, Move
-from Code.Engines import EngineResponse
+from Code.Base.Constantes import NAG_3
 from Code.Databases import WDB_Utils
+from Code.Engines import EngineResponse
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code import Util
-from Code.Base.Constantes import NAG_3
 
 
 class AnalyzeGame:
@@ -380,55 +379,49 @@ FILESW=%s:100
         si_poner_pgn_original_blunders = False
         si_poner_pgn_original_brilliancies = False
 
-        n_jugadas = len(game)
+        n_mov = len(game)
         if self.li_selected:
-            li_moves = self.li_selected
+            li_pos_moves = self.li_selected[:]
         else:
-            li_moves = list(range(n_jugadas))
+            li_pos_moves = list(range(n_mov))
 
+        li_borrar = []
         if xlibro_aperturas:
-            li_borrar = []
-            for pos, njg in enumerate(li_moves):
-
+            for pos, mov in enumerate(li_pos_moves, 1):
                 if tmp_bp.is_canceled():
                     self.xmanager.remove_gui_dispatch()
                     return
 
-                # # Si esta en el book
-                move = game.move(njg)
+                move = game.move(mov)
                 if xlibro_aperturas.get_list_moves(move.position_before.fen()):
                     li_borrar.append(pos)
                     continue
                 else:
                     break
-            if li_borrar:
-                li_borrar.reverse()
-                for x in li_borrar:
-                    del li_moves[x]
 
         if self.from_last_move:
-            li_moves.reverse()
+            li_pos_moves.reverse()
 
-        n_jugadas = len(li_moves)
+        n_moves = len(li_pos_moves)
         if si_bp2:
-            tmp_bp.ponTotal(2, n_jugadas)
+            tmp_bp.ponTotal(2, n_moves)
         else:
-            tmp_bp.ponTotal(n_jugadas)
+            tmp_bp.ponTotal(n_moves)
 
-        for npos, njg in enumerate(li_moves):
+        for npos, pos_move in enumerate(li_pos_moves):
 
             if tmp_bp.is_canceled():
                 self.xmanager.remove_gui_dispatch()
                 return
 
-            move = game.move(njg)
+            move = game.move(pos_move)
             if si_bp2:
                 tmp_bp.pon(2, npos + 1)
             else:
                 tmp_bp.pon(npos)
 
             if self.rut_dispatch_bp:
-                self.rut_dispatch_bp(npos, n_jugadas, njg)
+                self.rut_dispatch_bp(npos, n_moves, pos_move)
 
             if tmp_bp.is_canceled():
                 self.xmanager.remove_gui_dispatch()
@@ -455,7 +448,7 @@ FILESW=%s:100
             if move.analysis is None:
                 resp = self.xmanager.analizaJugadaPartida(
                     game,
-                    njg,
+                    pos_move,
                     self.vtime,
                     depth=self.depth,
                     brDepth=self.dpbrilliancies,
@@ -504,7 +497,7 @@ FILESW=%s:100
                 if ok_blunder:
                     rm.ponBlunder(dif)
 
-                    self.graba_tactic(game, njg, mrm, pos_act)
+                    self.graba_tactic(game, pos_move, mrm, pos_act)
 
                     if self.save_pgn(self.pgnblunders, mrm.name, game.dicTags(), fen, move, rm, mj):
                         si_poner_pgn_original_blunders = True
@@ -990,8 +983,11 @@ def analysis_game(manager):
         if is_white:
             num_move += 1
 
-    mensaje = _("Analyzing the move....")
     num_moves = len(li_moves)
+    if len(alm.num_moves) > 0 and num_moves == 0:
+        return
+
+    mensaje = _("Analyzing the move....")
     tmp_bp = QTUtil2.BarraProgreso(main_window, _("Analysis"), mensaje, num_moves).show_top_right()
 
     ap = AnalyzeGame(procesador, alm, False, li_moves)
@@ -1041,6 +1037,7 @@ def analysis_game(manager):
 
         if li_creados or li_no_creados:
             WDB_Utils.mensajeEntrenamientos(main_window, li_creados, li_no_creados)
+            procesador.entrenamientos.rehaz()
 
     tmp_bp.cerrar()
 

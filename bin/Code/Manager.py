@@ -11,7 +11,40 @@ from Code import Util
 from Code import XRun
 from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis, Histogram
 from Code.Base import Game, Move, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    GT_ALONE,
+    ST_ENDGAME,
+    ST_PLAYING,
+    GT_AGAINST_PGN,
+    GT_AGAINST_GM,
+    RS_WIN_PLAYER,
+    RS_WIN_OPPONENT,
+    RS_DRAW,
+    GT_BOOK,
+    GT_ELO,
+    GT_MICELO,
+    RS_UNKNOWN,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_UTILITIES,
+    RS_DRAW_50,
+    RESULT_DRAW,
+    RS_DRAW_MATERIAL,
+    RS_DRAW_REPETITION,
+    RS_WIN_OPPONENT_TIME,
+    RS_WIN_PLAYER_TIME,
+    GT_AGAINST_ENGINE,
+    GO_BACK,
+    GO_END,
+    GO_FORWARD,
+    GO_START,
+    GT_OPENINGS,
+    GT_POSITIONS,
+    GT_TACTICS,
+    TERMINATION_DRAW_AGREEMENT,
+)
 from Code.Board import BoardTypes
 from Code.Databases import DBgames
 from Code.Kibitzers import Kibitzers
@@ -19,7 +52,7 @@ from Code.Openings import OpeningsStd
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.QT import Replay
 from Code.QT import WindowArbol
@@ -343,8 +376,8 @@ class Manager:
             self.configuration.x_show_effects = ant
             self.board.set_position(move.position)
 
-    def move_the_pieces(self, liMovs, siMovTemporizado=False):
-        if siMovTemporizado and self.configuration.x_show_effects:
+    def move_the_pieces(self, liMovs, timed_movement=False):
+        if timed_movement and self.configuration.x_show_effects:
 
             rapidez = self.configuration.x_pieces_speed * 1.0 / 100.0
             cpu = self.procesador.cpu
@@ -362,7 +395,7 @@ class Manager:
                         dist = (dc ** 2 + df ** 2) ** 0.5
                         seconds = 4.0 * dist / (9.9 * rapidez)
                     if self.procesador.manager:
-                        cpu.muevePieza(movim[1], movim[2], siExclusiva=False, seconds=seconds)
+                        cpu.muevePieza(movim[1], movim[2], seconds)
                     else:
                         return
 
@@ -373,8 +406,7 @@ class Manager:
             for movim in liMovs:
                 if movim[0] == "b":
                     if self.procesador.manager:
-                        n = cpu.duerme(seconds * 0.80 / rapidez)
-                        cpu.borraPieza(movim[1], padre=n)
+                        cpu.borraPiezaSecs(movim[1], seconds)
                     else:
                         return
 
@@ -426,6 +458,8 @@ class Manager:
             opening = self.game.opening
             if opening:
                 nomOpening = opening.trNombre
+                if opening.eco:
+                    nomOpening += " (%s)" % opening.eco
             if self.main_window.siCapturas:
                 self.main_window.ponCapturas(dic)
             if self.main_window.siInformacionPGN:
@@ -544,6 +578,10 @@ class Manager:
 
     def beepZeitnot(self):
         self.runSound.playZeitnot()
+
+    def beepError(self):
+        if self.configuration.x_sound_error:
+            self.runSound.playError()
 
     def beepResultadoCAMBIAR(self, resfinal):  # TOO Cambiar por beepresultado1
         if not self.configuration.x_sound_results:
@@ -856,7 +894,9 @@ class Manager:
         if not self.is_finished():
             move = Move.Move(self.game, position_before=self.game.last_position.copia())
             max_recursion = 999
-            Analysis.show_analysis(self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, 0, must_save=False)
+            Analysis.show_analysis(
+                self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, 0, must_save=False
+            )
 
     def analizaPosicion(self, row, key):
         if row < 0:
@@ -872,7 +912,16 @@ class Manager:
         else:
             if not (
                 self.game_type
-                in [GT_POSITIONS, GT_AGAINST_PGN, GT_AGAINST_ENGINE, GT_AGAINST_GM, GT_ALONE, GT_BOOK, GT_OPENINGS, GT_TACTICS]
+                in [
+                    GT_POSITIONS,
+                    GT_AGAINST_PGN,
+                    GT_AGAINST_ENGINE,
+                    GT_AGAINST_GM,
+                    GT_ALONE,
+                    GT_BOOK,
+                    GT_OPENINGS,
+                    GT_TACTICS,
+                ]
                 or (self.game_type in [GT_ELO, GT_MICELO] and not self.is_competitive)
             ):
                 if siUltimo or self.hints == 0:
@@ -881,9 +930,11 @@ class Manager:
             else:
                 max_recursion = 9999
         if move.analysis is None:
-            siCancelar = self.xtutor.mstime_engine > 5000 or self.xtutor.depth_engine > 5
+            siCancelar = self.xanalyzer.mstime_engine > 5000 or self.xanalyzer.depth_engine > 5
             mens = _("Analyzing the move....")
-            me = QTUtil2.mensEspera.start(self.main_window, mens, physical_pos="ad", siCancelar=siCancelar, titCancelar=_("Stop"))
+            me = QTUtil2.mensEspera.start(
+                self.main_window, mens, physical_pos="ad", siCancelar=siCancelar, titCancelar=_("Stop"), siParentNone=True
+            )
             self.main_window.setDisabled(True)
             if siCancelar:
                 ya_cancelado = [False]
@@ -901,7 +952,9 @@ class Manager:
                     return True
 
                 self.xanalyzer.set_gui_dispatch(test_me)
-            mrm, pos = self.xanalyzer.analizaJugadaPartida(self.game, pos_jg, self.xtutor.mstime_engine, self.xtutor.depth_engine)
+            mrm, pos = self.xanalyzer.analizaJugadaPartida(
+                self.game, pos_jg, self.xtutor.mstime_engine, self.xtutor.depth_engine
+            )
             move.analysis = mrm, pos
             self.main_window.setDisabled(False)
             me.final()
@@ -1034,7 +1087,16 @@ class Manager:
 
     def exePulsadaLetra(self, siActivar, letra):
         if siActivar:
-            dic = {"a": GO_START, "b": GO_BACK, "c": GO_BACK, "d": GO_BACK, "e": GO_FORWARD, "f": GO_FORWARD, "g": GO_FORWARD, "h": GO_END}
+            dic = {
+                "a": GO_START,
+                "b": GO_BACK,
+                "c": GO_BACK,
+                "d": GO_BACK,
+                "e": GO_FORWARD,
+                "f": GO_FORWARD,
+                "g": GO_FORWARD,
+                "h": GO_END,
+            }
             self.mueveJugada(dic[letra])
 
     def kibitzers(self, orden):
@@ -1090,7 +1152,8 @@ class Manager:
         if self.configuration.x_digital_board:
             if not DGT.activarSegunON_OFF(self.dgt):  # Error
                 QTUtil2.message_error(
-                    self.main_window, _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board
+                    self.main_window,
+                    _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board,
                 )
             else:
                 if set_position:
@@ -1099,9 +1162,11 @@ class Manager:
     def dgt(self, quien, a1h8):
         if self.board.mensajero and self.board.pieces_are_active:
             if quien == "whiteMove":
+                DGT.allowHumanTB = False
                 if not self.board.side_pieces_active:
                     return 0
             elif quien == "blackMove":
+                DGT.allowHumanTB = False
                 if self.board.side_pieces_active:
                     return 0
             elif quien == "scan":
@@ -1113,9 +1178,12 @@ class Manager:
                     and hasattr(self.main_window, "is_enabled_option_toolbar")
                     and self.main_window.is_enabled_option_toolbar(TB_TAKEBACK)
                     and hasattr(self, "takeback")
+                    and (DGT.allowHumanTB)
                 ):
+                    DGT.allowHumanTB = False
                     self.takeback()
                     return 1
+                DGT.allowHumanTB = True
                 return 0
             elif quien == "blackTakeBack":
                 if (
@@ -1123,9 +1191,12 @@ class Manager:
                     and hasattr(self.main_window, "is_enabled_option_toolbar")
                     and self.main_window.is_enabled_option_toolbar(TB_TAKEBACK)
                     and hasattr(self, "takeback")
+                    and (DGT.allowHumanTB)
                 ):
+                    DGT.allowHumanTB = False
                     self.takeback()
                     return 1
+                DGT.allowHumanTB = True
                 return 0
             else:
                 return 1
@@ -1178,7 +1249,9 @@ class Manager:
         # DGT
         dboard = self.configuration.x_digital_board
         if dboard:
-            menu.opcion("dgt", _("Disable %s board") % dboard if DGT.siON() else _("Enable %s board") % dboard, Iconos.DGT())
+            menu.opcion(
+                "dgt", _("Disable %s board") % dboard if DGT.siON() else _("Enable %s board") % dboard, Iconos.DGT()
+            )
             menu.separador()
 
         # Ciega - Mostrar todas - Ocultar blancas - Ocultar negras
@@ -1214,12 +1287,16 @@ class Manager:
         # On top
         menu.separador()
         label = _("Disable") if self.main_window.onTop else _("Enable")
-        menu.opcion("ontop", "%s: %s" % (label, _("window on top")), Iconos.Bottom() if self.main_window.onTop else Iconos.Top())
+        menu.opcion(
+            "ontop", "%s: %s" % (label, _("window on top")), Iconos.Bottom() if self.main_window.onTop else Iconos.Top()
+        )
 
         # Right mouse
         menu.separador()
         label = _("Disable") if self.configuration.x_direct_graphics else _("Enable")
-        menu.opcion("mouseGraphics", "%s: %s" % (label, _("Live graphics with the right mouse button")), Iconos.RightMouse())
+        menu.opcion(
+            "mouseGraphics", "%s: %s" % (label, _("Live graphics with the right mouse button")), Iconos.RightMouse()
+        )
 
         # Logs of engines
         menu.separador()
@@ -1227,7 +1304,7 @@ class Manager:
         label = _("Save engines log")
         if is_engines_log_active:
             icono = Iconos.LogActive()
-            label += " ...%s..." % _("Working")
+            label += " ...%s" % _("Working...")
             key = "log_close"
         else:
             icono = Iconos.LogInactive()
@@ -1317,7 +1394,9 @@ class Manager:
         liSon.append(separador)
         liSon.append((_("Activate sounds with our moves") + ":", self.configuration.x_sound_our))
         liSon.append(separador)
-        resultado = FormLayout.fedit(liSon, title=_("Sounds"), parent=self.main_window, anchoMinimo=250, icon=Iconos.S_Play())
+        resultado = FormLayout.fedit(
+            liSon, title=_("Sounds"), parent=self.main_window, anchoMinimo=250, icon=Iconos.S_Play()
+        )
         if resultado:
             self.configuration.x_sound_beep, self.configuration.x_sound_results, self.configuration.x_sound_move, self.configuration.x_sound_our = resultado[
                 1
@@ -1476,8 +1555,12 @@ class Manager:
         elif resp.startswith("vol"):
             accion = resp[3:]
             if accion == "fichero":
-                resp = QTUtil2.salvaFichero(
-                    self.main_window, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
+                resp = SelectFiles.salvaFichero(
+                    self.main_window,
+                    _("File to save"),
+                    self.configuration.x_save_folder,
+                    "%s PNG (*.png)" % _("File"),
+                    False,
                 )
                 if resp:
                     self.board.save_as_img(resp, "png")
@@ -1495,7 +1578,7 @@ class Manager:
             self.save_db(resp[4:])
 
         elif resp.startswith("fen"):
-            extension = resp[:3]
+            # extension = resp[:3]
             si_fichero = resp.endswith("fichero")
             self.save_fen(si_fichero)
 
@@ -1514,7 +1597,9 @@ class Manager:
         elos = self.game.calc_elos(self.configuration)
         elosFORM = self.game.calc_elosFORM(self.configuration)
         alm = Histogram.genHistograms(self.game)
-        alm.indexesHTML, alm.indexesRAW, alm.eloW, alm.eloB, alm.eloT = AnalysisIndexes.gen_indexes(self.game, elos, elosFORM, alm)
+        alm.indexesHTML, alm.indexesRAW, alm.eloW, alm.eloB, alm.eloT = AnalysisIndexes.gen_indexes(
+            self.game, elos, elosFORM, alm
+        )
         alm.is_white_bottom = self.board.is_white_bottom
         um.final()
         if len(alm.lijg) == 0:
@@ -1557,7 +1642,7 @@ class Manager:
         extension = "lcsb"
         file = self.configuration.x_save_lcsb
         while True:
-            file = QTUtil2.salvaFichero(
+            file = SelectFiles.salvaFichero(
                 self.main_window,
                 _("File to save"),
                 file,
@@ -1599,7 +1684,7 @@ class Manager:
         dato = self.listado("fen")
         if siFichero:
             extension = "fns"
-            resp = QTUtil2.salvaFichero(
+            resp = SelectFiles.salvaFichero(
                 self.main_window,
                 _("File to save"),
                 self.configuration.x_save_folder,
@@ -1633,7 +1718,8 @@ class Manager:
                     QTUtil.ponPortapapeles(dato)
                     QTUtil2.message_error(
                         self.main_window,
-                        "%s : %s\n\n%s" % (_("Unable to save"), resp, _("It is saved in the clipboard to paste it wherever you want.")),
+                        "%s : %s\n\n%s"
+                        % (_("Unable to save"), resp, _("It is saved in the clipboard to paste it wherever you want.")),
                     )
 
         else:
@@ -1675,26 +1761,39 @@ class Manager:
 
             txt = "%s||%s|%s\n" % (fen, siguientes, pgn)
             QTUtil.ponPortapapeles(txt)
-            QTUtil2.mensajeTemporal(self.main_window, _("It is saved in the clipboard to paste it wherever you want."), 2)
+            QTUtil2.mensajeTemporal(
+                self.main_window, _("It is saved in the clipboard to paste it wherever you want."), 2
+            )
 
-    # Para elo games + entmaq
     def tablasPlayer(self):
+        # Para elo games + entmaq
         siAcepta = False
-        njug = len(self.game)
-        if len(self.lirm_engine) >= 4 and njug > 40:
-            if njug > 100:
+        nplies = len(self.game)
+        if len(self.lirm_engine) >= 4 and nplies > 40:
+            if nplies > 100:
+                limite = -50
+            elif nplies > 60:
                 limite = -100
-            elif njug > 60:
-                limite = -150
             else:
-                limite = -200
+                limite = -150
             siAcepta = True
-            for rm in self.lirm_engine[-4:]:
+            for rm in self.lirm_engine[-3:]:
                 if rm.centipawns_abs() > limite:
                     siAcepta = False
+            if not siAcepta:
+                si_ceros = True
+                for rm in self.lirm_engine[-3:]:
+                    if abs(rm.centipawns_abs()) > 15:
+                        si_ceros = False
+                        break
+                if si_ceros:
+                    mrm = self.xtutor.analiza(self.game.last_position.fen(), None, 7)
+                    rm = mrm.mejorMov()
+                    if abs(rm.centipawns_abs()) < 15:
+                        siAcepta = True
         if siAcepta:
             self.game.last_jg().is_draw_agreement = True
-            self.game.set_termination(TERMINATION_DRAW_AGREEMENT, RS_DRAW)
+            self.game.set_termination(TERMINATION_DRAW_AGREEMENT, RESULT_DRAW)
         else:
             QTUtil2.message_bold(self.main_window, _("Sorry, but the engine doesn't accept a draw right now."))
         self.next_test_resign = 5
@@ -1775,7 +1874,9 @@ class Manager:
         # Llamado from_sq ManagerEnPos and ManagerEntTac, para salvar la position tras pulsar una P
         with open(self.configuration.ficheroSelectedPositions, "at", encoding="utf-8", errors="ignore") as q:
             q.write(lineaTraining + "\n")
-        QTUtil2.mensajeTemporal(self.main_window, _('Position saved in "%s" file.') % self.configuration.ficheroSelectedPositions, 2)
+        QTUtil2.mensajeTemporal(
+            self.main_window, _('Position saved in "%s" file.') % self.configuration.ficheroSelectedPositions, 2
+        )
         self.procesador.entrenamientos.menu = None
 
     def play_current_position(self):
@@ -1889,7 +1990,7 @@ class Manager:
                 return
             else:
                 position_before = var_move.position_before.copia()
-                game_var = Game.Game(ini_posicion=position_before)
+                game_var = Game.Game(first_position=position_before)
                 ok, mens, new_move = Move.get_game_move(game_var, position_before, from_sq, to_sq, promotion)
                 if not ok:
                     return
@@ -1917,14 +2018,16 @@ class Manager:
                     return
 
                 position_before = var_move.position_before.copia()
-                game_var = Game.Game(ini_posicion=position_before)
+                game_var = Game.Game(first_position=position_before)
                 ok, mens, new_move = Move.get_game_move(game_var, position_before, from_sq, to_sq, promotion)
                 if not ok:
                     return
 
                 game_var.add_move(new_move)
                 var_move.add_variation(game_var)
-                link_variation_pressed("%s|%d|%d|%d" % (cvariation_move, (num_var_move + 1), len(var_move.variations) - 1, 0))
+                link_variation_pressed(
+                    "%s|%d|%d|%d" % (cvariation_move, (num_var_move + 1), len(var_move.variations) - 1, 0)
+                )
                 self.kibitzers_manager.put_game(game_var)
 
             # si no tiene mas movimientos se añade al final

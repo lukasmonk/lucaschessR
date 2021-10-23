@@ -1,15 +1,28 @@
 from PySide2 import QtCore
 
-from Code.Openings import Opening
 from Code import Manager
 from Code.Base import Move, Position
-from Code.QT import WindowJuicio
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_HELP,
+    TB_NEXT,
+    TB_UTILITIES,
+    GT_WASHING_CREATE,
+    GT_WASHING_REPLAY,
+    GT_WASHING_TACTICS,
+)
+from Code.Engines import EngineResponse
+from Code.Openings import Opening
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
+from Code.QT import WindowJuicio
 from Code.Tutor import Tutor
-from Code.Engines import EngineResponse
 from Code.Washing import Washing
-from Code.Base.Constantes import *
 
 
 def managerWashing(procesador):

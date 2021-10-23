@@ -1,7 +1,6 @@
 # import datetime
 from PySide2 import QtCore, QtGui, QtWidgets
 
-
 class ED(QtWidgets.QLineEdit):
     """
     Control de entrada de texto en una linea.

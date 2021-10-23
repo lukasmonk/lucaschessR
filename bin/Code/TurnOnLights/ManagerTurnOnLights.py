@@ -2,10 +2,20 @@ import time
 
 from Code import Manager
 from Code.Base import Move, Position
-from Code.TurnOnLights import TurnOnLights
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_CONFIG,
+    TB_HELP,
+    TB_NEXT,
+    TB_UTILITIES,
+    GT_TURN_ON_LIGHTS,
+)
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.Base.Constantes import *
+from Code.TurnOnLights import TurnOnLights
 
 
 class ManagerTurnOnLights(Manager.Manager):
@@ -66,7 +76,9 @@ class ManagerTurnOnLights(Manager.Manager):
         if self.lb_previous:
             r1 += "<br><b>%s</b>" % self.lb_previous
         if self.num_line:
-            av_secs, txt = self.block.calc_current(self.num_line - 1, self.total_time_used, self.errores, self.hints, self.calculation_mode)
+            av_secs, txt = self.block.calc_current(
+                self.num_line - 1, self.total_time_used, self.errores, self.hints, self.calculation_mode
+            )
             r1 += '<br><b>%s: %s - %0.2f"' % (_("Current"), txt, av_secs)
         self.set_label1(r1)
         if next is not None:
@@ -171,7 +183,9 @@ class ManagerTurnOnLights(Manager.Manager):
         else:
             self.human_is_playing = True
             self.base_time = time.time()
-            if not (self.calculation_mode and self.ini_time is None):  # Se inicia salvo que sea el principio de la linea
+            if not (
+                self.calculation_mode and self.ini_time is None
+            ):  # Se inicia salvo que sea el principio de la linea
                 self.ini_time = self.base_time
             self.activate_side(is_white)
             if self.calculation_mode:
@@ -239,8 +253,10 @@ class ManagerTurnOnLights(Manager.Manager):
                 + "<tr><td align=right> %s: </td><td> %d</td></tr>" % (_("Total moves"), num_moves)
                 + '<tr><td align=right> %s: </td><td> %0.2f"</td></tr>' % (_("Average time"), tm)
                 + "<tr><td align=right> %s: </td><td> %s</td></tr>" % (_("Block qualification"), cat_block)
-                + "<tr><td align=right> %s: </td><td> %s %s</td></tr>" % (_("Level qualification"), cat_level, txt_more_cat)
-                + "<tr><td align=right> %s: </td><td> %s %s</td></tr>" % (_("Global qualification"), cat_global, txt_more_global)
+                + "<tr><td align=right> %s: </td><td> %s %s</td></tr>"
+                % (_("Level qualification"), cat_level, txt_more_cat)
+                + "<tr><td align=right> %s: </td><td> %s %s</td></tr>"
+                % (_("Global qualification"), cat_global, txt_more_global)
                 + "</table></center></big><hr>"
                 + txt_more_line
             )

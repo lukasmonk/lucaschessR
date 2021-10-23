@@ -621,3 +621,4 @@ def check_table_in_db(path_db: str, table: str):
     cursor.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name=?", (table,))
     resp = cursor.fetchone()[0] == 1
     conexion.close()
+    return resp

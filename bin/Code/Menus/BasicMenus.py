@@ -425,6 +425,8 @@ def menu_information(procesador):
     menu.separador()
     menu.opcion("blog", "Fresh news", Iconos.Blog())
     menu.separador()
+    menu.opcion("wiki", "Wiki", Iconos.Wiki())
+    menu.separador()
     menu.opcion("mail", _("Contact") + " (%s)" % "lukasmonk@gmail.com", Iconos.Mail())
     menu.separador()
     if procesador.configuration.is_main:

@@ -5,8 +5,11 @@ import time
 
 from PySide2 import QtWidgets, QtCore, QtGui
 
+import Code
+from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game, Move, Position
+from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -15,11 +18,8 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
 from Code.SQL import Base
-from Code import Util
 from Code.SQL import UtilSQL
-import Code
 
 
 def lee_1_linea_mfn(linea):
@@ -401,7 +401,7 @@ class WPotenciaBase(QTVarios.WDialogo):
             (_("Repeat"), Iconos.Pelicula_Repetir(), self.repetir),
             None,
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
         # self.pon_toolbar([self.terminar, self.empezar, self.repetir, self.configurar, self.borrar])
 
         # Colocamos
@@ -595,7 +595,7 @@ class WPotencia(QTVarios.WDialogo):
             (_("Cancel"), Iconos.Cancelar(), self.cancelar),
             (_("Check"), Iconos.Check(), self.comprobar),
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         # Layout
         lyInfo = Colocacion.H().relleno().control(self.lbInformacion).control(self.btConsultar).relleno()

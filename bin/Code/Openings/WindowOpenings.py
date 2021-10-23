@@ -2,9 +2,12 @@ import copy
 
 from PySide2 import QtCore, QtWidgets
 
-from Code.Base.Constantes import FEN_INITIAL
-from Code.Openings import OpeningsStd
+import Code
+from Code import Util
+from Code import Variations
 from Code.Base import Game, Move
+from Code.Board import Board
+from Code.Openings import OpeningsStd
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -14,10 +17,6 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import Util
-import Code
-from Code import Variations
 
 
 class WOpenings(QTVarios.WDialogo):
@@ -50,7 +49,7 @@ class WOpenings(QTVarios.WDialogo):
         self.tbBM = tbBM
 
         # Tool bar
-        tb = Controles.TBrutina(self)
+        tb = QTVarios.LCTB(self)
         tb.new(_("Accept"), Iconos.Aceptar(), self.aceptar)
         tb.new(_("Cancel"), Iconos.Cancelar(), self.cancelar)
         tb.new(_("Reinit"), Iconos.Reiniciar(), self.resetPartida)
@@ -292,7 +291,7 @@ class EntrenamientoOpening(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
         ]
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         lbNombre = Controles.LB(self, _("Name") + ": ")
         self.edNombre = Controles.ED(self, name)
@@ -423,7 +422,7 @@ class OpeningsPersonales(QTVarios.WDialogo):
         QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
-        tb = Controles.TBrutina(self)
+        tb = QTVarios.LCTB(self)
         tb.new(_("Close"), Iconos.MainMenu(), self.terminar)
         tb.new(_("New"), Iconos.TutorialesCrear(), self.nuevo)
         tb.new(_("Modify"), Iconos.Modificar(), self.modificar)
@@ -527,8 +526,6 @@ class OpeningsPersonales(QTVarios.WDialogo):
             return
         eco = liResp[1].upper()
         estandar = liResp[2]
-
-        fen = FEN_INITIAL
 
         self.procesador.procesador = self.procesador  # ya que edit_variation espera un manager
 

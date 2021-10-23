@@ -1,7 +1,6 @@
 from Code import SingularMoves
 from Code.QT import Colocacion
 from Code.QT import Columnas
-from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
@@ -28,7 +27,7 @@ class WSingularM(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
         )
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("N", _("N."), 60, centered=True)

@@ -1,14 +1,18 @@
 import os
 import random
 
-from Code.Engines import Engines
-
-from Code.Base import Game, Position
-from Code import Util
-from Code.SQL import UtilSQL
 import Code
-
-from Code.Base.Constantes import *
+from Code import Util
+from Code.Base import Game, Position
+from Code.Base.Constantes import (
+    RESULT_DRAW,
+    RESULT_WIN_BLACK,
+    RESULT_WIN_WHITE,
+    WHITE,
+    BLACK,
+)
+from Code.Engines import Engines
+from Code.SQL import UtilSQL
 
 
 class EngineTournament(Engines.Engine):

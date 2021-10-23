@@ -2,15 +2,28 @@ import datetime
 import random
 import time
 
-from Code.Openings import Opening
-from Code import Manager
-from Code.Base import Move
-from Code.QT import QTUtil2
-from Code import Util
 from Code import Adjournments
-from Code.SQL import UtilSQL
+from Code import Manager
+from Code import Util
+from Code.Base import Move
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    RS_WIN_PLAYER,
+    RS_WIN_OPPONENT,
+    RS_DRAW,
+    GT_ELO,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_CANCEL,
+    TB_DRAW,
+    TB_RESIGN,
+    TB_UTILITIES,
+)
 from Code.Engines import EngineResponse
-from Code.Base.Constantes import *
+from Code.Openings import Opening
+from Code.QT import QTUtil2
+from Code.SQL import UtilSQL
 
 
 def listaMotoresElo():

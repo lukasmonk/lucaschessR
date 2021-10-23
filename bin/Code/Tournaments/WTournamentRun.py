@@ -3,25 +3,36 @@ import time
 from PySide2 import QtWidgets, QtCore
 
 import Code
+from Code import CPU
+from Code import ControlPGN
 from Code import Util
 from Code.Base import Game, Move
-from Code.Polyglots import Books
-from Code import ControlPGN
+from Code.Base.Constantes import (
+    ST_PLAYING,
+    RESULT_DRAW,
+    RESULT_WIN_BLACK,
+    RESULT_WIN_WHITE,
+    ST_WAITING,
+    TERMINATION_ADJUDICATION,
+    BLACK,
+    WHITE,
+    ST_PAUSE,
+    TERMINATION_UNKNOWN,
+    TERMINATION_WIN_ON_TIME,
+)
+from Code.Board import Board
 from Code.Engines import EngineManager
-from Code.SQL import UtilSQL
+from Code.Polyglots import Books
 from Code.QT import Colocacion
 from Code.QT import Columnas
-from Code.QT import Delegados
 from Code.QT import Controles
-from Code.Board import Board
+from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
+from Code.SQL import UtilSQL
 from Code.Tournaments import Tournament
-from Code.Base.Constantes import *
-
-from Code import CPU
 
 
 class TournamentRun:
@@ -113,7 +124,7 @@ class WTournamentRun(QtWidgets.QWidget):
         self.setWindowIcon(Iconos.Torneos())
 
         # Toolbar
-        self.tb = Controles.TBrutina(self, icon_size=24)
+        self.tb = QTVarios.LCTB(self, icon_size=24)
 
         # Board
         conf_board = Code.configuration.config_board("TOURNEYPLAY", 36)
@@ -148,11 +159,21 @@ class WTournamentRun(QtWidgets.QWidget):
         li_acciones = [(_("Close"), Iconos.Close(), self.close), None]
         if state == ST_PLAYING:
             li_acciones.extend(
-                [(_("Pause"), Iconos.Pause(), self.pausa), None, (_("Adjudication"), Iconos.EndGame(), self.adjudication), None]
+                [
+                    (_("Pause"), Iconos.Pause(), self.pausa),
+                    None,
+                    (_("Adjudication"), Iconos.EndGame(), self.adjudication),
+                    None,
+                ]
             )
         elif state == ST_PAUSE:
             li_acciones.extend(
-                [(_("Continue"), Iconos.Continue(), self.seguir), None, (_("Adjudication"), Iconos.EndGame(), self.adjudication), None]
+                [
+                    (_("Continue"), Iconos.Continue(), self.seguir),
+                    None,
+                    (_("Adjudication"), Iconos.EndGame(), self.adjudication),
+                    None,
+                ]
             )
         self.tb.reset(li_acciones)
 
@@ -165,8 +186,12 @@ class WTournamentRun(QtWidgets.QWidget):
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("NUMBER", _("N."), 52, centered=True)
         si_figurines_pgn = configuration.x_pgn_withfigurines
-        o_columnas.nueva("WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None))
-        o_columnas.nueva("BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None))
+        o_columnas.nueva(
+            "WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
+        )
+        o_columnas.nueva(
+            "BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
+        )
         self.grid_pgn = Grid.Grid(self, o_columnas, siCabeceraMovible=False)
         self.grid_pgn.setMinimumWidth(n_ancho_pgn)
         self.grid_pgn.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -175,11 +200,10 @@ class WTournamentRun(QtWidgets.QWidget):
 
         # # Blancas y negras
         f = Controles.TipoLetra(puntos=configuration.x_sizefont_infolabels + 2, peso=75)
-        bl, ng = "", ""
         alto_lb = 48
         self.lb_player = {}
         for side in (WHITE, BLACK):
-            self.lb_player[side] = Controles.LB(self, bl).anchoFijo(n_ancho_labels).altoFijo(alto_lb)
+            self.lb_player[side] = Controles.LB(self).anchoFijo(n_ancho_labels).altoFijo(alto_lb)
             self.lb_player[side].align_center().ponFuente(f).set_wrap()
             self.lb_player[side].setFrameStyle(QtWidgets.QFrame.Box | QtWidgets.QFrame.Raised)
         self.lb_player[WHITE].set_foreground_backgound("black", "white")
@@ -252,7 +276,10 @@ class WTournamentRun(QtWidgets.QWidget):
         self.segundos_jugada = self.tournament_game.segundos_jugada
 
         # abrimos motores
-        rival = {WHITE: self.torneo.buscaHEngine(self.tournament_game.hwhite), BLACK: self.torneo.buscaHEngine(self.tournament_game.hblack)}
+        rival = {
+            WHITE: self.torneo.buscaHEngine(self.tournament_game.hwhite),
+            BLACK: self.torneo.buscaHEngine(self.tournament_game.hblack),
+        }
         for side in (WHITE, BLACK):
             self.lb_player[side].set_text(rival[side].key)
 

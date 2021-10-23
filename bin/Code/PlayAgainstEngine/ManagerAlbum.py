@@ -1,9 +1,19 @@
-from Code.PlayAgainstEngine import Albums
+from Code import Adjournments
 from Code import Manager
 from Code.Base import Move
-from Code import Adjournments
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_CONFIG,
+    TB_ADJOURN,
+    TB_CANCEL,
+    TB_RESIGN,
+    TB_UTILITIES,
+    GT_ALBUM,
+)
+from Code.PlayAgainstEngine import Albums
 from Code.QT import QTUtil2
-from Code.Base.Constantes import *
 
 
 class ManagerAlbum(Manager.Manager):

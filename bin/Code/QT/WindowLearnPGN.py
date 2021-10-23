@@ -2,7 +2,10 @@ import time
 
 from PySide2 import QtWidgets, QtCore
 
+from Code import Util
 from Code.Base import Game
+from Code.Board import Board
+from Code.Translations import TrListas
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -12,9 +15,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code.Config import TrListas
-from Code import Util
 from Code.SQL import UtilSQL
 
 
@@ -174,7 +174,7 @@ class WLearn1(QTVarios.WDialogo):
             (_("Remove"), Iconos.Borrar(), self.borrar),
             None,
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         # Colocamos
         lyTB = Colocacion.H().control(self.tb).margen(0)
@@ -301,7 +301,7 @@ class WLearnPuente(QTVarios.WDialogo):
         self.repWorking = False
 
         # Tool bar
-        self.tb = Controles.TBrutina(self, [])
+        self.tb = QTVarios.LCTB(self, [])
 
         self.pon_toolbar(self.INICIO)
 

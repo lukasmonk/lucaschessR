@@ -1,22 +1,18 @@
 import os
 
+import FasterCode
 from PySide2 import QtCore
 
-import FasterCode
-
 from Code.Base import Position
-from Code.SQL import UtilSQL
-from Code import Util
+from Code.Board import Board
+from Code.Polyglots import PolyglotImportExports, DBPolyglot
 from Code.QT import Colocacion
 from Code.QT import Columnas
-from Code.QT import Controles
+from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.Board import Board
-from Code.QT import Delegados
-from Code.QT import Voyager
 from Code.QT import QTVarios
-from Code.Polyglots import PolyglotImportExports, DBPolyglot
+from Code.QT import Voyager
 
 
 class WPolyglot(QTVarios.WDialogo):
@@ -66,7 +62,7 @@ class WPolyglot(QTVarios.WDialogo):
             (_("Create book"), Iconos.BinBook(), self.pol_export.exportar),
             None,
         )
-        self.tb = Controles.TBrutina(self, li_acciones)
+        self.tb = QTVarios.LCTB(self, li_acciones)
 
         ly2 = Colocacion.V().control(self.tb).control(self.grid_moves)
 

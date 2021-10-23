@@ -4,19 +4,35 @@ import time
 import FasterCode
 
 from Code import Manager
-from Code.Config import TrListas
 from Code import Util
 from Code.Base import Game, Position
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    GT_ALONE,
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_REINIT,
+    TB_TAKEBACK,
+    TB_CONFIG,
+    TB_CANCEL,
+    TB_END_GAME,
+    TB_FILE,
+    TB_HELP_TO_MOVE,
+    TB_PGN_LABELS,
+    TB_SAVE_AS,
+    TB_UTILITIES,
+    ADJUST_BETTER,
+)
 from Code.Openings import WindowOpenings
 from Code.PlayAgainstEngine import WPlayAgainstEngine
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.QT import Voyager
 from Code.QT import WindowPgnTags
+from Code.Translations import TrListas
 
 
 class ManagerSolo(Manager.Manager):
@@ -148,7 +164,9 @@ class ManagerSolo(Manager.Manager):
 
         # Comprobamos que no haya habido cambios from_sq el ultimo grabado
         if self.is_changed() and len(self.game):
-            resp = QTUtil2.preguntaCancelar(self.main_window, _("Do you want to save changes to a file?"), _("Yes"), _("No"))
+            resp = QTUtil2.preguntaCancelar(
+                self.main_window, _("Do you want to save changes to a file?"), _("Yes"), _("No")
+            )
             if resp is None:
                 return
             elif resp:
@@ -298,7 +316,7 @@ class ManagerSolo(Manager.Manager):
         else:
             file = self.configuration.folder_save_lcsb()
         while True:
-            resp = QTUtil2.salvaFichero(
+            resp = SelectFiles.salvaFichero(
                 self.main_window,
                 _("File to save"),
                 file,
@@ -395,7 +413,7 @@ class ManagerSolo(Manager.Manager):
         self.pon_toolbar()
 
     def restore_lcsb(self):
-        resp = QTUtil2.leeFichero(self.main_window, self.configuration.folder_save_lcsb(), "lcsb")
+        resp = SelectFiles.leeFichero(self.main_window, self.configuration.folder_save_lcsb(), "lcsb")
         if resp:
             self.leeFichero(resp)
 
@@ -453,10 +471,8 @@ class ManagerSolo(Manager.Manager):
         mt = _("Engine").lower()
         mt = _X(_("Disable %1"), mt) if self.play_against_engine else _X(_("Enable %1"), mt)
 
-        sep = (None, None, None)
-
-        liMasOpciones = [("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion())]
-        resp = self.configurar(liMasOpciones, siCambioTutor=True, siSonidos=True)
+        li_mas_opciones = [("rotacion", _("Auto-rotate board"), Iconos.JS_Rotacion())]
+        resp = self.configurar(li_mas_opciones, siCambioTutor=True, siSonidos=True)
 
         if resp == "rotacion":
             self.auto_rotate = not self.auto_rotate
@@ -552,7 +568,9 @@ class ManagerSolo(Manager.Manager):
             if texto:
                 ok, game = Game.pgn_game(texto)
                 if not ok:
-                    QTUtil2.message_error(self.main_window, _("The text from the clipboard does not contain a chess game in PGN format"))
+                    QTUtil2.message_error(
+                        self.main_window, _("The text from the clipboard does not contain a chess game in PGN format")
+                    )
                     return
                 self.xfichero = None
                 self.xpgn = None
@@ -586,7 +604,7 @@ class ManagerSolo(Manager.Manager):
 
     def basic_initial_position(self):
         if len(self.game) > 0:
-            if not QTUtil2.pregunta(self.main_window, _("Dou you want to remove all moves?")):
+            if not QTUtil2.pregunta(self.main_window, _("Do you want to remove all moves?")):
                 return
         self.xfichero = None
         self.xpgn = None
@@ -619,7 +637,7 @@ class ManagerSolo(Manager.Manager):
         if position is not None:
             if self.game.first_position == position:
                 return
-            self.game = Game.Game(ini_posicion=position, li_tags=self.game.li_tags)
+            self.game = Game.Game(first_position=position, li_tags=self.game.li_tags)
             self.game.set_tag("FEN", None if self.game.siFenInicial() else position.fen())
             self.game.order_tags()
             self.xfichero = None
@@ -664,7 +682,9 @@ class ManagerSolo(Manager.Manager):
         else:
             dicBase = self.configuration.read_variables("ENG_MANAGERSOLO")
 
-        dic = self.dicRival = WPlayAgainstEngine.cambioRival(self.main_window, self.configuration, dicBase, siManagerSolo=True)
+        dic = self.dicRival = WPlayAgainstEngine.cambioRival(
+            self.main_window, self.configuration, dicBase, siManagerSolo=True
+        )
 
         if dic:
             for k, v in dic.items():

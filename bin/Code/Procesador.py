@@ -1,58 +1,84 @@
 import os
 import random
+import stat
 import sys
 import webbrowser
-from stat import *
 
 import Code
-from Code import Util
-from Code.Routes import Routes, WindowRoutes, ManagerRoutes
-from Code import Update
-from Code.Engines import EngineManager, WEngines, WindowSTS
-from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson, Albums, ManagerAlbum, WindowAlbumes
-from Code.Base.Constantes import *
+from Code import Adjournments
 from Code import CPU
-from Code.Config import Configuration, WindowConfig, WindowUsuarios
 from Code import DGT
-from Code.Base import Position
-from Code.Menus import MenuTrainings, BasicMenus
-from Code.GM import ManagerGM
-from Code.Competitions import ManagerElo, ManagerFideFics, ManagerMicElo
+from Code import ManagerAnotar
 from Code import ManagerEntPos
-from Code import ManagerEverest
+from Code import ManagerGame
 from Code import ManagerMateMap
+from Code import ManagerPlayGame
 from Code import ManagerSingularM
 from Code import ManagerSolo
-from Code import ManagerGame
-from Code.Washing import ManagerWashing, WindowWashing
-from Code import ManagerPlayGame
-from Code import ManagerAnotar
-from Code import Adjournments
-from Code.CompetitionWithTutor import WCompetitionWithTutor, ManagerCompeticion
-from Code.QT import Iconos
+from Code import Update
+from Code import Util
 from Code.About import About
-from Code.MainWindow import MainWindow, Presentacion
-from Code.QT import WindowAnotar
-from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd, ManagerOpeningLines
-from Code.QT import WindowBMT
+from Code.Base import Position
+from Code.Base.Constantes import (
+    GT_ALONE,
+    ST_PLAYING,
+    GT_AGAINST_PGN,
+    GT_AGAINST_GM,
+    GT_BOOK,
+    GT_ELO,
+    GT_MICELO,
+    TB_Adjournments,
+    TB_COMPETE,
+    TB_INFORMATION,
+    TB_OPTIONS,
+    TB_PLAY,
+    TB_QUIT,
+    TB_TOOLS,
+    TB_TRAIN,
+    GT_AGAINST_CHILD_ENGINE,
+    GT_AGAINST_ENGINE,
+    GT_ALBUM,
+    GT_COMPETITION_WITH_TUTOR,
+    GT_FICS,
+    GT_FIDE,
+    GT_LICHESS,
+    OUT_REINIT,
+)
 from Code.Board import WindowColors
-from Code.QT import WindowEverest
-from Code.Sound import WindowSonido
-from Code.QT import WindowSingularM
-from Code.QT import WindowWorkMap
-from Code.QT import WindowPlayGame
+from Code.CompetitionWithTutor import WCompetitionWithTutor, ManagerCompeticion
+from Code.Competitions import ManagerElo, ManagerFideFics, ManagerMicElo
+from Code.Config import Configuration, WindowConfig, WindowUsuarios
+from Code.Databases import WindowDatabase, WDB_Games, DBgames
+from Code.Endings import WEndingsGTB
+from Code.Engines import EngineManager, WEngines, WindowSTS
+from Code.Expeditions import WindowEverest, ManagerEverest
+from Code.GM import ManagerGM
+from Code.Kibitzers import KibitzersManager
+from Code.MainWindow import MainWindow, Presentacion
+from Code.Menus import MenuTrainings, BasicMenus
+from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd, \
+    ManagerOpeningLines
+from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson, Albums, ManagerAlbum, \
+    WindowAlbumes
+from Code.Polyglots import WFactory, WPolyglot, Books, WindowBooksTrain, ManagerTrainBooks
+from Code.QT import Delegados
+from Code.QT import Iconos
 from Code.QT import Piezas
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.QT import Delegados
-from Code.Databases import WindowDatabase, WDB_Games, DBgames
+from Code.QT import SelectFiles
+from Code.QT import WindowAnotar
+from Code.TrainBMT import WindowBMT
 from Code.QT import WindowManualSave
-from Code.Kibitzers import KibitzersManager
+from Code.QT import WindowPlayGame
+from Code.QT import WindowSingularM
+from Code.QT import WindowWorkMap
+from Code.Routes import Routes, WindowRoutes, ManagerRoutes
+from Code.Sound import WindowSonido
 from Code.Tournaments import WTournaments
-from Code.Polyglots import WFactory, WPolyglot, Books, WindowBooksTrain, ManagerTrainBooks
-from Code.Endings import WEndingsGTB
 from Code.Version11 import Version11
+from Code.Washing import ManagerWashing, WindowWashing
 
 
 class Procesador:
@@ -69,6 +95,7 @@ class Procesador:
         self.web = "https://lucaschess.pythonanywhere.com"
         self.blog = "https://lucaschess.blogspot.com"
         self.github = "https://github.com/lukasmonk/lucaschessR"
+        self.wiki = "https://chessionate.com/lucaswiki"
 
         self.main_window = None
         self.kibitzers_manager = KibitzersManager.Manager(self)
@@ -276,6 +303,7 @@ class Procesador:
         xtutor = EngineManager.EngineManager(self, self.configuration.tutor)
         xtutor.function = _("tutor")
         xtutor.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
+        xtutor.set_priority(self.configuration.x_tutor_priority)
         if self.configuration.x_tutor_multipv == 0:
             xtutor.maximize_multipv()
         else:
@@ -596,7 +624,7 @@ class Procesador:
         label = _("Save engines log")
         if is_engines_log_active:
             icono = Iconos.LogActive()
-            label += " ...%s..." % _("Working")
+            label += " ...%s" % _("Working...")
             key = self.log_close
         else:
             icono = Iconos.LogInactive()
@@ -653,7 +681,7 @@ class Procesador:
         w.exec_()
 
     def folder_change(self):
-        carpeta = QTUtil2.leeCarpeta(
+        carpeta = SelectFiles.get_existing_directory(
             self.main_window, self.configuration.carpeta, _("Change the folder where all data is saved") + "\n" + _("Be careful please")
         )
         if carpeta:
@@ -698,8 +726,8 @@ class Procesador:
         if w.exec_() and w.book_player:
             self.type_play = GT_BOOK
             self.estado = ST_PLAYING
-            self.gestor = ManagerTrainBooks.ManagerTrainBooks(self)
-            self.gestor.start(w.book_player, w.player_highest, w.book_rival, w.rival_resp, w.is_white, w.show_menu)
+            self.manager = ManagerTrainBooks.ManagerTrainBooks(self)
+            self.manager.start(w.book_player, w.player_highest, w.book_rival, w.rival_resp, w.is_white, w.show_menu)
 
     def menu_tools(self):
         resp = BasicMenus.menu_tools(self)
@@ -819,8 +847,7 @@ class Procesador:
 
     def database(self, accion, dbpath, is_temporary=False):
         if accion == "M":
-            if Code.is_windows:
-                os.startfile(self.configuration.folder_databases())
+            Code.startfile(self.configuration.folder_databases())
             return
 
         if accion == "N":
@@ -841,9 +868,10 @@ class Procesador:
             self.configuration.set_last_database(Util.relative_path(dbpath))
             w = WindowDatabase.WBDatabase(self.main_window, self, dbpath, is_temporary, False)
             if self.main_window:
-                if w.exec_():
-                    if w.reiniciar:
-                        self.database("R", self.configuration.get_last_database())
+                with QTUtil.EscondeWindow(self.main_window):
+                    if w.exec_():
+                        if w.reiniciar:
+                            self.database("R", self.configuration.get_last_database())
             else:
                 Delegados.generaPM(w.infoMove.board.piezas)
                 w.show()
@@ -883,7 +911,7 @@ class Procesador:
             else:
                 Util.remove_file(entry.path)
         if len(li_ant) > 10:
-            li_ant.sort(key=lambda x: x.stat()[ST_ATIME], reverse=True)
+            li_ant.sort(key=lambda x: x.stat()[stat.ST_ATIME], reverse=True)
             for x in li_ant[10:]:
                 Util.remove_file(x.path)
 
@@ -914,13 +942,13 @@ class Procesador:
         self.database("R", file_db, is_temporary=True)
 
     def visorPGN(self):
-        path = QTVarios.select_pgn(self.main_window)
+        path = SelectFiles.select_pgn(self.main_window)
         if path:
             self.read_pgn(path)
 
     def select_1_pgn(self, wparent=None):
         wparent = self.main_window if wparent is None else wparent
-        path = QTVarios.select_pgn(wparent)
+        path = SelectFiles.select_pgn(wparent)
         if path:
             fichero_pgn = os.path.abspath(path)
             cfecha_pgn = str(os.path.getmtime(fichero_pgn))
@@ -1004,7 +1032,7 @@ class Procesador:
                     list_books.borra(book)
                     list_books.save_pickle(self.configuration.file_books)
             elif orden == "n":
-                fbin = QTUtil2.leeFichero(self.main_window, list_books.path, "bin", titulo=_("Polyglot book"))
+                fbin = SelectFiles.leeFichero(self.main_window, list_books.path, "bin", titulo=_("Polyglot book"))
                 if fbin:
                     list_books.path = os.path.dirname(fbin)
                     name = os.path.basename(fbin)[:-4]
@@ -1030,8 +1058,6 @@ class Procesador:
         self.manager.start()
 
     def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump):
-        # self.game_type = GT_POSITIONS
-        # self.state = ST_PLAYING
         self.manager = ManagerEntPos.ManagerEntPos(self)
         self.manager.set_training(entreno)
         self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump)
@@ -1039,18 +1065,12 @@ class Procesador:
     def playRoute(self, route):
         if route.state == Routes.BETWEEN:
             self.manager = ManagerRoutes.ManagerRoutesTactics(self)
-            # self.state = ST_PLAYING
-            # self.game_type = GT_POSITIONS
             self.manager.start(route)
         elif route.state == Routes.ENDING:
             self.manager = ManagerRoutes.ManagerRoutesEndings(self)
-            # self.state = ST_PLAYING
-            # self.game_type = GT_POSITIONS
             self.manager.start(route)
         elif route.state == Routes.PLAYING:
             self.manager = ManagerRoutes.ManagerRoutesPlay(self)
-            # self.state = ST_PLAYING
-            # self.game_type = GT_AGAINST_ENGINE
             self.manager.start(route)
 
     def showRoute(self):
@@ -1058,8 +1078,6 @@ class Procesador:
 
     def playEverest(self, recno):
         self.manager = ManagerEverest.ManagerEverest(self)
-        # self.state = ST_PLAYING
-        # self.game_type = GT_AGAINST_ENGINE
         self.manager.start(recno)
 
     def showEverest(self, recno):
@@ -1111,6 +1129,8 @@ class Procesador:
             webbrowser.open(resp)
         elif resp == "web":
             webbrowser.open("%s/index?lang=%s" % (self.web, self.configuration.translator()))
+        elif resp == "wiki":
+            webbrowser.open(self.wiki)
         elif resp == "mail":
             webbrowser.open("mailto:lukasmonk@gmail.com")
 
@@ -1168,12 +1188,12 @@ class Procesador:
         board = clon_procesador.main_window.board
         if father_board:
             board.dbvisual_set_file(father_board.dbVisual.file)
-            board.dbvisual_set_show_allways(father_board.dbVisual.showAllways)
+            board.dbvisual_set_show_allways(father_board.dbVisual.show_allways)
 
         resp = clon_procesador.main_window.show_variations(clon_procesador.manager.window_title())
         if father_board:
             father_board.dbvisual_set_file(father_board.dbVisual.file)
-            father_board.dbvisual_set_show_allways(father_board.dbVisual.showAllways())
+            father_board.dbvisual_set_show_allways(father_board.dbVisual.show_allways())
 
         if resp:
             return clon_procesador.manager.game

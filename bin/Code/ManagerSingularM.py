@@ -2,7 +2,16 @@ import time
 
 from Code import Manager
 from Code.Base import Game
-from Code.Base.Constantes import *
+from Code.Base.Constantes import (
+    ST_ENDGAME,
+    ST_PLAYING,
+    TB_CLOSE,
+    TB_CONFIG,
+    TB_NEXT,
+    TB_RESIGN,
+    TB_UTILITIES,
+    GT_SINGULAR_MOVES,
+)
 
 
 class ManagerSingularM(Manager.Manager):

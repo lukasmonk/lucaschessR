@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   inkscape:version="1.1 (c68e22c387, 2021-05-23)"
    id="svg23"
    version="1.1"
    sodipodi:docname="bk.svg"
    viewBox="-60 -60 120 120"
    height="120mm"
-   width="120mm">
+   width="120mm"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs25">
     <image
@@ -31,9 +31,9 @@
      inkscape:bbox-nodes="false"
      inkscape:bbox-paths="false"
      inkscape:window-maximized="1"
-     inkscape:window-y="-9"
-     inkscape:window-x="-9"
-     inkscape:window-height="1005"
+     inkscape:window-y="-10"
+     inkscape:window-x="-10"
+     inkscape:window-height="996"
      inkscape:window-width="1920"
      inkscape:snap-bbox-midpoints="true"
      inkscape:snap-bbox="true"
@@ -44,15 +44,16 @@
      showgrid="false"
      inkscape:current-layer="Template"
      inkscape:document-units="mm"
-     inkscape:cy="219.59846"
-     inkscape:cx="174.94276"
+     inkscape:cy="219.9102"
+     inkscape:cx="175.00892"
      inkscape:zoom="1.4142136"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
      bordercolor="#666666"
      pagecolor="#ffffff"
-     inkscape:snap-nodes="false">
+     inkscape:snap-nodes="false"
+     inkscape:pagecheckerboard="0">
     <sodipodi:guide
        id="guide2827"
        position="226.771653543,226.771653543"
@@ -81,7 +82,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -90,21 +91,6 @@
      id="Template"
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
-    <circle
-       id="circle16"
-       r="60"
-       cy="0"
-       cx="0" />
-    <circle
-       id="circle18"
-       r="19"
-       cy="0"
-       cx="0" />
-    <circle
-       id="circle20"
-       r="7.5"
-       cy="0"
-       cx="0" />
     <use
        style="clip-rule:evenodd;fill-rule:evenodd"
        id="g4"

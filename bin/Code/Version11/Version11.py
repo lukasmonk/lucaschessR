@@ -4,15 +4,15 @@ import pickle
 import shutil
 import sqlite3
 import subprocess
-import datetime
 
 import Code
 from Code import Util
 from Code.Base import Game, Move
-from Code.Base.Constantes import *
+from Code.Base.Constantes import RESULT_UNKNOWN, dicHTMLnags, dicHTMLnagsTxt
 from Code.Databases import DBgames
 from Code.Engines import EngineResponse
 from Code.QT import QTUtil2
+from Code.QT import SelectFiles
 from Code.SQL import UtilSQL
 
 
@@ -157,7 +157,14 @@ class Version11:
                 pv = dic_mv["M"]
                 position = current_position.copia()
                 position.moverPV(pv)
-                move = Move.Move(g, position_before=current_position, position=position, from_sq=pv[:2], to_sq=pv[2:4], promotion=pv[4:])
+                move = Move.Move(
+                    g,
+                    position_before=current_position,
+                    position=position,
+                    from_sq=pv[:2],
+                    to_sq=pv[2:4],
+                    promotion=pv[4:],
+                )
                 if "VARIATIONS" in dic_mv:
                     li_varpgn = dic_mv["VARIATIONS"]
                     fen_base = current_position.fen()
@@ -203,7 +210,7 @@ class Version11:
         dic = self.configuration.read_variables("VERSION11")
         titulo = _("Select the folder with the %s to be imported") % _("Databases")
         QTUtil2.message(self.wowner, titulo)
-        folder = QTUtil2.leeCarpeta(self.wowner, dic.get("FOLDER", "../.."), titulo=titulo)
+        folder = SelectFiles.get_existing_directory(self.wowner, dic.get("FOLDER", "../.."), titulo=titulo)
         if not folder:
             return
         um = QTUtil2.unMomento(self.wowner, _("Working...") + "\n This is a very slow process")
@@ -288,7 +295,7 @@ class Version11:
         dic = self.configuration.read_variables("VERSION11")
         titulo = _("Select the folder with the %s to be imported") % _("Opening lines")
         QTUtil2.message(self.wowner, titulo)
-        folder = QTUtil2.leeCarpeta(self.wowner, dic.get("FOLDER_OPENINGLINES", "../.."), titulo=titulo)
+        folder = SelectFiles.get_existing_directory(self.wowner, dic.get("FOLDER_OPENINGLINES", "../.."), titulo=titulo)
         if not folder:
             return
         dic["FOLDER_OPENINGLINES"] = os.path.abspath(folder)
@@ -300,7 +307,9 @@ class Version11:
         dic = self.configuration.read_variables("VERSION11")
         titulo = "Select the UsrData folder of version 11"
         QTUtil2.message(self.wowner, titulo)
-        usrdata_folder = QTUtil2.leeCarpeta(self.wowner, dic.get("FOLDER_USRDATA", "../.."), titulo=titulo)
+        usrdata_folder = SelectFiles.get_existing_directory(
+            self.wowner, dic.get("FOLDER_USRDATA", "../.."), titulo=titulo
+        )
         if not usrdata_folder:
             return
         if not usrdata_folder.lower().endswith("usrdata"):

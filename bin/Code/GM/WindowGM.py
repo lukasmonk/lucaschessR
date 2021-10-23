@@ -2,19 +2,19 @@ import os
 import zipfile
 
 import Code
-from Code.Polyglots import Books
+from Code import Util
 from Code.GM import GM
+from Code.Openings import WindowOpenings
+from Code.Polyglots import Books
 from Code.QT import Colocacion
-from Code.QT import Common
 from Code.QT import Columnas
+from Code.QT import Common
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.Openings import WindowOpenings
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code import Util
 from Code.SQL import UtilSQL
 
 
@@ -46,7 +46,7 @@ class WGM(QTVarios.WDialogo):
             None,
             (_("Import"), Iconos.ImportarGM(), self.importar),
         ]
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         # Grandes maestros
         self.li_gm = GM.lista_gm()
@@ -96,7 +96,7 @@ class WGM(QTVarios.WDialogo):
         self.chbEvals = Controles.CHB(self, _("Show all evaluations"), False)
         li_options = [(_("All moves"), None), (_("Moves are different"), True), (_("Never"), False)]
         self.cbJshow = Controles.CB(self, li_options, True)
-        self.lbJmultiPV = Controles.LB2P(self, _("Number of moves evaluated by engine(MultiPV)"))
+        self.lbJmultiPV = Controles.LB2P(self, _("Number of half-moves evaluated by engine(MultiPV)"))
         li = [(_("Default"), "PD"), (_("Maximum"), "MX")]
         for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 30, 40, 50, 75, 100, 150, 200):
             li.append((str(x), str(x)))
@@ -135,9 +135,9 @@ class WGM(QTVarios.WDialogo):
         # Openings
 
         self.btOpening = Controles.PB(self, " " * 5 + _("Undetermined") + " " * 5, self.aperturasEditar).ponPlano(False)
-        self.btOpeningsFavoritas = Controles.PB(self, "", self.preferred_openings).ponIcono(Iconos.Favoritos())
-        self.btOpeningsQuitar = Controles.PB(self, "", self.aperturasQuitar).ponIcono(Iconos.Motor_No())
-        hbox = Colocacion.H().control(self.btOpeningsQuitar).control(self.btOpening).control(self.btOpeningsFavoritas).relleno()
+        self.btOpeningsFavoritas = Controles.PB(self, "", self.preferred_openings).ponIcono(Iconos.Favoritos()).anchoFijo(24)
+        self.btOpeningsQuitar = Controles.PB(self, "", self.aperturasQuitar).ponIcono(Iconos.Motor_No()).anchoFijo(24)
+        hbox = Colocacion.H().control(self.btOpeningsQuitar).control(self.btOpening).control(self.btOpeningsFavoritas)
         gbOpening = Controles.GB(self, _("Opening"), hbox)
 
         # gbBasic
@@ -204,7 +204,8 @@ class WGM(QTVarios.WDialogo):
         self.check_personal()
         self.check_histo()
         self.aperturaMuestra()
-        self.btOpeningsFavoritas.hide()
+        if not self.li_preferred_openings:
+            self.btOpeningsFavoritas.hide()
 
         self.restore_video(anchoDefecto=750)
 
@@ -431,7 +432,7 @@ class WGM(QTVarios.WDialogo):
             select_rival_move = dic.get("JUGCONTRARIO", False)
             jug_inicial = dic.get("JUGINICIAL", 1)
             self.li_preferred_openings = dic.get("APERTURASFAVORITAS", [])
-            self.opening_block = dic.get("APERTURA", None)
+            self.opening_block = dic.get("OPENING", None)
             if self.opening_block:
                 n_esta = -1
                 for npos, bl in enumerate(self.li_preferred_openings):
@@ -584,7 +585,7 @@ class WImportar(QTVarios.WDialogo):
             (_("Mark"), Iconos.Marcar(), self.marcar),
             None,
         ]
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         # Lista
         o_columns = Columnas.ListaColumnas()
@@ -744,7 +745,7 @@ class SelectGame(QTVarios.WDialogo):
             li_acciones.append((_("Remove"), Iconos.Borrar(), self.remove))
             li_acciones.append(None)
 
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         layout = Colocacion.V().control(tb).control(self.grid).margen(3)
         self.setLayout(layout)

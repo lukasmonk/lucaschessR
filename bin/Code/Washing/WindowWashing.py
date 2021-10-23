@@ -5,7 +5,6 @@ from PySide2 import QtSvg, QtCore
 
 import Code
 from Code import Util
-from Code.Washing import Washing
 from Code.Base import Game
 from Code.Databases import DBgames
 from Code.QT import Colocacion
@@ -17,6 +16,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import WindowSavePGN
+from Code.Washing import Washing
 
 
 class WWashing(QTVarios.WDialogo):

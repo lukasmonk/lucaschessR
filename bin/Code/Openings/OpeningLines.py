@@ -1,20 +1,20 @@
+import collections
+import datetime
 import os
+import random
 import shutil
 import sqlite3
-import random
-import datetime
-import collections
 
 import FasterCode
 
 import Code
 from Code import Util
-from Code.SQL import UtilSQL
 from Code.Base import Game, Position
 from Code.Databases import DBgamesST
-from Code.Openings import OpeningsStd
 from Code.Engines import EnginesBunch
+from Code.Openings import OpeningsStd
 from Code.QT import QTUtil2
+from Code.SQL import UtilSQL
 
 
 class ListaOpenings:
@@ -365,7 +365,7 @@ class Opening:
         reg["LIGAMES_SEQUENTIAL"] = ligamesSQ
         reg["DICFENM2"] = dicFENm2
 
-        bcolor = " w " if is_white else " b "
+        # bcolor = " w " if is_white else " b "
         liTrainPositions = []
         for fenm2 in dicFENm2:
             data = {}
@@ -588,6 +588,22 @@ class Opening:
         self.li_xpv.sort()
         self.add_cache(xpv, game)
 
+    def append_pv(self, pv):
+        xpv = FasterCode.pv_xpv(pv)
+        # add_pv = True
+        for pos, xpv1 in enumerate(self.li_xpv):
+            if xpv == xpv1 or xpv1.startswith(xpv):
+                return False
+            if xpv.startswith(xpv1):
+                game = Game.Game()
+                game.read_pv(pv)
+                self.__setitem__(pos, game)
+                return True
+        game = Game.Game()
+        game.read_pv(pv)
+        self.append(game)
+        return True
+
     def posPartida(self, game):
         # return siNueva, numlinea, siAppend
         xpv_busca = FasterCode.pv_xpv(game.pv())
@@ -754,7 +770,7 @@ class Opening:
                 self.db_cache_engines = None
 
             if self.board:
-                self.board.dbVisual_close()
+                self.board.dbvisual_close()
                 self.board = None
 
             if si_pack:
@@ -1041,13 +1057,40 @@ class Opening:
 
         ws.pb(total)
 
+        alm = Util.Record()
+        alm.info_variation = True
+        alm.best_variation = False
+        alm.one_move_variation = False
+        alm.si_pdt = True
+
+
         for recno in range(total):
             ws.pb_pos(recno + 1)
             if ws.pb_cancel():
                 break
-            game = self[recno]
+            game = self[recno].copia()
 
             liTags[1] = ["Site", "%s %d" % (_("Line"), recno + 1)]
+            for tag, value in liTags:
+                game.set_tag(tag, value)
+
+            for move in game.li_moves:
+                fenm2 = move.position.fenm2()
+                dic = self.getfenvalue(fenm2)
+                if dic:
+                    comment = dic.get("COMENTARIO")
+                    if comment:
+                        move.add_comment(comment)
+                    nag = dic.get("VALORACION")
+                    if nag:
+                        move.add_nag(nag)
+                    nag = dic.get("VENTAJA")
+                    if nag:
+                        move.add_nag(nag)
+                    analisis = dic.get("ANALISIS")
+                    if analisis is not None:
+                        move.analysis = analisis, -1
+                        move.analisis2variantes(alm, False)
 
             if recno > 0 or not ws.is_new:
                 ws.write("\n\n")

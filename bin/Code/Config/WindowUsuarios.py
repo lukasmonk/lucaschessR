@@ -138,9 +138,8 @@ def set_password(procesador):
     user = configuration.user
     li_usuarios = Usuarios.Usuarios().list_users
     if user:
-        number = int(user)
         for n, usu in enumerate(li_usuarios):
-            if usu.number == number:
+            if usu.number == user.number:
                 npos = n
                 break
         if npos == 0:

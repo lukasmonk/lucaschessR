@@ -107,6 +107,7 @@ class SelectBanda(QtWidgets.QWidget):
             self.liLB_F.append(lb_f)
             layout.controlc(lb, n, 0)
         lb_f = Controles.LB("%s F10\n%s" % (_("CTRL"), _("Changes")))
+        # Activa la posibilidad de mover las piezas con el ratón
         lb_f.setStyleSheet("*{ border: 1px solid %s; background: %s;}" % (color, color))
         lb_f.anchoFijo(64)
         lb_f.altoFijo(36)

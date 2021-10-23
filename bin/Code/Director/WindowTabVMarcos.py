@@ -2,6 +2,9 @@ import copy
 
 from PySide2 import QtCore, QtWidgets
 
+import Code
+from Code import Util
+from Code.Board import Board, BoardTypes
 from Code.Director import TabVisual
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -12,9 +15,6 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board, BoardTypes
-from Code import Util
-import Code
 
 
 class WTV_Marco(QtWidgets.QDialog):

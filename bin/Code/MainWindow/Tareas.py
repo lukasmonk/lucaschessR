@@ -21,7 +21,6 @@ class Tarea:
     def enlaza(self, cpu):
         self.cpu = cpu
         self.id = cpu.nuevaID()
-        self.junks = cpu.junks
         self.padre = 0
 
 
@@ -31,7 +30,7 @@ class TareaDuerme(Tarea):
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
-        self.totalPasos = int(self.seconds * self.junks)
+        self.totalPasos = int(self.seconds * 1000 / 40)
 
         self.pasoActual = 0
 
@@ -102,6 +101,38 @@ class TareaBorraPieza(Tarea):
         board.borraPieza(self.a1h8)
 
 
+class TareaBorraPiezaSecs(Tarea):
+    def __init__(self, a1h8, secs, tipo=None):
+        self.a1h8 = a1h8
+        self.seconds = secs
+        self.tipo = tipo
+
+    def enlaza(self, cpu):
+        Tarea.enlaza(self, cpu)
+
+        pasos = int(self.seconds * 1000.0 / cpu.ms_step)
+        self.liPasos = [False] * pasos
+        self.liPasos[int(pasos*0.9)] = True
+        self.totalPasos = len(self.liPasos)
+        self.pasoActual = 0
+
+    def unPaso(self):
+        if self.liPasos[self.pasoActual]:
+            if self.tipo:
+                self.cpu.board.borraPiezaTipo(self.a1h8, self.tipo)
+            else:
+                self.cpu.board.borraPieza(self.a1h8)
+
+        self.pasoActual += 1
+        return self.pasoActual >= self.totalPasos  # si es ultimo
+
+    def __str__(self):
+        return _X(_("Remove piece on %1"), self.a1h8)
+
+    def directo(self, board):
+        board.borraPieza(self.a1h8)
+
+
 class TareaMuevePieza(Tarea):
     def __init__(self, from_a1h8, to_a1h8, seconds=0.0):
         self.pieza = None
@@ -119,7 +150,7 @@ class TareaMuevePieza(Tarea):
 
         linea = QtCore.QLineF(dx, dy, hx, hy)
 
-        pasos = int(self.seconds * self.junks)
+        pasos = int(self.seconds * 1000.0 / cpu.ms_step)
         self.liPuntos = []
         for x in range(1, pasos + 1):
             self.liPuntos.append(linea.pointAt(float(x) / pasos))
@@ -160,75 +191,6 @@ class TareaMuevePieza(Tarea):
 
     def directo(self, board):
         board.muevePieza(self.from_a1h8, self.to_a1h8)
-
-
-class TareaMuevePiezaV(TareaMuevePieza):
-    def __init__(self, from_a1h8, to_a1h8, vsegundos):
-        TareaMuevePieza.__init__(self, from_a1h8, to_a1h8, 0.0)
-        self.vsegundos = vsegundos
-
-    def enlaza(self, cpu):
-        self.seconds = self.vsegundos.valor
-        TareaMuevePieza.enlaza(self, cpu)
-
-    def __str__(self):
-        return _X(
-            _("Move piece from %1 to %2 on %3 second (s)"),
-            self.from_a1h8,
-            self.to_a1h8,
-            "%0.2f (%s)" % (self.vsegundos.valor, self.vsegundos.name),
-        )
-
-    def directo(self, board):
-        board.muevePieza(self.from_a1h8, self.to_a1h8)
-
-
-class TareaMuevePiezaLI(Tarea):
-    def __init__(self, lista, seconds):
-        self.lista = lista
-        self.seconds = seconds
-
-    def enlaza(self, cpu):
-        Tarea.enlaza(self, cpu)
-        self.board = self.cpu.board
-        self.pieza = None
-        self.from_a1h8 = self.lista[0][0]
-        self.to_a1h8 = self.lista[-1][1]
-        self.liPuntos = []
-        pasos1 = int(self.seconds * self.junks / len(self.lista))
-
-        for from_a1h8, to_a1h8 in self.lista:
-            dx, dy = self.a1h8_xy(from_a1h8)
-            hx, hy = self.a1h8_xy(to_a1h8)
-
-            linea = QtCore.QLineF(dx, dy, hx, hy)
-
-            for x in range(1, pasos1 + 1):
-                self.liPuntos.append(linea.pointAt(float(x) / pasos1))
-        self.nPaso = 0
-        self.totalPasos = len(self.liPuntos)
-
-    def a1h8_xy(self, a1h8):
-        row = int(a1h8[1])
-        column = ord(a1h8[0]) - 96
-        x = self.board.columna2punto(column)
-        y = self.board.fila2punto(row)
-        return x, y
-
-    def unPaso(self):
-        if self.pieza is None:
-            self.pieza = self.board.damePiezaEn(self.from_a1h8)
-        p = self.liPuntos[self.nPaso]
-        bp = self.pieza.bloquePieza
-        bp.physical_pos.x = p.x()
-        bp.physical_pos.y = p.y()
-        self.pieza.rehazPosicion()
-        self.nPaso += 1
-        siUltimo = self.nPaso >= self.totalPasos
-        if siUltimo:
-            # Para que este al final en la position correcta
-            self.board.colocaPieza(bp, self.to_a1h8)
-        return siUltimo
 
 
 class TareaCreaFlecha(Tarea):

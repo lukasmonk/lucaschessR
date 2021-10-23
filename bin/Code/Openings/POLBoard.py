@@ -4,17 +4,33 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 import Code.Nags.Nags
 from Code.Base import Game, Move
+from Code.Base.Constantes import (
+    GOOD_MOVE,
+    VERY_GOOD_MOVE,
+    NO_RATING,
+    BAD_MOVE,
+    VERY_POOR_MOVE,
+    SPECULATIVE_MOVE,
+    QUESTIONABLE_MOVE,
+)
+from Code.Board import Board
+from Code.Board import WindowColors
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code.Board import WindowColors
 
-from Code.Base.Constantes import *
-
-V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_MAS, V_NEGRAS_MAS_MAS = (0, 11, 14, 15, 16, 17, 18, 19)
+V_SIN, V_IGUAL, V_BLANCAS, V_NEGRAS, V_BLANCAS_MAS, V_NEGRAS_MAS, V_BLANCAS_MAS_MAS, V_NEGRAS_MAS_MAS = (
+    0,
+    11,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+)
 
 
 class LBKey(Controles.LB):
@@ -55,7 +71,7 @@ class BoardLines(QtWidgets.QWidget):
         self.board.dispatchSize(self.ajustaAncho)
         self.board.dbvisual_set_file(self.dbop.nom_fichero)
         self.board.dbvisual_set_show_allways(True)
-        self.board.dbVisual_setSaveAllways(True)
+        self.board.dbvisual_set_save_allways(True)
 
         self.board.ponerPiezasAbajo(self.dbop.getconfig("WHITEBOTTOM", True))
 
@@ -63,13 +79,15 @@ class BoardLines(QtWidgets.QWidget):
 
         self.intervalo = configuration.x_interval_replay
 
-        tipoLetra = Controles.TipoLetra(puntos=configuration.x_pgn_fontpoints)
+        tipo_letra = Controles.TipoLetra(puntos=configuration.x_pgn_fontpoints)
 
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
         self.lbPGN = LBKey(self).set_wrap()
-        self.lbPGN.setStyleSheet("QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}")
-        self.lbPGN.ponFuente(tipoLetra)
+        self.lbPGN.setStyleSheet(
+            "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}"
+        )
+        self.lbPGN.ponFuente(tipo_letra)
         self.lbPGN.setOpenExternalLinks(False)
 
         def muestraPos(txt):
@@ -102,22 +120,22 @@ class BoardLines(QtWidgets.QWidget):
         # Valoracion
         li_options = [(tit[0], k, tit[1]) for k, tit in self.dicValoracion.items()]
         self.cbValoracion = Controles.CB(self, li_options, 0).capture_changes(self.cambiadoValoracion)
-        self.cbValoracion.ponFuente(tipoLetra)
+        self.cbValoracion.ponFuente(tipo_letra)
 
         # Ventaja
         li_options = [(tit, k, icon) for k, (tit, icon) in self.dicVentaja.items()]
         self.cbVentaja = Controles.CB(self, li_options, 0).capture_changes(self.cambiadoVentaja)
-        self.cbVentaja.ponFuente(tipoLetra)
+        self.cbVentaja.ponFuente(tipo_letra)
 
         # Comentario
         self.emComentario = Controles.EM(self, siHTML=False).capturaCambios(self.cambiadoComentario)
-        self.emComentario.ponFuente(tipoLetra)
+        self.emComentario.ponFuente(tipo_letra)
         self.emComentario.altoFijo(5 * configuration.x_pgn_rowheight)
         lyVal = Colocacion.H().control(self.cbValoracion).control(self.cbVentaja)
         lyEd = Colocacion.V().otro(lyVal).control(self.emComentario)
 
         # Opening
-        self.lb_opening = Controles.LB(self).align_center().ponFuente(tipoLetra).set_wrap()
+        self.lb_opening = Controles.LB(self).align_center().ponFuente(tipo_letra).set_wrap()
 
         lyt = Colocacion.H().relleno().control(self.board).relleno()
 
@@ -266,8 +284,8 @@ class BoardLines(QtWidgets.QWidget):
         self.board.set_position(position)
         if move:
             self.board.put_arrow_sc(move.from_sq, move.to_sq)
-            position_before = move.position_before
-            fenM2_base = position_before.fenm2()
+            # position_before = move.position_before
+            # fenM2_base = position_before.fenm2()
 
         if self.siReloj:
             self.board.disable_all()

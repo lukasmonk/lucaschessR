@@ -1,11 +1,11 @@
 """
 Rutinas internas para la conexion con DGTEBDLL.dll
 """
-import os
 import ctypes
+import os
 
-from Code import Util
 import Code
+from Code import Util
 
 DGT_ON = "DGT.ON"
 
@@ -115,8 +115,8 @@ def activar():
             path_so = os.path.join(path, "libdgt.so")
         elif Code.configuration.x_digital_board == "Certabo":
             path_so = os.path.join(path, "libcer.so")
-        elif Code.configuration.x_digital_board == "CertaboBT":
-            path_so = os.path.join(path, "libcerBT.so")
+        # elif Code.configuration.x_digital_board == "CertaboBT":
+        #     path_so = os.path.join(path, "libcerBT.so")
         elif Code.configuration.x_digital_board == "Millennium":
             path_so = os.path.join(path, "libmcl.so")
         elif Code.configuration.x_digital_board == "Citrine":
@@ -266,6 +266,7 @@ def writeDebug(activar):
 
 def writePosition(cposicion):
     if Code.dgt:
+        Code.dgt.allowHumanTB = False
         # log( "Enviado a la DGT" + cposicion )
         dgt = Code.dgt
         dgt._DGTDLL_WritePosition(cposicion.encode())

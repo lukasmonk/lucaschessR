@@ -3,6 +3,9 @@ import os
 
 from PySide2 import QtCore, QtWidgets
 
+import Code
+from Code import Util
+from Code.Board import Board
 from Code.Director import TabVisual
 from Code.QT import Colocacion
 from Code.QT import Columnas
@@ -13,9 +16,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Board import Board
-from Code import Util
-import Code
+from Code.QT import SelectFiles
 
 
 class WTV_Marker(QtWidgets.QDialog):
@@ -35,7 +36,7 @@ class WTV_Marker(QtWidgets.QDialog):
                 regMarker.name = name
 
         li_acciones = [(_("Save"), Iconos.Aceptar(), self.grabar), None, (_("Cancel"), Iconos.Cancelar(), self.reject), None]
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         # Board
         config_board = owner.board.config_board
@@ -159,7 +160,7 @@ class WTV_Markers(QTVarios.WDialogo):
             (_("Down"), Iconos.Abajo(), self.abajo),
             None,
         ]
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
         tb.setFont(flb)
 
         ly = Colocacion.V().control(tb).control(self.grid)
@@ -236,7 +237,7 @@ class WTV_Markers(QTVarios.WDialogo):
             return
 
         if resp == "@":
-            file = QTUtil2.leeFichero(self, "imgs", "svg", titulo=_("Image"))
+            file = SelectFiles.leeFichero(self, "imgs", "svg", titulo=_("Image"))
             if not file:
                 return
         else:

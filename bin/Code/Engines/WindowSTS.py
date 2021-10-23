@@ -16,7 +16,7 @@ from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
-from Code.QT import QTUtil2
+from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 
 
@@ -656,7 +656,7 @@ class WUnSTS(QTVarios.WDialogo):
                     return
 
     def export(self):
-        resp = QTUtil2.salvaFichero(self, _("CSV file"), Code.configuration.x_save_folder, _("File") + " csv (*.csv)", True)
+        resp = SelectFiles.salvaFichero(self, _("CSV file"), Code.configuration.x_save_folder, _("File") + " csv (*.csv)", True)
         if resp:
             self.sts.writeCSV(resp)
 
@@ -791,7 +791,7 @@ class WSTS(QTVarios.WDialogo):
             (_("Copy"), Iconos.Copiar(), self.copiar),
             (_("Remove"), Iconos.Borrar(), self.borrar),
         )
-        tb = Controles.TBrutina(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
         if len(self.lista) == 0:
             for x in (self.modificar, self.borrar, self.copiar, self.rename):
                 tb.setAccionVisible(x, False)

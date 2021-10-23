@@ -1,9 +1,23 @@
+from Code.Base.Constantes import (
+    ADJUST_BETTER,
+    ADJUST_HIGH_LEVEL,
+    ADJUST_INTERMEDIATE_LEVEL,
+    ADJUST_LOW_LEVEL,
+    ADJUST_SELECTED_BY_PLAYER,
+    ADJUST_SIMILAR,
+    ADJUST_SOMEWHAT_BETTER,
+    ADJUST_SOMEWHAT_BETTER_MORE,
+    ADJUST_SOMEWHAT_BETTER_MORE_MORE,
+    ADJUST_SOMEWHAT_WORSE_LESS,
+    ADJUST_SOMEWHAT_WORSE_LESS_LESS,
+    ADJUST_WORSE,
+    ADJUST_WORST_MOVE,
+)
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
-from Code.Base.Constantes import *
 
 
 class Personalities:
@@ -57,13 +71,22 @@ class Personalities:
         li_gen.append((None, None))
 
         li_gen.append((None, _("Serious errors, select the best move if:")))
-        li_gen.append((FormLayout.Editbox(_("Mate is less than or equal to"), tipo=int, ancho=50), una.get("MAXMATE", 0)))
-        li_gen.append((FormLayout.Editbox(_("The loss of centipawns is greater than"), tipo=int, ancho=50), una.get("MINDIFPUNTOS", 0)))
+        li_gen.append(
+            (FormLayout.Editbox(_("Mate is less than or equal to"), tipo=int, ancho=50), una.get("MAXMATE", 0))
+        )
+        li_gen.append(
+            (
+                FormLayout.Editbox(_("The loss of centipawns is greater than"), tipo=int, ancho=50),
+                una.get("MINDIFPUNTOS", 0),
+            )
+        )
         li_gen.append((None, None))
         li_gen.append(
             (
                 FormLayout.Editbox(
-                    _("Max. loss of centipawns per move by the <br> engine to reach a leveled evaluation"), tipo=int, ancho=50
+                    _("Max. loss of centipawns per move by the <br> engine to reach a leveled evaluation"),
+                    tipo=int,
+                    ancho=50,
                 ),
                 una.get("ATERRIZAJE", 50),
             )
@@ -100,7 +123,9 @@ class Personalities:
         liF = [(None, None)]
 
         # Ajustar
-        liF.append((FormLayout.Combobox(_("Strength"), self.listaAjustes(False)), una.get("AJUSTARFINAL", ADJUST_BETTER)))
+        liF.append(
+            (FormLayout.Combobox(_("Strength"), self.listaAjustes(False)), una.get("AJUSTARFINAL", ADJUST_BETTER))
+        )
 
         liF.append((FormLayout.Spinbox(_("Maximum pieces at this stage"), 0, 32, 50), una.get("MAXPIEZASFINAL", 0)))
         liF.append((None, None))
@@ -121,7 +146,9 @@ class Personalities:
             lista.append((liA, _("Opening"), ""))
             lista.append((liMJ, _("Middlegame"), ""))
             lista.append((liF, _("Endgame"), ""))
-            resultado = FormLayout.fedit(lista, title=_("Personalities"), parent=self.owner, anchoMinimo=460, icon=icono)
+            resultado = FormLayout.fedit(
+                lista, title=_("Personalities"), parent=self.owner, anchoMinimo=460, icon=icono
+            )
             if resultado:
                 accion, liResp = resultado
                 liGenR, liAR, liMJR, liFR = liResp

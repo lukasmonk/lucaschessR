@@ -2,12 +2,19 @@ from PySide2 import QtCore
 
 import Code
 from Code import DGT
-
+from Code.Base.Constantes import (
+    MENU_PLAY_ANY_ENGINE,
+    MENU_PLAY_BOTH,
+    MENU_PLAY_YOUNG_PLAYERS,
+    POS_TUTOR_VERTICAL,
+    POS_TUTOR_HORIZONTAL_2_1,
+    POS_TUTOR_HORIZONTAL_1_2,
+    POS_TUTOR_HORIZONTAL,
+)
+from Code.Engines import Priorities
 from Code.QT import FormLayout
-from Code.QT import QTUtil2
 from Code.QT import Iconos
-from Code import Util
-from Code.Base.Constantes import *
+from Code.QT import QTUtil2
 
 
 def options(parent, configuration):
@@ -57,6 +64,8 @@ def options(parent, configuration):
     form.checkbox(_("Rival moves"), configuration.x_sound_move)
     form.separador()
     form.checkbox(_("Activate sounds with our moves"), configuration.x_sound_our)
+    form.separador()
+    form.checkbox(_("Beep when there is an error in training tactics"), configuration.x_sound_error)
 
     form.add_tab(_("Sounds"))
 
@@ -66,8 +75,7 @@ def options(parent, configuration):
     form.float(_("Duration of tutor analysis (secs)"), float(configuration.x_tutor_mstime / 1000.0))
     form.spinbox(_("Depth"), 0, 40, 100, configuration.x_tutor_depth)
 
-    form.spinbox(_("Number of moves evaluated by engine(MultiPV)"), 0, 512, 100, configuration.x_tutor_multipv)
-    form.separador()
+    form.spinbox(_("Number of half-moves evaluated by engine(MultiPV)"), 0, 512, 100, configuration.x_tutor_multipv)
     form.checkbox(_("Disabled at the beginning of the game"), not configuration.x_default_tutor_active)
 
     li_pos_tutor = [
@@ -77,10 +85,10 @@ def options(parent, configuration):
         (_("Vertical"), POS_TUTOR_VERTICAL),
     ]
     form.combobox(_("Tutor boards position"), li_pos_tutor, configuration.x_tutor_view)
-    form.separador()
     form.checkbox(_("Work in the background, when possible"), not configuration.x_engine_notbackground)
+    form.combobox(_("Process priority"), Priorities.priorities.combo(), configuration.x_tutor_priority)
     form.separador()
-    form.separador()
+
     form.apart(_("Sensitivity"))
     form.spinbox(_("Minimum difference in centipawns"), 0, 1000, 70, configuration.x_tutor_difpoints)
     form.spinbox(_("Minimum difference in %"), 0, 1000, 70, configuration.x_tutor_difporc)
@@ -134,7 +142,7 @@ def options(parent, configuration):
             (_("None"), ""),
             (_("DGT") + x, "DGT-gon"),
             (_("Certabo") + x, "Certabo"),
-            ("%s (%s) %s" % (_("Certabo"), _("Bluetooth"), x), "CertaboBT"),
+            # ("%s (%s) %s" % (_("Certabo"), _("Bluetooth"), x), "CertaboBT"),
             (_("Millennium") + x, "Millennium"),
             (_("Novag Citrine") + x, "Citrine"),
             (_("Novag UCB") + x, "Novag UCB"),
@@ -146,17 +154,21 @@ def options(parent, configuration):
     li_pos = [(_("Bottom"), "B"), (_("Top"), "T")]
     form.combobox(_("Configuration icon position"), li_pos, configuration.x_position_tool_board)
     form.separador()
-    form.checkbox(_("Show icon when position has graphic information"), configuration.x_director_icon)
+
+    li_gr = [(_("Show nothing"), None), (_("Show icon"), True), (_("Show graphics"), False)]
+    form.combobox(_("When position has graphic information"), li_gr, configuration.x_director_icon)
     form.separador()
     form.checkbox(_("Live graphics with the right mouse button"), configuration.x_direct_graphics)
 
     form.add_tab(_("Boards"))
 
-    # Aspect ########################################################################################################
+    # Aspect 1/2 #######################################################################################################
+    form.separador()
     form.checkbox(_("By default"), False)
     form.separador()
     form.font(_("Font"), configuration.x_font_family)
 
+    form.separador()
     form.apart(_("Menus"))
     form.spinbox(_("Font size"), 3, 64, 60, configuration.x_menu_points)
     form.checkbox(_("Bold"), configuration.x_menu_bold)
@@ -173,6 +185,11 @@ def options(parent, configuration):
     )
     form.combobox(_("Icons"), li, configuration.tipoIconos())
 
+    form.add_tab("%s 1" % _("Appearance"))
+
+    form.separador()
+    form.checkbox(_("By default"), False)
+    form.separador()
     form.separador()
     form.apart(_("PGN table"))
     form.spinbox(_("Width"), 283, 1000, 70, configuration.x_pgn_width)
@@ -181,13 +198,16 @@ def options(parent, configuration):
     form.checkbox(_("PGN always in English"), configuration.x_pgn_english)
     form.checkbox(_("PGN with figurines"), configuration.x_pgn_withfigurines)
     form.separador()
+    form.separador()
 
     form.checkbox(_("Enable captured material window by default"), configuration.x_captures_activate)
     form.checkbox(_("Enable information panel by default"), configuration.x_info_activate)
     form.separador()
     form.spinbox(_("Font size of information labels"), 3, 30, 70, configuration.x_sizefont_infolabels)
+    form.separador()
+    form.checkbox(_("Enable high dpi scaling"), configuration.x_enable_highdpiscaling)
 
-    form.add_tab(_("Appearance"))
+    form.add_tab("%s 2" % _("Appearance"))
 
     # Perfomance ####################################################################################################
     perf = configuration.perfomance
@@ -227,7 +247,7 @@ def options(parent, configuration):
     if resultado:
         accion, resp = resultado
 
-        li_gen, li_son, li_tt, li_b, li_asp, li_pr, li_nc = resp
+        li_gen, li_son, li_tt, li_b, li_asp1, li_asp2, li_pr, li_nc = resp
 
         if Code.is_windows:
             (
@@ -249,26 +269,11 @@ def options(parent, configuration):
 
         configuration.set_translator(translator)
 
-        por_defecto = li_asp[0]
+        por_defecto = li_asp1[0]
         if por_defecto:
-            li_asp = (
-                "",
-                11,
-                False,
-                11,
-                False,
-                QtCore.Qt.ToolButtonTextUnderIcon,
-                283,
-                22,
-                10,
-                False,
-                True,
-                True,
-                False,
-                10,
-            )
+            li_asp1 = ("", 11, False, 11, False, QtCore.Qt.ToolButtonTextUnderIcon)
         else:
-            del li_asp[0]
+            del li_asp1[0]
         (
             configuration.x_font_family,
             configuration.x_menu_points,
@@ -276,6 +281,14 @@ def options(parent, configuration):
             configuration.x_tb_fontpoints,
             configuration.x_tb_bold,
             qt_iconstb,
+        ) = li_asp1
+
+        por_defecto = li_asp2[0]
+        if por_defecto:
+            li_asp2 = (348, 24, 10, False, True, True, False, 10, True)
+        else:
+            del li_asp2[0]
+        (
             configuration.x_pgn_width,
             configuration.x_pgn_rowheight,
             configuration.x_pgn_fontpoints,
@@ -284,7 +297,9 @@ def options(parent, configuration):
             configuration.x_captures_activate,
             configuration.x_info_activate,
             configuration.x_sizefont_infolabels,
-        ) = li_asp
+            configuration.x_enable_highdpiscaling,
+        ) = li_asp2
+
         if configuration.x_font_family == "System":
             configuration.x_font_family = ""
 
@@ -295,6 +310,7 @@ def options(parent, configuration):
             configuration.x_sound_results,
             configuration.x_sound_move,
             configuration.x_sound_our,
+            configuration.x_sound_error,
         ) = li_son
 
         (
@@ -305,6 +321,7 @@ def options(parent, configuration):
             tutor_inactive,
             configuration.x_tutor_view,
             workinbackground,
+            configuration.x_tutor_priority,
             configuration.x_tutor_difpoints,
             configuration.x_tutor_difporc,
             configuration.x_carpeta_gaviota,

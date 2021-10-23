@@ -1,8 +1,6 @@
-import configparser
 import sys
 
 from Code import Util
-
 from Code.Config import Configuration
 
 
