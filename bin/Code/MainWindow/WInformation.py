@@ -101,7 +101,8 @@ class Information(QtWidgets.QWidget):
         if self.move:
             cpws_lost = self.move.get_points_lost()
             if cpws_lost is not None and cpws_lost > 0:
-                str_cpws_lost = "%.02f %s" % (cpws_lost/100.0, _("pawns lost"))
+                analysis_depth = self.move.analysis[0].li_rm[0].depth
+                str_cpws_lost = "%.02f %s (%s %s)" % (cpws_lost / 100.0, _("pawns lost"), _("Depth"), analysis_depth)
                 self.lb_cpws_lost.set_text(str_cpws_lost)
                 visible = True
         self.lb_cpws_lost.setVisible(visible)

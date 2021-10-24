@@ -58,7 +58,7 @@ def change_folder(nueva):
         Util.remove_file(LCFILEFOLDER)
 
 
-class Perfomance:
+class Performance:
     def __init__(self):
         self.limit_max = 3500.0
         self.limit_min = 800.0
@@ -97,7 +97,7 @@ class Perfomance:
 
     def save_dic(self):
         dic = {}
-        default = Perfomance()
+        default = Performance()
         for x in dir(self):
             if not x.startswith("_"):
                 atr = getattr(self, x)
@@ -193,6 +193,7 @@ class Configuration:
 
         self.x_captures_activate = True
         self.x_info_activate = False
+        self.x_show_bestmove = True
 
         self.x_default_tutor_active = True
 
@@ -272,7 +273,7 @@ class Configuration:
 
         self.palette = {}
 
-        self.perfomance = Perfomance()
+        self.perfomance = Performance()
 
         self.li_favoritos = None
 
@@ -526,7 +527,7 @@ class Configuration:
 
         self.rival = self.buscaRival(self.x_rival_inicial)
 
-        self.perfomance = Perfomance()
+        self.perfomance = Performance()
 
     def buscaRival(self, key, defecto=None):
         if key in self.dic_engines:

@@ -202,6 +202,7 @@ def options(parent, configuration):
 
     form.checkbox(_("Enable captured material window by default"), configuration.x_captures_activate)
     form.checkbox(_("Enable information panel by default"), configuration.x_info_activate)
+    form.checkbox(_("Arrow with the best move when there is an analysis"), configuration.x_show_bestmove)
     form.separador()
     form.spinbox(_("Font size of information labels"), 3, 30, 70, configuration.x_sizefont_infolabels)
     form.separador()
@@ -285,7 +286,7 @@ def options(parent, configuration):
 
         por_defecto = li_asp2[0]
         if por_defecto:
-            li_asp2 = (348, 24, 10, False, True, True, False, 10, True)
+            li_asp2 = (348, 24, 10, False, True, True, False, True, 10, True)
         else:
             del li_asp2[0]
         (
@@ -296,6 +297,7 @@ def options(parent, configuration):
             configuration.x_pgn_withfigurines,
             configuration.x_captures_activate,
             configuration.x_info_activate,
+            configuration.x_show_bestmove,
             configuration.x_sizefont_infolabels,
             configuration.x_enable_highdpiscaling,
         ) = li_asp2

@@ -176,6 +176,10 @@ class Board(QtWidgets.QGraphicsView):
             elif key == Qt.Key_L:
                 webbrowser.open("https://lichess.org/analysis/standard/" + self.last_position.fen())
 
+            # ALT-T
+            elif key == Qt.Key_T:
+                webbrowser.open("https://old.chesstempo.com/gamedb/fen/" + self.last_position.fen())
+
             elif (
                 hasattr(self.main_window, "manager")
                 and self.main_window.manager

@@ -162,7 +162,7 @@ then
     echo "PROBLEM: INSTALLING AS ROOT"
     echo
     echo "It is advisable that you install LucasChess as a normal user and not as root."
-    read -e -p "Do you wish to continue installing? [yn]" yn
+    read -e -p "Do you wish to continue installing? (yn) " yn
     if [[ "$yn" != "y" ]]
     then
         echo

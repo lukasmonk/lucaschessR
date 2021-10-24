@@ -445,7 +445,7 @@ class Manager:
         if self.main_window.siCapturas or self.main_window.siInformacionPGN or self.kibitzers_manager.some_working():
             if move:
                 dic = move.position.capturas_diferencia()
-                if move.analysis:
+                if move.analysis and self.configuration.x_show_bestmove:
                     mrm, pos = move.analysis
                     if pos:  # no se muestra la mejor move si es la realizada
                         rm0 = mrm.mejorMov()
@@ -1244,6 +1244,8 @@ class Manager:
         menuVista.opcion("vista_pgn", _("PGN information"), Iconos.InformacionPGNUno())
         menuVista.separador()
         menuVista.opcion("vista_capturas", _("Captured material"), Iconos.Capturas())
+        menuVista.separador()
+        menuVista.opcion("vista_bestmove", _("Arrow with the best move when there is an analysis"), Iconos.Flechas())
         menu.separador()
 
         # DGT
@@ -1342,6 +1344,10 @@ class Manager:
                     self.put_view()
                 elif resp == "capturas":
                     self.main_window.activaCapturas()
+                    self.put_view()
+                elif resp == "bestmove":
+                    self.configuration.x_show_bestmove = not self.configuration.x_show_bestmove
+                    self.configuration.graba()
                     self.put_view()
 
             elif resp == "dgt":
@@ -1919,24 +1925,6 @@ class Manager:
                 cambio = salto
             tipo = "ms" if tipo == "mt" else "mt"
         return True
-
-    def ponFlechasTutor(self, mrm, nArrows):
-        self.board.remove_arrows()
-        if self.board.flechaSC:
-            self.board.flechaSC.hide()
-
-        rm_mejor = mrm.mejorMov()
-        if not rm_mejor:
-            return
-        rm_peor = mrm.li_rm[-1]
-        peso0 = rm_mejor.centipawns_abs()
-        rango = peso0 - rm_peor.centipawns_abs()
-        for n, rm in enumerate(mrm.li_rm, 1):
-            peso = rm.centipawns_abs()
-            factor = 1.0 - (peso0 - peso) * 1.0 / rango
-            self.board.creaFlechaTutor(rm.from_sq, rm.to_sq, factor)
-            if n >= nArrows:
-                return
 
     def start_message(self):
         mensaje = _("Press the continue button to start.")

@@ -4,6 +4,8 @@ import time
 from PySide2 import QtCore
 
 from Code.TrainBMT import BMT
+import Code
+Code.BMT = BMT
 from Code import ControlPGN
 from Code import Util
 from Code.Analysis import Analysis

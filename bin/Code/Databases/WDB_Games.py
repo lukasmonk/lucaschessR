@@ -1111,7 +1111,7 @@ class WGames(QtWidgets.QWidget):
         mens_puzzles = _("Download the puzzles in csv format from LiChess website")
         link_puzzles = "https://database.lichess.org/#puzzles"
 
-        mens_7z = _("Uncompress this file with a tool like 7z")
+        mens_7z = _("Uncompress this file with a tool like 7-Zip")
         link_7z = "https://www.7-zip.org/"
         mens_unzip = _("Uncompress this file")
 
