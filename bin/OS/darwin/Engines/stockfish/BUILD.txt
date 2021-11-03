@@ -1,0 +1,21 @@
+Build Info
+
+Source: https://github.com/official-stockfish/Stockfish/archive/refs/tags/sf_14.1.zip
+
+Instructions:
+1) Extract files
+2) cd Stockfish-sf_14.1/src
+3) make net
+4) make build for different arch
+Stockfish_14_1_x64-bmi2:
+  make clean
+  make build ARCH=x86-64-bmi2
+  cp stockfish Stockfish_14_1_x64-bmi2
+Stockfish_14_1_x64:
+  make clean
+  make build ARCH=x86-64
+  cp stockfish Stockfish_14_1_x64
+Stockfish_14_1_arm64:
+  make clean
+  make build ARCH=apple-silicon
+  cp stockfish Stockfish_14_1_arm64
