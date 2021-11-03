@@ -1,4 +1,7 @@
 #include <sys/types.h>
+#ifdef MACOS
+#include <sys/time.h>
+#endif
 #include <sys/timeb.h>
 #include <string.h>
 #include <ctype.h>
