@@ -61,7 +61,10 @@ def run_gui(procesador):
             lng_default = "en"
             name_default = "English"
             if len(li_info) == 2:
-                lng = li_info[0][:2]
+                lng = lng_default
+                tmp = li_info[0]
+                if tmp is not None:
+                    lng = li_info[0][:2]
                 for k, name, porc, author in li:
                     if k == lng:
                         name_default = name

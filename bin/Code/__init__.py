@@ -31,11 +31,21 @@ def path_resource(*lista):
         p = os.path.join(p, x)
     return os.path.realpath(p)
 
+is_windows = True
+is_linux = False
+is_macos = False
 
-is_linux = sys.platform.startswith("linux")
-is_windows = not is_linux
+if sys.platform.startswith("linux"):
+    is_linux = True
+    is_windows = False
+elif sys.platform.startswith("darwin"):
+    is_macos = True
+    is_windows = False
 
-if is_linux:
+#is_linux = sys.platform.startswith("linux")
+#is_windows = not (is_linux or is_macos)
+
+if is_linux or is_macos:
     if not os.environ.get("PYTHONHTTPSVERIFY", "") and getattr(ssl, "_create_unverified_context", None):
         ssl._create_default_https_context = ssl._create_unverified_context
     startfile = os.system
