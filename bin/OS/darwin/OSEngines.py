@@ -112,7 +112,7 @@ def read_engines(folder_engines):
 
     mas("igel", "Volodymyr Shcherbyna", "3.0.0", "https://github.com/vshcherbyna/igel/", "Igel-3.0.0", 3402)
 
-    mas("irina", "Lucas Monge", "0.15", "https://github.com/lukasmonk/irina", "Irina-0.15", 1200)
+    mas("irina", "Lucas Monge", "0.14", "https://github.com/lukasmonk/irina", "Irina-0.14", 1200)
 
     mas("jabba", "Richard Allbert", "1.0", "http://jabbachess.blogspot.com/", "Jabba-1.0", 2078)
 
