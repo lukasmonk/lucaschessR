@@ -1,6 +1,18 @@
+import platform
 import os
 
-import FasterCode
+# assume it is darwin, just need to figure out if x86 or ARM
+isARM = False
+useFC = False
+machineStr = platform.machine()
+
+if machineStr == 'x86_64':
+# detect for x86
+    import FasterCode
+    useFC = True
+elif machineStr == 'arm64':
+# detect for ARM
+    isARM = True
 
 from Code.Engines import Engines
 
@@ -19,7 +31,9 @@ def read_engines(folder_engines):
         dic_engines[clave] = engine
         return engine
 
-    bmi2 = "-bmi2" if FasterCode.bmi2() else ""
+    bmi2 = ""
+    if useFC:
+        bmi2 = "-bmi2" if FasterCode.bmi2() else ""
 
     for level in range(1100, 2000, 100):
         cm = mas("maia-%d" % level, "Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang + LcZero team", "%d" % level, "https://maiachess.com/", "Lc0-0.27.0", level)
