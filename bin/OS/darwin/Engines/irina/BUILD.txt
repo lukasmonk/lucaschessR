@@ -1,0 +1,11 @@
+Build Info
+
+Source: https://github.com/lukasmonk/irina
+
+Instructions:
+1) Extract files
+2) copy Makefile to irina-master/src
+3) cd irina-master/src
+4) make clean all
+
+Note: -arch arm64 -arch x86_64 flags for a "fat" universal binary

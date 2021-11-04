@@ -12,8 +12,8 @@ all : $(LINK_TARGET)
 	echo All done
 
 $(LINK_TARGET) : $(OBJS)
-	gcc -O3 -o $@ $^  -DNDEBUG
+	gcc -O3 -arch arm64 -arch x86_64 -o $@ $^  -DNDEBUG
 	strip $(LINK_TARGET)
 
 %.o : %.c
-	gcc -Wall -O3 -o $@ -c $< -DNDEBUG
+	gcc -Wall -O3 -arch arm64 -arch x86_64 -o $@ -c $< -DNDEBUG
