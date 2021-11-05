@@ -31,6 +31,7 @@ def path_resource(*lista):
         p = os.path.join(p, x)
     return os.path.realpath(p)
 
+# default is is_windows
 is_windows = True
 is_linux = False
 is_macos = False
@@ -42,8 +43,7 @@ elif sys.platform.startswith("darwin"):
     is_macos = True
     is_windows = False
 
-#is_linux = sys.platform.startswith("linux")
-#is_windows = not (is_linux or is_macos)
+# at this point only 1 is_xxx should be True
 
 if is_linux or is_macos:
     if not os.environ.get("PYTHONHTTPSVERIFY", "") and getattr(ssl, "_create_unverified_context", None):
