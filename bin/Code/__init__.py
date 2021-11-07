@@ -68,7 +68,9 @@ tbookPTZ = path_resource("Openings", "fics15.bin")
 tbookI = path_resource("Openings", "irina.bin")
 xtutor = None
 
-font_mono = "Courier New" if is_windows else "Mono"
+font_mono = "Mono"
+if is_windows or is_macos:
+    font_mono = "Courier New"
 
 list_engine_managers = None
 
