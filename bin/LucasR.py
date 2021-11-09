@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # ==============================================================================
 # Author : Lucas Monge, lukasmonk@gmail.com
 # Web : http://lucaschess.pythonanywhere.com/
