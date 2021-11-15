@@ -132,7 +132,7 @@ class RunEngine:
     def get_lines(self):
         li = []
         if self.stdout_lock is None:
-            return
+            return li
         self.stdout_lock.acquire()
         li = self.liBuffer
         self.liBuffer = []
