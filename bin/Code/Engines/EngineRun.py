@@ -31,6 +31,9 @@ class RunEngine:
             self.xstdout_thread = self.xstdout_thread_base
 
         self.name = name
+        self.stdout_lock = None
+        self.stdin_lock = None
+        self.working = None
 
         self.ponder = False
         self.pondering = False
@@ -44,10 +47,6 @@ class RunEngine:
         self.uci_ok = False
 
         self.uci_lines = []
-
-        if not os.path.isfile(exe):
-            QTUtil2.message_error(None, "%s:\n  %s" % (_("Engine not found"), exe))
-            return
 
         self.pid = None
         self.exe = os.path.abspath(exe)
@@ -64,6 +63,10 @@ class RunEngine:
         self.direct_dispatch = None
 
         self.mrm = None
+
+        if not os.path.isfile(exe):
+            QTUtil2.message_error(None, "%s:\n  %s" % (_("Engine not found"), exe))
+            return
 
         self.start()
 
@@ -116,6 +119,8 @@ class RunEngine:
 
     def put_line_base(self, line: str):
         if self.working:
+            if self.stdin_lock is None:
+                return
             self.stdin_lock.acquire()
             line = line.encode()
             if self.log:
@@ -125,6 +130,9 @@ class RunEngine:
             self.stdin_lock.release()
 
     def get_lines(self):
+        li = []
+        if self.stdout_lock is None:
+            return
         self.stdout_lock.acquire()
         li = self.liBuffer
         self.liBuffer = []
@@ -135,6 +143,8 @@ class RunEngine:
         return len(self.liBuffer) > 0
 
     def reset(self):
+        if self.stdout_lock is None:
+            return
         self.stdout_lock.acquire()
         self.mrm = EngineResponse.MultiEngineResponse(self.name, self.is_white)
         self.stdout_lock.release()
@@ -221,7 +231,7 @@ class RunEngine:
             self.log_close()
             self.log = None
 
-        if self.pid:
+        if self.pid is not None:
             try:
                 if self.process.poll() is None:
                     self.put_line("stop")
@@ -416,11 +426,15 @@ class RunEngine:
 
     def ac_estado(self):
         self.ac_lee()
+        if self.mrm is None:
+            return
         self.mrm.ordena()
         return self.mrm
 
     def ac_minimo(self, minimoTiempo, lockAC):
         self.ac_lee()
+        if self.mrm is None:
+            return
         self.mrm.ordena()
         rm = self.mrm.mejorMov()
         tm = rm.time  # problema cuando da por terminada la lectura y el rm.time siempre es el mismo
@@ -437,6 +451,8 @@ class RunEngine:
 
     def ac_minimoTD(self, minTime, minDepth, lockAC):
         self.ac_lee()
+        if self.mrm is None:
+            return
         self.mrm.ordena()
         rm = self.mrm.mejorMov()
         while rm.time < minTime or rm.depth < minDepth:
