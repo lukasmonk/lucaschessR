@@ -1,0 +1,14 @@
+eid: 'lc0'
+author: 'The LCZero Authors'
+version: '0.28.0'
+url: 'https://github.com/LeelaChessZero'
+elo: 3332
+bin:
+  x86_64: 'Lc0-0.28.0'
+  arm64: 'Lc0-0.28.0'
+UCI:
+  Hash: '64'
+  Threads: '2'
+PV:
+  num: 20
+  maximo: 500

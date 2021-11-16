@@ -1,0 +1,116 @@
+eid: maia-1100
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1100'
+url: https://maiachess.com/
+elo: 1100
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1100.pb.gz
+  Hash: '8'
+---
+eid: maia-1200
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1200'
+url: https://maiachess.com/
+elo: 1200
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1200.pb.gz
+  Hash: '8'
+---
+eid: maia-1300
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1300'
+url: https://maiachess.com/
+elo: 1300
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1300.pb.gz
+  Hash: '8'
+---
+eid: maia-1400
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1400'
+url: https://maiachess.com/
+elo: 1400
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1400.pb.gz
+  Hash: '8'
+---
+eid: maia-1500
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1500'
+url: https://maiachess.com/
+elo: 1500
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1500.pb.gz
+  Hash: '8'
+---
+eid: maia-1600
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1600'
+url: https://maiachess.com/
+elo: 1600
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1600.pb.gz
+  Hash: '8'
+---
+eid: maia-1700
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1700'
+url: https://maiachess.com/
+elo: 1700
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1700.pb.gz
+  Hash: '8'
+---
+eid: maia-1800
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1800'
+url: https://maiachess.com/
+elo: 1800
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1800.pb.gz
+  Hash: '8'
+---
+eid: maia-1900
+author: Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang
+  + LcZero team
+version: '1900'
+url: https://maiachess.com/
+elo: 1900
+bin:
+  x86_64: Lc0-0.27.0
+  arm64: Lc0-0.27.0
+UCI:
+  WeightsFile: maia-1900.pb.gz
+  Hash: '8'

@@ -1,0 +1,15 @@
+eid: 'stockfish'
+author: 'Tord Romstad, Marco Costalba, Joona Kiiski'
+version: '14.1'
+url: 'http://stockfishchess.org/'
+elo: '3551'
+bin:
+  x86_64: 'Stockfish_14_1_x64'
+  x86_64-bmi2: 'Stockfish_14_1_x64-bmi2'
+  arm64: 'Stockfish_14_1_arm64'
+UCI:
+  Hash: '64'
+  Threads: '2'
+PV:
+  num: 20
+  maximo: 500

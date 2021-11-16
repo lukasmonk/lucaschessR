@@ -1,0 +1,8 @@
+eid: 'irina'
+author: 'Lucas Monge'
+version: '0.14'
+url: 'https://github.com/lukasmonk/irina'
+elo: '1200'
+bin:
+  x86_64: 'Irina-0.14'
+  arm64: 'Irina-0.14'
