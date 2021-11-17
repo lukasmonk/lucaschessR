@@ -2,7 +2,7 @@ eid: 'stockfish'
 author: 'Tord Romstad, Marco Costalba, Joona Kiiski'
 version: '14.1'
 url: 'http://stockfishchess.org/'
-elo: '3551'
+elo: 3551
 bin:
   x86_64: 'Stockfish_14_1_x64'
   x86_64-bmi2: 'Stockfish_14_1_x64-bmi2'

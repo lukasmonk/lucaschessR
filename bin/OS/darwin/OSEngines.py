@@ -28,8 +28,10 @@ def read_config(config_yaml):
         file.close
     except FileNotFoundError:
         logging.debug('File not found, it is okay!')
+        pass
     except:
         logging.error('Exception: ', sys.exc_info()[0], ' occured')
+        pass
     return configs
 
 # trying to avoid rereading config files
@@ -81,11 +83,12 @@ def read_engines(folder_engines):
                                   t_bin = bins.get('x86_64-bmi2', '')
                                   if len(t_bin) > 0:
                                       l_bin = t_bin
+                                      version = f"{version}{bmi2}"
                       else:
                           log.warn('missing configuration, bin')
                           continue
-                      elo = c.get('elo', '')
-                      if len(eid) > 0 and len(author) > 0 and len(version) > 0 and len(url) > 0 and len(l_bin) > 0 and len(elo) > 0:
+                      elo = c.get('elo')
+                      if len(eid) > 0 and len(author) > 0 and len(version) > 0 and len(url) > 0 and len(l_bin) > 0 and elo is not None:
                           path_exe = os.path.join(folder_engines, entry.name, l_bin)
                           cm = mas(eid, author, version, url, path_exe, elo)
                           uci = c.get('UCI')
@@ -107,11 +110,11 @@ def dict_engines_fixed_elo(folder_engines):
 # read config file
     configs = read_config(folder_engines +'/engine-fixed-elo.yaml')
     for nm, xfrom, xto in configs:
-        print(nm)
+        logging.debug(nm)
         engine = d.get(nm)
 # check that engine exist
         if engine is not None:
-            print('Found: ' +nm)
+            logging.debug('Found: ' +nm)
             for elo in range(xfrom, xto + 100, 100):
                 cm = d[nm].clona()
                 if elo not in dic:
