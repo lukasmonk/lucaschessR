@@ -17,6 +17,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 
 class BotonTema(QtWidgets.QPushButton):
@@ -129,7 +130,7 @@ class BotonImagen(Colocacion.H):
         configuration = Code.configuration
         dic = configuration.read_variables("WindowColores")
         folder_prev = dic.get("PNGfolder", "")
-        resp = SelectFiles.leeFichero(self.parent, folder_prev, "%s PNG (*.png)" % _("File"))
+        resp = SelectFiles.leeFichero(self.parent, folder_prev, "png")
         if resp:
             folder = os.path.dirname(resp)
             if folder_prev != folder:
@@ -225,13 +226,13 @@ class DialNum(Colocacion.H):
         self.rut_actualiza()
 
 
-class WColores(QTVarios.WDialogo):
+class WColores(LCDialog.LCDialog):
     def __init__(self, boardOriginal):
         main_window = boardOriginal.parent()
         titulo = _("Colors")
         icono = Iconos.EditarColores()
         extparam = "WColores"
-        QTVarios.WDialogo.__init__(self, main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, main_window, titulo, icono, extparam)
 
         self.boardOriginal = boardOriginal
         self.configuration = Code.configuration

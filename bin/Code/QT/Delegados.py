@@ -126,7 +126,7 @@ class LineaTextoUTF8(QtWidgets.QItemDelegate):
 class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
     def __init__(self, is_white, siAlineacion=False, siFondo=False):
         self.is_white = is_white  # None = no hacer
-        self.si_figurines_pgn = is_white is not None
+        self.with_figurines = is_white is not None
         self.siAlineacion = siAlineacion
         self.siFondo = siFondo
         QtWidgets.QStyledItemDelegate.__init__(self, None)
@@ -159,7 +159,7 @@ class EtiquetaPGN(QtWidgets.QStyledItemDelegate):
         iniPZ = None
         finPZ = None
         salto_finPZ = 0
-        if self.si_figurines_pgn and len(pgn) > 2:
+        if self.with_figurines and len(pgn) > 2:
             if pgn[0] in "QBKRN":
                 iniPZ = pgn[0] if self.is_white else pgn[0].lower()
                 pgn = pgn[1:]
@@ -451,7 +451,7 @@ class MultiEditor(QtWidgets.QItemDelegate):
 
 class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
     def __init__(self, with_figurines, siFondo=False, siLineas=True):
-        self.si_figurines_pgn = with_figurines
+        self.with_figurines = with_figurines
         self.siAlineacion = False
         self.siLineas = siLineas
         self.siFondo = siFondo
@@ -478,7 +478,7 @@ class EtiquetaPOS(QtWidgets.QStyledItemDelegate):
 
         iniPZ = None
         finPZ = None
-        if self.si_figurines_pgn and pgn:
+        if self.with_figurines and pgn:
             if pgn[0] in "QBKRN":
                 iniPZ = pgn[0] if is_white else pgn[0].lower()
                 pgn = pgn[1:]

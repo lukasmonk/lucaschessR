@@ -1,10 +1,11 @@
 from Code import Util
 from Code.QT import Colocacion, Columnas, Controles, Grid, Iconos, QTUtil2, QTVarios
+from Code.QT import LCDialog
 
 from Code.Mate15 import Mate15, WRunMate15
 
 
-class WMate15(QTVarios.WDialogo):
+class WMate15(LCDialog.LCDialog):
     def __init__(self, procesador):
         configuration = procesador.configuration
         path = configuration.file_mate15()
@@ -13,7 +14,7 @@ class WMate15(QTVarios.WDialogo):
         extconfig = "mate15"
         self.db = Mate15.DBMate15(path)
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, title, icon, extconfig)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, title, icon, extconfig)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("POS", _("N."), 70, centered=True)

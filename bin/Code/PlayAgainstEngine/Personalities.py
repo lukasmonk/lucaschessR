@@ -156,7 +156,7 @@ class Personalities:
                 name = liGenR[0].strip()
 
                 if not name:
-                    QTUtil2.message_error(self.owner, _("Missing name"))
+                    QTUtil2.message_error(self.owner, _("Name missing"))
                     continue
 
                 una = {}

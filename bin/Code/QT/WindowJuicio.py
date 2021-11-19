@@ -12,9 +12,10 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WJuicio(QTVarios.WDialogo):
+class WJuicio(LCDialog.LCDialog):
     def __init__(self, manager, xengine, nombreOP, position, mrm, rmOP, rmUsu, analysis, is_competitive=None):
         self.is_competitive = manager.is_competitive if is_competitive is None else is_competitive
         self.nombreOP = nombreOP
@@ -32,7 +33,7 @@ class WJuicio(QTVarios.WDialogo):
         titulo = _("Analysis")
         icono = Iconos.Analizar()
         extparam = "jzgm"
-        QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, manager.main_window, titulo, icono, extparam)
 
         self.colorNegativo = QTUtil.qtColorRGB(255, 0, 0)
         self.colorImpares = QTUtil.qtColorRGB(231, 244, 254)
@@ -43,9 +44,6 @@ class WJuicio(QTVarios.WDialogo):
         self.board = Board.Board(self, config_board)
         self.board.crea()
         self.board.ponerPiezasAbajo(position.is_white)
-
-        self.lbMotor = Controles.LB(self).align_center()
-        self.lbTiempo = Controles.LB(self).align_center()
 
         liMas = ((_("Close"), "close", Iconos.AceptarPeque()),)
         lyBM, tbBM = QTVarios.lyBotonesMovimiento(self, "", siLibre=False, icon_size=24, siMas=manager.continueTt, liMasAcciones=liMas)

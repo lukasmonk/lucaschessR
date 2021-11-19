@@ -28,12 +28,13 @@ from Code.QT import QTVarios
 from Code.QT import Voyager
 from Code.SQL import UtilSQL
 from Code.Tutor import WindowTutor
+from Code.QT import LCDialog
 
 
-class WPlayAgainstEngine(QTVarios.WDialogo):
+class WPlayAgainstEngine(LCDialog.LCDialog):
     def __init__(self, procesador, titulo, direct_option):
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, Iconos.Libre(), "entMaquina")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, Iconos.Libre(), "entMaquina")
 
         font = Controles.TipoLetra(puntos=procesador.configuration.x_menu_points)
 
@@ -166,7 +167,7 @@ class WPlayAgainstEngine(QTVarios.WDialogo):
         _label(lyG, _("Side you play with"), hbox)
 
         if self.configuration.x_digital_board:
-            self.chb_dgt = Controles.CHB(self, "%s: %s" % (_("Activate board"), self.configuration.x_digital_board), DGT.siON()).ponFuente(
+            self.chb_dgt = Controles.CHB(self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.siON()).ponFuente(
                 Controles.TipoLetra(puntos=14)
             )
             lyH = Colocacion.H().control(self.chb_dgt)
@@ -973,7 +974,7 @@ class WCambioRival(QtWidgets.QDialog):
         # Layout
         # Color
         hbox = Colocacion.H().relleno().control(self.rb_white).espacio(30).control(self.rb_black).relleno()
-        gbColor = Controles.GB(self, _("Play with"), hbox)
+        gbColor = Controles.GB(self, _("Side you play with"), hbox)
 
         # #Color
         hAC = Colocacion.H().control(gbColor)

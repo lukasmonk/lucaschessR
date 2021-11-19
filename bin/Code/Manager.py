@@ -9,7 +9,7 @@ from Code import ControlPGN
 from Code import DGT
 from Code import Util
 from Code import XRun
-from Code.Analysis import Analysis, AnalysisIndexes, WindowAnalysis, Histogram
+from Code.Analysis import Analysis, AnalysisGame, AnalysisIndexes, Histogram, WindowAnalysisGraph
 from Code.Base import Game, Move, Position
 from Code.Base.Constantes import (
     GT_ALONE,
@@ -626,10 +626,10 @@ class Manager:
         else:
             is_white = key != "BLACK"
 
-        if_starts_with_black = game.if_starts_with_black
+        starts_with_black = game.starts_with_black
 
         lj = len(game)
-        if if_starts_with_black:
+        if starts_with_black:
             lj += 1
         ultFila = (lj - 1) / 2
         siUltBlancas = lj % 2 == 1
@@ -641,7 +641,7 @@ class Manager:
             pos = row * 2
             if not is_white:
                 pos += 1
-            if row < 0 or (row == 0 and pos == 0 and if_starts_with_black):
+            if row < 0 or (row == 0 and pos == 0 and starts_with_black):
                 self.ponteAlPrincipio()
                 return
         elif tipo == GO_FORWARD:
@@ -662,14 +662,14 @@ class Manager:
         if row < 0 or row > ultFila:
             self.refresh()
             return
-        if row == 0 and is_white and if_starts_with_black:
+        if row == 0 and is_white and starts_with_black:
             is_white = False
 
         self.main_window.pgnColocate(row, is_white)
         self.pgnMueve(row, is_white)
 
     def ponteEnJugada(self, numJugada):
-        row = (numJugada + 1) / 2 if self.game.if_starts_with_black else numJugada / 2
+        row = (numJugada + 1) / 2 if self.game.starts_with_black else numJugada / 2
         move = self.game.move(numJugada)
         is_white = move.position_before.is_white
         self.main_window.pgnColocate(row, is_white)
@@ -724,7 +724,7 @@ class Manager:
         game = self.game
         row, column = self.main_window.pgnPosActual()
         is_white = column.key != "BLACK"
-        if_starts_with_black = game.if_starts_with_black
+        starts_with_black = game.starts_with_black
 
         num_moves = len(game)
         if num_moves == 0:
@@ -732,7 +732,7 @@ class Manager:
         nj = row * 2
         if not is_white:
             nj += 1
-        if if_starts_with_black:
+        if starts_with_black:
             nj -= 1
         return num_moves, nj, row, is_white
 
@@ -810,7 +810,7 @@ class Manager:
         pos = row * 2
         if not is_white:
             pos += 1
-        if self.game.if_starts_with_black:
+        if self.game.starts_with_black:
             pos -= 1
         tam_lj = len(self.game)
         siUltimo = (pos + 1) >= tam_lj
@@ -839,7 +839,7 @@ class Manager:
         pos = row * 2
         if not is_white:
             pos += 1
-        if self.game.if_starts_with_black:
+        if self.game.starts_with_black:
             pos -= 1
         tam_lj = len(self.game)
         if 0 <= pos < tam_lj:
@@ -880,7 +880,7 @@ class Manager:
         pos = row * 2
         if not is_white:
             pos += 1
-        if self.game.if_starts_with_black:
+        if self.game.starts_with_black:
             pos -= 1
         tam_lj = len(self.game)
         if tam_lj == 0:
@@ -963,7 +963,7 @@ class Manager:
         self.put_view()
 
     def analizar(self):
-        Analysis.analysis_game(self)
+        AnalysisGame.analysis_game(self)
         self.refresh()
 
     def borrar(self):
@@ -1240,7 +1240,7 @@ class Manager:
         menu = QTVarios.LCMenu(self.main_window)
 
         # Vista
-        menuVista = menu.submenu(_("View"), Iconos.Vista())
+        menuVista = menu.submenu(_("Show/hide"), Iconos.Vista())
         menuVista.opcion("vista_pgn", _("PGN information"), Iconos.InformacionPGNUno())
         menuVista.separador()
         menuVista.opcion("vista_capturas", _("Captured material"), Iconos.Capturas())
@@ -1561,13 +1561,7 @@ class Manager:
         elif resp.startswith("vol"):
             accion = resp[3:]
             if accion == "fichero":
-                resp = SelectFiles.salvaFichero(
-                    self.main_window,
-                    _("File to save"),
-                    self.configuration.x_save_folder,
-                    "%s PNG (*.png)" % _("File"),
-                    False,
-                )
+                resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, "png", False)
                 if resp:
                     self.board.save_as_img(resp, "png")
 
@@ -1603,7 +1597,7 @@ class Manager:
         elos = self.game.calc_elos(self.configuration)
         elosFORM = self.game.calc_elosFORM(self.configuration)
         alm = Histogram.genHistograms(self.game)
-        alm.indexesHTML, alm.indexesRAW, alm.eloW, alm.eloB, alm.eloT = AnalysisIndexes.gen_indexes(
+        alm.indexesHTML, alm.indexesHTMLelo, alm.indexesHTMLmoves, alm.indexesRAW, alm.eloW, alm.eloB, alm.eloT = AnalysisIndexes.gen_indexes(
             self.game, elos, elosFORM, alm
         )
         alm.is_white_bottom = self.board.is_white_bottom
@@ -1611,7 +1605,7 @@ class Manager:
         if len(alm.lijg) == 0:
             QTUtil2.message(self.main_window, "There are no analyzed moves.")
         else:
-            WindowAnalysis.showGraph(self.main_window, self, alm, Analysis.show_analysis)
+            WindowAnalysisGraph.showGraph(self.main_window, self, alm, Analysis.show_analysis)
 
     def save_db(self, database):
         try:
@@ -1648,13 +1642,7 @@ class Manager:
         extension = "lcsb"
         file = self.configuration.x_save_lcsb
         while True:
-            file = SelectFiles.salvaFichero(
-                self.main_window,
-                _("File to save"),
-                file,
-                _("File") + " %s (*.%s)" % (extension, extension),
-                siConfirmarSobreescritura=False,
-            )
+            file = SelectFiles.salvaFichero(self.main_window, _("File to save"), file, extension, False)
             if file:
                 file = str(file)
                 if os.path.isfile(file):
@@ -1690,13 +1678,7 @@ class Manager:
         dato = self.listado("fen")
         if siFichero:
             extension = "fns"
-            resp = SelectFiles.salvaFichero(
-                self.main_window,
-                _("File to save"),
-                self.configuration.x_save_folder,
-                _("File") + " %s (*.%s)" % (extension, extension),
-                False,
-            )
+            resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, extension, False)
             if resp:
                 try:
 

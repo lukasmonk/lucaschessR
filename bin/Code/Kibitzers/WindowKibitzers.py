@@ -15,14 +15,15 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 
-class WKibitzers(QTVarios.WDialogo):
+class WKibitzers(LCDialog.LCDialog):
     def __init__(self, w_parent, kibitzers_manager):
         titulo = _("Kibitzers")
         icono = Iconos.Kibitzer()
         extparam = "kibitzer"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         self.kibitzers_manager = kibitzers_manager
         self.configuration = kibitzers_manager.configuration
@@ -401,14 +402,14 @@ class WKibitzers(QTVarios.WDialogo):
                 self.liKibActual.append(("%s%s" % (opcion.name, label_default), valor, "opcion,%d" % num))
 
 
-class WKibitzerLive(QTVarios.WDialogo):
+class WKibitzerLive(LCDialog.LCDialog):
     def __init__(self, w_parent, configuration, numkibitzer):
         self.kibitzers = Kibitzers.Kibitzers()
         self.kibitzer = self.kibitzers.kibitzer(numkibitzer)
         titulo = self.kibitzer.name
         icono = Iconos.Kibitzer()
         extparam = "kibitzerlive"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         self.configuration = configuration
 

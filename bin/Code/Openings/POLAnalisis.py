@@ -227,7 +227,7 @@ class TabEngine(QtWidgets.QWidget):
                     li_options.append((("Previous"), "previous"))
             form.combobox(_("Variations to add"), li_options, tp)
             form.separador()
-            form.spinbox(_("Plies to add in each variation"), 0, 999, 50, plies)
+            form.spinbox(_("Movements to add in each variation"), 0, 999, 50, plies)
             form.apart_simple_np("    %s = 0" % _("Full line"))
             form.separador()
             resp = form.run()
@@ -638,6 +638,9 @@ class TabTree(QtWidgets.QWidget):
             elif resp == "collapseall":
                 quien, siExpand = None, False
 
+            else:
+                return
+
         def work(data):
             item = data.item
             if item:
@@ -725,7 +728,7 @@ class TabsAnalisis(QtWidgets.QWidget):
         menu.separador()
         menu.opcion("database", _("Database"), Iconos.Database())
         menu.separador()
-        menu.opcion("summary", _("Database summary"), Iconos.Arbol())
+        menu.opcion("summary", _("Database opening explorer"), Iconos.Arbol())
         resp = menu.lanza()
         pos = 0
         if resp == "book":

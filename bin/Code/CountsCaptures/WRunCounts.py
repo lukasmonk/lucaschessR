@@ -1,18 +1,18 @@
 import time
 
+import FasterCode
 from PySide2 import QtCore, QtGui
 
-import FasterCode
-
 import Code
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
 from Code.Board import Board
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
+from Code.QT import LCDialog
 
 
-class WRunCounts(QTVarios.WDialogo):
+class WRunCounts(LCDialog.LCDialog):
     def __init__(self, owner, db_counts, count):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Count moves"), Iconos.Count(), "runcounts")
+        LCDialog.LCDialog.__init__(self, owner, _("Count moves"), Iconos.Count(), "runcounts")
 
         self.configuration = Code.configuration
         self.count = count

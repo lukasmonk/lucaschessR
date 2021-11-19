@@ -20,6 +20,7 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import Base
 from Code.SQL import UtilSQL
+from Code.QT import LCDialog
 
 
 def lee_1_linea_mfn(linea):
@@ -365,10 +366,10 @@ class WBlqMove(QtWidgets.QWidget):
             self.cancelar.show()
 
 
-class WPotenciaBase(QTVarios.WDialogo):
+class WPotenciaBase(LCDialog.LCDialog):
     def __init__(self, procesador):
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Determine your calculating power"), Iconos.Potencia(), "potenciaBase")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, _("Determine your calculating power"), Iconos.Potencia(), "potenciaBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -540,7 +541,7 @@ class WPotenciaBase(QTVarios.WDialogo):
         self.ghistorico.refresh()
 
 
-class WPotencia(QTVarios.WDialogo):
+class WPotencia(LCDialog.LCDialog):
     def __init__(self, owner, engine, seconds, min_min, min_max, linea=None, ref=None):
 
         super(WPotencia, self).__init__(owner, _("Determine your calculating power"), Iconos.Potencia(), "potencia")

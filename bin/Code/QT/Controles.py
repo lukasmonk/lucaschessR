@@ -872,6 +872,13 @@ class TBrutina(QtWidgets.QToolBar):
         if accion:
             accion.setEnabled(value)
 
+    def set_action_title(self, key, title):
+        accion:QtWidgets.QAction
+        accion = self.dic_toolbar.get(key, None)
+        if accion:
+            accion.setIconText(title)
+            accion.setToolTip(title)
+
 
 class TipoLetra(QtGui.QFont):
     def __init__(self, name="", puntos=8, peso=50, is_italic=False, is_underlined=False, is_striked=False, txt=None):

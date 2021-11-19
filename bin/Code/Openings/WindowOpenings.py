@@ -17,14 +17,15 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WOpenings(QTVarios.WDialogo):
+class WOpenings(LCDialog.LCDialog):
     def __init__(self, owner, configuration, opening_block):
         icono = Iconos.Opening()
         titulo = _("Select an opening")
         extparam = "selectOpening"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Variables--------------------------------------------------------------------------
         self.apStd = OpeningsStd.apTrain
@@ -267,12 +268,12 @@ class WOpenings(QTVarios.WDialogo):
         return ap
 
 
-class EntrenamientoOpening(QTVarios.WDialogo):
+class EntrenamientoOpening(LCDialog.LCDialog):
     def __init__(self, owner, listaOpeningsStd, dic_data):
         icono = Iconos.Opening()
         titulo = _("Learn openings by repetition")
         extparam = "opentrainingE"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         name = dic_data.get("NOMBRE", "")
         self.listaOpeningsStd = listaOpeningsStd
@@ -407,7 +408,7 @@ class EntrenamientoOpening(QTVarios.WDialogo):
         return li
 
 
-class OpeningsPersonales(QTVarios.WDialogo):
+class OpeningsPersonales(LCDialog.LCDialog):
     def __init__(self, procesador, owner=None):
 
         self.procesador = procesador
@@ -419,7 +420,7 @@ class OpeningsPersonales(QTVarios.WDialogo):
         icono = Iconos.Opening()
         titulo = _("Custom openings")
         extparam = "customopen"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
         tb = QTVarios.LCTB(self)

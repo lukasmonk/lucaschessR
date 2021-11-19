@@ -14,15 +14,16 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.QT import Voyager
+from Code.QT import LCDialog
 
 
-class WManualSave(QTVarios.WDialogo):
+class WManualSave(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         icono = Iconos.ManualSave()
         extparam = "manualsave"
-        titulo = _("Save positions to FNS/PGN")
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        titulo = _("Edit and save positions to PGN or FNS")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
 
         self.procesador = procesador
         self.configuration = procesador.configuration

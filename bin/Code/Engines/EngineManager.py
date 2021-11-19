@@ -268,6 +268,8 @@ class EngineManager:
             rm.to_sq = mv[2:4]
             rm.promotion = mv[4] if len(mv) == 5 else ""
             rm.pv = mv
+            if move.is_mate:
+                rm.mate = 1
         else:
             position = move.position
 

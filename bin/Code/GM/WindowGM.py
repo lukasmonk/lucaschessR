@@ -16,9 +16,10 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
+from Code.QT import LCDialog
 
 
-class WGM(QTVarios.WDialogo):
+class WGM(LCDialog.LCDialog):
     def __init__(self, procesador):
         self.configuration = procesador.configuration
         self.procesador = procesador
@@ -32,7 +33,7 @@ class WGM(QTVarios.WDialogo):
         icono = Iconos.GranMaestro()
 
         extparam = "gm"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         flb = Controles.TipoLetra(puntos=procesador.configuration.x_menu_points)
 
@@ -143,7 +144,7 @@ class WGM(QTVarios.WDialogo):
         # gbBasic
         # # Color
         hbox = Colocacion.H().relleno().control(self.rb_white).espacio(10).control(self.rb_black).relleno()
-        gbColor = Controles.GB(self, _("Play with"), hbox).ponFuente(flb)
+        gbColor = Controles.GB(self, _("Side you play with"), hbox).ponFuente(flb)
         gbColor.setStyleSheet(gb_style)
 
         # Tiempo
@@ -564,7 +565,7 @@ def select_move(manager, li_moves, is_gm):
         return from_sq, to_sq, promotion
 
 
-class WImportar(QTVarios.WDialogo):
+class WImportar(LCDialog.LCDialog):
     def __init__(self, w_parent, li_gm):
 
         self.li_gm = li_gm
@@ -575,7 +576,7 @@ class WImportar(QTVarios.WDialogo):
         self.qtColor = {"w": QTUtil.qtColorRGB(221, 255, 221), "m": QTUtil.qtColorRGB(247, 247, 247)}
 
         extparam = "imp_gm"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         li_acciones = [
             (_("Import"), Iconos.Aceptar(), self.importar),
@@ -713,7 +714,7 @@ def importar_gm(owner_gm):
     return False
 
 
-class SelectGame(QTVarios.WDialogo):
+class SelectGame(LCDialog.LCDialog):
     def __init__(self, wgm, ogm):
         self.ogm = ogm
         self.liRegs = ogm.gen_toselect()
@@ -725,7 +726,7 @@ class SelectGame(QTVarios.WDialogo):
         titulo = "%s - %s" % (_("One game"), name)
         icono = Iconos.Uno()
         extparam = "gm1g"
-        QTVarios.WDialogo.__init__(self, wgm, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, wgm, titulo, icono, extparam)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NOMBRE", _("Opponent"), 180)

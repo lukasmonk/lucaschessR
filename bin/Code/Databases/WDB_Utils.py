@@ -10,6 +10,7 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
@@ -275,9 +276,9 @@ class EM_SQL(Controles.EM):
                 self.insertarTexto(resp)
 
 
-class WFiltrarRaw(QTVarios.WDialogo):
+class WFiltrarRaw(LCDialog.LCDialog):
     def __init__(self, w_parent, o_columns, where):
-        QTVarios.WDialogo.__init__(self, w_parent, _("Filter"), Iconos.Filtrar(), "rawfilter")
+        LCDialog.LCDialog.__init__(self, w_parent, _("Filter"), Iconos.Filtrar(), "rawfilter")
 
         self.where = ""
         li_fields = [(x.head, x.key) for x in o_columns.li_columns if x.key != "__num__"]

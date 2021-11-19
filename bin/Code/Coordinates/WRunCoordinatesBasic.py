@@ -7,12 +7,13 @@ from Code.Base import Position
 from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
 from Code.Board import Board
 from Code.Coordinates import CoordinatesBasic
+from Code.QT import LCDialog
 
 
-class WRunCoordinatesBasic(QTVarios.WDialogo):
+class WRunCoordinatesBasic(LCDialog.LCDialog):
     def __init__(self, owner, db_coordinates, is_white):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Coordinates"), Iconos.Blocks(), "runcoordinatesbasic")
+        LCDialog.LCDialog.__init__(self, owner, _("Coordinates"), Iconos.Blocks(), "runcoordinatesbasic")
 
         self.configuration = Code.configuration
         self.is_white = is_white

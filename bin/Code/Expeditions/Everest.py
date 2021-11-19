@@ -286,8 +286,8 @@ class Expeditions:
         reg.NEXT_GAME = 0
         reg.TRIES_USED = 0
         reg.DISTRIBUTION = str(distribution(ngames))
-        reg.TOLERANCE = "%d,%d" % (reg_base.tolerance_min, reg_base.tolerance_max)
-        reg.TRIES = "%d,%d" % (reg_base.tries_min, reg_base.tries_max)
+        reg.TOLERANCE = "%d - %d" % (reg_base.tolerance_min, reg_base.tolerance_max)
+        reg.TRIES = "%d - %d" % (reg_base.tries_min, reg_base.tries_max)
         reg.COLOR = reg_base.color
         reg.GAMES = Util.var2zip(games)
 

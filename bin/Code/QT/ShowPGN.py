@@ -143,7 +143,7 @@ class ShowPGN(QtWidgets.QScrollArea):
             if variation_game.first_comment:
                 pgn_work = "{%s} " % variation_game.first_comment
 
-            if variation_game.if_starts_with_black:
+            if variation_game.starts_with_black:
                 pgn_work += '<span style="%s">%d...</span>' % (style_number, num_move)
                 num_move += 1
                 salta = 1

@@ -278,6 +278,6 @@ class ManagerTactics(Manager.Manager):
 
     def end_training(self):
         self.tactic.end_training()
-        mensaje = "<big>%s<br>%s</big>" % (_("Congratulations goal achieved"), _("Endgame"))
+        mensaje = "<big>%s<br>%s</big>" % (_("Congratulations, goal achieved"), _("GAME OVER"))
         self.mensajeEnPGN(mensaje)
         self.end_game()

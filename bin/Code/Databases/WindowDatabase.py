@@ -5,15 +5,16 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WBDatabase(QTVarios.WDialogo):
+class WBDatabase(LCDialog.LCDialog):
     def __init__(self, w_parent, procesador, file_database, is_temporary, si_select):
         self.is_temporary = is_temporary
         icono = Iconos.Database()
         extparam = "databases"
         titulo = _("Temporary database") if self.is_temporary else _("Database")
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
         self.owner = w_parent
 
         self.procesador = procesador
@@ -45,7 +46,7 @@ class WBDatabase(QTVarios.WDialogo):
         self.tab = Controles.Tab()
         self.tab.nuevaTab(self.wgames, _("Games"))
         if siSummary:
-            self.tab.nuevaTab(self.wsummary, _("Summary"))
+            self.tab.nuevaTab(self.wsummary, _("Opening explorer"))
             self.tab.dispatchChange(self.tabChanged)
         if not si_select:
             self.tab.nuevaTab(self.wplayer, _("Players"))

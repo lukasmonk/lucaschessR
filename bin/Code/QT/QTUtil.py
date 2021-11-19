@@ -2,6 +2,8 @@ import gc
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
+import Code
+
 
 class GarbageCollector(QtCore.QObject):
     """
@@ -125,8 +127,11 @@ def centraWindow(window):
 
 def escondeWindow(window):
     pos = window.pos()
-    screen = QtWidgets.QDesktopWidget().screenGeometry()
-    window.move(screen.width() * 10, 0)
+    if Code.is_windows:
+        screen = QtWidgets.QDesktopWidget().screenGeometry()
+        window.move(screen.width() * 10, 0)
+    else:
+        window.hide()
     return pos
 
 
@@ -136,8 +141,11 @@ class EscondeWindow:
 
     def __enter__(self):
         self.pos = self.window.pos()
-        screen = QtWidgets.QDesktopWidget().screenGeometry()
-        self.window.move(screen.width() * 10, 0)
+        if Code.is_windows:
+            screen = QtWidgets.QDesktopWidget().screenGeometry()
+            self.window.move(screen.width() * 10, 0)
+        else:
+            self.window.hide()
         return self
 
     def __exit__(self, type, value, traceback):

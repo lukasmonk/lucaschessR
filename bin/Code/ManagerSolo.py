@@ -316,13 +316,7 @@ class ManagerSolo(Manager.Manager):
         else:
             file = self.configuration.folder_save_lcsb()
         while True:
-            resp = SelectFiles.salvaFichero(
-                self.main_window,
-                _("File to save"),
-                file,
-                _("File") + " %s (*.%s)" % (extension, extension),
-                siConfirmarSobreescritura=siConfirmar,
-            )
+            resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), file, extension, siConfirmar)
             if resp:
                 resp = str(resp)
                 if not siConfirmar:
@@ -496,9 +490,9 @@ class ManagerSolo(Manager.Manager):
         sep = (None, None, None)
 
         liMasOpciones = (
-            (None, _("Change the initial position"), Iconos.PGN()),
+            (None, _("Change the starting position"), Iconos.PGN()),
             sep,
-            ("position", _("Edit start position") + " [S]", Iconos.Datos()),
+            ("position", _("Board editor") + " [S]", Iconos.Datos()),
             sep,
             ("initial", _("Basic position") + " [B]", Iconos.Board()),
             sep,
@@ -628,12 +622,13 @@ class ManagerSolo(Manager.Manager):
         return [
             ("V", _("Paste position")),
             ("T", _("Save position in 'Selected positions' file")),
-            ("S", _("Set start position")),
+            ("S", _("Board editor")),
             ("B", _("Basic position")),
         ]
 
     def startPosition(self):
         position = Voyager.voyager_position(self.main_window, self.game.first_position)
+        Manager.Manager.compruebaDGT(self, False)
         if position is not None:
             if self.game.first_position == position:
                 return

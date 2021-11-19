@@ -65,6 +65,7 @@ class Performance:
         self.lost_factor = 15.0
         self.lost_exp = 1.35
 
+        self.questionable = 30
         self.very_bad_lostp = 200
         self.bad_lostp = 90
         self.bad_limit_min = 1200.0
@@ -182,7 +183,7 @@ class Configuration:
         self.x_style = "WindowsVista" if Code.is_windows else "Fusion"
         self.x_tutor_view = POS_TUTOR_HORIZONTAL
 
-        self.x_enable_highdpiscaling = True
+        self.x_enable_highdpiscaling = False
 
         self.x_show_effects = False
         self.x_pieces_speed = 100

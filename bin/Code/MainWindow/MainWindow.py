@@ -5,8 +5,8 @@ from Code import DGT
 from Code.MainWindow import WInformation, WBase
 from Code.QT import Colocacion
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
-from Code.QT import QTVarios
 
 
 class EstadoWindow:
@@ -18,7 +18,7 @@ class EstadoWindow:
         self.active = x == QtCore.Qt.WindowActive
 
 
-class MainWindow(QTVarios.WDialogo):
+class MainWindow(LCDialog.LCDialog):
     signal_notify = QtCore.Signal()
     signal_routine_connected = None
     dato_notify = None
@@ -29,7 +29,7 @@ class MainWindow(QTVarios.WDialogo):
         titulo = ""
         icono = Iconos.Aplicacion64()
         extparam = extparam if extparam else "maind"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.owner = owner
 

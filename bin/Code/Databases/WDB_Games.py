@@ -7,7 +7,7 @@ from PySide2 import QtWidgets, QtCore
 import Code
 import Code.Openings.WindowOpenings as WindowOpenings
 from Code import Util
-from Code.Analysis import Analysis, WindowAnalysisParam
+from Code.Analysis import AnalysisGame, WindowAnalysisParam
 from Code.Base import Game
 from Code.Base.Constantes import WHITE, BLACK
 from Code.Databases import DBgames, WDB_Utils
@@ -30,6 +30,7 @@ from Code.QT import WindowSavePGN
 from Code.SQL import UtilSQL
 from Code.Themes import WDB_Theme_Analysis
 from Code.Translations import TrListas
+from Code.QT import LCDialog
 
 
 class WGames(QtWidgets.QWidget):
@@ -582,7 +583,7 @@ class WGames(QtWidgets.QWidget):
         if li_sel:
             submenu.separador()
             submenu.opcion(
-                (self.tw_exportar_pgn, True), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul()
+                (self.tw_exportar_pgn, True), "%s [%d]" % (_("Only selected games"), len(li_sel)), Iconos.PuntoAzul()
             )
 
         menu.separador()
@@ -591,7 +592,7 @@ class WGames(QtWidgets.QWidget):
         if li_sel:
             submenu.separador()
             submenu.opcion(
-                (self.tw_exportar_db, li_sel), "%s [%d]" % (_("Only selected"), len(li_sel)), Iconos.PuntoAzul()
+                (self.tw_exportar_db, li_sel), "%s [%d]" % (_("Only selected games"), len(li_sel)), Iconos.PuntoAzul()
             )
 
         resp = menu.lanza()
@@ -791,10 +792,10 @@ class WGames(QtWidgets.QWidget):
 
             li = [
                 (_("Any"), None),
-                (_("Win"), ("Win")),
+                (_("Win"), "Win"),
                 (_("Win+Draw"), "Win+Draw"),
-                (_("Lost"), "Lost"),
-                (_("Lost+Draw"), "Lost+Draw"),
+                (_("Loss"), "Lost"),
+                (_("Loss+Draw"), "Lost+Draw"),
             ]
             form.combobox(_("Result"), li, result)
             form.separador()
@@ -900,7 +901,7 @@ class WGames(QtWidgets.QWidget):
             else:
                 lni = None
 
-            ap = Analysis.AnalyzeGame(self.procesador, alm, True)
+            ap = AnalysisGame.AnalyzeGame(self.procesador, alm, True)
 
             ap.cached_begin()
 
@@ -1325,7 +1326,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         gb_group = Controles.GB(self, "%s (%s)" % (_("Group"), "optional"), ly_group)
 
-        lb_summary = Controles.LB2P(self, _("Summary depth (0=disable)"))
+        lb_summary = Controles.LB2P(self, _("Opening explorer depth (0=disable)"))
         self.sb_summary = Controles.SB(self, dic_data.get("SUMMARY_DEPTH", 12), 0, 999)
         ly_summary = Colocacion.H().control(lb_summary).control(self.sb_summary).relleno(1)
 
@@ -1440,7 +1441,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
             try:
                 os.makedirs(folder, True)
             except:
-                QTUtil2.message_error(self, "%s\n%s" % (_("Unable to create folder"), folder))
+                QTUtil2.message_error(self, "%s\n%s" % (_("Unable to create the folder"), folder))
                 return
 
         filename = "%s.lcdb" % name
@@ -1511,9 +1512,9 @@ def modify_database(owner, configuration, db):
         return None
 
 
-class WTags(QTVarios.WDialogo):
+class WTags(LCDialog.LCDialog):
     def __init__(self, owner, dbgames: [DBgames.DBgames]):
-        QTVarios.WDialogo.__init__(self, owner, _("Tags"), Iconos.Tags(), "tagsedition")
+        LCDialog.LCDialog.__init__(self, owner, _("Tags"), Iconos.Tags(), "tagsedition")
         self.dbgames = dbgames
         self.dic_cambios = None
 

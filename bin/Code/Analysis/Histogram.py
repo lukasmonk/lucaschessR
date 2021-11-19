@@ -418,7 +418,7 @@ class Histogram(QtWidgets.QGraphicsView):
                     QTUtil.ponPortapapeles(pm, tipo="p")
                 else:
                     configuration = Code.configuration
-                    path = SelectFiles.salvaFichero(self, _("File to save"), configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
+                    path = SelectFiles.salvaFichero(self, _("File to save"), configuration.x_save_folder, "png", False)
                     if path:
                         pm.save(path, "png")
                         configuration.x_save_folder = os.path.dirname(path)

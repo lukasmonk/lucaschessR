@@ -18,14 +18,15 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WRun(QTVarios.WDialogo):
+class WRun(LCDialog.LCDialog):
     def __init__(self, w_parent, sts, work, procesador):
         titulo = "%s - %s - %s" % (sts.name, work.ref, work.pathToExe())
         icono = Iconos.STS()
         extparam = "runsts"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         self.work = work
         self.sts = sts
@@ -234,12 +235,12 @@ class WRun(QTVarios.WDialogo):
                 r.labels[ng].is_max = key in st
 
 
-class WRun2(QTVarios.WDialogo):
+class WRun2(LCDialog.LCDialog):
     def __init__(self, w_parent, sts, work, procesador):
         titulo = "%s - %s - %s" % (sts.name, work.ref, work.pathToExe())
         icono = Iconos.STS()
         extparam = "runsts2"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         self.work = work
         self.sts = sts
@@ -454,7 +455,7 @@ class WWork(QtWidgets.QDialog):
             | QtCore.Qt.WindowMaximizeButtonHint
         )
 
-        tb = QTUtil2.tbAcceptCancel(self)
+        tb = QTVarios.tbAcceptCancel(self)
 
         # Tabs
         tab = Controles.Tab()
@@ -559,12 +560,12 @@ class WWork(QtWidgets.QDialog):
         self.accept()
 
 
-class WUnSTS(QTVarios.WDialogo):
+class WUnSTS(LCDialog.LCDialog):
     def __init__(self, w_parent, sts, procesador):
         titulo = sts.name
         icono = Iconos.STS()
         extparam = "unsts"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         # Datos
         self.sts = sts
@@ -656,7 +657,7 @@ class WUnSTS(QTVarios.WDialogo):
                     return
 
     def export(self):
-        resp = SelectFiles.salvaFichero(self, _("CSV file"), Code.configuration.x_save_folder, _("File") + " csv (*.csv)", True)
+        resp = SelectFiles.salvaFichero(self, _("CSV file"), Code.configuration.x_save_folder, "csv", True)
         if resp:
             self.sts.writeCSV(resp)
 
@@ -769,13 +770,13 @@ class WUnSTS(QTVarios.WDialogo):
             self.grid.gotop()
 
 
-class WSTS(QTVarios.WDialogo):
+class WSTS(LCDialog.LCDialog):
     def __init__(self, w_parent, procesador):
 
         titulo = _("STS: Strategic Test Suite")
         icono = Iconos.STS()
         extparam = "sts"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         # Datos
         self.procesador = procesador

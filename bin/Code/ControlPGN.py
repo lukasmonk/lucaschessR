@@ -38,7 +38,7 @@ class ControlPGN:
     def num_rows(self):
         if self.manager.game:
             n = len(self.manager.game)
-            if self.manager.game.if_starts_with_black:
+            if self.manager.game.starts_with_black:
                 n += 1
             if n % 2 == 1:
                 n += 1
@@ -53,10 +53,10 @@ class ControlPGN:
         size_limoves = len(li_moves)
 
         if key == "WHITE":
-            if self.manager.game.if_starts_with_black:
+            if self.manager.game.starts_with_black:
                 pos -= 1
         else:
-            if not self.manager.game.if_starts_with_black:
+            if not self.manager.game.starts_with_black:
                 pos += 1
 
         if 0 <= pos <= (size_limoves - 1):
@@ -83,16 +83,16 @@ class ControlPGN:
         return self.only_move(row, key)
 
     def mueve(self, row, is_white):
-        if_starts_with_black = self.manager.game.if_starts_with_black
+        starts_with_black = self.manager.game.starts_with_black
 
-        if row == 0 and is_white and if_starts_with_black:
+        if row == 0 and is_white and starts_with_black:
             return
 
         lj = self.manager.game.li_moves
         pos = row * 2
         if not is_white:
             pos += 1
-        if if_starts_with_black:
+        if starts_with_black:
             pos -= 1
 
         tam_lj = len(lj)
@@ -128,7 +128,7 @@ class ControlPGN:
         pos = row * 2
         if not is_white:
             pos += 1
-        if self.manager.game.if_starts_with_black:
+        if self.manager.game.starts_with_black:
             pos -= 1
         tam_lj = len(self.manager.game)
         if tam_lj == 0:

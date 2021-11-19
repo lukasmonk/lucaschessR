@@ -281,6 +281,11 @@ class Position:
         self.set_lce()
         return FasterCode.get_pgn(from_sq, to_sq, promotion)
 
+    def get_fenm2(self, from_sq, to_sq, promotion=""):
+        self.set_lce()
+        fen = FasterCode.get_fen()
+        return FasterCode.fen_fenm2(fen)
+
     def html(self, mv: str):
         pgn = self.pgn(mv[:2], mv[2:4], mv[4:])
         li = []

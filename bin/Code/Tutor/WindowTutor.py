@@ -12,17 +12,18 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 
 
-class WindowTutor(QTVarios.WDialogo):
+class WindowTutor(LCDialog.LCDialog):
     def __init__(self, manager, tutor, siRival, siOpenings, is_white, siPuntos):
-        titulo = _("Analyzing your move")
+        titulo = _("Analyzing the move....")
         icono = Iconos.Tutor()
         extparam = "tutor"
-        QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, manager.main_window, titulo, icono, extparam)
 
         self.tutor = tutor
         self.manager = manager

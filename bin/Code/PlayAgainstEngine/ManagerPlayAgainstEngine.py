@@ -334,7 +334,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def ponRotuloBasico(self):
         rotulo1 = ""
         if self.book_rival_active:
-            rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Rival"), os.path.basename(self.book_rival.name))
+            rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Opponent"), os.path.basename(self.book_rival.name))
         if self.book_player_active:
             rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Player"), os.path.basename(self.book_player.name))
         self.set_label1(rotulo1)

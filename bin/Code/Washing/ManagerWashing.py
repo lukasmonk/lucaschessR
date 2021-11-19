@@ -80,7 +80,7 @@ class ManagerWashingReplay(Manager.Manager):
         self.set_position(self.game.last_position)
         self.put_pieces_bottom(is_white)
 
-        self.set_label1("%s: %s\n%s: %s" % (_("Rival"), self.engine.name, _("Task"), self.engine.lbState()))
+        self.set_label1("%s: %s\n%s: %s" % (_("Opponent"), self.engine.name, _("Task"), self.engine.lbState()))
 
         self.pgnRefresh(True)
 
@@ -491,7 +491,7 @@ class ManagerWashingCreate(Manager.Manager):
         self.put_pieces_bottom(is_white)
 
         self.set_label1(
-            "%s: %s\n%s: %s\n %s: %s" % (_("Rival"), self.engine.name, _("Task"), self.engine.lbState(), _("Tutor"), self.xtutor.name)
+            "%s: %s\n%s: %s\n %s: %s" % (_("Opponent"), self.engine.name, _("Task"), self.engine.lbState(), _("Tutor"), self.xtutor.name)
         )
         self.ponRotuloDatos()
 

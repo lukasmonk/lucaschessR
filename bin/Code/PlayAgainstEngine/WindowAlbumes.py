@@ -3,16 +3,16 @@ from PySide2 import QtGui
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 
 
-class WAlbum(QTVarios.WDialogo):
+class WAlbum(LCDialog.LCDialog):
     def __init__(self, wowner, procesador, album):
 
         self.album = album
         titulo = album.name
-        QTVarios.WDialogo.__init__(self, wowner, titulo, album.icono(), "albumes")
+        LCDialog.LCDialog.__init__(self, wowner, titulo, album.icono(), "albumes")
 
         self.configuration = procesador.configuration
 

@@ -7,18 +7,18 @@ from PySide2 import QtCore, QtGui, QtWidgets
 import Code
 from Code import Util
 from Code.Board import BoardElements, BoardTypes
-from Code.Translations import TrListas
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 from Code.QT import SelectFiles
 from Code.SQL import UtilSQL
 from Code.Sound import Sound
+from Code.Translations import TrListas
 
 
 class MesaSonido(QtWidgets.QGraphicsView):
@@ -143,7 +143,7 @@ class MesaSonido(QtWidgets.QGraphicsView):
             x.activa(siActivar)
 
 
-class WEdicionSonido(QTVarios.WDialogo):
+class WEdicionSonido(LCDialog.LCDialog):
     ks_aceptar, ks_cancelar, ks_microfono, ks_wav, ks_play, ks_stopplay, ks_stopmic, ks_record, ks_cancelmic, ks_limpiar, ks_grabar = range(
         11
     )
@@ -153,7 +153,7 @@ class WEdicionSonido(QTVarios.WDialogo):
         # titulo = _("Sound edition" )
         icono = Iconos.S_Play()
         extparam = "sound"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.confich = Code.configuration.ficheroDirSound
 
@@ -339,8 +339,7 @@ class WEdicionSonido(QTVarios.WDialogo):
 
     def grabar(self):
         carpeta = Util.restore_pickle(self.confich)
-        filtro = _("File") + " wav (*.wav)"
-        file = SelectFiles.salvaFichero(self, _("Save wav"), carpeta, filtro, siConfirmarSobreescritura=True)
+        file = SelectFiles.salvaFichero(self, _("Save wav"), carpeta, "wav", True)
         if file:
             carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
@@ -383,7 +382,7 @@ def editSonido(owner, titulo, wav):
         return None
 
 
-class WSonidos(QTVarios.WDialogo):
+class WSonidos(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         self.procesador = procesador
@@ -394,7 +393,7 @@ class WSonidos(QTVarios.WDialogo):
         titulo = _("Custom sounds")
         icono = Iconos.S_Play()
         extparam = "sounds"
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
 
         # Toolbar
         li_acciones = (
@@ -520,9 +519,9 @@ class WSonidos(QTVarios.WDialogo):
         d["GANAMOS"] = _("You win")
         d["GANARIVAL"] = _("Opponent wins")
         d["TABLAS"] = _("Stalemate")
-        d["TABLASREPETICION"] = _("Draw due to three times repetition")
-        d["TABLAS50"] = _("Draw according to the 50 move rule")
-        d["TABLASFALTAMATERIAL"] = _("Draw, not enough material")
+        d["TABLASREPETICION"] = _("Draw by threefold repetition")
+        d["TABLAS50"] = _("Draw by fifty-move rule")
+        d["TABLASFALTAMATERIAL"] = _("Draw by insufficient material")
         d["GANAMOSTIEMPO"] = _("You win on time")
         d["GANARIVALTIEMPO"] = _("Opponent has won on time")
 
@@ -550,7 +549,7 @@ class WSonidos(QTVarios.WDialogo):
         # for f in "12345678":
         # self.liSonidos.append( [ c+f, c+f, None ] )
 
-class WSonidosGuion(QTVarios.WDialogo):
+class WSonidosGuion(LCDialog.LCDialog):
     def __init__(self, owner, db):
 
         self.db = db
@@ -560,7 +559,7 @@ class WSonidosGuion(QTVarios.WDialogo):
         titulo = _("Custom sounds")
         icono = Iconos.S_Play()
         extparam = "sounds"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
         li_acciones = (

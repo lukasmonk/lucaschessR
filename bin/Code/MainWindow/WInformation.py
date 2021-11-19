@@ -244,8 +244,9 @@ class WVariations(QtWidgets.QWidget):
         board.put_arrow_sc(var_move.from_sq, var_move.to_sq)
         self.mostrar()
 
-        manager = self.owner.w_parent.manager
-        manager.kibitzers_manager.put_game(variation.copia(num_var_move))
+        if variation is not None:
+            manager = self.owner.w_parent.manager
+            manager.kibitzers_manager.put_game(variation.copia(num_var_move))
 
     def link_variation_edit(self, num_variation):
         self.edit(num_variation)

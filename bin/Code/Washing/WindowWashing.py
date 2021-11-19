@@ -13,13 +13,14 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import WindowSavePGN
 from Code.Washing import Washing
 
 
-class WWashing(QTVarios.WDialogo):
+class WWashing(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         self.procesador = procesador
@@ -37,7 +38,7 @@ class WWashing(QTVarios.WDialogo):
         titulo = _("The Washing Machine")
         extparam = "washing"
         icono = Iconos.WashingMachine()
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
         tb = QTVarios.LCTB(self)
@@ -90,7 +91,7 @@ class WWashing(QTVarios.WDialogo):
             plant = '<tr><td align="right">%s:</td><td><b>%s</b></td></tr>'
             hints, times, games = self.washing.totals()
             nEngines = self.washing.num_engines()
-            html = '<h2><center>%s: %d %s</center></h2><br><table cellpadding="4">' % (_("Finished"), nEngines, _("engines"))
+            html = '<h2><center>%s: %d %s</center></h2><br><table cellpadding="4">' % (_("Finished"), nEngines, _("Engines"))
             for x in range(3):
                 html += plant
             html += "</table>"

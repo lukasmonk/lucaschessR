@@ -16,6 +16,7 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -27,7 +28,7 @@ from Code.Tournaments import Tournament
 GRID_ALIAS, GRID_VALUES, GRID_GAMES_QUEUED, GRID_GAMES_FINISHED, GRID_RESULTS = range(5)
 
 
-class WTournament(QTVarios.WDialogo):
+class WTournament(LCDialog.LCDialog):
     def __init__(self, w_parent, nombre_torneo):
 
         torneo = self.torneo = Tournament.Tournament(nombre_torneo)
@@ -35,7 +36,7 @@ class WTournament(QTVarios.WDialogo):
         titulo = nombre_torneo
         icono = Iconos.Torneos()
         extparam = "untorneo_v1"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         self.configuration = Code.configuration
 
@@ -719,7 +720,7 @@ class WTournament(QTVarios.WDialogo):
         li_engines = self.torneo.list_engines()
         n_engines = len(li_engines)
         if n_engines < 2:
-            QTUtil2.message_error(self, _("You must create at least two engines"))
+            QTUtil2.message_error(self, _("You must use at least two engines"))
             return
 
         dicValores = self.configuration.read_variables("crear_torneo")

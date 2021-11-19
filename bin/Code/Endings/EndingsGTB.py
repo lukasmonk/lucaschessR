@@ -113,10 +113,10 @@ class DBendings:
 
             moves_previo = dic_fen.get("MOVES")
             if (moves_previo is None) or (moves < moves_previo):
-                label = _("New best moves")
+                label = _("New best number of movements")
                 dic_fen["MOVES"] = moves
             else:
-                label = _("Moves")
+                label = _("Number of movements")
             if moves_previo:
                 xdif = moves - moves_previo
                 dif = " (%d)" % (xdif,) if xdif < 0 else " (=)"

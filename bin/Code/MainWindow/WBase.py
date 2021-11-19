@@ -74,6 +74,7 @@ class WBase(QtWidgets.QWidget):
     def __init__(self, parent, manager):
         super(WBase, self).__init__(parent)
 
+        self.parent = parent
         self.manager = manager
 
         self.configuration = Code.configuration
@@ -230,12 +231,12 @@ class WBase(QtWidgets.QWidget):
         # # Pgn
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 52, centered=True)
-        si_figurines_pgn = configuration.x_pgn_withfigurines
+        with_figurines = configuration.x_pgn_withfigurines
         o_columns.nueva(
-            "WHITE", _("White"), with_each_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
+            "WHITE", _("White"), with_each_color, edicion=Delegados.EtiquetaPGN(True if with_figurines else None)
         )
         o_columns.nueva(
-            "BLACK", _("Black"), with_each_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
+            "BLACK", _("Black"), with_each_color, edicion=Delegados.EtiquetaPGN(False if with_figurines else None)
         )
         self.pgn = Grid.Grid(self, o_columns, siCabeceraMovible=False)
         self.pgn.setMinimumWidth(width_pgn)

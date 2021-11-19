@@ -4,11 +4,11 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 
 
-class WResistance(QTVarios.WDialogo):
+class WResistance(LCDialog.LCDialog):
     def __init__(self, owner, resistance):
 
         self.resistance = resistance
@@ -24,7 +24,7 @@ class WResistance(QTVarios.WDialogo):
             elif tipo == "p2":
                 titulo += "-" + _("Hide only opponent pieces")
         extparam = "boxing"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
         # self.setStyleSheet("QWidget { background: #AFC3D7 }")
 
         # Tool bar ---------------------------------------------------------------

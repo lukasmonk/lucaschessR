@@ -574,3 +574,9 @@ class ManagerMate(Manager.Manager):
             self.finJuego()
             return
         self.jugar(row)
+
+
+    def jugadaActual(self):
+        """Necesario para que funcionen los atajos de ratón"""
+        num_moves = len(self.game)
+        return num_moves, num_moves-1, num_moves // 2, self.game.last_position.is_white

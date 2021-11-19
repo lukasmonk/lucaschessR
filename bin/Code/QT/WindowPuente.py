@@ -13,9 +13,9 @@ from Code.QT import Columnas
 from Code.QT import Controles
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 from Code.QT import WindowPotencia
 from Code.SQL import Base
 
@@ -259,11 +259,11 @@ class WEdMove(QtWidgets.QWidget):
         return menu
 
 
-class WPuenteBase(QTVarios.WDialogo):
+class WPuenteBase(LCDialog.LCDialog):
     def __init__(self, procesador, nivel):
 
         titulo = "%s. %s %d" % (_("Moves between two positions"), _("Level"), nivel)
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, Iconos.Puente(), "puenteBase")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, Iconos.Puente(), "puenteBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -390,10 +390,10 @@ class WPuenteBase(QTVarios.WDialogo):
         self.ghistorico.refresh()
 
 
-class WPuente(QTVarios.WDialogo):
+class WPuente(LCDialog.LCDialog):
     def __init__(self, owner, fenIni, fenFin, liMV, info):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Moves between two positions"), Iconos.Puente(), "puente")
+        LCDialog.LCDialog.__init__(self, owner, _("Moves between two positions"), Iconos.Puente(), "puente")
 
         self.owner = owner
         self.historico = owner.historico

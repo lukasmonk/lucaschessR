@@ -3,12 +3,13 @@ from PySide2 import QtSvg, QtCore
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.Routes import Routes
 
 
-class WTranssiberian(QTVarios.WDialogo):
+class WTranssiberian(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         route = self.route = Routes.Transsiberian(procesador.configuration)
@@ -16,7 +17,7 @@ class WTranssiberian(QTVarios.WDialogo):
         titulo = "%s (%d)" % (_("Transsiberian Railway"), route.level)
         icono = Iconos.Train()
         extparam = "transsiberian"
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
 
         self.procesador = procesador
         wsvg = QtSvg.QSvgWidget()

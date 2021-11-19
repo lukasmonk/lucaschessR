@@ -16,9 +16,10 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.Board import BoardTypes
+from Code.QT import LCDialog
 
 
-class WPanelDirector(QTVarios.WDialogo):
+class WPanelDirector(LCDialog.LCDialog):
     def __init__(self, owner, board):
         self.owner = owner
         self.position = board.last_position
@@ -33,7 +34,7 @@ class WPanelDirector(QTVarios.WDialogo):
         titulo = _("Director")
         icono = Iconos.Script()
         extparam = "tabvisualscript"
-        QTVarios.WDialogo.__init__(self, board, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, board, titulo, icono, extparam)
 
         self.must_save = False
         self.ant_foto = None
@@ -137,8 +138,9 @@ class WPanelDirector(QTVarios.WDialogo):
             self.selectBanda.seleccionarNum(number)
 
     def grabar(self):
-        li = self.guion.guarda()
-        self.board.dbVisual_save(self.fenm2, li)
+        if self.guion is not None:
+            li = self.guion.guarda()
+            self.board.dbVisual_save(self.fenm2, li)
 
         self.must_save = False
         self.tb.setAccionVisible(self.grabar, False)
@@ -681,7 +683,7 @@ class WPanelDirector(QTVarios.WDialogo):
 
     def grabarFichero(self):
         dirSalvados = self.configuration.x_save_folder
-        resp = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PNG (*.png)", False)
+        resp = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, "png", False)
         if resp:
             self.board.save_as_img(resp, "png")
             txt = resp

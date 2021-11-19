@@ -8,9 +8,10 @@ from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WBooksTrain(QTVarios.WDialogo):
+class WBooksTrain(LCDialog.LCDialog):
     ISWHITE, BOOK_PLAYER, BOOK_RIVAL, ALWAYS_HIGHEST, RESP_RIVAL, SHOW_MENU = range(6)
 
     def __init__(self, procesador):
@@ -21,7 +22,7 @@ class WBooksTrain(QTVarios.WDialogo):
         titulo = _("Training with a book")
         icono = Iconos.Libros()
 
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, "bookstrain")
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, "bookstrain")
 
         self.setMinimumWidth(450)
 
@@ -41,7 +42,7 @@ class WBooksTrain(QTVarios.WDialogo):
         self.rb_black.setChecked(not dic_data.get(self.ISWHITE, True))
 
         hbox = Colocacion.H().relleno().control(self.rb_white).espacio(10).control(self.rb_black).relleno()
-        gb_side = Controles.GB(self, _("Play with"), hbox).ponFuente(flb)
+        gb_side = Controles.GB(self, _("Side you play with"), hbox).ponFuente(flb)
 
         # Books
         fvar = self.configuration.file_books

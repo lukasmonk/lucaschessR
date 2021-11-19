@@ -463,7 +463,7 @@ def import_polyglot_config(owner, configuration, titulo, with_collisions):
     form = FormLayout.FormLayout(owner, titulo, Iconos.Import8(), anchoMinimo=440)
     form.separador()
 
-    form.spinbox(_("Maximum half-moves (plies)"), 1, 999, 60, dic.get("PLIES", 50))
+    form.spinbox(_("Maximum movements"), 1, 999, 60, dic.get("PLIES", 50))
     form.separador()
 
     li_options = (("%s + %s" % (_("White"), _("Black")), {True, False}), (_("White"), {True}), (_("Black"), {False}))

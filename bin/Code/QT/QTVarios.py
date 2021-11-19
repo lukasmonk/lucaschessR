@@ -143,7 +143,7 @@ class BlancasNegras(QtWidgets.QDialog):
 
         icoP = Code.todasPiezas.iconoDefecto("K")
         icop = Code.todasPiezas.iconoDefecto("k")
-        self.setWindowTitle(_("Choose Color"))
+        self.setWindowTitle(_("Choose a color"))
         self.setWindowIcon(icoP)
 
         btBlancas = Controles.PB(self, "", rutina=self.accept, plano=False).ponIcono(icoP, icon_size=64)
@@ -174,7 +174,7 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
 
         icoP = Code.todasPiezas.iconoDefecto("K")
         icop = Code.todasPiezas.iconoDefecto("k")
-        self.setWindowTitle(_("Choose Color"))
+        self.setWindowTitle(_("Choose a color"))
         self.setWindowIcon(icoP)
         self.key_saved = "BLANCASNEGRASTIEMPO"
 
@@ -258,7 +258,7 @@ class Tiempo(QtWidgets.QDialog):
         self.setWindowTitle(_("Time"))
         self.setWindowIcon(Iconos.MoverTiempo())
 
-        tb = QTUtil2.tbAcceptCancel(self)
+        tb = tbAcceptCancel(self)
 
         f = Controles.TipoLetra(puntos=11)
 
@@ -967,3 +967,17 @@ def change_interval(owner, configuration):
     if vtime > 0.01:
         configuration.x_interval_replay = int(vtime * 1000)
         configuration.graba()
+
+
+def tbAcceptCancel(parent, if_default=False, siReject=True):
+    li_acciones = [
+        (_("Accept"), Iconos.Aceptar(), parent.aceptar),
+        None,
+        (_("Cancel"), Iconos.Cancelar(), parent.reject if siReject else parent.cancelar),
+    ]
+    if if_default:
+        li_acciones.append(None)
+        li_acciones.append((_("Default"), Iconos.Defecto(), parent.defecto))
+    li_acciones.append(None)
+
+    return LCTB(parent, li_acciones)

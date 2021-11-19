@@ -6,12 +6,13 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTVarios
 from Code.Themes import Themes
 
 
-class WThemes(QTVarios.WDialogo):
+class WThemes(LCDialog.LCDialog):
     def __init__(self, owner, themes: Themes.Themes, current_move: Move.Move):
         title = _("Select themes")
         extparam = "selelectthemes"
@@ -22,7 +23,7 @@ class WThemes(QTVarios.WDialogo):
         self.st_current_themes = set(self.current_move.li_themes)
 
         icono = Iconos.Themes()
-        QTVarios.WDialogo.__init__(self, owner, title, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, title, icono, extparam)
 
         self.themes = themes
 

@@ -39,6 +39,7 @@ from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil2
+from Code.QT import QTVarios
 from Code.QT import SelectFiles
 
 separador = (None, None)
@@ -218,9 +219,7 @@ class Carpeta:
 class Fichero:
     def __init__(self, label, extension, siSave, siRelativo=True, anchoMinimo=None, ficheroDefecto="", li_histo=None):
         self.tipo = FICHERO
-        self.extension = (
-            extension
-        )  # si extension puede tener un elemento como pgn o -> "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)"
+        self.extension = extension
         self.siSave = siSave
         self.label = label + ":"
         self.siRelativo = siRelativo
@@ -248,9 +247,8 @@ class BotonFichero(QtWidgets.QPushButton):
     def cambiaFichero(self):
         titulo = _("File to save") if self.siSave else _("File to read")
         fbusca = self.file if self.file else self.ficheroDefecto
-        filtro = self.extension if "(" in self.extension else (_("File") + " %s (*.%s)" % (self.extension, self.extension))
         if self.siSave:
-            resp = SelectFiles.salvaFichero(self, titulo, fbusca, filtro)
+            resp = SelectFiles.salvaFichero(self, titulo, fbusca, self.extension, True)
         else:
             resp = SelectFiles.leeFichero(self, fbusca, self.extension, titulo=titulo)
         if resp:
@@ -799,7 +797,7 @@ class FormDialog(QtWidgets.QDialog):
             if dispatch:
                 dispatch(self.formwidget)  # enviamos el form de donde tomar datos cuando hay cambios
 
-        tb = QTUtil2.tbAcceptCancel(self, if_default, siReject=False)
+        tb = QTVarios.tbAcceptCancel(self, if_default, siReject=False)
 
         layout = Colocacion.V()
         layout.control(tb)

@@ -16,6 +16,7 @@ from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTVarios
 from Code.Translations import TrListas
+from Code.QT import LCDialog
 
 
 class ConjuntoPiezas:
@@ -221,13 +222,13 @@ class Blindfold(ConjuntoPiezas):
         self.dicPiezas = self.leePiezas()
 
 
-class WBlindfold(QTVarios.WDialogo):
+class WBlindfold(LCDialog.LCDialog):
     def __init__(self, owner, nom_pieces_ori):
 
         titulo = _("Blindfold") + " - " + _("Configuration")
         icono = Iconos.Ojo()
         extparam = "wblindfold"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.config = BlindfoldConfig(nom_pieces_ori)
         self.nom_pieces_ori = nom_pieces_ori

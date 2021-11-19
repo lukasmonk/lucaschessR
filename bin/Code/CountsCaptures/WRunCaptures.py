@@ -5,14 +5,15 @@ import FasterCode
 import Code
 from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
 from Code.Board import Board
+from Code.QT import LCDialog
 
 from Code.CountsCaptures import WRunCommon
 
 
-class WRunCaptures(QTVarios.WDialogo):
+class WRunCaptures(LCDialog.LCDialog):
     def __init__(self, owner, db_captures, capture):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Captures and threats in a game"), Iconos.Captures(), "runcaptures")
+        LCDialog.LCDialog.__init__(self, owner, _("Captures and threats in a game"), Iconos.Captures(), "runcaptures")
 
         self.configuration = Code.configuration
         self.capture = capture

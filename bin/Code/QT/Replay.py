@@ -55,7 +55,7 @@ class Replay:
         self.manager = manager
         self.procesador = manager.procesador
         self.main_window = manager.main_window
-        self.if_starts_with_black = manager.game.if_starts_with_black
+        self.starts_with_black = manager.game.starts_with_black
         self.board = manager.board
         self.seconds = seconds
         self.if_start = if_start
@@ -122,7 +122,7 @@ class Replay:
 
         move = self.li_moves[self.current_position]
         num = self.current_position
-        if self.if_starts_with_black:
+        if self.starts_with_black:
             num += 1
         row = int(num / 2)
         self.main_window.pgnColocate(row, move.position_before.is_white)

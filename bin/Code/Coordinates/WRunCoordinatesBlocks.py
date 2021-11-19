@@ -4,14 +4,15 @@ from PySide2 import QtCore, QtWidgets
 
 import Code
 from Code.Base import Position
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
 from Code.Board import Board
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
+from Code.QT import LCDialog
 
 
-class WRunCoordinatesBlocks(QTVarios.WDialogo):
+class WRunCoordinatesBlocks(LCDialog.LCDialog):
     def __init__(self, owner, db_coordinates, coordinates):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Coordinates by blocks"), Iconos.Blocks(), "runcoordinatesblocks")
+        LCDialog.LCDialog.__init__(self, owner, _("Coordinates by blocks"), Iconos.Blocks(), "runcoordinatesblocks")
 
         self.configuration = Code.configuration
         self.coordinates = coordinates

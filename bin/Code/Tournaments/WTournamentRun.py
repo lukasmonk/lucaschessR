@@ -185,12 +185,12 @@ class WTournamentRun(QtWidgets.QWidget):
         # # Pgn
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("NUMBER", _("N."), 52, centered=True)
-        si_figurines_pgn = configuration.x_pgn_withfigurines
+        with_figurines = configuration.x_pgn_withfigurines
         o_columnas.nueva(
-            "WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None)
+            "WHITE", _("White"), n_ancho_color, edicion=Delegados.EtiquetaPGN(True if with_figurines else None)
         )
         o_columnas.nueva(
-            "BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None)
+            "BLACK", _("Black"), n_ancho_color, edicion=Delegados.EtiquetaPGN(False if with_figurines else None)
         )
         self.grid_pgn = Grid.Grid(self, o_columnas, siCabeceraMovible=False)
         self.grid_pgn.setMinimumWidth(n_ancho_pgn)

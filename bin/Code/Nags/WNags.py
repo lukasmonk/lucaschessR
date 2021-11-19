@@ -8,9 +8,10 @@ from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WNags(QTVarios.WDialogo):
+class WNags(LCDialog.LCDialog):
     def __init__(self, owner, nags: Nags.Nags, current_move: Move.Move):
         title = _("Ratings")
         extparam = "selelectnags"
@@ -23,7 +24,7 @@ class WNags(QTVarios.WDialogo):
         self.nags = nags
         icono = self.nags.ico(14, 16)
 
-        QTVarios.WDialogo.__init__(self, owner, title, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, title, icono, extparam)
 
         self.configuration = Code.configuration
 

@@ -14,13 +14,14 @@ from Code.Base.Constantes import (
     SPECULATIVE_MOVE,
     QUESTIONABLE_MOVE,
     BAD_MOVE,
-    VERY_POOR_MOVE,
+    VERY_BAD_MOVE,
 )
 from Code.Board import Board
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -219,7 +220,7 @@ class ListaMoves:
             SPECULATIVE_MOVE: 1300,
             QUESTIONABLE_MOVE: 1700,
             BAD_MOVE: 2000,
-            VERY_POOR_MOVE: 3000,
+            VERY_BAD_MOVE: 3000,
             NO_RATING: 4000,
         }
         for mov in self.liMovesInicial:
@@ -304,7 +305,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
         self.dicValoracion["1"] = (VERY_GOOD_MOVE, dic_nags[3])
         self.dicValoracion["2"] = (GOOD_MOVE, dic_nags[1])
         self.dicValoracion["3"] = (BAD_MOVE, dic_nags[2])
-        self.dicValoracion["4"] = (VERY_POOR_MOVE, dic_nags[4])
+        self.dicValoracion["4"] = (VERY_BAD_MOVE, dic_nags[4])
         self.dicValoracion["5"] = (SPECULATIVE_MOVE, dic_nags[5])
         self.dicValoracion["6"] = (QUESTIONABLE_MOVE, dic_nags[6])
         self.dicValoracion["0"] = (NO_RATING, _("No rating"))
@@ -471,7 +472,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
                     smenu.separador()
 
         if nOcultos:
-            menu.opcion("mostrar", _("Show hidden"), Iconos.Mostrar())
+            menu.opcion("mostrar", _("Show what is hidden"), Iconos.Mostrar())
 
         resp = menu.lanza()
         if resp is None:
@@ -710,7 +711,7 @@ class InfoMove(QtWidgets.QWidget):
         self.ponValores()
 
 
-class WindowArbol(QTVarios.WDialogo):
+class WindowArbol(LCDialog.LCDialog):
     def __init__(self, w_parent, game, nj, procesador):
 
         main_window = w_parent
@@ -720,7 +721,7 @@ class WindowArbol(QTVarios.WDialogo):
         titulo = _("Moves tree")
         icono = Iconos.Arbol()
         extparam = "moves"
-        QTVarios.WDialogo.__init__(self, main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, main_window, titulo, icono, extparam)
 
         dicVideo = self.restore_dicvideo()
 

@@ -8,12 +8,7 @@ from PySide2 import QtCore, QtWidgets
 from Code import Util
 from Code.Analysis import Analysis
 from Code.Base import Game
-from Code.Base.Constantes import (
-    NONE,
-    ALL,
-    ONLY_BLACK,
-    ONLY_WHITE,
-)
+from Code.Base.Constantes import NONE, ALL, ONLY_BLACK, ONLY_WHITE
 from Code.Engines import EnginesBunch
 from Code.Engines import Priorities
 from Code.Openings import WindowOpenings, POLAnalisis, POLBoard, OpeningLines
@@ -29,14 +24,15 @@ from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.QT import Voyager
 from Code.QT import WindowSavePGN
+from Code.QT import LCDialog
 
 
-class WLines(QTVarios.WDialogo):
+class WLines(LCDialog.LCDialog):
     def __init__(self, procesador, dbop):
         self.dbop = dbop
         self.title = dbop.gettitle()
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, self.title, Iconos.OpeningLines(), "studyOpening")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, self.title, Iconos.OpeningLines(), "studyOpening")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -46,7 +42,7 @@ class WLines(QTVarios.WDialogo):
         self.game = None
 
         self.resultado = None
-        si_figurines_pgn = self.configuration.x_pgn_withfigurines
+        with_figurines = self.configuration.x_pgn_withfigurines
 
         li_acciones = (
             (_("Close"), Iconos.MainMenu(), self.terminar),
@@ -69,7 +65,7 @@ class WLines(QTVarios.WDialogo):
         start = self.gamebase.num_moves() // 2 + 1
         ancho_col = int(((self.configuration.x_pgn_width - 35 - 20) / 2) * 80 / 100)
         for x in range(start, 75):
-            o_columns.nueva(str(x), str(x), ancho_col, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, True))
+            o_columns.nueva(str(x), str(x), ancho_col, edicion=Delegados.EtiquetaPOS(with_figurines, True))
         self.glines = Grid.Grid(self, o_columns, siCabeceraMovible=False)
         self.glines.setAlternatingRowColors(False)
         self.glines.tipoLetra(puntos=self.configuration.x_pgn_fontpoints)
@@ -148,11 +144,11 @@ class WLines(QTVarios.WDialogo):
         submenu.separador()
         submenu.opcion(self.ta_remove, _("Delete all previous analysis"), Iconos.Delete())
         menu.separador()
-        lihistory = self.dbop.lihistory()
-        if lihistory:
+        list_history = self.dbop.list_history()
+        if list_history:
             submenu = menu.submenu(_("Backups"), Iconos.Copiar())
             rondo = QTVarios.rondoPuntos()
-            for history in lihistory[:30]:
+            for history in list_history[:20]:
                 h = history
                 if len(h) > 70:
                     h = h[:70] + "..."
@@ -165,7 +161,7 @@ class WLines(QTVarios.WDialogo):
             if isinstance(resp, str):
                 if QTUtil2.pregunta(self, _("Are you sure you want to restore backup %s ?") % ("\n%s" % resp)):
                     um = QTUtil2.unMomento(self, _("Working..."))
-                    self.dbop.rechistory(resp)
+                    self.dbop.recovering_history(resp)
                     self.glines.refresh()
                     self.glines.gotop()
                     um.final()
@@ -178,10 +174,15 @@ class WLines(QTVarios.WDialogo):
         form = FormLayout.FormLayout(self, _("Mass analysis"), Iconos.Analizar(), anchoMinimo=460)
         form.separador()
 
-        form.combobox(_("Engine"), self.configuration.comboMotoresMultiPV10(4), dicVar.get("ENGINE", self.configuration.tutor))
+        form.combobox(
+            _("Engine"), self.configuration.comboMotoresMultiPV10(4), dicVar.get("ENGINE", self.configuration.tutor)
+        )
         form.separador()
 
-        form.float(_("Duration of engine analysis (secs)"), dicVar.get("SEGUNDOS", float(self.configuration.x_tutor_mstime / 1000.0)))
+        form.float(
+            _("Duration of engine analysis (secs)"),
+            dicVar.get("SEGUNDOS", float(self.configuration.x_tutor_mstime / 1000.0)),
+        )
 
         liDepths = [("--", 0)]
         for x in range(1, 51):
@@ -192,14 +193,20 @@ class WLines(QTVarios.WDialogo):
         li = [(_("Maximum"), 0)]
         for x in (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 30, 40, 50, 75, 100, 150, 200):
             li.append((str(x), x))
-        form.combobox(_("Number of half-moves evaluated by engine(MultiPV)"), li, dicVar.get("MULTIPV", self.configuration.x_tutor_multipv))
+        form.combobox(
+            _("Number of half-moves evaluated by engine(MultiPV)"),
+            li,
+            dicVar.get("MULTIPV", self.configuration.x_tutor_multipv),
+        )
         form.separador()
 
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK"), (_("White & Black"), "BOTH")]
         form.combobox(_("Analyze only color"), liJ, dicVar.get("COLOR", "BOTH"))
         form.separador()
 
-        form.combobox(_("Process priority"), Priorities.priorities.combo(), dicVar.get("PRIORITY", Priorities.priorities.normal))
+        form.combobox(
+            _("Process priority"), Priorities.priorities.combo(), dicVar.get("PRIORITY", Priorities.priorities.normal)
+        )
         form.separador()
 
         form.checkbox(_("Redo any existing prior analysis (if they exist)"), dicVar.get("REDO", False))
@@ -295,7 +302,9 @@ class WLines(QTVarios.WDialogo):
             submenu.opcion("update", _("Update current trainings"), Iconos.Reindexar())
             submenu.separador()
         submenu1 = submenu.submenu(_("Create trainings"), Iconos.Modificar())
-        submenu1.opcion("new_ssp", "%s - %s - %s" % (_("Sequential"), _("Static"), _("Positions")), Iconos.TrainSequential())
+        submenu1.opcion(
+            "new_ssp", "%s - %s - %s" % (_("Sequential"), _("Static"), _("Positions")), Iconos.TrainSequential()
+        )
         submenu1.opcion("new_eng", _("With engines"), Iconos.TrainEngines())
 
         resp = menu.lanza()
@@ -333,14 +342,14 @@ class WLines(QTVarios.WDialogo):
         li_gen = [separador]
 
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK")]
-        config = FormLayout.Combobox(_("Play with"), liJ)
+        config = FormLayout.Combobox(_("Side you play with"), liJ)
         li_gen.append((config, color))
 
         li_gen.append(separador)
         li_gen.append((_("Random order"), random_order))
 
         li_gen.append(separador)
-        li_gen.append((_("Maximum number of moves (0=all)"), max_moves))
+        li_gen.append((_("Maximum number of movements (0=all)"), max_moves))
 
         resultado = FormLayout.fedit(li_gen, title=_("New training"), parent=self, anchoMinimo=360, icon=Iconos.Study())
         if resultado is None:
@@ -394,19 +403,21 @@ class WLines(QTVarios.WDialogo):
         li_gen = [separador]
 
         liJ = [(_("White"), "WHITE"), (_("Black"), "BLACK")]
-        config = FormLayout.Combobox(_("Play with"), liJ)
+        config = FormLayout.Combobox(_("Side you play with"), liJ)
         li_gen.append((config, color))
 
-        li_gen.append((_("Mandatory moves") + ":", mandatory))
+        li_gen.append((_("Mandatory movements") + ":", mandatory))
         li_gen.append(separador)
-        li_gen.append((_("Moves until the control") + ":", control))
+        li_gen.append((_("Movements until the control") + ":", control))
         li_gen.append(separador)
         li_gen.append((_("Maximum number of lost centipawns to pass control") + ":", lost_points))
         li_gen.append(separador)
 
         dic_engines = self.configuration.dic_engines
         li_engines = EnginesBunch.lista(dic_engines)
-        config = FormLayout.Spinbox("%s: %s" % (_("Automatic selection"), _("number of engines")), 0, len(li_engines), 50)
+        config = FormLayout.Spinbox(
+            "%s: %s" % (_("Automatic selection"), _("number of engines")), 0, len(li_engines), 50
+        )
         li_gen.append((config, num_engines))
 
         likeys = [(dic_engines[x].name, x) for x in li_engines if x in dic_engines]
@@ -444,7 +455,12 @@ class WLines(QTVarios.WDialogo):
         list_books.check()
         libooks = [(bookx.name, bookx) for bookx in list_books.lista]
         libooks.insert(0, ("--", None))
-        li_books_sel = (("", ""), (_("Uniform random"), "au"), (_("Proportional random"), "ap"), (_("Always the highest percentage"), "mp"))
+        li_books_sel = (
+            ("", ""),
+            (_("Uniform random"), "au"),
+            (_("Proportional random"), "ap"),
+            (_("Always the highest percentage"), "mp"),
+        )
         for level in range(5):
             n = level + 1
             title = "%s %d" % (_("Level"), n)
@@ -571,7 +587,7 @@ class WLines(QTVarios.WDialogo):
             frommenu.separador()
             frommenu.opcion(("polyglot", game_base), _("Polyglot book"), Iconos.Libros())
             frommenu.separador()
-            frommenu.opcion(("summary", game_base), _("Database summary"), Iconos.Database())
+            frommenu.opcion(("summary", game_base), _("Database opening explorer"), Iconos.Database())
             if all:
                 frommenu.separador()
                 frommenu.opcion(("voyager2", game_base), _("Voyager 2"), Iconos.Voyager())
@@ -636,19 +652,19 @@ class WLines(QTVarios.WDialogo):
         form = FormLayout.FormLayout(self, titulo, Iconos.Naranja(), anchoMinimo=360)
         form.separador()
 
-        form.apart(_("Select a maximum number of half-moves (plies)<br> to consider from each game"))
+        form.apart(_("Select the number of half-moves <br> for each game to be considered"))
         form.spinbox(_("Depth"), 3, 99, 50, dicData.get("DEPTH", 30))
         form.separador()
 
-        li = [(_("Only white best moves"), True), (_("Only black best moves"), False)]
+        li = [(_("Only white best movements"), True), (_("Only black best movements"), False)]
         form.combobox(_("Moves"), li, dicData.get("SIWHITE", True))
         form.separador()
 
-        li = [(_("Only one best move"), True), (_("All best moves"), False)]
+        li = [(_("Only one best movement"), True), (_("All best movements"), False)]
         form.combobox(_("Best move"), li, dicData.get("ONLYONE", True))
         form.separador()
 
-        form.spinbox(_("Minimum moves must have each line"), 0, 99, 50, dicData.get("MINMOVES", 0))
+        form.spinbox(_("Minimum movements must have each line"), 0, 99, 50, dicData.get("MINMOVES", 0))
         form.separador()
 
         if with_excltrans:
@@ -675,10 +691,15 @@ class WLines(QTVarios.WDialogo):
     def importarSummary(self, game):
         nomfichgames = QTVarios.select_db(self, self.configuration, True, False)
         if nomfichgames:
-            dicData = self.import_param_books(_("Database summary"), False)
+            dicData = self.import_param_books(_("Database opening explorer"), False)
             if dicData:
                 ficheroSummary = nomfichgames + ".st1"
-                depth, siWhite, onlyone, minMoves = (dicData["DEPTH"], dicData["SIWHITE"], dicData["ONLYONE"], dicData["MINMOVES"])
+                depth, siWhite, onlyone, minMoves = (
+                    dicData["DEPTH"],
+                    dicData["SIWHITE"],
+                    dicData["ONLYONE"],
+                    dicData["MINMOVES"],
+                )
                 self.dbop.importarSummary(self, game, ficheroSummary, depth, siWhite, onlyone, minMoves)
                 self.glines.refresh()
                 self.glines.gotop()
@@ -703,10 +724,10 @@ class WLines(QTVarios.WDialogo):
         form.separador()
 
         li = [(bookx.name, bookx) for bookx in list_books.lista]
-        form.combobox(_("Book that plays white side"), li, bookW)
+        form.combobox(_("Book for White"), li, bookW)
         form.separador()
 
-        form.combobox(_("Book that plays black side"), li, bookB)
+        form.combobox(_("Book for Black"), li, bookB)
         form.separador()
 
         resultado = form.run()
@@ -724,8 +745,16 @@ class WLines(QTVarios.WDialogo):
         titulo = bookW.name if bookW == bookB else "%s/%s" % (bookW.name, bookB.name)
         dicData = self.import_param_books(titulo, True)
         if dicData:
-            depth, siWhite, onlyone, minMoves, excl_transpositions = (dicData["DEPTH"], dicData["SIWHITE"], dicData["ONLYONE"], dicData["MINMOVES"], dicData["EXCLTRANSPOSITIONS"])
-            self.dbop.import_polyglot(self, game, bookW, bookB, titulo, depth, siWhite, onlyone, minMoves, excl_transpositions)
+            depth, siWhite, onlyone, minMoves, excl_transpositions = (
+                dicData["DEPTH"],
+                dicData["SIWHITE"],
+                dicData["ONLYONE"],
+                dicData["MINMOVES"],
+                dicData["EXCLTRANSPOSITIONS"],
+            )
+            self.dbop.import_polyglot(
+                self, game, bookW, bookB, titulo, depth, siWhite, onlyone, minMoves, excl_transpositions
+            )
             self.glines.refresh()
             self.glines.gotop()
 
@@ -733,7 +762,7 @@ class WLines(QTVarios.WDialogo):
         previo = self.configuration.read_variables("OPENINGLINES")
         carpeta = previo.get("CARPETAPGN", "")
 
-        fichero_pgn = SelectFiles.leeFichero(self, carpeta, "%s (*.pgn)" % _("PGN Format"), titulo=_("File to import"))
+        fichero_pgn = SelectFiles.leeFichero(self, carpeta, "pgn", titulo=_("File to import"))
         if not fichero_pgn:
             return
         previo["CARPETAPGN"] = os.path.dirname(fichero_pgn)
@@ -741,7 +770,7 @@ class WLines(QTVarios.WDialogo):
         form = FormLayout.FormLayout(self, os.path.basename(fichero_pgn), Iconos.PGN_Importar(), anchoMinimo=460)
         form.separador()
 
-        form.apart(_("Select a maximum number of half-moves (plies)<br> to consider from each game"))
+        form.apart(_("Select the number of half-moves <br> for each game to be considered"))
 
         form.spinbox(_("Depth"), 3, 999, 50, previo.get("IPGN_DEPTH", 30))
         form.separador()
@@ -845,39 +874,38 @@ class WLines(QTVarios.WDialogo):
         return len(self.dbop) * 2
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
+        row, pos = self.glines.posActualN()
+
         if k == QtCore.Qt.Key_Left:
-            row, col = self.glines.current_position()
-            pos = col.posCreacion
             if pos > 1:
-                if row % 2 == 0:
-                    self.glines.goto(row + 1, pos - 2)
-                else:
-                    self.glines.goto(row - 1, pos - 1)
-                return
-        elif k == QtCore.Qt.Key_Right:
-            row, col = self.glines.current_position()
-            pos = col.posCreacion
-            if pos >= 1:
                 if row % 2 == 0:
                     self.glines.goto(row + 1, pos - 1)
                 else:
                     self.glines.goto(row - 1, pos)
                 return
+
+        elif k == QtCore.Qt.Key_Right:
+            if pos >= 1:
+                if row % 2 == 0:
+                    self.glines.goto(row + 1, pos)
+                else:
+                    self.glines.goto(row - 1, pos + 1)
+                return
+
         elif k in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):
             row, col = self.glines.current_position()
             if col.key == "LINE":
                 self.borrar()
             else:
                 self.borrar_move()
+
         elif k == QtCore.Qt.Key_Up:
-            row, col = self.glines.current_position()
             if row > 0:
-                self.glines.goto(row - 1, col.posCreacion - 1)
+                self.glines.goto(row - 1, pos)
 
         elif k == QtCore.Qt.Key_Down:
-            row, col = self.glines.current_position()
             if row < self.grid_num_datos(None) - 1:
-                self.glines.goto(row + 1, col.posCreacion - 1)
+                self.glines.goto(row + 1, pos)
 
     def grid_doble_click(self, grid, row, o_column):
         game = self.gameActual()
@@ -893,10 +921,18 @@ class WLines(QTVarios.WDialogo):
             else:
                 me = QTUtil2.mensEspera.start(self, _("Analyzing the move...."), physical_pos="ad")
 
-                move.analysis = xanalyzer.analizaJugadaPartida(game, len(game) - 1, xanalyzer.mstime_engine, xanalyzer.depth_engine)
+                move.analysis = xanalyzer.analizaJugadaPartida(
+                    game, len(game) - 1, xanalyzer.mstime_engine, xanalyzer.depth_engine
+                )
                 me.final()
             Analysis.show_analysis(
-                self.procesador, xanalyzer, move, self.pboard.board.is_white_bottom, 9999, len(game) - 1, main_window=self
+                self.procesador,
+                xanalyzer,
+                move,
+                self.pboard.board.is_white_bottom,
+                9999,
+                len(game) - 1,
+                main_window=self,
             )
 
             dic = self.dbop.getfenvalue(fenm2)
@@ -953,7 +989,7 @@ class WLines(QTVarios.WDialogo):
         resp = menu.lanza()
 
         if resp == "current":
-            self.dbop.saveHistory(_("Remove line %d") % (current + 1,))
+            self.dbop.save_history(_("Remove line %d") % (current + 1,))
             del self.dbop[current]
             self.goto_inilinea()
 
@@ -1004,7 +1040,9 @@ class WLines(QTVarios.WDialogo):
 
     def remove_lastmove(self, iswhite):
         um = QTUtil2.unMomento(self, _("Working..."))
-        self.dbop.remove_lastmove(iswhite, "%s %s" % (_("Remove last move if the line ends with"), _("White") if iswhite else _("Black")))
+        self.dbop.remove_lastmove(
+            iswhite, "%s %s" % (_("Remove last move if the line ends with"), _("White") if iswhite else _("Black"))
+        )
         um.final()
 
     def remove_worst(self):
@@ -1059,7 +1097,7 @@ class WLines(QTVarios.WDialogo):
                     li_moves = book.get_list_moves(fen)
                     if li_moves:
                         # (from_sq, to_sq, promotion, "%-5s -%7.02f%% -%7d" % (pgn, pc, w), 1.0 * w / maxim))
-                        li = [(m[0]+m[1]+m[2], m[4]) for m in li_moves if m[0]+m[1]+m[2] in st_a1h8]
+                        li = [(m[0] + m[1] + m[2], m[4]) for m in li_moves if m[0] + m[1] + m[2] in st_a1h8]
                         if li:
                             li.sort(key=lambda x: x[1], reverse=True)
                             st_ya = set(x[0] for x in li)
@@ -1072,7 +1110,7 @@ class WLines(QTVarios.WDialogo):
                     for a1h8 in dic_a1h8:
                         rm, pos = mrm.buscaRM(a1h8)
                         li.append((a1h8, pos))
-                    li.sort(key=lambda x:x[1])
+                    li.sort(key=lambda x: x[1])
 
                 for a1h8, pos in li[1:]:
                     for num_linea in dic_a1h8[a1h8]:

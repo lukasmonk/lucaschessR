@@ -16,6 +16,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import Base
+from Code.QT import LCDialog
 
 
 class HorsesHistorico:
@@ -105,10 +106,10 @@ class HorsesHistorico:
         self.dbf.leer()
 
 
-class WHorsesBase(QTVarios.WDialogo):
+class WHorsesBase(LCDialog.LCDialog):
     def __init__(self, procesador, test, titulo, tabla, icono):
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, "horsesBase")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, "horsesBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -192,10 +193,10 @@ class WHorsesBase(QTVarios.WDialogo):
         self.ghistorico.refresh()
 
 
-class WHorses(QTVarios.WDialogo):
+class WHorses(LCDialog.LCDialog):
     def __init__(self, owner, test, procesador, titulo, icono):
 
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, "horses")
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, "horses")
 
         self.historico = owner.historico
         self.procesador = owner.procesador
@@ -293,7 +294,7 @@ class WHorses(QTVarios.WDialogo):
             self,
             "<b>%s<b><ul><li>%s: <b>%d</b> (%s=%d) </li><li>%s: <b>%d</b></li><li>%s: <b>%d</b></li></ul>"
             % (
-                _("Congratulations goal achieved"),
+                _("Congratulations, goal achieved"),
                 _("Moves"),
                 self.moves,
                 _("Minimum"),

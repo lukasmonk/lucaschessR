@@ -22,6 +22,8 @@ def activarSegunON_OFF(dispatch):
     else:
         if Code.dgt:
             desactivar()
+    if Code.dgt:
+        Code.dgt.setupBoard = False
     return True
 
 
@@ -88,6 +90,31 @@ def registerScanFunc(dato):
     return 1
 
 
+def registerStartSetupFunc():
+    Code.dgt.setupBoard = True
+    return 1
+
+
+def registerStableBoardFunc(dato):
+    if Code.dgt.setupBoard:
+        envia("stableBoard", _dgt2fen(dato))
+    return 1
+
+
+def registerStopSetupWTMFunc(dato):
+    if Code.dgt.setupBoard:
+        envia("stopSetupWTM", _dgt2fen(dato))
+        Code.dgt.setupBoard = False
+    return 1
+
+
+def registerStopSetupBTMFunc(dato):
+    if Code.dgt.setupBoard:
+        envia("stopSetupBTM", _dgt2fen(dato))
+        Code.dgt.setupBoard = False
+    return 1
+
+
 def registerWhiteMoveInputFunc(dato):
     return envia("whiteMove", _dgt2pv(dato))
 
@@ -105,10 +132,8 @@ def registerBlackTakeBackFunc():
 
 
 def activar():
-    is_linux = Code.is_linux
-
     dgt = None
-    if is_linux:
+    if Code.is_linux:
         functype = ctypes.CFUNCTYPE
         path = os.path.join(Code.folder_OS, "DigitalBoards")
         if Code.configuration.x_digital_board == "DGT-gon":
@@ -180,6 +205,30 @@ def activar():
     dgt._DGTDLL_RegisterScanFunc.argtype = [st]
     dgt._DGTDLL_RegisterScanFunc.restype = ctypes.c_int
     dgt._DGTDLL_RegisterScanFunc(st)
+
+    cmpfunc = functype(ctypes.c_int)
+    st = cmpfunc(registerStartSetupFunc)
+    dgt._DGTDLL_RegisterStartSetupFunc.argtype = [st]
+    dgt._DGTDLL_RegisterStartSetupFunc.restype = ctypes.c_int
+    dgt._DGTDLL_RegisterStartSetupFunc(st)
+
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
+    st = cmpfunc(registerStableBoardFunc)
+    dgt._DGTDLL_RegisterStableBoardFunc.argtype = [st]
+    dgt._DGTDLL_RegisterStableBoardFunc.restype = ctypes.c_int
+    dgt._DGTDLL_RegisterStableBoardFunc(st)
+
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
+    st = cmpfunc(registerStopSetupWTMFunc)
+    dgt._DGTDLL_RegisterStopSetupWTMFunc.argtype = [st]
+    dgt._DGTDLL_RegisterStopSetupWTMFunc.restype = ctypes.c_int
+    dgt._DGTDLL_RegisterStopSetupWTMFunc(st)
+
+    cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
+    st = cmpfunc(registerStopSetupBTMFunc)
+    dgt._DGTDLL_RegisterStopSetupBTMFunc.argtype = [st]
+    dgt._DGTDLL_RegisterStopSetupBTMFunc.restype = ctypes.c_int
+    dgt._DGTDLL_RegisterStopSetupBTMFunc(st)
 
     cmpfunc = functype(ctypes.c_int, ctypes.c_char_p)
     st = cmpfunc(registerWhiteMoveInputFunc)
