@@ -64,10 +64,8 @@ class DirectEngine(object):
         self.stdout = self.process.stdout
         self.stdin = self.process.stdin
 
-        self.orden_uci()
-
         setoptions = False
-        if liOpcionesUCI:
+        if liOpcionesUCI is not None:
             for opcion, valor in liOpcionesUCI:
                 if type(valor) == bool:
                     valor = str(valor).lower()
@@ -75,6 +73,8 @@ class DirectEngine(object):
                 setoptions = True
                 if opcion.lower() == "ponder":
                     self.ponder = valor == "true"
+
+        self.orden_uci()
 
         if setoptions:
             self.pwait_list("isready", "readyok", 1000)
@@ -192,18 +192,35 @@ class DirectEngine(object):
         return mrm
 
     def close(self):
-        if self.pid:
-            if self.process.poll() is None:
-                self.put_line("quit")
-                wtime = 40  # wait for it, wait for it...
-                while self.process.poll() is None and wtime > 0:
-                    time.sleep(0.05)
-                    wtime -= 1
+        if self.pid is not None:
+            # yl - use wait with timeout to close engine process gracefully with quit instruction, the stdin.close is extra for engines which detect close
+            try:
+                if self.process.poll() is None:
+                    self.put_line("quit")
+                    self.stdin.close()
+                    for i in range(5):
+                        try:
+                            self.process.wait(timeout=0.5)
+                            break
+                        except subprocess.TimeoutExpired:
+                            continue
+            except:
+                sys.stderr.write("EngineRunDirect close in except: %s\n" % sys.exc_info()[0])
+            # yl - ###
+            try:
+                if self.process.poll() is None:
+                    self.put_line("quit")
+                    wtime = 40  # wait for it, wait for it...
+                    while self.process.poll() is None and wtime > 0:
+                        time.sleep(0.05)
+                        wtime -= 1
 
-                if self.process.poll() is None:  # nope, no luck
-                    sys.stderr.write("INFO X CLOSE525: the engine %s won't close properly.\n" % self.exe)
-                    self.process.kill()
-                    self.process.terminate()
+                    if self.process.poll() is None:  # nope, no luck
+                        sys.stderr.write("INFO X CLOSE525: the engine %s won't close properly.\n" % self.exe)
+                        self.process.kill()
+                        self.process.terminate()
+            except:
+                sys.stderr.write("EngineRunDirect close in except: %s\n" % sys.exc_info()[0])
 
             self.pid = None
         if self.log:

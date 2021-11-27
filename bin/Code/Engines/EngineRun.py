@@ -226,12 +226,26 @@ class RunEngine:
         self.starting = False
 
     def close(self):
-        self.working = False
         if self.log:
             self.log_close()
             self.log = None
 
         if self.pid is not None:
+            # yl - use wait with timeout to close engine process gracefully with quit instruction, the stdin.close is extra for engines which detect close
+            try:
+                if self.process.poll() is None:
+                    self.put_line("stop")
+                    self.put_line("quit")
+                    self.stdin.close()
+                    for i in range(5):
+                        try:
+                            self.process.wait(timeout=0.5)
+                            break
+                        except subprocess.TimeoutExpired:
+                            continue
+            except:
+                sys.stderr.write("EngineRun close in except: %s\n" % sys.exc_info()[0])
+            # yl - ###
             try:
                 if self.process.poll() is None:
                     self.put_line("stop")
@@ -246,6 +260,8 @@ class RunEngine:
                     os.kill(self.pid, signal.SIGTERM)
                 sys.stderr.write("INFO X CLOSE: except - the engine %s won't close properly.\n" % self.exe)
 
+            # yl - working False will prevent put_line_base from writing to engine
+            self.working = False
             self.pid = None
 
     def log_open(self, file):
