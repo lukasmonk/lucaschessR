@@ -289,7 +289,7 @@ class Histogram(QtWidgets.QGraphicsView):
         # Numeros de move, en dos lineas
         for x in range(njg - 1):
             num = firstmove + x
-            decimal = num / 10
+            decimal = num // 10
             if decimal:
                 painter.drawText(textRect.translated(x * step, 0), str(decimal))
         for x in range(njg - 1):

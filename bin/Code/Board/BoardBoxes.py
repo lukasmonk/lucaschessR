@@ -41,7 +41,8 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
     def physical_pos2xy(self):
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
         df, dc, hf, hc = self.board.a1h8_fc(bm.a1h8)
 
@@ -50,20 +51,21 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
         if dc > hc:
             dc, hc = hc, dc
 
-        physical_pos.x = ac * (dc - 1)
-        physical_pos.y = ac * (df - 1)
+        physical_pos.x = ac * (dc - 1) + tf / 2
+        physical_pos.y = ac * (df - 1) + tf / 2
         physical_pos.ancho = (hc - dc + 1) * ac
         physical_pos.alto = (hf - df + 1) * ac
 
     def xy2physical_pos(self):
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
         f = lambda xy: int(round(float(xy) / float(ac), 0))
 
-        dc = f(physical_pos.x) + 1
-        df = f(physical_pos.y) + 1
+        dc = f(physical_pos.x-tf/2) + 1
+        df = f(physical_pos.y-tf/2) + 1
         hc = f(physical_pos.x + physical_pos.ancho)
         hf = f(physical_pos.y + physical_pos.alto)
 
@@ -205,7 +207,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
     def pixmap(self):
         bm = self.bloqueDatos
 
-        xk = float(bm.width_square / 32.0)
+        xk = float(self.board.width_square / 32.0)
 
         p = bm.physical_pos
         g = int(bm.grosor * xk)
@@ -231,7 +233,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
 
         bm = self.bloqueDatos
 
-        xk = float(bm.width_square / 32.0)
+        xk = float(self.board.width_square / 32.0)
 
         physical_pos = bm.physical_pos
         dx = physical_pos.x
@@ -259,7 +261,7 @@ class MarcoSC(BoardBlocks.BloqueEspSC):
             color = QtGui.QColor(bm.colorinterior)
             if bm.colorinterior2 >= 0:
                 color2 = QtGui.QColor(bm.colorinterior2)
-                gradient = QtWidgets.QLinearGradient(0, 0, bm.physical_pos.ancho, bm.physical_pos.alto)
+                gradient = QtGui.QLinearGradient(0, 0, bm.physical_pos.ancho, bm.physical_pos.alto)
                 gradient.setColorAt(0.0, color)
                 gradient.setColorAt(1.0, color2)
                 painter.setBrush(QtGui.QBrush(gradient))

@@ -379,7 +379,7 @@ class Manager:
     def move_the_pieces(self, liMovs, timed_movement=False):
         if timed_movement and self.configuration.x_show_effects:
 
-            rapidez = self.configuration.x_pieces_speed * 1.0 / 100.0
+            rapidez = self.configuration.pieces_speed_porc()
             cpu = self.procesador.cpu
             cpu.reset()
             seconds = None
@@ -1908,13 +1908,12 @@ class Manager:
             tipo = "ms" if tipo == "mt" else "mt"
         return True
 
-    def start_message(self):
+    def start_message(self, nomodal=False):
         mensaje = _("Press the continue button to start.")
-        self.mensaje(mensaje)
-
-    def start_message_nomodal(self):
-        mensaje = _("Press the continue button to start.")
-        QTUtil2.menssage_nomodal(self.main_window, mensaje)
+        if nomodal:
+            QTUtil2.message_nomodal(self.main_window, mensaje)
+        else:
+            self.mensaje(mensaje)
 
     def player_has_moved_base(self, from_sq, to_sq, promotion=""):
         if self.board.variation_history is not None:

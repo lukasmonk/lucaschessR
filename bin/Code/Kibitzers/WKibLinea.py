@@ -197,7 +197,7 @@ class WKibLinea(QtWidgets.QDialog):
     def closeEvent(self, event):
         self.finalizar()
 
-    def if_to_analyze(self):
+    def whether_to_analyse(self):
         siW = self.game.last_position.is_white
         if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
             return False

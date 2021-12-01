@@ -124,6 +124,7 @@ class SelectBanda(QtWidgets.QWidget):
         self.li_tipos = (
             (_("Arrows"), Iconos.Flechas(), self.owner.flechas),
             (_("Boxes"), Iconos.Marcos(), self.owner.marcos),
+            (_("Circles"), Iconos.Circle(), self.owner.circles),
             (_("Images"), Iconos.SVGs(), self.owner.svgs),
             (_("Markers"), Iconos.Markers(), self.owner.markers),
         )
@@ -148,7 +149,7 @@ class SelectBanda(QtWidgets.QWidget):
                     if tp == txt:
                         ico = icot
                 dicmenu[tp] = menu.submenu(tp, ico)
-                # menu.separador()
+                menu.separador()
             dicmenu[tp].opcion(xid, nom, QtGui.QIcon(pm))
 
         menu.separador()
@@ -165,10 +166,10 @@ class SelectBanda(QtWidgets.QWidget):
 
         submenu = menu.submenu(_("Edit"), Iconos.Modificar())
         if lb and lb.id is not None:
-            submenuCurrent = submenu.submenu(_("Current"), QtGui.QIcon(lb.pixmap))
-            submenuCurrent.opcion(-1, _("Edit"), Iconos.Modificar())
-            submenuCurrent.separador()
-            submenuCurrent.opcion(-2, _("Remove"), Iconos.Delete())
+            submenu_current = submenu.submenu(_("Current"), QtGui.QIcon(lb.pixmap))
+            submenu_current.opcion(-1, _("Edit"), Iconos.Modificar())
+            submenu_current.separador()
+            submenu_current.opcion(-2, _("Remove"), Iconos.Delete())
             submenu.separador()
 
         for txt, ico, rut in self.li_tipos:
@@ -340,6 +341,7 @@ class DragBanda(QtWidgets.QWidget):
         liTipos = (
             (_("Arrows"), Iconos.Flechas(), self.owner.flechas),
             (_("Boxes"), Iconos.Marcos(), self.owner.marcos),
+            (_("Circles"), Iconos.Circle(), self.owner.circles),
             (_("Images"), Iconos.SVGs(), self.owner.svgs),
             (_("Markers"), Iconos.Markers(), self.owner.markers),
         )

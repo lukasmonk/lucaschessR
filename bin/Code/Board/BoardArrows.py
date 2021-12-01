@@ -35,25 +35,25 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
     def physical_pos2xy(self):
         bf = self.bloqueDatos
         physical_pos = bf.physical_pos
-        width_square = bf.width_square
-        tamFrontera = bf.tamFrontera
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
         df, dc, hf, hc = self.board.a1h8_fc(bf.a1h8)
 
         # siempre sale del centro
-        dx = physical_pos.x = dc * width_square - width_square / 2 + tamFrontera / 2
-        dy = physical_pos.y = df * width_square - width_square / 2 + tamFrontera / 2
+        dx = physical_pos.x = dc * ac - ac / 2 + tf / 2
+        dy = physical_pos.y = df * ac - ac / 2 + tf / 2
 
         if bf.destino == "c":
-            hx = hc * width_square - width_square / 2
-            hy = hf * width_square - width_square / 2
-        else: #if bf.destino == "m":  # minimo
+            hx = hc * ac - ac / 2
+            hy = hf * ac - ac / 2
+        else:  # if bf.destino == "m":  # minimo
             min_v = 99999999999
             min_hx = min_hy = 0
             for x in (3, 2, 1):  # 3/4 = izquierda 1/2 y 1/4 izquierda
                 for y in (3, 2, 1):  # 3/4 = arriba 1/2 y 1/4
-                    hx = hc * width_square - width_square * x / 4
-                    hy = hf * width_square - width_square * y / 4
+                    hx = hc * ac - ac * x / 4
+                    hy = hf * ac - ac * y / 4
                     v = (hx - dx) ** 2 + (hy - dy) ** 2
                     if v < min_v:
                         min_hx = hx
@@ -62,19 +62,19 @@ class FlechaSC(BoardBlocks.BloqueEspSC):
             hx = min_hx
             hy = min_hy
 
-        physical_pos.ancho = hx + tamFrontera / 2 if dc != hc else dx
-        physical_pos.alto = hy + tamFrontera / 2  if df != hf else dy
+        physical_pos.ancho = hx + tf / 2 if dc != hc else dx
+        physical_pos.alto = hy + tf / 2 if df != hf else dy
 
     def xy2physical_pos(self):
-
         bf = self.bloqueDatos
         physical_pos = bf.physical_pos
         ac = bf.width_square
+        tf = self.board.tamFrontera
 
         f = lambda xy: int(round((float(xy) + ac / 2.0) / float(ac), 0))
 
-        dc = f(physical_pos.x)
-        df = f(physical_pos.y)
+        dc = f(physical_pos.x - tf / 2)
+        df = f(physical_pos.y - tf / 2)
         hc = f(physical_pos.ancho)
         hf = f(physical_pos.alto)
 
@@ -333,7 +333,7 @@ def paintArrow(painter, bf):
             if bf.colorinterior2 >= 0:
                 color2 = QtGui.QColor(bf.colorinterior2)
                 x, y = p_ini.x(), p_ini.y()
-                gradient = QtWidgets.QLinearGradient(x, y, x, y - tamLinea - altoCab)
+                gradient = QtGui.QLinearGradient(x, y, x, y - tamLinea - altoCab)
                 gradient.setColorAt(0.0, color)
                 gradient.setColorAt(1.0, color2)
                 painter.setBrush(QtGui.QBrush(gradient))
@@ -357,7 +357,9 @@ def paintArrow(painter, bf):
                 painter.drawPolygon(QtGui.QPolygonF([p_ini, p_cab1, p_ala1, p_fin, p_ala2, p_cab2, p_ini]))
             # tipo 3 base cabeza = un punto
             elif forma == "3":
-                painter.drawPolygon(QtGui.QPolygonF([p_base1, p_basecab, p_ala1, p_fin, p_ala2, p_basecab, p_base2, p_base1]))
+                painter.drawPolygon(
+                    QtGui.QPolygonF([p_base1, p_basecab, p_ala1, p_fin, p_ala2, p_basecab, p_base2, p_base1])
+                )
 
     return poligonoSizeBottom, poligonoMove, poligonoSizeTop
 

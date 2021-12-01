@@ -664,7 +664,7 @@ class WTournamentRun(QtWidgets.QWidget):
     def move_the_pieces(self, liMovs):
         if self.slow_pieces:
 
-            rapidez = self.configuration.x_pieces_speed * 1.0 / 100.0
+            rapidez = self.configuration.pieces_speed_porc()
             cpu = self.cpu
             cpu.reset()
             seconds = None

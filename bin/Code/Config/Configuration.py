@@ -322,6 +322,11 @@ class Configuration:
             return 5
         return 4
 
+    def pieces_speed_porc(self):
+        sp = min(self.x_pieces_speed, 300)
+        return sp / 100.0
+
+
     def set_player(self, value):
         self.x_player = value
 

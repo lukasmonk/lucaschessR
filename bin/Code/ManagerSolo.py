@@ -3,6 +3,8 @@ import time
 
 import FasterCode
 
+from PySide2 import QtCore
+
 from Code import Manager
 from Code import Util
 from Code.Base import Game, Position
@@ -607,7 +609,7 @@ class ManagerSolo(Manager.Manager):
         self.opening_block = None
         self.reiniciar()
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey == ord("V"):
             self.paste(QTUtil.traePortapapeles())
         elif nkey == ord("T"):
@@ -615,8 +617,10 @@ class ManagerSolo(Manager.Manager):
             self.saveSelectedPosition("|".join(li))
         elif nkey == ord("S"):
             self.startPosition()
-        elif nkey == ord("B"):
-            self.basic_initial_position()
+        elif nkey == ord("B") and modifiers is not None:
+            is_control = (modifiers & QtCore.Qt.ControlModifier) > 0
+            if is_control:
+                self.basic_initial_position()
 
     def listHelpTeclado(self):
         return [

@@ -10,7 +10,7 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         self.rutinaPulsada = rutinaPulsada
         self.rutinaPulsadaCarga = None
 
-        self.distBordes = 0.20 * bloqueMarker.width_square
+        self.distBordes = 0.20 * self.board.width_square
 
         self.pixmap = QtSvg.QSvgRenderer(QtCore.QByteArray(bloqueMarker.xml.encode()))
 
@@ -45,10 +45,10 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         self.update()
 
     def physical_pos2xy(self):
-
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
         df, dc, hf, hc = self.board.a1h8_fc(bm.a1h8)
 
@@ -57,21 +57,21 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
         if dc > hc:
             dc, hc = hc, dc
 
-        physical_pos.x = ac * (dc - 1)
-        physical_pos.y = ac * (df - 1)
+        physical_pos.x = ac * (dc - 1) + tf / 2
+        physical_pos.y = ac * (df - 1) + tf / 2
         physical_pos.ancho = (hc - dc + 1) * ac
         physical_pos.alto = (hf - df + 1) * ac
 
     def xy2physical_pos(self):
-
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
         f = lambda xy: int(round(float(xy) / float(ac), 0))
 
-        dc = f(physical_pos.x) + 1
-        df = f(physical_pos.y) + 1
+        dc = f(physical_pos.x - tf/2) + 1
+        df = f(physical_pos.y - tf/2) + 1
         hc = f(physical_pos.x + physical_pos.ancho)
         hf = f(physical_pos.y + physical_pos.alto)
 
@@ -209,13 +209,13 @@ class MarkerSC(BoardBlocks.BloqueEspSC):
     def paint(self, painter, option, widget):
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
         poscelda = bm.poscelda
         psize = bm.psize
 
         def haz(a1h8):
 
-            alto = ancho = bm.width_square * 0.3
+            alto = ancho = self.board.width_square * 0.3
             df, dc, hf, hc = self.board.a1h8_fc(a1h8)
 
             if df > hf:

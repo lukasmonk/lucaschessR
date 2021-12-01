@@ -334,6 +334,36 @@ class Marco(Bloque):
         Bloque.__init__(self, li_vars, dic=dic)
 
 
+class Circle(Bloque):
+    physical_pos: Physicalphysical_pos
+    a1h8: str
+    color: int
+    colorinterior: int
+    colorinterior2: int
+    grosor: int
+    redEsquina: int
+    tipo: int
+    opacity: int
+    width_square: int
+    png: str
+
+    def __init__(self, dic=None):
+        li_vars = [
+            ("physical_pos", "o", Physicalphysical_pos(0, 0, 80, 80, 0)),
+            ("a1h8", "c", "a1h8"),
+            ("color", "n", 0),
+            ("colorinterior", "n", -1),
+            ("colorinterior2", "n", -1),  # para el gradiente
+            ("grosor", "n", 1),
+            ("redEsquina", "n", 0),
+            ("tipo", "n", 1),  # 1=SolidLine, 2=DashLine, 3=DotLine, 4=DashDotLine, 5=DashDotDotLine, 0=Sin borde
+            ("opacity", "n", 1.0),
+            ("width_square", "n", 1),
+            ("png", "c", ""),  # png para usar como boton
+        ]
+        Bloque.__init__(self, li_vars, dic=dic)
+
+
 class SVG(Bloque):
     physical_pos: Physicalphysical_pos
     fa1h8: str

@@ -47,6 +47,8 @@ class CoordinatesBlocks:
         self.date_ini = datetime.datetime.now()
         self.date_end = None
         self.min_score = 0
+        self.min_score_white = 0
+        self.min_score_black = 0
         self.tries = 0
         self.current_block = 0
         self.current_try_in_block = 0
@@ -71,13 +73,19 @@ class CoordinatesBlocks:
     def new_try(self):
         side, xfrom, xto = self.li_blocks[self.current_block]
         self.gen_try = GenTry(xfrom, xto)
+        self.min_score = self.min_score_white if side == WHITE else self.min_score_black
         return side == WHITE
 
     def new_done(self, num_success):
+        side = self.li_blocks[self.current_block][0]
         if num_success > self.current_max_in_block:
             self.current_max_in_block = num_success
             if num_success > self.min_score:
                 self.min_score = num_success
+                if side == WHITE:
+                    self.min_score_white = num_success
+                else:
+                    self.min_score_black = num_success
         self.tries += 1
         self.current_try_in_block += 1
         if self.current_try_in_block >= self.base_tries:
@@ -95,12 +103,21 @@ class CoordinatesBlocks:
     def is_ended(self):
         return self.current_block >= self.num_blocks()
 
+    def min_score_side(self):
+        side = self.li_blocks[self.current_block][0]
+        return self.min_score_white if side == WHITE else self.min_score_black
+
+    def current_side(self):
+        return self.li_blocks[self.current_block][0]
+
     def save(self):
         dic = {
             "date_ini": self.date_ini,
             "date_end": self.date_end,
             "tries": self.tries,
             "min_score": self.min_score,
+            "min_score_white": self.min_score_white,
+            "min_score_black": self.min_score_black,
             "current_block": self.current_block,
             "current_try_in_block": self.current_try_in_block,
             "current_max_in_block": self.current_max_in_block,
@@ -111,10 +128,15 @@ class CoordinatesBlocks:
         self.date_ini = dic["date_ini"]
         self.date_end = dic["date_end"]
         self.min_score = dic["min_score"]
+        self.min_score_white = dic.get("min_score_white", self.min_score)
+        self.min_score_black = dic.get("min_score_black", self.min_score)
         self.current_block = dic["current_block"]
         self.current_try_in_block = dic["current_try_in_block"]
         self.current_max_in_block = dic["current_max_in_block"]
         self.tries = dic["tries"]
+        if self.current_block >= 0:
+            side = self.li_blocks[self.current_block][0]
+            self.min_score = self.min_score_white if side == WHITE else self.min_score_black
 
 
 class DBCoordinatesBlocks:

@@ -100,10 +100,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.hints:
                 self.xtutor.check_engine()
             self.xrival.check_engine()
-            if Code.dgt and Code.is_linux:
-                self.start_message_nomodal()   #problema con eboard
-            else:
-                self.start_message()
+            self.start_message(
+                nomodal=Code.dgt and Code.is_linux
+            )   #nomodal: problema con eboard
 
         self.play_next_move()
 
@@ -1062,6 +1061,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     self.opening_mandatory = None
                 else:
                     self.board.ponFlechasTmp(((apdesde, aphasta, False),))
+                    self.beepError()
                     self.sigueHumano()
                     return False
 

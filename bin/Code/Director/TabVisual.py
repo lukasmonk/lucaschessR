@@ -22,6 +22,13 @@ class PMarco(BoardTypes.Marco):
         self.id = None
 
 
+class PCircle(BoardTypes.Circle):
+    def __init__(self):
+        BoardTypes.Circle.__init__(self)
+        self.name = ""
+        self.id = None
+
+
 class PSVG(BoardTypes.SVG):
     def __init__(self):
         BoardTypes.SVG.__init__(self)
@@ -36,7 +43,7 @@ class PMarker(BoardTypes.Marker):
         self.id = None
 
 
-TP_FLECHA, TP_MARCO, TP_TEXTO, TP_SVG, TP_MARKER, TP_PIEZACREA, TP_PIEZAMUEVE, TP_PIEZABORRA, TP_ACTION, TP_CONFIGURATION = (
+TP_FLECHA, TP_MARCO, TP_TEXTO, TP_SVG, TP_MARKER, TP_PIEZACREA, TP_PIEZAMUEVE, TP_PIEZABORRA, TP_ACTION, TP_CONFIGURATION, TP_CIRCLE = (
     "F",
     "M",
     "T",
@@ -47,6 +54,7 @@ TP_FLECHA, TP_MARCO, TP_TEXTO, TP_SVG, TP_MARKER, TP_PIEZACREA, TP_PIEZAMUEVE, T
     "PB",
     "A",
     "C",
+    "D",
 )
 
 
@@ -226,6 +234,27 @@ class GT_Marco(GT_Item):
             self._itemSC.show()
 
         sc = self.guion.board.creaMarco(self._bloqueDatos)
+        sc.ponRutinaPulsada(None, self.id())
+        self.itemSC(sc)
+        self.marcado(True)
+
+
+class GT_Circle(GT_Item):
+    def __init__(self, guion):
+        GT_Item.__init__(self, guion, TP_CIRCLE)
+
+    def txt_tipo(self):
+        return _("Circle")
+
+    def info(self):
+        bd = self._itemSC.bloqueDatos
+        return bd.a1h8
+
+    def run(self):
+        if self._itemSC:
+            self._itemSC.show()
+
+        sc = self.guion.board.creaCircle(self._bloqueDatos)
         sc.ponRutinaPulsada(None, self.id())
         self.itemSC(sc)
         self.marcado(True)
@@ -655,6 +684,7 @@ class Guion:
         dic = {
             TP_FLECHA: GT_Flecha,
             TP_MARCO: GT_Marco,
+            TP_CIRCLE: GT_Circle,
             TP_SVG: GT_SVG,
             TP_MARKER: GT_Marker,
             TP_TEXTO: GT_Texto,
@@ -681,6 +711,9 @@ class Guion:
 
                     elif tp == TP_MARCO:
                         tarea = GT_Marco(self)
+
+                    elif tp == TP_CIRCLE:
+                        tarea = GT_Circle(self)
 
                     elif tp == TP_SVG:
                         tarea = GT_SVG(self)
@@ -728,7 +761,7 @@ class Guion:
 
 class DBManagerVisual:
     def __init__(self, file, show_allways=False, saveAllways=False):
-        self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = None
+        self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = self._dbCircles = None
         self._show_allways = show_allways
         self._saveAllways = saveAllways
         self.set_file(file)
@@ -818,6 +851,12 @@ class DBManagerVisual:
         return self._dbMarcos
 
     @property
+    def dbCircles(self):
+        if self._dbCircles is None:
+            self._dbCircles = UtilSQL.DictSQL(self._fichero, tabla="Circles")
+        return self._dbCircles
+
+    @property
     def dbSVGs(self):
         if self._dbSVGs is None:
             self._dbSVGs = UtilSQL.DictSQL(self._fichero, tabla="SVGs")
@@ -830,10 +869,10 @@ class DBManagerVisual:
         return self._dbMarkers
 
     def close(self):
-        for db in (self._dbFEN, self._dbConfig, self._dbFlechas, self._dbMarcos, self._dbSVGs, self._dbMarkers):
+        for db in (self._dbFEN, self._dbConfig, self._dbFlechas, self._dbMarcos, self._dbCircles, self._dbSVGs, self._dbMarkers):
             if db is not None:
                 db.close()
-        self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbSVGs = self._dbMarkers = None
+        self._dbFEN = self._dbConfig = self._dbFlechas = self._dbMarcos = self._dbCircles = self._dbSVGs = self._dbMarkers = None
 
 
 # def readGraphLive(configuration):

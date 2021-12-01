@@ -374,7 +374,7 @@ class ManagerGame(Manager.Manager):
         self.changed = True
         self.put_toolbar()
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey == ord("V"):  # V
             self.paste_pgn()
 

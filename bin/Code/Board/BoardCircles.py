@@ -1,36 +1,31 @@
-from PySide2 import QtCore, QtGui, QtWidgets, QtSvg
+from PySide2 import QtCore, QtGui, QtWidgets
 
 from Code.Board import BoardBlocks
 
 
-class SVGSC(BoardBlocks.BloqueEspSC):
-    def __init__(self, escena, bloqueImgSVG, rutinaPulsada=None, siEditando=False):
+class CircleSC(BoardBlocks.BloqueEspSC):
+    def __init__(self, escena, bloque_circle, rutinaPulsada=None):
 
-        super(SVGSC, self).__init__(escena, bloqueImgSVG)
+        super(CircleSC, self).__init__(escena, bloque_circle)
 
         self.rutinaPulsada = rutinaPulsada
         self.rutinaPulsadaCarga = None
 
-        self.distBordes = 0.30 * bloqueImgSVG.width_square
-
-        self.pixmap = QtSvg.QSvgRenderer(QtCore.QByteArray(bloqueImgSVG.xml.encode("utf-8")))
+        self.distBordes = 0.20 * self.board.width_square
 
         self.physical_pos2xy()
 
         self.siMove = False
         self.tpSize = None
 
-        self.siRecuadro = False
-        if siEditando:
-            self.setAcceptHoverEvents(True)
-
-    def hoverEnterEvent(self, event):
-        self.siRecuadro = True
-        self.update()
-
-    def hoverLeaveEvent(self, event):
-        self.siRecuadro = False
-        self.update()
+        # bm = self.bloqueDatos
+        # physical_pos = bm.physical_pos
+        # dx = physical_pos.x
+        # dy = physical_pos.y
+        # ancho = physical_pos.ancho
+        # alto = physical_pos.alto
+        # rect = QtCore.QRectF( dx, dy, ancho, alto )
+        # self.dicEsquinas = { "tl":rect.topLeft(), "tr":rect.topRight(), "bl":rect.bottomLeft(), "br":rect.bottomRight() }
 
     def ponRutinaPulsada(self, rutina, carga):
         self.rutinaPulsada = rutina
@@ -39,14 +34,9 @@ class SVGSC(BoardBlocks.BloqueEspSC):
     def reset(self):
         self.physical_pos2xy()
         bm = self.bloqueDatos
-        self.pixmap = QtSvg.QSvgRenderer(QtCore.QByteArray(bm.xml.encode()))
         self.setOpacity(bm.opacity)
         self.setZValue(bm.physical_pos.orden)
         self.update()
-
-    def ponA1H8(self, a1h8):
-        self.bloqueDatos.a1h8 = a1h8
-        self.physical_pos2xy()
 
     def physical_pos2xy(self):
         bm = self.bloqueDatos
@@ -66,17 +56,28 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         physical_pos.ancho = (hc - dc + 1) * ac
         physical_pos.alto = (hf - df + 1) * ac
 
-    def coordinaPosicionOtro(self, otroSVG):
-        bs = self.bloqueDatos
-        bso = otroSVG.bloqueDatos
+    def xy2physical_pos(self):
+        bm = self.bloqueDatos
+        physical_pos = bm.physical_pos
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
-        xk = float(bs.width_square * 1.0 / bso.width_square)
-        physical_pos = bs.physical_pos
-        posiciono = bso.physical_pos
-        physical_pos.x = int(posiciono.x * xk)
-        physical_pos.y = int(posiciono.y * xk)
-        physical_pos.ancho = int(posiciono.ancho * xk)
-        physical_pos.alto = int(posiciono.alto * xk)
+        f = lambda xy: int(round(float(xy) / float(ac), 0))
+
+        dc = f(physical_pos.x-tf/2) + 1
+        df = f(physical_pos.y-tf/2) + 1
+        hc = f(physical_pos.x + physical_pos.ancho)
+        hf = f(physical_pos.y + physical_pos.alto)
+
+        bien = lambda fc: (fc < 9) and (fc > 0)
+        if bien(dc) and bien(df) and bien(hc) and bien(hf):
+            bm.a1h8 = self.board.fc_a1h8(df, dc, hf, hc)
+
+        self.physical_pos2xy()
+
+    def ponA1H8(self, a1h8):
+        self.bloqueDatos.a1h8 = a1h8
+        self.physical_pos2xy()
 
     def contain(self, p):
         p = self.mapFromScene(p)
@@ -104,15 +105,18 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         return self.siMove
 
     def name(self):
-        return _("Image")
+        return _("Box")
 
     def mousePressEvent(self, event):
         QtWidgets.QGraphicsItem.mousePressEvent(self, event)
+        self.mousePressExt(event)
+
         p = event.scenePos()
         self.expX = p.x()
         self.expY = p.y()
 
     def mousePressExt(self, event):
+        """Needed in Scripts"""
         p = event.pos()
         p = self.mapFromScene(p)
         self.expX = p.x()
@@ -125,6 +129,7 @@ class SVGSC(BoardBlocks.BloqueEspSC):
 
         p = event.pos()
         p = self.mapFromScene(p)
+
         x = p.x()
         y = p.y()
 
@@ -159,10 +164,28 @@ class SVGSC(BoardBlocks.BloqueEspSC):
 
         self.escena.update()
 
+    def mouseMoveExt(self, event):
+        p = event.pos()
+        p = self.mapFromScene(p)
+        x = p.x()
+        y = p.y()
+
+        dx = x - self.expX
+        dy = y - self.expY
+
+        self.expX = x
+        self.expY = y
+
+        physical_pos = self.bloqueDatos.physical_pos
+        physical_pos.ancho += dx
+        physical_pos.alto += dy
+        self.escena.update()
+
     def mouseReleaseEvent(self, event):
         QtWidgets.QGraphicsItem.mouseReleaseEvent(self, event)
         if self.siActivo:
             if self.siMove or self.tpSize:
+                self.xy2physical_pos()
                 self.escena.update()
                 self.siMove = False
                 self.tpSize = None
@@ -175,27 +198,22 @@ class SVGSC(BoardBlocks.BloqueEspSC):
                 self.rutinaPulsada()
 
     def mouseReleaseExt(self):
-        if self.siActivo:
-            if self.siMove or self.tpSize:
-                self.escena.update()
-                self.siMove = False
-                self.tpSize = None
-            self.activa(False)
+        self.xy2physical_pos()
+        self.escena.update()
+        self.siMove = False
+        self.tpSize = None
+        self.activa(False)
 
-    def pixmapX(self):
+    def pixmap(self):
         bm = self.bloqueDatos
 
         p = bm.physical_pos
 
-        p.x = 0
-        p.y = 0
-        p.ancho = 32
-        ant_psize = bm.psize
-        bm.psize = 100
+        # bm.grosor *= 2
+        p.x = bm.grosor*2
+        p.y = bm.grosor*2
 
-        p.alto = p.ancho
-
-        pm = QtGui.QPixmap(p.ancho + 1, p.ancho + 1)
+        pm = QtGui.QPixmap(p.ancho+bm.grosor*3, p.alto+bm.grosor*3)
         pm.fill(QtCore.Qt.transparent)
 
         painter = QtGui.QPainter()
@@ -204,14 +222,13 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         painter.end()
 
         self.ponA1H8(bm.a1h8)
-        bm.psize = ant_psize
-
-        return pm
+        return pm.scaled(32, 32, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
 
     def paint(self, painter, option, widget):
 
-        self.physical_pos2xy()
         bm = self.bloqueDatos
+
+        xk = float(self.board.width_square / 32.0)
 
         physical_pos = bm.physical_pos
         dx = physical_pos.x
@@ -219,54 +236,35 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         ancho = physical_pos.ancho
         alto = physical_pos.alto
 
-        psize = bm.psize
-        if psize != 100:
-            anchon = ancho * psize / 100
-            dx += (ancho - anchon) / 2
-            ancho = anchon
-            alton = alto * psize / 100
-            dy += (alto - alton) / 2
-            alto = alton
+        self.rect = QtCore.QRectF(dx, dy, ancho, alto)
 
-        self.rect = rect = QtCore.QRectF(dx, dy, ancho, alto)
+        color = QtGui.QColor(bm.color)
+        pen = QtGui.QPen()
+        pen.setWidth(int(bm.grosor * xk))
+        pen.setColor(color)
+        pen.setStyle(bm.tipoqt())
+        pen.setCapStyle(QtCore.Qt.RoundCap)
+        pen.setJoinStyle(QtCore.Qt.RoundJoin)
+        painter.setPen(pen)
 
-        self.pixmap.render(painter, rect)
+        pen = QtGui.QPen()
+        pen.setColor(QtGui.QColor(bm.color))
+        pen.setWidth(int(bm.grosor * xk))
+        pen.setStyle(bm.tipoqt())
+        painter.setPen(pen)
+        if bm.colorinterior >= 0:
+            color = QtGui.QColor(bm.colorinterior)
+            if bm.colorinterior2 >= 0:
+                color2 = QtGui.QColor(bm.colorinterior2)
+                gradient = QtGui.QLinearGradient(0, 0, bm.physical_pos.ancho, bm.physical_pos.alto)
+                gradient.setColorAt(0.0, color)
+                gradient.setColorAt(1.0, color2)
+                painter.setBrush(QtGui.QBrush(gradient))
+            else:
+                painter.setBrush(color)
 
-        if self.siRecuadro:
-            pen = QtGui.QPen()
-            pen.setColor(QtGui.QColor("blue"))
-            pen.setWidth(2)
-            pen.setStyle(QtCore.Qt.DashLine)
-            painter.setPen(pen)
-            painter.drawRect(rect)
+        painter.drawEllipse(self.rect)
 
-
-class SVGCandidate(SVGSC):
-    def physical_pos2xy(self):
-
-        bm = self.bloqueDatos
-        physical_pos = bm.physical_pos
-        ac = self.board.width_square
-
-        df, dc, hf, hc = self.board.a1h8_fc(bm.a1h8)
-
-        if df > hf:
-            df, hf = hf, df
-        if dc > hc:
-            dc, hc = hc, dc
-
-        ancho = self.board.width_square * 0.3
-        physical_pos.x = ac * (dc - 1)
-        physical_pos.y = ac * (df - 1)
-
-        posCuadro = bm.posCuadro
-        if posCuadro == 1:
-            physical_pos.x += ac - ancho
-        elif posCuadro == 2:
-            physical_pos.y += ac - ancho
-        elif posCuadro == 3:
-            physical_pos.y += ac - ancho
-            physical_pos.x += ac - ancho
-
-        physical_pos.ancho = ancho
-        physical_pos.alto = ancho
+    def boundingRect(self):
+        x = self.bloqueDatos.grosor
+        return QtCore.QRectF(self.rect).adjusted(-x, -x, x * 2, x * 2)

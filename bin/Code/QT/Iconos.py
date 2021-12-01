@@ -3844,3 +3844,11 @@ def Wiki():
     return QtGui.QIcon(pmWiki())
 
 
+def pmCircle():
+    return PM(973288,974748)
+
+
+def Circle():
+    return QtGui.QIcon(pmCircle())
+
+

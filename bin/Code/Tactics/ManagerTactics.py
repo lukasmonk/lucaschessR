@@ -141,7 +141,7 @@ class ManagerTactics(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey in (Qt.Key_Plus, Qt.Key_PageDown):
             if self.state == ST_ENDGAME:
                 self.ent_siguiente()

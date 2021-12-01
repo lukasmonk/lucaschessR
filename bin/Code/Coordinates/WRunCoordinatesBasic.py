@@ -104,10 +104,15 @@ class WRunCoordinatesBasic(LCDialog.LCDialog):
             QTUtil.refresh_gui()
 
     def pulsada_celda(self, celda):
-        if celda == self.square_object and self.working:
-            self.current_score += 1
-            self.lb_score.set_text("%d" % self.current_score)
-            self.go_next()
+        if self.working:
+            if celda == self.square_object:
+                self.current_score += 1
+                self.lb_score.set_text("%d" % self.current_score)
+                self.go_next()
+            else:
+                QTUtil2.message_error(self, "%s - %s ≠ %s" % (_("Error"), celda, self.square_object))
+                self.end_work()
+
 
     def closeEvent(self, event):
         self.working = False

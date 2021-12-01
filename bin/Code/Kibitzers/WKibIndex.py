@@ -215,7 +215,7 @@ class WKibIndex(QtWidgets.QDialog):
     def closeEvent(self, event):
         self.finalizar()
 
-    def if_to_analyze(self):
+    def whether_to_analyse(self):
         if not self.siPlay:
             return False
         siw = self.game.last_position.is_white

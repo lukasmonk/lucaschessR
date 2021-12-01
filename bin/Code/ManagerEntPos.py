@@ -227,7 +227,7 @@ class ManagerEntPos(Manager.Manager):
             pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump
         )
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey in (Qt.Key_Plus, Qt.Key_PageDown):
             self.ent_siguiente(TB_NEXT)
         elif nkey in (Qt.Key_Minus, Qt.Key_PageUp):

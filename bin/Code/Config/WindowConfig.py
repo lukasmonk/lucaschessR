@@ -102,7 +102,7 @@ def options(parent, configuration):
     form.separador()
     form.checkbox(_("Visual effects"), configuration.x_show_effects)
 
-    drap = {1: 100, 2: 150, 3: 200, 4: 250, 5: 300, 6: 350, 7: 400, 8: 450, 9: 500}
+    drap = {1: 100, 2: 125, 3: 150, 4: 175, 5: 200, 6: 225, 7: 250, 8: 275, 9: 300}
     drap_v = {}
     for x in drap:
         drap_v[drap[x]] = x

@@ -646,7 +646,6 @@ class ManagerOpeningLinesSequential(Manager.Manager):
 
     def ayuda(self):
         self.siAyuda = True
-        self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_CONFIG, TB_UTILITIES))
         self.board.dbvisual_set_show_allways(True)
 
         self.muestraAyuda()
@@ -778,7 +777,7 @@ class ManagerOpeningLinesSequential(Manager.Manager):
     def reiniciar(self):
         if len(self.game) > 0 and self.state != ST_ENDGAME:
             self.game_finished(False)
-        self.reinicio(self.dbop, self.modo, self.num_linea)
+        self.reinicio(self.dbop)
 
     def play_next_move(self):
         self.muestraInformacion()
@@ -817,8 +816,8 @@ class ManagerOpeningLinesSequential(Manager.Manager):
         else:
             self.activate_side(is_white)
             self.human_is_playing = True
-            if self.siAyuda:
-                self.muestraAyuda()
+            # if self.siAyuda:
+            #     self.muestraAyuda()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)
@@ -956,7 +955,6 @@ class ManagerOpeningLinesStatic(Manager.Manager):
 
     def ayuda(self):
         self.siAyuda = True
-        self.main_window.pon_toolbar((TB_CLOSE, TB_REINIT, TB_CONFIG, TB_UTILITIES))
         self.board.dbvisual_set_show_allways(True)
 
         self.muestraAyuda()
@@ -1018,20 +1016,7 @@ class ManagerOpeningLinesStatic(Manager.Manager):
         if is_complete:
             if sinError:
                 self.game_info["NOERROR"] += 1
-                # noError = self.game_info["NOERROR"]
                 if self.modo == "sequential":
-                    # salto = 2 ** (noError + 1)
-                    # numGames = len(self.liGames)
-                    # for x in range(salto, numGames):
-                    #     game_info = self.liGames[x]
-                    #     if game_info["NOERROR"] != noError:
-                    #         salto = x
-                    #         break
-                    #
-                    # liNuevo = self.liGames[1:salto]
-                    # liNuevo.append(self.game_info)
-                    # if numGames > salto:
-                    #     liNuevo.extend(self.liGames[salto:])
                     liNuevo = self.liGames[1:]
                     liNuevo.append(self.game_info)
                     self.training["LIGAMES_SEQUENTIAL"] = liNuevo

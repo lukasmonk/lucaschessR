@@ -11,9 +11,12 @@ def str_file(file):
 
 
 def gen_list(txt):  # tolerance and tries in 12
-    xmin, xmax = txt.split(",")
-    xmin = int(xmin)
-    xmax = int(xmax)
+    if "," in txt:
+        xmin, xmax = txt.split(",")
+    else:
+        xmin, xmax = txt.split("-")
+    xmin = int(xmin.strip())
+    xmax = int(xmax.strip())
     dif = (xmax - xmin) / 11.0
     li = [xmax, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, xmin]
     for x in range(1, 11):

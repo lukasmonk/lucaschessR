@@ -19,7 +19,7 @@ from Code.Base.Constantes import (
     BLINDFOLD_WHITE,
     BLINDFOLD_ALL,
 )
-from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows
+from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows, BoardCircles
 from Code.Director import TabVisual, WindowDirector
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -947,6 +947,9 @@ class Board(QtWidgets.QGraphicsView):
             elif TabVisual.TP_MARCO == elem.TP:
                 self.current_graphlive = self.creaMarco(elem)
                 self.current_graphlive.mousePressExt(event)
+            elif TabVisual.TP_CIRCLE == elem.TP:
+                self.current_graphlive = self.creaCircle(elem)
+                self.current_graphlive.mousePressExt(event)
             elif TabVisual.TP_MARKER == elem.TP:
                 self.current_graphlive = self.creaMarker(elem)
                 self.current_graphlive.mousePressExt(event)
@@ -988,6 +991,10 @@ class Board(QtWidgets.QGraphicsView):
                     xdb = db.dbMarcos
                     tp = TabVisual.TP_MARCO
                     obj = BoardTypes.Marco()
+                elif xid.startswith("_D"):
+                    xdb = db.dbCircles
+                    tp = TabVisual.TP_CIRCLE
+                    obj = BoardTypes.Circle()
                 elif xid.startswith("_S"):
                     xdb = db.dbSVGs
                     tp = TabVisual.TP_SVG
@@ -1036,6 +1043,9 @@ class Board(QtWidgets.QGraphicsView):
                     self.current_graphlive.TP = tp
                 elif tp == TabVisual.TP_MARCO:
                     self.current_graphlive = self.creaMarco(elem)
+                    self.current_graphlive.TP = tp
+                elif tp == TabVisual.TP_CIRCLE:
+                    self.current_graphlive = self.creaCircle(elem)
                     self.current_graphlive.TP = tp
                 elif tp == TabVisual.TP_MARKER:
                     self.current_graphlive = self.creaMarker(elem)
@@ -2052,6 +2062,12 @@ class Board(QtWidgets.QGraphicsView):
 
         return BoardBoxes.MarcoSC(self.escena, bloqueMarcoN)
 
+    def creaCircle(self, bloque_circle):
+        bloque_circle = copy.deepcopy(bloque_circle)
+        bloque_circle.width_square = self.width_square
+
+        return BoardCircles.CircleSC(self.escena, bloque_circle)
+
     def creaSVG(self, bloqueSVG, siEditando=False):
         bloqueSVGN = copy.deepcopy(bloqueSVG)
         bloqueSVGN.width_square = self.width_square
@@ -2102,11 +2118,13 @@ class Board(QtWidgets.QGraphicsView):
             for k, v in self.dicMovibles.items():
                 xobj = str(v)
                 if "Marco" in xobj:
-                    tp = "M"
+                    tp = TabVisual.TP_MARCO
                 elif "Flecha" in xobj:
-                    tp = "F"
+                    tp = TabVisual.TP_FLECHA
                 elif "SVG" in xobj:
-                    tp = "S"
+                    tp = TabVisual.TP_SVG
+                elif "Circle" in xobj:
+                    tp = TabVisual.TP_CIRCLE
                 else:
                     continue
                 li.append((tp, v.bloqueDatos))
@@ -2120,13 +2138,15 @@ class Board(QtWidgets.QGraphicsView):
         if xData:
             liDatos = Util.txt2var(str(xData))
             for tp, bloqueDatos in liDatos:
-                if tp == "M":
+                if tp == TabVisual.TP_MARCO:
                     self.creaMarco(bloqueDatos)
-                elif tp == "F":
+                elif tp == TabVisual.TP_CIRCLE:
+                    self.creaCircle(bloqueDatos)
+                elif tp == TabVisual.TP_FLECHA:
                     self.creaFlecha(bloqueDatos)
-                elif tp == "S":
+                elif tp == TabVisual.TP_SVG:
                     self.creaSVG(bloqueDatos)
-                elif tp == "X":
+                elif tp == TabVisual.TP_MARKER:
                     self.creaMarker(bloqueDatos)
 
     def borraMovible(self, itemSC):
