@@ -1,6 +1,6 @@
 import os
 
-import FasterCode
+import CpuUtil
 
 from Code.Engines import Engines
 
@@ -19,7 +19,7 @@ def read_engines(folder_engines):
         dic_engines[clave] = engine
         return engine
 
-    bmi2 = "-bmi2" if FasterCode.bmi2() else ""
+    bmi2 = "-bmi2" if CpuUtil.bmi2() else ""
 
     for level in range(1100, 2000, 100):
         cm = mas("maia-%d" % level, "Reid McIlroy-Young,Ashton Anderson,Siddhartha Sen,Jon Kleinberg,Russell Wang + LcZero team", "%d" % level, "https://maiachess.com/", "Lc0-0.27.0", level)

@@ -6,13 +6,13 @@ import yaml
 
 # assume it is darwin, just need to figure out if x86 or ARM
 isARM = False
-useFC = False
+useCpuUtil = False
 machineStr = platform.machine()
 
 if machineStr == 'x86_64':
 # detect for x86
-    import FasterCode
-    useFC = True
+    import CpuUtil
+    useCpuUtil = True
 elif machineStr == 'arm64':
 # detect for ARM
     isARM = True
@@ -51,8 +51,8 @@ def read_engines(folder_engines):
         return engine
 
     bmi2 = ""
-    if useFC:
-        bmi2 = "-bmi2" if FasterCode.bmi2() else ""
+    if useCpuUtil:
+        bmi2 = "-bmi2" if CpuUtil.bmi2() else ""
 
 # return cached engines to avoid rereading config files
     if len(engines) > 0:
@@ -77,9 +77,12 @@ def read_engines(folder_engines):
                       if bins is not None:
                           if isARM:
                               l_bin = bins.get('arm64', '')
+                              # skip out early when no bin for arm64
+                              if len(l_bin) < 1:
+                                  continue
                           else:
                               l_bin = bins.get('x86_64', '')
-                              if useFC:
+                              if useCpuUtil:
                                   t_bin = bins.get('x86_64-bmi2', '')
                                   if len(t_bin) > 0:
                                       l_bin = t_bin

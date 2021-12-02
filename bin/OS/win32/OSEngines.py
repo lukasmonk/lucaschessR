@@ -1,7 +1,7 @@
 import os
 import platform
 
-import FasterCode
+import CpuUtil
 
 from Code.Engines import Engines
 
@@ -187,7 +187,7 @@ def read_engines(folder_engines):
     is64 = platform.machine().endswith("64")
     t32_64 = "64" if is64 else "32"
     if is64:
-        if FasterCode.bmi2() == 1:
+        if CpuUtil.bmi2() == 1:
             t32_64 = "64-bmi2"
 
     cm = mas(

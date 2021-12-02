@@ -18,6 +18,17 @@ python3 setup_linux.py build_ext --inplace --verbose
 cp FasterCode.cpython-3* ../../OS/linux
 
 echo ""
-echo ":: Building Complete"
+echo ":: Building FasterCode Complete"
 echo ""
 
+echo ""
+echo ":: Building CpuUtil"
+echo ""
+
+python3 setup_cpuutil.py build_ext --inplace --verbose
+
+cp CpuUtil.cpython-3* ../../OS/linux
+
+echo ""
+echo ":: Building CpuUtil Complete"
+echo ""

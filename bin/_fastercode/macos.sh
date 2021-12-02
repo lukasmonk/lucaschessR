@@ -13,11 +13,10 @@ cd ..
 
 cat Faster_Irina.pyx Faster_Polyglot.pyx > FasterCode.pyx
 
-python3 setup_linux.py build_ext --inplace --verbose
+python3 setup_macos_fastercode.py build_ext --inplace --verbose
 
 cp FasterCode.cpython-3* ../../OS/darwin
 
 echo ""
-echo ":: Building Complete"
+echo ":: Building FasterCode Complete"
 echo ""
-
