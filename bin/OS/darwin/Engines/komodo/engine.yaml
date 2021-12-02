@@ -1,0 +1,14 @@
+eid: 'komodo'
+author: 'Don Dailey, Larry Kaufman'
+version: '12.1.1'
+url: 'http://komodochess.com/'
+elo: 3240
+bin:
+  x86_64: 'komodo-12.1.1-64-osx'
+  x86_64-bmi2: 'komodo-12.1.1-64-BMI2-osx'
+UCI:
+  Hash: '64'
+  Threads: '2'
+PV:
+  num: 20
+  maximo: 218
