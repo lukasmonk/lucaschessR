@@ -7,8 +7,13 @@ bin:
   x86_64: 'Lc0-0.28.0'
   arm64: 'Lc0-0.28.0'
 UCI:
+  Backend: 'blas'
+#  BackendOptions: 'backend=blas,(blas_cores=1),(batch_size=128)'
+#  RamLimitMb: '1000'
+#  MiniBatchSize: '64'
+#  MaxPrefetch: '16'
   Hash: '64'
-  Threads: '2'
+  Threads: '1'
 PV:
   num: 20
   maximo: 500
