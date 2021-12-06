@@ -6,14 +6,15 @@ import Code
 from Code.Base import Position
 from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios
 from Code.Board import Board
+from Code.QT import LCDialog
 
 from Code.CountsCaptures import WRunCommon
 
 
-class WRunMate15(QTVarios.WDialogo):
+class WRunMate15(LCDialog.LCDialog):
     def __init__(self, owner, db_mate15, mate15):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Mate in 1½"), Iconos.Mate15(), "runmate15")
+        LCDialog.LCDialog.__init__(self, owner, _("Mate in 1½"), Iconos.Mate15(), "runmate15")
 
         self.configuration = Code.configuration
         self.mate15 = mate15

@@ -49,7 +49,7 @@ class ManagerTrainBooks(Manager.Manager):
         self.remove_hints(siQuitarAtras=False)
         self.put_pieces_bottom(is_white)
         self.set_label1("%s: %s" % (_("Player"), self.book_player.name))
-        self.set_label2("%s: %s" % (_("Rival"), self.book_rival.name))
+        self.set_label2("%s: %s" % (_("Opponent"), self.book_rival.name))
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 

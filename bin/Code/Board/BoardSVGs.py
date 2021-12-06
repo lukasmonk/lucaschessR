@@ -49,10 +49,10 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         self.physical_pos2xy()
 
     def physical_pos2xy(self):
-
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
+        tf = self.board.tamFrontera
 
         df, dc, hf, hc = self.board.a1h8_fc(bm.a1h8)
 
@@ -61,8 +61,8 @@ class SVGSC(BoardBlocks.BloqueEspSC):
         if dc > hc:
             dc, hc = hc, dc
 
-        physical_pos.x = ac * (dc - 1)
-        physical_pos.y = ac * (df - 1)
+        physical_pos.x = ac * (dc - 1) + tf / 2
+        physical_pos.y = ac * (df - 1) + tf / 2
         physical_pos.ancho = (hc - dc + 1) * ac
         physical_pos.alto = (hf - df + 1) * ac
 
@@ -108,7 +108,6 @@ class SVGSC(BoardBlocks.BloqueEspSC):
 
     def mousePressEvent(self, event):
         QtWidgets.QGraphicsItem.mousePressEvent(self, event)
-
         p = event.scenePos()
         self.expX = p.x()
         self.expY = p.y()
@@ -211,6 +210,7 @@ class SVGSC(BoardBlocks.BloqueEspSC):
 
     def paint(self, painter, option, widget):
 
+        self.physical_pos2xy()
         bm = self.bloqueDatos
 
         physical_pos = bm.physical_pos
@@ -240,17 +240,13 @@ class SVGSC(BoardBlocks.BloqueEspSC):
             painter.setPen(pen)
             painter.drawRect(rect)
 
-            # def boundingRect(self):
-            # x = self.bloqueDatos.grosor
-            # return QtCore.QRectF(self.rect).adjusted( -x, -x, x*2, x*2 )
-
 
 class SVGCandidate(SVGSC):
     def physical_pos2xy(self):
 
         bm = self.bloqueDatos
         physical_pos = bm.physical_pos
-        ac = bm.width_square
+        ac = self.board.width_square
 
         df, dc, hf, hc = self.board.a1h8_fc(bm.a1h8)
 
@@ -259,7 +255,7 @@ class SVGCandidate(SVGSC):
         if dc > hc:
             dc, hc = hc, dc
 
-        ancho = bm.width_square * 0.3
+        ancho = self.board.width_square * 0.3
         physical_pos.x = ac * (dc - 1)
         physical_pos.y = ac * (df - 1)
 

@@ -46,7 +46,7 @@ class WStEval(WKibCommon.WKibCommon):
         self.siPlay = False
         self.engine.ac_final(0)
 
-    def if_to_analyze(self):
+    def whether_to_analyse(self):
         siW = self.game.last_position.is_white
         if not self.siPlay or (siW and (not self.is_white)) or ((not siW) and (not self.is_black)):
             return False
@@ -80,7 +80,7 @@ class WStEval(WKibCommon.WKibCommon):
 
         self.board.set_position(posicion)
         self.board.activate_side(is_white)
-        if self.if_to_analyze():
+        if self.whether_to_analyse():
             self.engine.set_fen_position(posicion.fen())
             self.engine.put_line("eval")
             li, ok = self.engine.wait_list(":", 2000)

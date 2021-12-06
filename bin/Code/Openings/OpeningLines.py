@@ -426,8 +426,9 @@ class Opening:
 
     def updateTrainingEngines(self):
         reg = self.trainingEngines()
-        reg["DICFENM2"] = self.recalcFenM2()
-        self.setTrainingEngines(reg)
+        if reg:
+            reg["DICFENM2"] = self.recalcFenM2()
+            self.setTrainingEngines(reg)
 
     def createTrainingSSP(self, reg, procesador):
         self.preparaTraining(reg, procesador)
@@ -680,7 +681,7 @@ class Opening:
         return li_games
 
     def removeLines(self, li, label):
-        self.saveHistory(_("Removing"), label)
+        self.save_history(_("Removing"), label)
         li.sort(reverse=True)
         cursor = self._conexion.cursor()
         for num in li:
@@ -694,7 +695,7 @@ class Opening:
         cursor.close()
 
     def remove_lastmove(self, is_white, label):
-        self.saveHistory(_("Removing"), label)
+        self.save_history(_("Removing"), label)
         n = len(self.li_xpv)
         cursor = self._conexion.cursor()
         for x in range(n - 1, -1, -1):
@@ -718,16 +719,16 @@ class Opening:
         self._conexion.commit()
         cursor.close()
 
-    def lihistory(self):
+    def list_history(self):
         return self.db_history.keys(si_ordenados=True, si_reverse=True)
 
-    def saveHistory(self, *label):
+    def save_history(self, *label):
         d = datetime.datetime.now()
         s = "%s-%s" % (d.strftime("%Y-%m-%d %H:%M:%S"), ",".join(label))
         self.db_history[s] = self.li_xpv[:]
 
-    def rechistory(self, key):
-        self.saveHistory(_("Recovering"), key)
+    def recovering_history(self, key):
+        self.save_history(_("Recovering"), key)
 
         stActivo = set(self.li_xpv)
         li_xpv_rec = self.db_history[key]
@@ -795,7 +796,7 @@ class Opening:
 
         dlTmp = QTUtil2.BarraProgreso(owner, _("Import"), _("Working..."), Util.filesize(ficheroPGN)).mostrar()
 
-        self.saveHistory(_("Import"), _("PGN with variations"), os.path.basename(ficheroPGN))
+        self.save_history(_("Import"), _("PGN with variations"), os.path.basename(ficheroPGN))
 
         dic_comments = {}
 
@@ -864,7 +865,7 @@ class Opening:
 
     def guardaPartidas(self, label, liPartidas, minMoves=0, with_history=True):
         if with_history:
-            self.saveHistory(_("Import"), label)
+            self.save_history(_("Import"), label)
         gamebase = self.getgamebase()
         sql_insert = "INSERT INTO LINES( XPV) VALUES( ? )"
         sql_update = "UPDATE LINES SET XPV=? WHERE XPV=?"
@@ -889,7 +890,7 @@ class Opening:
         self.li_xpv.sort()
 
     def guardaLiXPV(self, label, liXPV):
-        self.saveHistory(_("Import"), label)
+        self.save_history(_("Import"), label)
         sql_insert = "INSERT INTO LINES( XPV) VALUES( ? )"
         sql_update = "UPDATE LINES SET XPV=? WHERE XPV=?"
         cursor = self._conexion.cursor()

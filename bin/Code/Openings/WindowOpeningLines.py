@@ -14,11 +14,12 @@ from Code.QT import Delegados
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 
 
-class WOpeningLines(QTVarios.WDialogo):
+class WOpeningLines(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         self.procesador = procesador
@@ -26,7 +27,7 @@ class WOpeningLines(QTVarios.WDialogo):
         self.resultado = None
         self.listaOpenings = OpeningLines.ListaOpenings(self.configuration)
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, self.getTitulo(), Iconos.OpeningLines(), "openingLines")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, self.getTitulo(), Iconos.OpeningLines(), "openingLines")
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("TITLE", _("Name"), 240)
@@ -166,7 +167,7 @@ class WOpeningLines(QTVarios.WDialogo):
                             try:
                                 os.mkdir(path)
                             except:
-                                error = _("Unable to create this folder")
+                                error = _("Unable to create the folder")
                                 continue
                             if not os.path.isdir(path):
                                 continue
@@ -325,7 +326,7 @@ class WOpeningLines(QTVarios.WDialogo):
         self.accept()
 
 
-class WStaticTraining(QTVarios.WDialogo):
+class WStaticTraining(LCDialog.LCDialog):
     def __init__(self, procesador, dbop):
         self.training = dbop.training()
         self.ligames = self.training["LIGAMES_STATIC"]
@@ -340,7 +341,7 @@ class WStaticTraining(QTVarios.WDialogo):
 
         extparam = "openlines_static_%s" % dbop.nom_fichero
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, Iconos.TrainStatic(), extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, Iconos.TrainStatic(), extparam)
 
         lb = Controles.LB(self, dbop.gettitle())
         lb.set_background("#BDDBE8").align_center().ponTipoLetra(puntos=14)

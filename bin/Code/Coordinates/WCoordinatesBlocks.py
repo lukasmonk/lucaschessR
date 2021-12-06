@@ -1,11 +1,12 @@
 from Code import Util
 from Code.QT import Colocacion, Columnas, Controles, Grid, Iconos, QTUtil2, QTVarios
+from Code.QT import LCDialog
 
 from Code.Coordinates import CoordinatesBlocks
 from Code.Coordinates import WRunCoordinatesBlocks
 
 
-class WCoordinatesBlocks(QTVarios.WDialogo):
+class WCoordinatesBlocks(LCDialog.LCDialog):
     def __init__(self, procesador):
         configuration = procesador.configuration
         path = configuration.file_coordinates()
@@ -14,7 +15,7 @@ class WCoordinatesBlocks(QTVarios.WDialogo):
         extconfig = "coordinatesbyblocks"
         self.db = CoordinatesBlocks.DBCoordinatesBlocks(path)
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, title, icon, extconfig)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, title, icon, extconfig)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE_INI", _("Initial date"), 140, centered=True)

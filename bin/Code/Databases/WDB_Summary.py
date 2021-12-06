@@ -35,7 +35,7 @@ class WSummary(QtWidgets.QWidget):
 
         self.aperturasStd = OpeningsStd.ap
 
-        self.si_figurines_pgn = self.configuration.x_pgn_withfigurines
+        self.with_figurines = self.configuration.x_pgn_withfigurines
 
         self.pvBase = ""
 
@@ -54,17 +54,17 @@ class WSummary(QtWidgets.QWidget):
         # Grid
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("number", _("N."), 35, centered=True)
-        self.delegadoMove = Delegados.EtiquetaPGN(True if self.si_figurines_pgn else None)
+        self.delegadoMove = Delegados.EtiquetaPGN(True if self.with_figurines else None)
         o_columns.nueva("move", _("Move"), 60, edicion=self.delegadoMove)
         o_columns.nueva("analysis", _("Analysis"), 60, siDerecha=True)
         o_columns.nueva("games", _("Games"), 70, siDerecha=True)
         o_columns.nueva("pgames", "% " + _("Games"), 70, siDerecha=True)
         o_columns.nueva("win", _("Win"), 70, siDerecha=True)
         o_columns.nueva("draw", _("Draw"), 70, siDerecha=True)
-        o_columns.nueva("lost", _("Lost"), 70, siDerecha=True)
+        o_columns.nueva("lost", _("Loss"), 70, siDerecha=True)
         o_columns.nueva("pwin", "% " + _("Win"), 60, siDerecha=True)
         o_columns.nueva("pdraw", "% " + _("Draw"), 60, siDerecha=True)
-        o_columns.nueva("plost", "% " + _("Lost"), 60, siDerecha=True)
+        o_columns.nueva("plost", "% " + _("Loss"), 60, siDerecha=True)
         o_columns.nueva("pdrawwin", "%% %s" % _("W+D"), 60, siDerecha=True)
         o_columns.nueva("pdrawlost", "%% %s" % _("L+D"), 60, siDerecha=True)
 
@@ -180,7 +180,7 @@ class WSummary(QtWidgets.QWidget):
         elif key == "analysis":
             return v.abrTextoBase() if v else ""
         elif key == "number":
-            if self.si_figurines_pgn:
+            if self.with_figurines:
                 self.delegadoMove.setWhite(not ("..." in v))
             return v
         else:
@@ -345,7 +345,7 @@ class WSummary(QtWidgets.QWidget):
         if analisisMRM:
             for rm in analisisMRM.li_rm:
                 dic_analisis[rm.movimiento()] = rm
-        self.liMoves = self.dbGames.get_summary(pvMirar, dic_analisis, self.si_figurines_pgn, self.allmoves)
+        self.liMoves = self.dbGames.get_summary(pvMirar, dic_analisis, self.with_figurines, self.allmoves)
 
         self.grid.refresh()
         self.grid.gotop()
@@ -373,7 +373,7 @@ class WSummary(QtWidgets.QWidget):
 
     def showActiveName(self, name):
         # Llamado de WBG_Games -> setNameToolbar
-        self.lbName.set_text(_("Summary of %s") % name)
+        self.lbName.set_text(_("Opening explorer of %s") % name)
 
     def leeConfig(self):
         dicConfig = self.configuration.read_variables("DBSUMMARY")
@@ -407,23 +407,23 @@ class WSummaryBase(QtWidgets.QWidget):
         self.procesador = procesador
         self.configuration = procesador.configuration
 
-        self.si_figurines_pgn = self.configuration.x_pgn_withfigurines
+        self.with_figurines = self.configuration.x_pgn_withfigurines
 
         self.orden = ["games", False]
 
         # Grid
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("number", _("N."), 35, centered=True)
-        self.delegadoMove = Delegados.EtiquetaPGN(True if self.si_figurines_pgn else None)
+        self.delegadoMove = Delegados.EtiquetaPGN(True if self.with_figurines else None)
         o_columns.nueva("move", _("Move"), 60, edicion=self.delegadoMove)
         o_columns.nueva("games", _("Games"), 70, siDerecha=True)
         o_columns.nueva("pgames", "% " + _("Games"), 70, siDerecha=True, centered=True)
         o_columns.nueva("win", _("Win"), 70, siDerecha=True)
         o_columns.nueva("draw", _("Draw"), 70, siDerecha=True)
-        o_columns.nueva("lost", _("Lost"), 70, siDerecha=True)
+        o_columns.nueva("lost", _("Loss"), 70, siDerecha=True)
         o_columns.nueva("pwin", "% " + _("Win"), 60, siDerecha=True)
         o_columns.nueva("pdraw", "% " + _("Draw"), 60, siDerecha=True)
-        o_columns.nueva("plost", "% " + _("Lost"), 60, siDerecha=True)
+        o_columns.nueva("plost", "% " + _("Loss"), 60, siDerecha=True)
         o_columns.nueva("pdrawwin", "%% %s" % _("W+D"), 60, siDerecha=True)
         o_columns.nueva("pdrawlost", "%% %s" % _("L+D"), 60, siDerecha=True)
 
@@ -487,7 +487,7 @@ class WSummaryBase(QtWidgets.QWidget):
         if key.startswith("p"):
             return "%.01f %%" % v
         elif key == "number":
-            if self.si_figurines_pgn:
+            if self.with_figurines:
                 self.delegadoMove.setWhite(not ("..." in v))
             return v
         else:
@@ -534,7 +534,7 @@ class WSummaryBase(QtWidgets.QWidget):
         else:
             pvMirar = self.pvBase
 
-        self.liMoves = self.db_stat.get_summary(pvMirar, {}, self.si_figurines_pgn, False)
+        self.liMoves = self.db_stat.get_summary(pvMirar, {}, self.with_figurines, False)
 
         self.grid.refresh()
         self.grid.gotop()

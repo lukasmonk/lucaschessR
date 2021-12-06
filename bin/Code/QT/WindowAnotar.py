@@ -6,9 +6,10 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
+from Code.QT import LCDialog
 
 
-class WAnotar(QTVarios.WDialogo):
+class WAnotar(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         self.procesador = procesador
@@ -18,14 +19,14 @@ class WAnotar(QTVarios.WDialogo):
         self.lista = self.db.keys(True, True)
         self.resultado = None
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Writing down moves of a game"), Iconos.Write(), "annotateagame")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, _("Writing down moves of a game"), Iconos.Write(), "annotateagame")
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 110)
         o_columns.nueva("COLOR", _("Color"), 80, centered=True)
         o_columns.nueva("GAME", _("Game"), 280)
         o_columns.nueva("MOVES", _("Moves"), 80, centered=True)
-        o_columns.nueva("TIME", _("Avg time"), 80, centered=True)
+        o_columns.nueva("TIME", _("Average time"), 80, centered=True)
         o_columns.nueva("ERRORS", _("Errors"), 80, centered=True)
         o_columns.nueva("HINTS", _("Hints"), 80, centered=True)
         self.glista = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)

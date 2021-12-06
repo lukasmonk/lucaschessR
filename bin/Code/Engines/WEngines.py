@@ -19,9 +19,10 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 
-class WEngines(QTVarios.WDialogo):
+class WEngines(LCDialog.LCDialog):
     def __init__(self, owner, configuration):
 
         self.lista_motores = configuration.lista_motores_externos()
@@ -32,7 +33,7 @@ class WEngines(QTVarios.WDialogo):
         icono = Iconos.MotoresExternos()
         titulo = _("External engines")
         extparam = "motoresExternos"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
         li_acciones = [
@@ -264,7 +265,7 @@ class WEngine(QtWidgets.QDialog):
         self.siTorneo = siTorneo
 
         # Toolbar
-        tb = QTUtil2.tbAcceptCancel(self)
+        tb = QTVarios.tbAcceptCancel(self)
 
         lb_alias = Controles.LB2P(self, _("Alias"))
         self.edAlias = Controles.ED(self, engine.key).anchoMinimo(360)
@@ -437,8 +438,8 @@ def selectEngine(wowner):
     """
     # Pedimos el ejecutable
     folderEngines = Code.configuration.read_variables("FOLDER_ENGINES")
-    extension = "%s EXE (*.exe)" if Code.is_windows else "%s (*)"
-    exeMotor = SelectFiles.leeFichero(wowner, folderEngines if folderEngines else ".", extension % _("File"), _("Engine"))
+    extension = "exe" if Code.is_windows else "*"
+    exeMotor = SelectFiles.leeFichero(wowner, folderEngines if folderEngines else ".", extension, _("Engine"))
     if not exeMotor:
         return None
     folderEngines = Util.relative_path(os.path.dirname(exeMotor))
@@ -454,9 +455,9 @@ def selectEngine(wowner):
     return me
 
 
-class WSelectEngineElo(QTVarios.WDialogo):
+class WSelectEngineElo(LCDialog.LCDialog):
     def __init__(self, manager, elo, titulo, icono, tipo):
-        QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, tipo.lower())
+        LCDialog.LCDialog.__init__(self, manager.main_window, titulo, icono, tipo.lower())
 
         self.siMicElo = tipo == "MICELO"
         self.siMicPer = tipo == "MICPER"
@@ -531,7 +532,7 @@ class WSelectEngineElo(QTVarios.WDialogo):
         if not self.siMicPer:
             o_columns.nueva("GANA", _("Win"), 80, centered=True)
             o_columns.nueva("TABLAS", _("Draw"), 80, centered=True)
-            o_columns.nueva("PIERDE", _("Lost"), 80, centered=True)
+            o_columns.nueva("PIERDE", _("Loss"), 80, centered=True)
         if self.siMic:
             o_columns.nueva("INFO", _("Information"), 300, centered=True)
 

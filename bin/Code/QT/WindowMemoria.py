@@ -10,6 +10,7 @@ from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
 class WDatos(QtWidgets.QDialog):
@@ -20,7 +21,7 @@ class WDatos(QtWidgets.QDialog):
         self.setWindowIcon(Iconos.Memoria())
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
 
-        tb = QTUtil2.tbAcceptCancel(self)
+        tb = QTVarios.tbAcceptCancel(self)
 
         f = Controles.TipoLetra(puntos=12, peso=75)
 
@@ -50,13 +51,13 @@ def paramMemoria(parent, txtCategoria, max_level):
         return None
 
 
-class WMemoria(QTVarios.WDialogo):
+class WMemoria(LCDialog.LCDialog):
     def __init__(self, procesador, txtcategoria, nivel, seconds, listaFen, record):
 
         titulo = _("Check your memory on a chessboard")
         icono = Iconos.Memoria()
         extparam = "memoria"
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
 
         f = Controles.TipoLetra(puntos=10, peso=75)
 

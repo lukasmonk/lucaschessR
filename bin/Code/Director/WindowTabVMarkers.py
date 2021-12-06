@@ -17,6 +17,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 
 class WTV_Marker(QtWidgets.QDialog):
@@ -121,13 +122,13 @@ class WTV_Marker(QtWidgets.QDialog):
         self.accept()
 
 
-class WTV_Markers(QTVarios.WDialogo):
+class WTV_Markers(LCDialog.LCDialog):
     def __init__(self, owner, list_markers, dbMarkers):
 
         titulo = _("Markers")
         icono = Iconos.Markers()
         extparam = "markers"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.owner = owner
 

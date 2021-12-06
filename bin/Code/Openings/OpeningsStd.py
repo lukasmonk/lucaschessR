@@ -40,6 +40,7 @@ class ListaOpeningsStd:
         self.hijos = None
         self.lia1h8 = None
         self.max_ply = None
+        self.stfenm2 = None
 
     def reset(self, configuration, si_basic, si_entrenar):
         self.dic = {}
@@ -243,6 +244,22 @@ class ListaOpeningsStd:
     def xpv(self, xpv):
         last_ap = self.base_xpv(xpv)
         return last_ap.trNombre if last_ap else ""
+
+    def gen_stfenm2(self):
+        st = set()
+        for xpv in self.dic:
+            FasterCode.set_init_fen()
+            for pv in xpv.split(" "):
+                FasterCode.make_move(pv)
+                fen = FasterCode.get_fen()
+                fenm2 = FasterCode.fen_fenm2(fen)
+                st.add(fenm2)
+        self.stfenm2 = st
+
+    def is_book_fenm2(self, fenm2):
+        if self.stfenm2 is None:
+            self.gen_stfenm2()
+        return fenm2 in self.stfenm2
 
 
 ap = ListaOpeningsStd()

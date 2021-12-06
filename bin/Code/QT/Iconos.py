@@ -3772,8 +3772,16 @@ def Select():
     return QtGui.QIcon(pmSelect())
 
 
+def pmSelectClose():
+    return PM(964931,965703)
+
+
+def SelectClose():
+    return QtGui.QIcon(pmSelectClose())
+
+
 def pmSelectHome():
-    return PM(964931,965713)
+    return PM(965703,966485)
 
 
 def SelectHome():
@@ -3781,7 +3789,7 @@ def SelectHome():
 
 
 def pmSelectHistory():
-    return PM(965713,966265)
+    return PM(966485,967037)
 
 
 def SelectHistory():
@@ -3789,7 +3797,7 @@ def SelectHistory():
 
 
 def pmSelectExplorer():
-    return PM(966265,966998)
+    return PM(967037,967770)
 
 
 def SelectExplorer():
@@ -3797,7 +3805,7 @@ def SelectExplorer():
 
 
 def pmSelectFolderCreate():
-    return PM(966998,967917)
+    return PM(967770,968689)
 
 
 def SelectFolderCreate():
@@ -3805,7 +3813,7 @@ def SelectFolderCreate():
 
 
 def pmSelectFolderRemove():
-    return PM(967917,968944)
+    return PM(968689,969716)
 
 
 def SelectFolderRemove():
@@ -3813,7 +3821,7 @@ def SelectFolderRemove():
 
 
 def pmSelectReload():
-    return PM(968944,970598)
+    return PM(969716,971370)
 
 
 def SelectReload():
@@ -3821,7 +3829,7 @@ def SelectReload():
 
 
 def pmSelectAccept():
-    return PM(970598,971399)
+    return PM(971370,972171)
 
 
 def SelectAccept():
@@ -3829,10 +3837,18 @@ def SelectAccept():
 
 
 def pmWiki():
-    return PM(971399,972516)
+    return PM(972171,973288)
 
 
 def Wiki():
     return QtGui.QIcon(pmWiki())
+
+
+def pmCircle():
+    return PM(973288,974748)
+
+
+def Circle():
+    return QtGui.QIcon(pmCircle())
 
 

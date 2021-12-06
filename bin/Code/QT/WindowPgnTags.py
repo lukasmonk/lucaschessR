@@ -7,9 +7,10 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTVarios, QTUtil2
 from Code.Base.Constantes import STANDARD_TAGS
+from Code.QT import LCDialog
 
 
-class WTagsPGN(QTVarios.WDialogo):
+class WTagsPGN(LCDialog.LCDialog):
     def __init__(self, procesador, liPGN, is_fen_possible):
         titulo = _("Edit PGN labels")
         icono = Iconos.PGN()
@@ -17,7 +18,7 @@ class WTagsPGN(QTVarios.WDialogo):
         self.listandard = STANDARD_TAGS
         self.is_fen_possible = is_fen_possible
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
         self.procesador = procesador
         self.creaLista(liPGN)
 

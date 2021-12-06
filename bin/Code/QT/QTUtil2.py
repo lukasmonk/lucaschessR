@@ -582,7 +582,7 @@ class QWMessage(QtWidgets.QWidget):
         self.activo = False
 
 
-def menssage_nomodal(owner, message):
+def message_nomodal(owner, message):
     w = QWMessage(owner, message)
     w.show()
     while w.activo:

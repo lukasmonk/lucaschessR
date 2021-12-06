@@ -17,12 +17,13 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
+from Code.QT import LCDialog
 
 
-class WControl(QTVarios.WDialogo):
+class WControl(LCDialog.LCDialog):
     def __init__(self, procesador, path_bloque):
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, _("The board at a glance"), Iconos.Gafas(), "visualizaBase")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, _("The board at a glance"), Iconos.Gafas(), "visualizaBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -237,7 +238,7 @@ class WControl(QTVarios.WDialogo):
                 self.ghistorico.refresh()
 
 
-class WPlay(QTVarios.WDialogo):
+class WPlay(LCDialog.LCDialog):
     def __init__(self, owner, dicdatos):
 
         self.dicdatos = dicdatos

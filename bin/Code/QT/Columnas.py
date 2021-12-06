@@ -253,14 +253,15 @@ class ListaColumnas:
         for x in self.li_columns:
             x.porDefecto()
 
-    def columnasMostrables(self):
+    def columnasMostrables(self, grid):
         """
         Crea un nuevo objeto con solo las columnas mostrables.
         """
         for col in self.li_columns:
             col.ponQT()
         cols = [column for column in self.li_columns if column.must_show]
-        cols.sort(key=lambda x: x.position)
+        if grid.siCabeceraMovible:
+            cols.sort(key=lambda x: x.position)
         oColumnasR = ListaColumnas()
         oColumnasR.li_columns = cols
         return oColumnasR

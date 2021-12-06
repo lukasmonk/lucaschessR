@@ -14,16 +14,17 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WMap(QTVarios.WDialogo):
+class WMap(LCDialog.LCDialog):
     def __init__(self, procesador, mapa):
         self.workmap = WorkMap.WorkMap(mapa)
         dic = TrListas.maps()
         titulo = dic[mapa]
         icono = getattr(Iconos, mapa)()
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, mapa)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, mapa)
 
         self.procesador = procesador
 
@@ -214,7 +215,7 @@ class WMap(QTVarios.WDialogo):
         return self.workmap.dato(row, key) if grid.id == "W" else self.workmap.db.dato(row, key)
 
 
-class WUnSTSMap(QTVarios.WDialogo):
+class WUnSTSMap(LCDialog.LCDialog):
     def __init__(self, owner):
 
         self.workmap = owner.workmap
@@ -222,7 +223,7 @@ class WUnSTSMap(QTVarios.WDialogo):
         self.configuration = self.procesador.configuration
         self.alm = self.workmap.getAim()
 
-        QTVarios.WDialogo.__init__(self, owner, _("STS: Strategic Test Suite"), Iconos.STS(), "stsmap")
+        LCDialog.LCDialog.__init__(self, owner, _("STS: Strategic Test Suite"), Iconos.STS(), "stsmap")
 
         # Board
         config_board = self.configuration.config_board("STSMAP", 48)

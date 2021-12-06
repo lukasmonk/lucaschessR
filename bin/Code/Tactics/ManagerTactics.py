@@ -141,7 +141,7 @@ class ManagerTactics(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey in (Qt.Key_Plus, Qt.Key_PageDown):
             if self.state == ST_ENDGAME:
                 self.ent_siguiente()
@@ -278,6 +278,6 @@ class ManagerTactics(Manager.Manager):
 
     def end_training(self):
         self.tactic.end_training()
-        mensaje = "<big>%s<br>%s</big>" % (_("Congratulations goal achieved"), _("Endgame"))
+        mensaje = "<big>%s<br>%s</big>" % (_("Congratulations, goal achieved"), _("GAME OVER"))
         self.mensajeEnPGN(mensaje)
         self.end_game()

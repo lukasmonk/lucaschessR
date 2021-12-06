@@ -289,7 +289,7 @@ class Histogram(QtWidgets.QGraphicsView):
         # Numeros de move, en dos lineas
         for x in range(njg - 1):
             num = firstmove + x
-            decimal = num / 10
+            decimal = num // 10
             if decimal:
                 painter.drawText(textRect.translated(x * step, 0), str(decimal))
         for x in range(njg - 1):
@@ -418,7 +418,7 @@ class Histogram(QtWidgets.QGraphicsView):
                     QTUtil.ponPortapapeles(pm, tipo="p")
                 else:
                     configuration = Code.configuration
-                    path = SelectFiles.salvaFichero(self, _("File to save"), configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False)
+                    path = SelectFiles.salvaFichero(self, _("File to save"), configuration.x_save_folder, "png", False)
                     if path:
                         pm.save(path, "png")
                         configuration.x_save_folder = os.path.dirname(path)

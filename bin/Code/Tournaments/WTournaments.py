@@ -9,6 +9,7 @@ from Code.QT import Columnas
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.Tournaments import WTournament
@@ -16,13 +17,13 @@ from Code.Tournaments import WTournament
 GRID_ALIAS, GRID_VALUES, GRID_GAMES_QUEUED, GRID_GAMES_FINISHED, GRID_RESULTS = range(5)
 
 
-class WTournaments(QTVarios.WDialogo):
+class WTournaments(LCDialog.LCDialog):
     def __init__(self, w_parent):
 
         titulo = _("Tournaments between engines")
         icono = Iconos.Torneos()
         extparam = "torneos"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
 
         self.configuration = Code.configuration
 
@@ -165,8 +166,11 @@ class WTournaments(QTVarios.WDialogo):
 
 
 def tournaments(parent):
-    w = WTournaments(parent)
-    if w.exec_():
-        if w.play_torneo:
-            w = WTournament.WTournament(parent, w.play_torneo)
-            w.exec_()
+    while True:
+        w = WTournaments(parent)
+        if w.exec_():
+            if w.play_torneo:
+                w = WTournament.WTournament(parent, w.play_torneo)
+                if w.exec_():
+                    continue
+        return

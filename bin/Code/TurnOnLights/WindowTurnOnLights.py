@@ -9,13 +9,14 @@ from Code.QT import Controles
 from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.TurnOnLights import TurnOnLights
 
 
-class WTurnOnLights(QTVarios.WDialogo):
+class WTurnOnLights(LCDialog.LCDialog):
     def __init__(self, procesador, name, title, icono, folder, li_tam_blocks, one_line):
         self.one_line = one_line
         if one_line:
@@ -35,7 +36,7 @@ class WTurnOnLights(QTVarios.WDialogo):
         self.procesador = procesador
         extparam = "tol%s-%d" % (name, self.tol.work_level)
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
 
         self.colorTheme = QTUtil.qtColor("#F0F0F0")
 
@@ -287,14 +288,14 @@ def windowTurnOnLigths(procesador, name, title, icono, folder, li_tam_blocks, on
     return None
 
 
-class WConfigOneLineTOL(QTVarios.WDialogo):
+class WConfigOneLineTOL(LCDialog.LCDialog):
     def __init__(self, owner, procesador):
 
         title = _("In one line")
         titulo = _("Turn on the lights") + ": " + title
         extparam = "tolconfoneline"
         icono = Iconos.TOLchange()
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.tol = TurnOnLights.read_oneline_tol()
         self.procesador = procesador

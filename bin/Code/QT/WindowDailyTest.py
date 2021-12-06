@@ -12,6 +12,7 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
@@ -19,10 +20,10 @@ from Code.QT import WindowPotencia
 from Code.SQL import UtilSQL
 
 
-class WDailyTestBase(QTVarios.WDialogo):
+class WDailyTestBase(LCDialog.LCDialog):
     def __init__(self, procesador):
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Your daily test"), Iconos.DailyTest(), "nivelBase")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, _("Your daily test"), Iconos.DailyTest(), "nivelBase")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -205,7 +206,7 @@ class WDailyTestBase(QTVarios.WDialogo):
         self.ghistorico.refresh()
 
 
-class WDailyTest(QTVarios.WDialogo):
+class WDailyTest(LCDialog.LCDialog):
     def __init__(self, owner, liFens, engine, seconds, fns):
 
         super(WDailyTest, self).__init__(owner, _("Your daily test"), Iconos.DailyTest(), "nivel")

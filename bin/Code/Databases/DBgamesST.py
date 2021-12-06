@@ -175,7 +175,7 @@ class TreeSTAT:
             li_resp.append(rec)
         return li_resp
 
-    def get_summary(self, pv_base, dic_analysis, si_figurines_pgn, allmoves=True):
+    def get_summary(self, pv_base, dic_analysis, with_figurines, allmoves=True):
 
         li_moves = []
         is_white = pv_base.count(" ") % 2 == 1 if pv_base else True
@@ -271,7 +271,7 @@ class TreeSTAT:
                 if p.num_moves():
                     move = p.last_jg()
                     num_moves = move.numMove()
-                    pgn = move.pgnFigurinesSP() if si_figurines_pgn else move.pgn_translated()
+                    pgn = move.pgnFigurinesSP() if with_figurines else move.pgn_translated()
                     dic["move"] = pgn
                     dic["number"] = "%d." % num_moves
                     if not move.is_white():

@@ -2,11 +2,12 @@ import Code
 from Code import Util
 from Code.Databases import DBgames, WindowDatabase
 from Code.QT import Colocacion, Columnas, Controles, Grid, Iconos, QTUtil2, QTVarios
+from Code.QT import LCDialog
 
 from Code.CountsCaptures import CountsCaptures, WRunCaptures, WRunCounts
 
 
-class WCountsCaptures(QTVarios.WDialogo):
+class WCountsCaptures(LCDialog.LCDialog):
     def __init__(self, procesador, is_captures):
         self.configuration = procesador.configuration
         self.is_captures = is_captures
@@ -23,7 +24,7 @@ class WCountsCaptures(QTVarios.WDialogo):
 
         self.db = CountsCaptures.DBCountCapture(path)
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, title, icon, extconfig)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, title, icon, extconfig)
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 120, centered=True)

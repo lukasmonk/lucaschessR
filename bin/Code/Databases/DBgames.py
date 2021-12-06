@@ -321,8 +321,8 @@ class DBgames:
             self.db_stat.commit()
         self.conexion.commit()
 
-    def get_summary(self, pvBase, dicAnalisis, si_figurines_pgn, allmoves=True):
-        return self.db_stat.get_summary(pvBase, dicAnalisis, si_figurines_pgn, allmoves)
+    def get_summary(self, pvBase, dicAnalisis, with_figurines, allmoves=True):
+        return self.db_stat.get_summary(pvBase, dicAnalisis, with_figurines, allmoves)
 
     def rebuild_stat(self, dispatch, depth):
         if not ("RESULT" in self.li_fields):

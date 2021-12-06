@@ -11,11 +11,12 @@ from Code.QT import Columnas
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 
 
-class WFactoryPolyglots(QTVarios.WDialogo):
+class WFactoryPolyglots(LCDialog.LCDialog):
     def __init__(self, procesador):
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -25,7 +26,7 @@ class WFactoryPolyglots(QTVarios.WDialogo):
 
         self.list_db = self.index_polyglots.list()
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, "Polyglot book factory", Iconos.FactoryPolyglot(), "factorypolyglots")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, "Polyglot book factory", Iconos.FactoryPolyglot(), "factorypolyglots")
 
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("NAME", _("Name"), 240)

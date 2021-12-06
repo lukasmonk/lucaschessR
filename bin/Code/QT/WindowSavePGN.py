@@ -16,6 +16,7 @@ from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.Translations import TrListas
 from Code import Util
+from Code.QT import LCDialog
 
 
 class WBaseSave(QtWidgets.QWidget):
@@ -139,9 +140,7 @@ class WBaseSave(QtWidgets.QWidget):
                     boxrooms.delete(ntras)
 
             elif op == 1:
-                resp = SelectFiles.salvaFichero(
-                    self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", _("File") + " pgn (*.pgn)", False
-                )
+                resp = SelectFiles.salvaFichero(self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", "pgn", False)
                 if resp:
                     resp = os.path.realpath(resp)
                     folder, boxroom = os.path.split(resp)
@@ -163,12 +162,12 @@ class WBaseSave(QtWidgets.QWidget):
         self.vars_save()
 
 
-class WSave(QTVarios.WDialogo):
+class WSave(LCDialog.LCDialog):
     def __init__(self, owner, game, configuration):
         titulo = _("Save to PGN")
         icono = Iconos.PGN()
         extparam = "savepgn"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.game = game
         self.game.order_tags()
@@ -353,9 +352,7 @@ class WSave(QTVarios.WDialogo):
                     boxrooms.delete(ntras)
 
             elif op == 1:
-                resp = SelectFiles.salvaFichero(
-                    self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", _("File") + " pgn (*.pgn)", False
-                )
+                resp = SelectFiles.salvaFichero(self, _("Boxrooms PGN"), self.configuration.x_save_folder + "/", "pgn", False)
                 if resp:
                     resp = os.path.realpath(resp)
                     folder, boxroom = os.path.split(resp)
@@ -500,12 +497,12 @@ class WSave(QTVarios.WDialogo):
         return self.li_labels[row][1]
 
 
-class WSaveVarios(QTVarios.WDialogo):
+class WSaveVarios(LCDialog.LCDialog):
     def __init__(self, owner, configuration):
         titulo = _("Save to PGN")
         icono = Iconos.PGN()
         extparam = "savepgnvarios"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.configuration = configuration
 

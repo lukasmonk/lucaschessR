@@ -7,6 +7,7 @@ from Code.QT import Controles
 from Code.QT import Delegados
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 
@@ -16,10 +17,10 @@ def consultaHistorico(main_window, tactica, icono):
     return w.resultado if w.exec_() else None
 
 
-class WHistoricoTacticas(QTVarios.WDialogo):
+class WHistoricoTacticas(LCDialog.LCDialog):
     def __init__(self, main_window, tactica, icono):
 
-        QTVarios.WDialogo.__init__(self, main_window, tactica.title, icono, "histoTacticas")
+        LCDialog.LCDialog.__init__(self, main_window, tactica.title, icono, "histoTacticas")
 
         self.li_histo = tactica.historico()
         self.tactica = tactica
@@ -301,7 +302,7 @@ class WConfTactics(QtWidgets.QWidget):
         self.grid_show = Grid.Grid(self, o_col, siSelecFilas=True, siEditable=True, xid="s")
         self.grid_show.setMinimumWidth(self.grid_show.anchoColumnas() + 20)
         ly = Colocacion.V().control(tb).control(self.grid_show)
-        gbShow = Controles.GB(self, _("Show text associated with each puzzle"), ly).ponFuente(f)
+        gbShow = Controles.GB(self, _("Show the reference associated with each puzzle"), ly).ponFuente(f)
         self.grid_show.gotop()
 
         # Reinforcement
@@ -569,10 +570,10 @@ class WConfTactics(QtWidgets.QWidget):
         self.grid_show.refresh()
 
 
-class WEditaTactica(QTVarios.WDialogo):
+class WEditaTactica(LCDialog.LCDialog):
     def __init__(self, owner, tactica, ncopia):
 
-        QTVarios.WDialogo.__init__(self, owner, _X(_("Configuration of %1"), tactica.title), Iconos.Tacticas(), "editTactica")
+        LCDialog.LCDialog.__init__(self, owner, _X(_("Configuration of %1"), tactica.title), Iconos.Tacticas(), "editTactica")
 
         self.tactica = tactica
 

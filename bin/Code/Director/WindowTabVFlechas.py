@@ -12,9 +12,9 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 
 
 def tiposDestino():
@@ -187,13 +187,13 @@ class WTV_Flecha(QtWidgets.QDialog):
         self.accept()
 
 
-class WTV_Flechas(QTVarios.WDialogo):
+class WTV_Flechas(LCDialog.LCDialog):
     def __init__(self, owner, list_arrows, dbFlechas):
 
         titulo = _("Arrows")
         icono = Iconos.Flechas()
         extparam = "flechas"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.owner = owner
 

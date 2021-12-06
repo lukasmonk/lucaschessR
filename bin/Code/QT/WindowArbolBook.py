@@ -11,6 +11,7 @@ from Code.QT import Controles
 from Code.QT import Iconos
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 
 class UnMove:
@@ -343,13 +344,13 @@ class InfoMove(QtWidgets.QWidget):
         self.ponValores()
 
 
-class WindowArbolBook(QTVarios.WDialogo):
+class WindowArbolBook(LCDialog.LCDialog):
     def __init__(self, manager, siEnVivo):
 
         titulo = _("Consult a book")
         icono = Iconos.Libros()
         extparam = "treebook"
-        QTVarios.WDialogo.__init__(self, manager.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, manager.main_window, titulo, icono, extparam)
 
         # Se lee la lista de libros1
         self.list_books = Books.ListBooks()

@@ -242,23 +242,23 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
 
         liBlunders, liBrilliancies = form_blunders_brilliancies(alm, configuration)
 
-        liST = [SEPARADOR]
-        liST.append((_("Activate") + ":", alm.stability))
-        liST.append(SEPARADOR)
-        liST.append((FormLayout.Spinbox(_("Last depths to control same best move"), 2, 10, 40), alm.st_depths))
-        liST.append(SEPARADOR)
-        liST.append(
-            (FormLayout.Spinbox(_("Maximum difference among last evaluations"), 0, 99999, 60), alm.st_centipawns)
-        )
-        liST.append(SEPARADOR)
-        liST.append((FormLayout.Spinbox(_("Additional time limit"), 0, 99999, 60), alm.st_timelimit))
+        # liST = [SEPARADOR]
+        # liST.append((_("Activate") + ":", alm.stability))
+        # liST.append(SEPARADOR)
+        # liST.append((FormLayout.Spinbox(_("Last depths to control same best move"), 2, 10, 40), alm.st_depths))
+        # liST.append(SEPARADOR)
+        # liST.append(
+        #     (FormLayout.Spinbox(_("Maximum difference among last evaluations"), 0, 99999, 60), alm.st_centipawns)
+        # )
+        # liST.append(SEPARADOR)
+        # liST.append((FormLayout.Spinbox(_("Additional time limit"), 0, 99999, 60), alm.st_timelimit))
 
         lista = []
         lista.append((li_gen, _("General options"), ""))
         lista.append((liVar, _("Variations"), ""))
         lista.append((liBlunders, _("Wrong moves"), ""))
         lista.append((liBrilliancies, _("Brilliancies"), ""))
-        lista.append((liST, _("Stability control"), ""))
+        # lista.append((liST, _("Stability control"), ""))
 
     else:
         lista = li_gen
@@ -308,7 +308,8 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
         accion, liResp = resultado
 
         if siModoAmpliado:
-            li_gen, liVar, liBlunders, liBrilliancies, liST = liResp
+            # li_gen, liVar, liBlunders, liBrilliancies, liST = liResp
+            li_gen, liVar, liBlunders, liBrilliancies = liResp
         else:
             li_gen = liResp
 
@@ -358,7 +359,8 @@ def analysis_parameters(parent, configuration, siModoAmpliado, siTodosMotores=Fa
                 alm.bmtbrilliancies,
             ) = liBrilliancies
 
-            (alm.stability, alm.st_depths, alm.st_centipawns, alm.st_timelimit) = liST
+            # (alm.stability, alm.st_depths, alm.st_centipawns, alm.st_timelimit) = liST
+            alm.stability = False
 
         dic = {}
         for x in dir(alm):

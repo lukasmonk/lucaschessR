@@ -246,16 +246,22 @@ class Grid(QtWidgets.QTableView):
         configuration = Code.configuration
 
         p = self.palette()
-        p.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Highlight, QtGui.QBrush(QtGui.QColor(configuration.pgn_selbackground())))
+        p.setBrush(
+            QtGui.QPalette.Active,
+            QtGui.QPalette.Highlight,
+            QtGui.QBrush(QtGui.QColor(configuration.pgn_selbackground())),
+        )
         self.setPalette(p)
 
         self.w_parent = w_parent
         self.id = xid
 
+        self.siCabeceraMovible = siCabeceraMovible
+
         self.o_columns = o_columns
         if dicVideo:
             self.restore_video(dicVideo)
-        self.oColumnasR = self.o_columns.columnasMostrables()  # Necesario tras recuperar video
+        self.oColumnasR = self.o_columns.columnasMostrables(self)  # Necesario tras recuperar video
 
         self.cg = ControlGrid(self, w_parent, self.oColumnasR)
 
@@ -315,7 +321,7 @@ class Grid(QtWidgets.QTableView):
         """
         Cuando se cambia la configuration de las columnas, se vuelven a releer y se indican al control de datos.
         """
-        self.oColumnasR = self.o_columns.columnasMostrables()
+        self.oColumnasR = self.o_columns.columnasMostrables(self)
         self.cg.oColumnasR = self.oColumnasR
         self.cg.refresh()
         self.set_widthsColumnas()
@@ -341,6 +347,8 @@ class Grid(QtWidgets.QTableView):
                 self.w_parent.grid_tecla_pulsada(self, event.text())
         if hasattr(self.w_parent, "grid_tecla_control"):
             self.w_parent.grid_tecla_control(self, k, is_shift, is_control, is_alt)
+            event.ignore()
+            return
 
         QtWidgets.QTableView.keyPressEvent(self, event)
 
@@ -444,13 +452,15 @@ class Grid(QtWidgets.QTableView):
         for column in self.o_columns.li_columns:
             column.recuperarConf(dic, self)
 
-        self.o_columns.li_columns.sort(key=lambda x: x.position)
+        if self.siCabeceraMovible:
+            self.o_columns.li_columns.sort(key=lambda xcol: xcol.position)
 
     def columnas(self):
         for n, column in enumerate(self.oColumnasR.li_columns):
             column.ancho = self.columnWidth(n)
             column.position = self.columnViewportPosition(n)
-        self.o_columns.li_columns.sort(key=lambda x: x.position)
+        if self.siCabeceraMovible:
+            self.o_columns.li_columns.sort(key=lambda xcol: xcol.position)
         return self.o_columns
 
     def anchoColumnas(self):

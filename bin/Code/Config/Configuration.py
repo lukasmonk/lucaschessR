@@ -65,6 +65,7 @@ class Performance:
         self.lost_factor = 15.0
         self.lost_exp = 1.35
 
+        self.questionable = 30
         self.very_bad_lostp = 200
         self.bad_lostp = 90
         self.bad_limit_min = 1200.0
@@ -182,7 +183,7 @@ class Configuration:
         self.x_style = "WindowsVista" if Code.is_windows else "Fusion"
         self.x_tutor_view = POS_TUTOR_HORIZONTAL
 
-        self.x_enable_highdpiscaling = True
+        self.x_enable_highdpiscaling = False
 
         self.x_show_effects = False
         self.x_pieces_speed = 100
@@ -320,6 +321,11 @@ class Configuration:
         if Util.exist_file(os.path.join(self.carpeta_gaviota(), "kbbkb.gtb.cp4")):
             return 5
         return 4
+
+    def pieces_speed_porc(self):
+        sp = min(self.x_pieces_speed, 300)
+        return sp / 100.0
+
 
     def set_player(self, value):
         self.x_player = value

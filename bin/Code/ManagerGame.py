@@ -290,25 +290,27 @@ class ManagerGame(Manager.Manager):
 
     def utilities_gs(self):
         sep = (None, None, None)
-
         li_mas_opciones = [
-            (None, _("Change the initial position"), Iconos.PGN()),
-            sep,
-            ("leerpgn", _("Read PGN file"), Iconos.PGN_Importar()),
-            sep,
-            ("pastepgn", _("Paste PGN"), Iconos.Pegar16()),
-            sep,
+            (None, _("Change the starting position"), Iconos.PGN()),
         ]
         if not self.is_complete:
             li_mas_opciones.extend(
                 [
-                    ("position", _("Edit start position"), Iconos.Datos()),
+                    ("position", _("Board editor"), Iconos.Datos()),
                     sep,
                     ("pasteposicion", _("Paste FEN position"), Iconos.Pegar16()),
                     sep,
                     ("voyager", _("Voyager 2"), Iconos.Voyager()),
                 ]
             )
+
+        li_mas_opciones.extend( [
+            sep,
+            ("leerpgn", _("Read PGN file"), Iconos.PGN_Importar()),
+            sep,
+            ("pastepgn", _("Paste PGN"), Iconos.Pegar16()),
+            sep,
+        ] )
 
         li_mas_opciones.extend([(None, None, True), sep, ("books", _("Consult a book"), Iconos.Libros())])
 
@@ -372,7 +374,7 @@ class ManagerGame(Manager.Manager):
         self.changed = True
         self.put_toolbar()
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey == ord("V"):  # V
             self.paste_pgn()
 

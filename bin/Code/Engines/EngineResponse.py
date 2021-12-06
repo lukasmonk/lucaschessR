@@ -2,10 +2,26 @@ import random
 
 from Code.Base import Game, Position
 from Code.Base.Constantes import (
-    ADJUST_BETTER, ADJUST_WORST_MOVE, ADJUST_WORSE, ADJUST_SOMEWHAT_WORSE_LESS_LESS, ADJUST_SOMEWHAT_WORSE_LESS,
-    ADJUST_SOMEWHAT_BETTER_MORE_MORE, ADJUST_SOMEWHAT_BETTER_MORE, ADJUST_SOMEWHAT_BETTER, ADJUST_SIMILAR,
-    ADJUST_LOW_LEVEL, ADJUST_INTERMEDIATE_LEVEL, ADJUST_HIGH_LEVEL
+    ADJUST_BETTER,
+    ADJUST_WORST_MOVE,
+    ADJUST_WORSE,
+    ADJUST_SOMEWHAT_WORSE_LESS_LESS,
+    ADJUST_SOMEWHAT_WORSE_LESS,
+    ADJUST_SOMEWHAT_BETTER_MORE_MORE,
+    ADJUST_SOMEWHAT_BETTER_MORE,
+    ADJUST_SOMEWHAT_BETTER,
+    ADJUST_SIMILAR,
+    ADJUST_LOW_LEVEL,
+    ADJUST_INTERMEDIATE_LEVEL,
+    ADJUST_HIGH_LEVEL,
+    NO_RATING,
+    GOOD_MOVE,
+    BAD_MOVE,
+    VERY_GOOD_MOVE,
+    VERY_BAD_MOVE,
+    QUESTIONABLE_MOVE,
 )
+
 
 class EngineResponse:
     def __init__(self, name, si_blancas):
@@ -31,11 +47,24 @@ class EngineResponse:
         self.sinInicializar = True
 
     def save(self):
-        li = [self.mate, self.puntos, self.pv, self.from_sq, self.to_sq, self.promotion, self.depth, self.nodes, self.nps, self.seldepth]
+        li = [
+            self.mate,
+            self.puntos,
+            self.pv,
+            self.from_sq,
+            self.to_sq,
+            self.promotion,
+            self.depth,
+            self.nodes,
+            self.nps,
+            self.seldepth,
+        ]
         return li
 
     def restore(self, li):
-        self.mate, self.puntos, self.pv, self.from_sq, self.to_sq, self.promotion, self.depth, self.nodes, self.nps, self.seldepth = li
+        self.mate, self.puntos, self.pv, self.from_sq, self.to_sq, self.promotion, self.depth, self.nodes, self.nps, self.seldepth = (
+            li
+        )
         self.sinInicializar = False
 
     def movimiento(self):
@@ -670,7 +699,9 @@ class MultiEngineResponse:
                 move = gameBase.move(num_moves - 3)
                 if hasattr(move, "puntosABS_3"):  # se graban en mejormovajustado
                     puntosPrevios = move.puntosABS_3
-            difpuntos = rm0.centipawns_abs() - puntosPrevios  # son puntos ganados por el engine y perdidos por el player
+            difpuntos = (
+                rm0.centipawns_abs() - puntosPrevios
+            )  # son puntos ganados por el engine y perdidos por el player
             if difpuntos > mindifpuntos:
                 if fdbg:
                     fdbg.write("1. %s : %s %d > %d\n" % (rm0.pv, _("Centipawns lost"), difpuntos, mindifpuntos))
@@ -795,7 +826,9 @@ class MultiEngineResponse:
                         if not cp.is_white:
                             p0 = -p0
                             pZ = -pZ
-                        fdbg.write("    %s (%s) : %d -> %d [%d => %d]\n" % (_("Advance"), dpr, xAvPR, rm.puntos, p0, pZ))
+                        fdbg.write(
+                            "    %s (%s) : %d -> %d [%d => %d]\n" % (_("Advance"), dpr, xAvPR, rm.puntos, p0, pZ)
+                        )
 
             if xJPR:
                 n = True
@@ -853,7 +886,13 @@ class MultiEngineResponse:
             fdbg.write("\n")
             fdbg.close()
 
-        return (una.get("AJUSTARFINAL" if tipo == "F" else "ADJUST", ADJUST_BETTER), mindifpuntos, maxmate, dbg, aterrizaje)
+        return (
+            una.get("AJUSTARFINAL" if tipo == "F" else "ADJUST", ADJUST_BETTER),
+            mindifpuntos,
+            maxmate,
+            dbg,
+            aterrizaje,
+        )
 
     def mejorMovAjustadoNivel(self, nTipo):
         if nTipo == ADJUST_HIGH_LEVEL:
@@ -875,7 +914,12 @@ class MultiEngineResponse:
                 ADJUST_SOMEWHAT_WORSE_LESS_LESS: 5,
             }
         elif nTipo == ADJUST_LOW_LEVEL:
-            dic = {ADJUST_SIMILAR: 25, ADJUST_WORSE: 60, ADJUST_SOMEWHAT_WORSE_LESS: 25, ADJUST_SOMEWHAT_WORSE_LESS_LESS: 10}
+            dic = {
+                ADJUST_SIMILAR: 25,
+                ADJUST_WORSE: 60,
+                ADJUST_SOMEWHAT_WORSE_LESS: 25,
+                ADJUST_SOMEWHAT_WORSE_LESS_LESS: 10,
+            }
         tp = 0
         for k, v in dic.items():
             tp += v
@@ -1007,7 +1051,9 @@ class MultiEngineResponse:
             siPersonalidad = nTipo >= 1000  # Necesario para grabar los puntos
 
             if siPersonalidad:
-                nTipo, mindifpuntos, maxmate, dbg, aterrizaje = self.ajustaPersonalidad(self.liPersonalidades[nTipo - 1000])
+                nTipo, mindifpuntos, maxmate, dbg, aterrizaje = self.ajustaPersonalidad(
+                    self.liPersonalidades[nTipo - 1000]
+                )
 
             if nTipo == ADJUST_BETTER:
                 rmSel = self.li_rm[0]
@@ -1093,28 +1139,28 @@ class MultiEngineResponse:
                     return
 
     def set_nag_color(self, configuration, rm):
-        # NAG_1=Jugada buena NAG_2=Jugada mala NAG_3=Muy buena move NAG_4=Muy mala move
-        NORMAL, GOOD, BAD, VERYGOOD, VERYBAD = range(5)
         if rm.level_brilliant():
-            return VERYGOOD, VERYGOOD
+            return VERY_GOOD_MOVE, VERY_GOOD_MOVE
         mj_pts = self.li_rm[0].centipawns_abs()
         rm_pts = rm.centipawns_abs()
         nb = mj_pts - rm_pts
         perf = configuration.perfomance
         if nb:
             if nb > perf.very_bad_lostp:
-                return VERYBAD, VERYBAD
+                return VERY_BAD_MOVE, VERY_BAD_MOVE
             elif nb > perf.bad_lostp:
-                return BAD, BAD
-            return NORMAL, NORMAL
+                return BAD_MOVE, BAD_MOVE
+            elif 0 < perf.questionable < nb:
+                return QUESTIONABLE_MOVE, QUESTIONABLE_MOVE
+            return NO_RATING, NO_RATING
 
         libest = self.bestmoves()
         if not (rm in libest):
-            return NORMAL, NORMAL
+            return NO_RATING, NO_RATING
 
         # Si la mayoría son buenos movimientos
         if len(libest) * 1.0 / len(self.li_rm) >= 0.8:
-            return NORMAL, GOOD
+            return NO_RATING, GOOD_MOVE
 
         # Si en la depth que se encontró era menor que 4
         dic = self.dicDepth
@@ -1137,17 +1183,17 @@ class MultiEngineResponse:
                         break
             if firstDepth >= perf.very_good_depth:
                 if len(libest) == 1 and (mj_pts - self.li_rm[1].centipawns_abs()) > 70:
-                    nag = VERYGOOD
-                    color = VERYGOOD
+                    nag = VERY_GOOD_MOVE
+                    color = VERY_GOOD_MOVE
                 else:
-                    nag = GOOD
-                    color = GOOD
+                    nag = GOOD_MOVE
+                    color = GOOD_MOVE
             elif firstDepth >= perf.good_depth:
-                nag = GOOD
-                color = GOOD
+                nag = GOOD_MOVE
+                color = GOOD_MOVE
             else:
-                nag = NORMAL
-                color = GOOD
+                nag = NO_RATING
+                color = GOOD_MOVE
             return nag, color
 
-        return GOOD, GOOD
+        return GOOD_MOVE, GOOD_MOVE

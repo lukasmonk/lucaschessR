@@ -20,11 +20,12 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
 from Code.QT import Voyager
+from Code.QT import LCDialog
 
 PLAY_STOP, PLAY_NEXT_SOLVED, PLAY_NEXT_BESTMOVES = range(3)
 
 
-class WEndingsGTB(QTVarios.WDialogo):
+class WEndingsGTB(LCDialog.LCDialog):
     def __init__(self, procesador):
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -32,7 +33,7 @@ class WEndingsGTB(QTVarios.WDialogo):
         self.db = EndingsGTB.DBendings(self.configuration)
         self.t4 = LibChess.T4(self.configuration)
 
-        QTVarios.WDialogo.__init__(self, procesador.main_window, _("Endings with Gaviota Tablebases"), Iconos.Finales(), "endings_gtb")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, _("Endings with Gaviota Tablebases"), Iconos.Finales(), "endings_gtb")
 
         self.game = Game.Game()
         self.act_recno = -1

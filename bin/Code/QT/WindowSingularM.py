@@ -5,15 +5,16 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WSingularM(QTVarios.WDialogo):
+class WSingularM(LCDialog.LCDialog):
     def __init__(self, owner, configuration):
         self.configuration = configuration
         titulo = "%s: %s" % (_("Singular moves"), _("Calculate your strength"))
         icono = Iconos.Strength()
         extparam = "singularmoves"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.sm = SingularMoves.SingularMoves(configuration.ficheroSingularMoves)
 

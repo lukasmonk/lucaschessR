@@ -138,11 +138,11 @@ class WPlayer(QtWidgets.QWidget):
         o_columns.nueva("plost", "% " + _("Loss"), ancho, siDerecha=True)
 
         ancho_col = 40
-        si_figurines_pgn = self.configuration.x_pgn_withfigurines
+        with_figurines = self.configuration.x_pgn_withfigurines
         for x in range(1, 50):
             num = (x - 1) * 2
-            o_columns.nueva(str(num), "%d." % x, ancho_col, centered=True, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, siLineas=False))
-            o_columns.nueva(str(num + 1), "...", ancho_col, centered=True, edicion=Delegados.EtiquetaPOS(si_figurines_pgn, siLineas=False))
+            o_columns.nueva(str(num), "%d." % x, ancho_col, centered=True, edicion=Delegados.EtiquetaPOS(with_figurines, siLineas=False))
+            o_columns.nueva(str(num + 1), "...", ancho_col, centered=True, edicion=Delegados.EtiquetaPOS(with_figurines, siLineas=False))
 
         self.gridMovesWhite = Grid.Grid(self, o_columns, siSelecFilas=True)
         self.gridMovesBlack = Grid.Grid(self, o_columns, siSelecFilas=True)

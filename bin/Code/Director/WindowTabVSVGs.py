@@ -17,6 +17,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 estrellaSVG = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
@@ -152,13 +153,13 @@ class WTV_SVG(QtWidgets.QDialog):
         self.accept()
 
 
-class WTV_SVGs(QTVarios.WDialogo):
+class WTV_SVGs(LCDialog.LCDialog):
     def __init__(self, owner, list_svgs, dbSVGs):
 
         titulo = _("Images")
         icono = Iconos.SVGs()
         extparam = "svgs"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.owner = owner
 

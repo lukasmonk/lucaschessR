@@ -13,12 +13,13 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTVarios
 from Code.QT import Voyager
+from Code.QT import LCDialog
 
 
-class WPolyglot(QTVarios.WDialogo):
+class WPolyglot(LCDialog.LCDialog):
     def __init__(self, wowner, configuration, path_lcbin):
         self.title = os.path.basename(path_lcbin)[:-6]
-        QTVarios.WDialogo.__init__(self, wowner, self.title, Iconos.Book(), "polyglot")
+        LCDialog.LCDialog.__init__(self, wowner, self.title, Iconos.Book(), "polyglot")
 
         self.configuration = configuration
         self.path_lcbin = path_lcbin

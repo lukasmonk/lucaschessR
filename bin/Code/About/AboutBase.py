@@ -471,6 +471,7 @@ class ThanksTo:
             ("fics", "http://ficsgames.org/cgi-bin/download.cgi"),
             ("Norman Pollock", "http://40h.000webhostapp.com/"),
             ("STS<br>" + _X(_("Created by %1"), "Dan Corbit,Swaminathan"), "https://sites.google.com/site/strategictestsuite/about-1"),
+            ("liChess database", "https://database.lichess.org"),
         )
         txt = '<center><table border="1" cellpadding="5" cellspacing="0" >'
         for nom, web in li:

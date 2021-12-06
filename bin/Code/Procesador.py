@@ -301,7 +301,7 @@ class Procesador:
 
     def creaXTutor(self):
         xtutor = EngineManager.EngineManager(self, self.configuration.tutor)
-        xtutor.function = _("tutor")
+        xtutor.function = _("Tutor")
         xtutor.options(self.configuration.x_tutor_mstime, self.configuration.x_tutor_depth, True)
         xtutor.set_priority(self.configuration.x_tutor_priority)
         if self.configuration.x_tutor_multipv == 0:
@@ -682,12 +682,11 @@ class Procesador:
 
     def folder_change(self):
         carpeta = SelectFiles.get_existing_directory(
-            self.main_window, self.configuration.carpeta, _("Change the folder where all data is saved") + "\n" + _("Be careful please")
+            self.main_window, self.configuration.carpeta, _("Change the folder where all data is saved") + ". " + _("Be careful please")
         )
-        if carpeta:
-            if os.path.isdir(carpeta):
-                self.configuration.changeActiveFolder(carpeta)
-                self.reiniciar()
+        if carpeta and os.path.isdir(carpeta):
+            self.configuration.changeActiveFolder(carpeta)
+            self.reiniciar()
 
     def folder_default(self):
         self.configuration.changeActiveFolder(None)
@@ -803,8 +802,8 @@ class Procesador:
                     self.openingsTrainingEngines(pathFichero)
 
     def openingsTrainingSequential(self, pathFichero):
-        self.manager = ManagerOpeningLines.ManagerOpeningLines(self)
-        self.manager.start(pathFichero, "sequential", 0)
+        self.manager = ManagerOpeningLines.ManagerOpeningLinesSequential(self)
+        self.manager.start(pathFichero)
 
     def openingsTrainingEngines(self, pathFichero):
         self.manager = ManagerOpeningLines.ManagerOpeningEngines(self)
@@ -815,7 +814,7 @@ class Procesador:
         num_linea = WindowOpeningLines.selectLine(self, dbop)
         dbop.close()
         if num_linea is not None:
-            self.manager = ManagerOpeningLines.ManagerOpeningLines(self)
+            self.manager = ManagerOpeningLines.ManagerOpeningLinesStatic(self)
             self.manager.start(pathFichero, "static", num_linea)
         else:
             self.openings()
@@ -1242,5 +1241,7 @@ class ProcesadorVariations(Procesador):
         self.replayBeep = None
 
         self.posicionInicial = None
+
+        self.entrenamientos = Code.procesador.entrenamientos
 
         self.cpu = CPU.CPU(self.main_window)

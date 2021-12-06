@@ -3,6 +3,8 @@ import time
 
 import FasterCode
 
+from PySide2 import QtCore
+
 from Code import Manager
 from Code import Util
 from Code.Base import Game, Position
@@ -316,13 +318,7 @@ class ManagerSolo(Manager.Manager):
         else:
             file = self.configuration.folder_save_lcsb()
         while True:
-            resp = SelectFiles.salvaFichero(
-                self.main_window,
-                _("File to save"),
-                file,
-                _("File") + " %s (*.%s)" % (extension, extension),
-                siConfirmarSobreescritura=siConfirmar,
-            )
+            resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), file, extension, siConfirmar)
             if resp:
                 resp = str(resp)
                 if not siConfirmar:
@@ -496,9 +492,9 @@ class ManagerSolo(Manager.Manager):
         sep = (None, None, None)
 
         liMasOpciones = (
-            (None, _("Change the initial position"), Iconos.PGN()),
+            (None, _("Change the starting position"), Iconos.PGN()),
             sep,
-            ("position", _("Edit start position") + " [S]", Iconos.Datos()),
+            ("position", _("Board editor") + " [S]", Iconos.Datos()),
             sep,
             ("initial", _("Basic position") + " [B]", Iconos.Board()),
             sep,
@@ -613,7 +609,7 @@ class ManagerSolo(Manager.Manager):
         self.opening_block = None
         self.reiniciar()
 
-    def control_teclado(self, nkey):
+    def control_teclado(self, nkey, modifiers):
         if nkey == ord("V"):
             self.paste(QTUtil.traePortapapeles())
         elif nkey == ord("T"):
@@ -621,19 +617,22 @@ class ManagerSolo(Manager.Manager):
             self.saveSelectedPosition("|".join(li))
         elif nkey == ord("S"):
             self.startPosition()
-        elif nkey == ord("B"):
-            self.basic_initial_position()
+        elif nkey == ord("B") and modifiers is not None:
+            is_control = (modifiers & QtCore.Qt.ControlModifier) > 0
+            if is_control:
+                self.basic_initial_position()
 
     def listHelpTeclado(self):
         return [
             ("V", _("Paste position")),
             ("T", _("Save position in 'Selected positions' file")),
-            ("S", _("Set start position")),
+            ("S", _("Board editor")),
             ("B", _("Basic position")),
         ]
 
     def startPosition(self):
         position = Voyager.voyager_position(self.main_window, self.game.first_position)
+        Manager.Manager.compruebaDGT(self, False)
         if position is not None:
             if self.game.first_position == position:
                 return

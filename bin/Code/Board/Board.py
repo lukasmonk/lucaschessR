@@ -19,7 +19,7 @@ from Code.Base.Constantes import (
     BLINDFOLD_WHITE,
     BLINDFOLD_ALL,
 )
-from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows
+from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows, BoardCircles
 from Code.Director import TabVisual, WindowDirector
 from Code.QT import Colocacion
 from Code.QT import Controles
@@ -160,9 +160,7 @@ class Board(QtWidgets.QGraphicsView):
 
             # ALT-J Save image to file (CTRL->no border)
             elif key == Qt.Key_J:
-                path = SelectFiles.salvaFichero(
-                    self, _("File to save"), self.configuration.x_save_folder, "%s PNG (*.png)" % _("File"), False
-                )
+                path = SelectFiles.salvaFichero(self, _("File to save"), self.configuration.x_save_folder, "png", False)
                 if path:
                     self.save_as_img(path, "png", is_ctrl=is_ctrl, is_alt=is_alt)
                     self.configuration.x_save_folder = os.path.dirname(path)
@@ -384,9 +382,9 @@ class Board(QtWidgets.QGraphicsView):
         fx = self.config_board.tamFrontera()
         self.tamFrontera = int(self.tamFrontera * fx // 100)
         if fx > 0 and self.tamFrontera == 0:
-            self.tamFrontera = 1
-        if self.tamFrontera == 1:
             self.tamFrontera = 2
+        if self.tamFrontera % 2 == 1:
+            self.tamFrontera += 1
 
         self.puntos = self.puntos * self.config_board.tamLetra() * 12 // 1000
 
@@ -455,7 +453,7 @@ class Board(QtWidgets.QGraphicsView):
                 cajon = BoardTypes.Caja()
                 cajon.colorRelleno = self.colorExterior
         self.ancho = ancho = cajon.physical_pos.alto = cajon.physical_pos.ancho = (
-            self.width_square * 8 + self.margenCentro * 2 + self.tamFrontera * 2 + 4
+            self.width_square * 8 + self.margenCentro * 2 + self.tamFrontera * 2
         )
         cajon.physical_pos.orden = 1
         cajon.tipo = QtCore.Qt.NoPen
@@ -472,8 +470,8 @@ class Board(QtWidgets.QGraphicsView):
         else:
             baseCasillas = BoardTypes.Caja()
             baseCasillas.colorRelleno = self.colorFondo
-        baseCasillas.physical_pos.x = baseCasillas.physical_pos.y = self.margenCentro + 2
-        baseCasillas.physical_pos.alto = baseCasillas.physical_pos.ancho = self.width_square * 8
+        baseCasillas.physical_pos.x = baseCasillas.physical_pos.y = self.margenCentro
+        baseCasillas.physical_pos.alto = baseCasillas.physical_pos.ancho = self.width_square * 8 + self.tamFrontera
         baseCasillas.physical_pos.orden = 2
         baseCasillas.tipo = 0
         if self.png64Fondo:
@@ -486,9 +484,9 @@ class Board(QtWidgets.QGraphicsView):
         # Frontera
         base_casillas_f = BoardTypes.Caja()
         base_casillas_f.grosor = self.tamFrontera
-        base_casillas_f.physical_pos.x = base_casillas_f.physical_pos.y = self.margenCentro + self.tamFrontera
+        base_casillas_f.physical_pos.x = base_casillas_f.physical_pos.y = self.margenCentro
         base_casillas_f.physical_pos.alto = base_casillas_f.physical_pos.ancho = (
-            self.width_square * 8 + self.tamFrontera
+            self.width_square * 8  + self.tamFrontera
         )
         base_casillas_f.physical_pos.orden = 3
         base_casillas_f.colorRelleno = -1
@@ -517,11 +515,11 @@ class Board(QtWidgets.QGraphicsView):
                 for y in range(8):
                     una = square.copia()
 
-                    k = self.margenCentro + 2
+                    k1 = k = self.margenCentro + self.tamFrontera // 2
                     if y % 2 == tipo:
                         k += self.width_square
-                    una.physical_pos.x = k + x * 2 * self.width_square + self.tamFrontera - 1
-                    una.physical_pos.y = self.margenCentro + 2 + y * self.width_square + self.tamFrontera - 1
+                    una.physical_pos.x = k + x * 2 * self.width_square
+                    una.physical_pos.y = k1 + y * self.width_square
                     if with_pixmap:
                         casillaSC = BoardElements.PixmapSC(self.escena, una, pixmap=pixmap)
                         pixmap = casillaSC.pixmap
@@ -829,6 +827,8 @@ class Board(QtWidgets.QGraphicsView):
                     nom_pieces_ori = self.config_board.nomPiezas()
                     self.cambiaPiezas(nom_pieces_ori)
                 self.reset(self.config_board)
+                if hasattr(self.main_window.parent, "ajustaTam"):
+                    self.main_window.parent.ajustaTam()
 
     def lanzaDirector(self):
         if self.siDirector:
@@ -947,6 +947,9 @@ class Board(QtWidgets.QGraphicsView):
             elif TabVisual.TP_MARCO == elem.TP:
                 self.current_graphlive = self.creaMarco(elem)
                 self.current_graphlive.mousePressExt(event)
+            elif TabVisual.TP_CIRCLE == elem.TP:
+                self.current_graphlive = self.creaCircle(elem)
+                self.current_graphlive.mousePressExt(event)
             elif TabVisual.TP_MARKER == elem.TP:
                 self.current_graphlive = self.creaMarker(elem)
                 self.current_graphlive.mousePressExt(event)
@@ -988,6 +991,10 @@ class Board(QtWidgets.QGraphicsView):
                     xdb = db.dbMarcos
                     tp = TabVisual.TP_MARCO
                     obj = BoardTypes.Marco()
+                elif xid.startswith("_D"):
+                    xdb = db.dbCircles
+                    tp = TabVisual.TP_CIRCLE
+                    obj = BoardTypes.Circle()
                 elif xid.startswith("_S"):
                     xdb = db.dbSVGs
                     tp = TabVisual.TP_SVG
@@ -1036,6 +1043,9 @@ class Board(QtWidgets.QGraphicsView):
                     self.current_graphlive.TP = tp
                 elif tp == TabVisual.TP_MARCO:
                     self.current_graphlive = self.creaMarco(elem)
+                    self.current_graphlive.TP = tp
+                elif tp == TabVisual.TP_CIRCLE:
+                    self.current_graphlive = self.creaCircle(elem)
                     self.current_graphlive.TP = tp
                 elif tp == TabVisual.TP_MARKER:
                     self.current_graphlive = self.creaMarker(elem)
@@ -1359,23 +1369,25 @@ class Board(QtWidgets.QGraphicsView):
 
     def fila2punto(self, row):
         factor = (8 - row) if self.is_white_bottom else (row - 1)
-        return factor * (self.anchoPieza + self.margenPieza * 2) + self.margenCentro + self.margenPieza + 2
+        # return factor * (self.anchoPieza + self.margenPieza * 2) + self.margenCentro + self.tamFrontera
+        return factor * self.width_square + self.margenCentro + self.tamFrontera / 2 + self.margenPieza
 
     def columna2punto(self, column):
         factor = (column - 1) if self.is_white_bottom else (8 - column)
-        return factor * (self.anchoPieza + self.margenPieza * 2) + self.margenCentro + self.margenPieza + 2
+        # return factor * (self.anchoPieza + self.margenPieza * 2) + self.margenCentro + self.tamFrontera
+        return factor * self.width_square + self.margenCentro + self.tamFrontera / 2 + self.margenPieza
 
     def punto2fila(self, pos):
-        pos -= self.margenCentro + self.margenPieza + 2
-        pos //= self.anchoPieza + self.margenPieza * 2
+        pos -= self.margenCentro + self.tamFrontera / 2 + self.margenPieza
+        pos //= self.width_square
         if self.is_white_bottom:
             return int(8 - pos)
         else:
             return int(pos + 1)
 
     def punto2columna(self, pos):
-        pos -= self.margenCentro + self.margenPieza + 2
-        pos //= self.anchoPieza + self.margenPieza * 2
+        pos -= self.margenCentro + self.tamFrontera / 2 + self.margenPieza
+        pos //= self.width_square
         if self.is_white_bottom:
             return int(pos + 1)
         else:
@@ -2050,6 +2062,12 @@ class Board(QtWidgets.QGraphicsView):
 
         return BoardBoxes.MarcoSC(self.escena, bloqueMarcoN)
 
+    def creaCircle(self, bloque_circle):
+        bloque_circle = copy.deepcopy(bloque_circle)
+        bloque_circle.width_square = self.width_square
+
+        return BoardCircles.CircleSC(self.escena, bloque_circle)
+
     def creaSVG(self, bloqueSVG, siEditando=False):
         bloqueSVGN = copy.deepcopy(bloqueSVG)
         bloqueSVGN.width_square = self.width_square
@@ -2065,6 +2083,7 @@ class Board(QtWidgets.QGraphicsView):
     def creaFlecha(self, bloqueFlecha, rutina=None):
         bloqueFlechaN = copy.deepcopy(bloqueFlecha)
         bloqueFlechaN.width_square = self.width_square
+        bloqueFlechaN.tamFrontera = self.tamFrontera
 
         return BoardArrows.FlechaSC(self.escena, bloqueFlechaN, rutina)
 
@@ -2099,11 +2118,13 @@ class Board(QtWidgets.QGraphicsView):
             for k, v in self.dicMovibles.items():
                 xobj = str(v)
                 if "Marco" in xobj:
-                    tp = "M"
+                    tp = TabVisual.TP_MARCO
                 elif "Flecha" in xobj:
-                    tp = "F"
+                    tp = TabVisual.TP_FLECHA
                 elif "SVG" in xobj:
-                    tp = "S"
+                    tp = TabVisual.TP_SVG
+                elif "Circle" in xobj:
+                    tp = TabVisual.TP_CIRCLE
                 else:
                     continue
                 li.append((tp, v.bloqueDatos))
@@ -2117,13 +2138,15 @@ class Board(QtWidgets.QGraphicsView):
         if xData:
             liDatos = Util.txt2var(str(xData))
             for tp, bloqueDatos in liDatos:
-                if tp == "M":
+                if tp == TabVisual.TP_MARCO:
                     self.creaMarco(bloqueDatos)
-                elif tp == "F":
+                elif tp == TabVisual.TP_CIRCLE:
+                    self.creaCircle(bloqueDatos)
+                elif tp == TabVisual.TP_FLECHA:
                     self.creaFlecha(bloqueDatos)
-                elif tp == "S":
+                elif tp == TabVisual.TP_SVG:
                     self.creaSVG(bloqueDatos)
-                elif tp == "X":
+                elif tp == TabVisual.TP_MARKER:
                     self.creaMarker(bloqueDatos)
 
     def borraMovible(self, itemSC):

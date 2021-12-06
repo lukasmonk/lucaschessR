@@ -4,7 +4,7 @@ from PySide2 import QtWidgets, QtCore, QtGui
 
 from Code import Util
 from Code.Translations import TrListas
-from Code.Director import TabVisual, WindowTab, WindowTabVFlechas, WindowTabVMarcos, WindowTabVMarkers, WindowTabVSVGs
+from Code.Director import TabVisual, WindowTab, WindowTabVFlechas, WindowTabVMarcos, WindowTabVMarkers, WindowTabVSVGs, WindowTabVCircles
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -16,9 +16,10 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.Board import BoardTypes
+from Code.QT import LCDialog
 
 
-class WPanelDirector(QTVarios.WDialogo):
+class WPanelDirector(LCDialog.LCDialog):
     def __init__(self, owner, board):
         self.owner = owner
         self.position = board.last_position
@@ -32,8 +33,8 @@ class WPanelDirector(QTVarios.WDialogo):
 
         titulo = _("Director")
         icono = Iconos.Script()
-        extparam = "tabvisualscript"
-        QTVarios.WDialogo.__init__(self, board, titulo, icono, extparam)
+        extparam = "tabvisualscript1"
+        LCDialog.LCDialog.__init__(self, board, titulo, icono, extparam)
 
         self.must_save = False
         self.ant_foto = None
@@ -67,7 +68,6 @@ class WPanelDirector(QTVarios.WDialogo):
         o_columns.nueva("NOMBRE", _("Name"), 100, centered=True, edicion=Delegados.LineaTextoUTF8())
         o_columns.nueva("INFO", _("Information"), 100, centered=True)
         self.g_guion = Grid.Grid(self, o_columns, siCabeceraMovible=False, siEditable=True, siSeleccionMultiple=True)
-        self.g_guion.fixMinWidth()
 
         self.register_grid(self.g_guion)
 
@@ -77,7 +77,7 @@ class WPanelDirector(QTVarios.WDialogo):
         self.selectBanda = WindowTab.SelectBanda(self)
 
         lyG = Colocacion.V().control(self.g_guion).control(self.chbSaveWhenFinished)
-        lySG = Colocacion.H().control(self.selectBanda).otro(lyG).relleno(1)
+        lySG = Colocacion.H().control(self.selectBanda).otro(lyG)
         layout = Colocacion.V().control(self.tb).otro(lySG).margen(3)
 
         self.setLayout(layout)
@@ -137,8 +137,9 @@ class WPanelDirector(QTVarios.WDialogo):
             self.selectBanda.seleccionarNum(number)
 
     def grabar(self):
-        li = self.guion.guarda()
-        self.board.dbVisual_save(self.fenm2, li)
+        if self.guion is not None:
+            li = self.guion.guarda()
+            self.board.dbVisual_save(self.fenm2, li)
 
         self.must_save = False
         self.tb.setAccionVisible(self.grabar, False)
@@ -225,6 +226,16 @@ class WPanelDirector(QTVarios.WDialogo):
                 regMarco.a1h8 = a1h8
                 sc = self.board.creaMarco(regMarco)
                 tarea = TabVisual.GT_Marco(self.guion)
+            elif tp == TabVisual.TP_CIRCLE:
+                dic_circle = self.dbCircles[xid]
+                if dic_circle is None:
+                    return None, None
+                reg_circle = BoardTypes.Circle()
+                reg_circle.restore_dic(dic_circle)
+                reg_circle.tpid = tpid
+                reg_circle.a1h8 = a1h8
+                sc = self.board.creaCircle(reg_circle)
+                tarea = TabVisual.GT_Circle(self.guion)
             elif tp == TabVisual.TP_SVG:
                 dicSVG = self.dbSVGs[xid]
                 if dicSVG is None:
@@ -362,7 +373,6 @@ class WPanelDirector(QTVarios.WDialogo):
 
             self.board.dbvisual_close()
 
-            # self.board.borraMovibles()
             self.guion.cierraPizarra()
             self.recuperar()
 
@@ -370,13 +380,9 @@ class WPanelDirector(QTVarios.WDialogo):
         ta = TabVisual.GT_Action(None)
         liActions = [(_F(txt), Iconos.PuntoRojo(), "GTA_%s" % action) for action, txt in ta.dicTxt.items()]
 
-        # tc = TabVisual.GT_Configuration(None)
-        # liConfigurations = [(txt, Iconos.PuntoVerde(), "GTC_%s" % configuration) for configuration, txt in tc.dicTxt.items()]
-
         liMore = [
             (_("Text"), Iconos.Texto(), TabVisual.TP_TEXTO),
             (_("Actions"), Iconos.Run(), liActions),
-            # (_("Configuration"), Iconos.Configurar(), liConfigurations),
         ]
         resp = self.selectBanda.menuParaExterior(liMore)
         if resp:
@@ -389,11 +395,6 @@ class WPanelDirector(QTVarios.WDialogo):
                 self.ponSiGrabar()
             elif resp.startswith("GTA_"):
                 self.creaAction(resp[4:], row)
-            # elif resp.startswith("GTC_"):
-            #     key = resp[4:]
-            #     txt = tc.dicTxt[key]
-            #     if not self.creaConfiguration(txt, key, row):
-            #         return
             else:
                 li = xid.split("_")
                 tp = li[1]
@@ -412,25 +413,6 @@ class WPanelDirector(QTVarios.WDialogo):
         row = self.guion.nuevaTarea(tarea, row)
         self.ponSiGrabar()
         self.refresh_guion()
-
-    # def creaConfiguration(self, txt, configuration, row):
-    #     li_gen = [(None, None)]
-    #     config = FormLayout.Editbox(_("Time in milliseconds"), 80, tipo=int)
-    #     li_gen.append((config, ""))
-    #     ico = Iconos.Configurar()
-
-    #     resultado = FormLayout.fedit(li_gen, title=txt, parent=self, icon=ico)
-    #     if resultado:
-    #         accion, liResp = resultado
-    #         value = liResp[0]
-    #         tarea = TabVisual.GT_Configuration(self.guion)
-    #         tarea.configuration(configuration)
-    #         tarea.value(value)
-    #         self.guion.nuevaTarea(tarea, row)
-    #         self.ponSiGrabar()
-    #         self.refresh_guion()
-    #         return True
-    #     return False
 
     def gnuevo(self):
         self.gmas(False)
@@ -549,6 +531,8 @@ class WPanelDirector(QTVarios.WDialogo):
             sc = self.board.creaFlecha(bloqueDatos)
         elif tp == TabVisual.TP_MARCO:
             sc = self.board.creaMarco(bloqueDatos)
+        elif tp == TabVisual.TP_CIRCLE:
+            sc = self.board.creaCircle(bloqueDatos)
         elif tp == TabVisual.TP_SVG:
             sc = self.board.creaSVG(bloqueDatos)
         elif tp == TabVisual.TP_MARKER:
@@ -639,6 +623,12 @@ class WPanelDirector(QTVarios.WDialogo):
             if w.exec_():
                 self.dbMarcos[xid] = w.regMarco.save_dic()
                 ok = True
+        elif tp == TabVisual.TP_CIRCLE:
+            reg_circle = BoardTypes.Circle(dic=self.dbCircles[xid])
+            w = WindowTabVCircles.WTV_Circle(self, reg_circle)
+            if w.exec_():
+                self.dbCircles[xid] = w.reg_circle.save_dic()
+                ok = True
         elif tp == TabVisual.TP_SVG:
             regSVG = BoardTypes.SVG(dic=self.dbSVGs[xid])
             w = WindowTabVSVGs.WTV_SVG(self, regSVG)
@@ -681,7 +671,7 @@ class WPanelDirector(QTVarios.WDialogo):
 
     def grabarFichero(self):
         dirSalvados = self.configuration.x_save_folder
-        resp = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PNG (*.png)", False)
+        resp = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, "png", False)
         if resp:
             self.board.save_as_img(resp, "png")
             txt = resp
@@ -714,6 +704,12 @@ class WPanelDirector(QTVarios.WDialogo):
         self.actualizaBandas()
         QTUtil.refresh_gui()
 
+    def circles(self):
+        w = WindowTabVCircles.WTV_Circles(self, self.list_circles(), self.dbCircles)
+        w.exec_()
+        self.actualizaBandas()
+        QTUtil.refresh_gui()
+
     def list_boxes(self):
         dic = self.dbMarcos.as_dictionary()
         li = []
@@ -721,6 +717,16 @@ class WPanelDirector(QTVarios.WDialogo):
             box = BoardTypes.Marco(dic=dicMarco)
             box.id = k
             li.append(box)
+        li.sort(key=lambda x: x.ordenVista)
+        return li
+
+    def list_circles(self):
+        dic = self.dbCircles.as_dictionary()
+        li = []
+        for k, dicCircle in dic.items():
+            circle = BoardTypes.Circle(dic=dicCircle)
+            circle.id = k
+            li.append(circle)
         li.sort(key=lambda x: x.ordenVista)
         return li
 
@@ -762,6 +768,7 @@ class WPanelDirector(QTVarios.WDialogo):
         self.dbConfig = self.dbManager.dbConfig
         self.dbFlechas = self.dbManager.dbFlechas
         self.dbMarcos = self.dbManager.dbMarcos
+        self.dbCircles = self.dbManager.dbCircles
         self.dbSVGs = self.dbManager.dbSVGs
         self.dbMarkers = self.dbManager.dbMarkers
 
@@ -795,6 +802,14 @@ class WPanelDirector(QTVarios.WDialogo):
             pm.loadFromData(box.png, "PNG")
             xid = "_M_%s" % box.id
             name = box.name
+            self.selectBanda.actualiza(xid, name, pm, tipo)
+
+        tipo = _("Circles")
+        for circle in self.list_circles():
+            pm = QtGui.QPixmap()
+            pm.loadFromData(circle.png, "PNG")
+            xid = "_D_%s" % circle.id
+            name = circle.name
             self.selectBanda.actualiza(xid, name, pm, tipo)
 
         tipo = _("Images")
@@ -832,12 +847,14 @@ class WPanelDirector(QTVarios.WDialogo):
                 "descuelgue",
             ),
             TabVisual.TP_MARCO: ("name", "color", "colorinterior", "colorinterior2", "grosor", "redEsquina", "tipo", "opacity"),
+            TabVisual.TP_CIRCLE: ("name", "color", "colorinterior", "colorinterior2", "grosor", "tipo", "opacity"),
             TabVisual.TP_SVG: ("name", "opacity"),
             TabVisual.TP_MARKER: ("name", "opacity"),
         }
         dicDB = {
             TabVisual.TP_FLECHA: self.dbFlechas,
             TabVisual.TP_MARCO: self.dbMarcos,
+            TabVisual.TP_CIRCLE: self.dbCircles,
             TabVisual.TP_SVG: self.dbSVGs,
             TabVisual.TP_MARKER: self.dbMarkers,
         }

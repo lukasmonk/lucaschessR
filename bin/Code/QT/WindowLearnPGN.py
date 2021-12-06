@@ -16,6 +16,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
+from Code.QT import LCDialog
 
 
 class LearnPGNs(UtilSQL.DictSQL):
@@ -47,11 +48,11 @@ class LearnPGNs(UtilSQL.DictSQL):
         self.regKeys = self.keys(True, True)
 
 
-class WLearnBase(QTVarios.WDialogo):
+class WLearnBase(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         titulo = _("Memorize a game")
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, Iconos.LearnGame(), "learngame")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, Iconos.LearnGame(), "learngame")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -136,10 +137,10 @@ class WLearnBase(QTVarios.WDialogo):
             w.exec_()
 
 
-class WLearn1(QTVarios.WDialogo):
+class WLearn1(LCDialog.LCDialog):
     def __init__(self, owner, numRegistro):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Learn a game"), Iconos.PGN(), "learn1game")
+        LCDialog.LCDialog.__init__(self, owner, _("Learn a game"), Iconos.PGN(), "learn1game")
 
         self.owner = owner
         self.db = owner.db
@@ -158,7 +159,7 @@ class WLearn1(QTVarios.WDialogo):
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 100, centered=True)
         o_columns.nueva("LEVEL", _("Level"), 80, centered=True)
-        o_columns.nueva("COLOR", _("Play with"), 80, centered=True)
+        o_columns.nueva("COLOR", _("Side you play with"), 80, centered=True)
         o_columns.nueva("ERRORS", _("Errors"), 80, centered=True)
         o_columns.nueva("HINTS", _("Hints"), 80, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
@@ -256,7 +257,7 @@ class WLearn1(QTVarios.WDialogo):
 
         li_gen.append((FormLayout.Spinbox(_("Level"), 0, len(self.game), 40), regBase.get("LEVEL", 0)))
         li_gen.append((None, None))
-        li_gen.append((None, _("User play with") + ":"))
+        li_gen.append((None, _("Side you play with") + ":"))
         li_gen.append((_("White"), "w" in regBase.get("COLOR", "bw")))
         li_gen.append((_("Black"), "b" in regBase.get("COLOR", "bw")))
         li_gen.append((None, None))
@@ -281,12 +282,12 @@ class WLearn1(QTVarios.WDialogo):
         w.exec_()
 
 
-class WLearnPuente(QTVarios.WDialogo):
+class WLearnPuente(LCDialog.LCDialog):
     INICIO, FINAL_JUEGO, REPLAY, REPLAY_CONTINUE = range(4)
 
     def __init__(self, owner, game, nivel, white, black, siClock):
 
-        QTVarios.WDialogo.__init__(self, owner, owner.label(), Iconos.PGN(), "learnpuente")
+        LCDialog.LCDialog.__init__(self, owner, owner.label(), Iconos.PGN(), "learnpuente")
 
         self.owner = owner
         self.procesador = owner.procesador

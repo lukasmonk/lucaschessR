@@ -12,9 +12,9 @@ from Code.QT import Controles
 from Code.QT import FormLayout
 from Code.QT import Grid
 from Code.QT import Iconos
+from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.QT import QTVarios
 
 
 class WTV_Marco(QtWidgets.QDialog):
@@ -129,13 +129,13 @@ class WTV_Marco(QtWidgets.QDialog):
         self.accept()
 
 
-class WTV_Marcos(QTVarios.WDialogo):
+class WTV_Marcos(LCDialog.LCDialog):
     def __init__(self, owner, list_boxes, dbMarcos):
 
         titulo = _("Boxes")
         icono = Iconos.Marcos()
         extparam = "marcos"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.owner = owner
 

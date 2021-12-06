@@ -10,6 +10,7 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.SQL import UtilSQL
+from Code.QT import LCDialog
 
 
 class DBPlayGame(UtilSQL.DictSQL):
@@ -67,11 +68,11 @@ class DBPlayGame(UtilSQL.DictSQL):
         return "%s-%s : %s %s %s" % (x("WHITE"), x("BLACK"), date, x("EVENT"), x("SITE"))
 
 
-class WPlayGameBase(QTVarios.WDialogo):
+class WPlayGameBase(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         titulo = _("Play against a game")
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, Iconos.Law(), "playgame")
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, Iconos.Law(), "playgame")
 
         self.procesador = procesador
         self.configuration = procesador.configuration
@@ -184,10 +185,10 @@ class WPlayGameBase(QTVarios.WDialogo):
                 self.accept()
 
 
-class WPlay1(QTVarios.WDialogo):
+class WPlay1(LCDialog.LCDialog):
     def __init__(self, owner, configuration, db, recno):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Play against a game"), Iconos.PlayGame(), "play1game")
+        LCDialog.LCDialog.__init__(self, owner, _("Play against a game"), Iconos.PlayGame(), "play1game")
 
         self.owner = owner
         self.db = db
@@ -204,7 +205,7 @@ class WPlay1(QTVarios.WDialogo):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("DATE", _("Date"), 80, centered=True)
-        o_columns.nueva("COLOR", _("Play with"), 80, centered=True)
+        o_columns.nueva("COLOR", _("Side you play with"), 80, centered=True)
         o_columns.nueva("POINTS", _("Score"), 80, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=True)

@@ -6,6 +6,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
 from Code import Util
+from Code import DGT
 from Code.Base import Game, Move, Position
 from Code.Board import Board
 from Code.QT import Colocacion
@@ -19,6 +20,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import Scanner
+from Code.QT import LCDialog
 
 MODO_POSICION, MODO_PARTIDA = range(2)
 
@@ -56,7 +58,7 @@ class WPosicion(QtWidgets.QWidget):
 
         QtWidgets.QWidget.__init__(self, wparent)
 
-        li_acciones = (
+        li_acciones = [
             (_("Save"), Iconos.GrabarComo(), self.save),
             None,
             (_("Cancel"), Iconos.Cancelar(), self.cancelar),
@@ -67,7 +69,10 @@ class WPosicion(QtWidgets.QWidget):
             (_("Paste FEN position"), Iconos.Pegar16(), self.pegar),
             (_("Copy FEN position"), Iconos.Copiar(), self.copiar),
             (_("Scanner"), Iconos.Scanner(), self.scanner),
-        )
+        ]
+        if self.configuration.x_digital_board:
+            li_acciones.append(None)
+            li_acciones.append((self.dgt_title_icon(), Iconos.DGT(), self.dgt_active))
 
         self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=20)
 
@@ -106,7 +111,9 @@ class WPosicion(QtWidgets.QWidget):
         pb_scanner_deduce = Controles.PB(self, _("Deduce"), self.scanner_deduce, plano=False)
         self.chb_scanner_flip = Controles.CHB(self, _("Flip the board"), False).capture_changes(self, self.scanner_flip)
         self.pb_scanner_learn = Controles.PB(self, _("Learn"), self.scanner_learn, plano=False)
-        self.pb_scanner_learn_quit = Controles.PB(self, "", self.scanner_learn_quit).ponIcono(Iconos.Menos(), icon_size=24)
+        self.pb_scanner_learn_quit = Controles.PB(self, "", self.scanner_learn_quit).ponIcono(
+            Iconos.Menos(), icon_size=24
+        )
         self.pb_scanner_learn_quit.ponToolTip(_("Remove last learned")).anchoFijo(24)
 
         self.sb_scanner_tolerance, lb_scanner_tolerance = QTUtil2.spinBoxLB(
@@ -141,8 +148,22 @@ class WPosicion(QtWidgets.QWidget):
         ly.controld(lbFullMoves, 1, 2).control(self.edFullMoves, 1, 3)
         gbOtros = Controles.GB(self, "", ly)
 
-        lyT = Colocacion.H().relleno().control(lb_scanner_tolerance).espacio(5).control(self.sb_scanner_tolerance).relleno()
-        lyTL = Colocacion.H().relleno().control(lb_scanner_tolerance_learns).espacio(5).control(self.sb_scanner_tolerance_learns).relleno()
+        lyT = (
+            Colocacion.H()
+            .relleno()
+            .control(lb_scanner_tolerance)
+            .espacio(5)
+            .control(self.sb_scanner_tolerance)
+            .relleno()
+        )
+        lyTL = (
+            Colocacion.H()
+            .relleno()
+            .control(lb_scanner_tolerance_learns)
+            .espacio(5)
+            .control(self.sb_scanner_tolerance_learns)
+            .relleno()
+        )
         lyL = Colocacion.H().control(self.pb_scanner_learn).control(self.pb_scanner_learn_quit)
         lyS = Colocacion.H().control(lb_scanner_select).control(self.cb_scanner_select).control(pb_scanner_more)
         ly = Colocacion.V().control(self.chb_scanner_flip).control(pb_scanner_deduce).otro(lyL).otro(lyT).otro(lyTL)
@@ -172,6 +193,43 @@ class WPosicion(QtWidgets.QWidget):
         self.lb_scanner.hide()
         self.pb_scanner_learn_quit.hide()
         self.gb_scanner.hide()
+
+        DGT.activarSegunON_OFF(self.dispatch_dgt)
+
+    def compruebaDGT(self, set_position):
+        if self.configuration.x_digital_board:
+            if not DGT.activarSegunON_OFF(self.dispatch_dgt):  # Error
+                QTUtil2.message_error(
+                    self.main_window,
+                    _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board,
+                )
+            else:
+                if set_position:
+                    DGT.set_position(Game.Game())
+
+    def dgt_active(self):
+        DGT.cambiarON_OFF()
+        self.compruebaDGT(True)
+        self.tb.set_action_title(self.dgt_active, self.dgt_title_icon())
+
+    def dgt_title_icon(self):
+        return (
+            _("Disable %s board") % self.configuration.x_digital_board
+            if DGT.siON()
+            else _("Enable %s board") % self.configuration.x_digital_board
+        )
+
+    def dispatch_dgt(self, quien, fen):
+        fen = str(fen)
+        self.position.read_fen(fen)
+        self.actPosicion()
+        self.resetPosicion(False)
+        if fen.count("K") == 1 and fen.count("k") == 1:
+            self.save()
+        elif fen.count("k") == 1:
+            self.rbWhite.activa(True)
+        elif fen.count("K") == 1:
+            self.rbBlack.activa(True)
 
     def closeEvent(self, QCloseEvent):
         self.scanner_write()
@@ -259,10 +317,14 @@ class WPosicion(QtWidgets.QWidget):
         li_options = []
         if not siK:
             li_options.append((_("King"), "K"))
-        li_options.extend([(_("Queen"), "Q"), (_("Rook"), "R"), (_("Bishop"), "B"), (_("Knight"), "N"), (_("Pawn"), "P")])
+        li_options.extend(
+            [(_("Queen"), "Q"), (_("Rook"), "R"), (_("Bishop"), "B"), (_("Knight"), "N"), (_("Pawn"), "P")]
+        )
         if not sik:
             li_options.append((_("King"), "k"))
-        li_options.extend([(_("Queen"), "q"), (_("Rook"), "r"), (_("Bishop"), "b"), (_("Knight"), "n"), (_("Pawn"), "p")])
+        li_options.extend(
+            [(_("Queen"), "q"), (_("Rook"), "r"), (_("Bishop"), "b"), (_("Knight"), "n"), (_("Pawn"), "p")]
+        )
 
         for txt, pieza in li_options:
             icono = self.board.piezas.icono(pieza)
@@ -353,28 +415,29 @@ class WPosicion(QtWidgets.QWidget):
         self.position.set_pos_initial()
         self.resetPosicion()
 
-    def resetPosicion(self):
+    def resetPosicion(self, resetAll=True):
         self.board.set_position(self.position)
         self.squares = self.position.squares
         self.board.squares = self.squares
         self.board.enable_all()
 
-        if self.position.is_white:
-            self.rbWhite.activa(True)
-        else:
-            self.rbBlack.activa(True)
+        if resetAll:
+            if self.position.is_white:
+                self.rbWhite.activa(True)
+            else:
+                self.rbBlack.activa(True)
 
-        # Enroques permitidos
-        castles = self.position.castles
-        self.cbWoo.setChecked("K" in castles)
-        self.cbWooo.setChecked("Q" in castles)
-        self.cbBoo.setChecked("k" in castles)
-        self.cbBooo.setChecked("q" in castles)
+            # Enroques permitidos
+            castles = self.position.castles
+            self.cbWoo.setChecked("K" in castles)
+            self.cbWooo.setChecked("Q" in castles)
+            self.cbBoo.setChecked("k" in castles)
+            self.cbBooo.setChecked("q" in castles)
 
-        # Otros
-        self.edEnPassant.set_text(self.position.en_passant)
-        self.edFullMoves.setValue(self.position.num_moves)
-        self.edMovesPawn.setValue(self.position.mov_pawn_capt)
+            # Otros
+            self.edEnPassant.set_text(self.position.en_passant)
+            self.edFullMoves.setValue(self.position.num_moves)
+            self.edMovesPawn.setValue(self.position.mov_pawn_capt)
 
     def scanner(self):
         pos = QTUtil.escondeWindow(self.wparent)
@@ -394,7 +457,9 @@ class WPosicion(QtWidgets.QWidget):
 
             self.vars_scanner.read()
             self.vars_scanner.tolerance = self.sb_scanner_tolerance.valor()  # releemos la variable
-            self.vars_scanner.tolerance_learns = min(self.sb_scanner_tolerance_learns.valor(), self.vars_scanner.tolerance)
+            self.vars_scanner.tolerance_learns = min(
+                self.sb_scanner_tolerance_learns.valor(), self.vars_scanner.tolerance
+            )
 
             if os.path.isfile(fich_png) and Util.filesize(fich_png):
                 self.scanner_read_png(fich_png)
@@ -526,7 +591,9 @@ class WPosicion(QtWidgets.QWidget):
             config = FormLayout.Editbox(_("Name"), ancho=120)
             li_gen.append((config, name))
 
-            resultado = FormLayout.fedit(li_gen, title=_("New scanner"), parent=self, anchoMinimo=200, icon=Iconos.Scanner())
+            resultado = FormLayout.fedit(
+                li_gen, title=_("New scanner"), parent=self, anchoMinimo=200, icon=Iconos.Scanner()
+            )
             if resultado:
                 accion, li_gen = resultado
                 name = li_gen[0].strip()
@@ -660,10 +727,14 @@ class WPGN(QtWidgets.QWidget):
 
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 35, centered=True)
-        self.si_figurines_pgn = configuration.x_pgn_withfigurines
+        self.with_figurines = configuration.x_pgn_withfigurines
         nAnchoColor = (self.board.ancho - 35 - 20) // 2
-        o_columns.nueva("WHITE", _("White"), nAnchoColor, edicion=Delegados.EtiquetaPGN(True if self.si_figurines_pgn else None))
-        o_columns.nueva("BLACK", _("Black"), nAnchoColor, edicion=Delegados.EtiquetaPGN(False if self.si_figurines_pgn else None))
+        o_columns.nueva(
+            "WHITE", _("White"), nAnchoColor, edicion=Delegados.EtiquetaPGN(True if self.with_figurines else None)
+        )
+        o_columns.nueva(
+            "BLACK", _("Black"), nAnchoColor, edicion=Delegados.EtiquetaPGN(False if self.with_figurines else None)
+        )
         self.pgn = Grid.Grid(self, o_columns, siCabeceraMovible=False, siSelecFilas=True)
         self.pgn.setMinimumWidth(self.board.ancho)
 
@@ -727,7 +798,7 @@ class WPGN(QtWidgets.QWidget):
         n = len(self.game)
         if not n:
             return 0
-        if self.game.if_starts_with_black:
+        if self.game.starts_with_black:
             n += 1
         if n % 2:
             n += 1
@@ -738,7 +809,7 @@ class WPGN(QtWidgets.QWidget):
         if col == "NUMBER":
             return str(self.game.first_position.num_moves + row)
 
-        siIniBlack = self.game.if_starts_with_black
+        siIniBlack = self.game.starts_with_black
         nJug = len(self.game)
         if row == 0:
             w = None if siIniBlack else 0
@@ -754,7 +825,7 @@ class WPGN(QtWidgets.QWidget):
             if n is None:
                 return ""
             move = self.game.move(n)
-            if self.si_figurines_pgn:
+            if self.with_figurines:
                 return move.pgnFigurinesSP()
             else:
                 return move.pgn_translated()
@@ -765,12 +836,12 @@ class WPGN(QtWidgets.QWidget):
             return xjug(b)
 
 
-class Voyager(QTVarios.WDialogo):
+class Voyager(LCDialog.LCDialog):
     def __init__(self, owner, is_game, game):
 
         titulo = _("Voyager 2") if is_game else _("Start position")
         icono = Iconos.Voyager() if is_game else Iconos.Datos()
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, "voyager")
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, "voyager")
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Window | QtCore.Qt.WindowStaysOnTopHint)
 
         self.is_game = is_game

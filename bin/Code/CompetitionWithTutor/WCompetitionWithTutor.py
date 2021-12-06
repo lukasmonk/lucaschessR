@@ -139,7 +139,7 @@ class wDatos(QtWidgets.QDialog):
         self.setWindowIcon(Iconos.Datos())
         self.setWindowFlags(QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
 
-        tb = QTUtil2.tbAcceptCancel(self)
+        tb = QTVarios.tbAcceptCancel(self)
 
         f = Controles.TipoLetra(puntos=12, peso=75)
         flb = Controles.TipoLetra(puntos=10)
@@ -198,7 +198,7 @@ class wDatos(QtWidgets.QDialog):
         gbT = Controles.GB(self, _("Tutor"), ly).ponFuente(f)
 
         hbox = Colocacion.H().relleno().control(self.rb_white).espacio(10).control(self.rb_black).relleno()
-        gbColor = Controles.GB(self, _("Play with"), hbox).ponFuente(f)
+        gbColor = Controles.GB(self, _("Side you play with"), hbox).ponFuente(f)
 
         lyNivel = Colocacion.H().control(lb).control(self.ed).espacio(10).control(self.lbPuntos).relleno()
 
@@ -245,7 +245,7 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         self.setWindowTitle(titulo)
         self.setWindowIcon(Iconos.Datos())
 
-        tb = QTUtil2.tbAcceptCancel(self)
+        tb = QTVarios.tbAcceptCancel(self)
 
         if pos is None:
             pos = 1  # random.randint( 1, to_sq )

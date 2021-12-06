@@ -7,6 +7,7 @@ from Code.QT import Grid
 from Code.QT import QTVarios
 from Code.QT import Iconos
 from Code.QT import Delegados
+from Code.QT import LCDialog
 
 from Code.Base.Constantes import MENU_PLAY_ANY_ENGINE, MENU_PLAY_YOUNG_PLAYERS
 
@@ -72,7 +73,7 @@ def menu_tools_savemenu(procesador, dic_data=None):
     menu1.separador()
     menu1.opcion("pgn_paste", _("Paste PGN"), Iconos.Pegar())
     menu1.separador()
-    menu1.opcion("manual_save", _("Save positions to FNS/PGN"), Iconos.ManualSave())
+    menu1.opcion("manual_save", _("Edit and save positions to PGN or FNS"), Iconos.ManualSave())
     menu1.separador()
     menu1.opcion("miniatura", _("Miniature of the day"), Iconos.Miniatura())
     menu1.separador()
@@ -223,7 +224,7 @@ def menu_compete(procesador):
     return savemenu.lanza(procesador)
 
 
-class WAtajos(QTVarios.WDialogo):
+class WAtajos(LCDialog.LCDialog):
     def __init__(self, procesador, dic_data):
         entrenamientos = procesador.entrenamientos
         entrenamientos.check()
@@ -232,7 +233,7 @@ class WAtajos(QTVarios.WDialogo):
         self.li_favoritos = self.procesador.configuration.get_favoritos()
         self.dic_data = dic_data
 
-        QTVarios.WDialogo.__init__(self, self.procesador.main_window, _("Shortcuts"), Iconos.Atajos(), "atajos")
+        LCDialog.LCDialog.__init__(self, self.procesador.main_window, _("Shortcuts"), Iconos.Atajos(), "atajos")
 
         li_acciones = [
             (_("Close"), Iconos.MainMenu(), self.terminar),
@@ -290,7 +291,7 @@ class WAtajos(QTVarios.WDialogo):
 
     def grid_dato(self, grid, row, o_column):
         if o_column.key == "KEY":
-            return "%s %d" % (_("Alt"), row + 1)
+            return "%s %d" % (_("ALT"), row + 1)
         dic = self.li_favoritos[row]
         opcion = dic["OPCION"]
         if opcion in self.dic_data:
@@ -372,7 +373,7 @@ def atajos(procesador):
             launcher, label, icono, is_disabled = dic_data[key]
             label = dic.get("LABEL", label)
             if nx <= 9:
-                label += "  [%s-%d]" % (_("Alt"), nx)
+                label += "  [%s-%d]" % (_("ALT"), nx)
             menu.opcion(key, label, icono, is_disabled)
             nx += 1
             menu.separador()

@@ -100,10 +100,9 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             if self.hints:
                 self.xtutor.check_engine()
             self.xrival.check_engine()
-            if Code.dgt and Code.is_linux:
-                self.start_message_nomodal()   #problema con eboard
-            else:
-                self.start_message()
+            self.start_message(
+                nomodal=Code.dgt and Code.is_linux
+            )   #nomodal: problema con eboard
 
         self.play_next_move()
 
@@ -334,7 +333,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def ponRotuloBasico(self):
         rotulo1 = ""
         if self.book_rival_active:
-            rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Rival"), os.path.basename(self.book_rival.name))
+            rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Opponent"), os.path.basename(self.book_rival.name))
         if self.book_player_active:
             rotulo1 += "<br>%s-%s: <b>%s</b>" % (_("Book"), _("Player"), os.path.basename(self.book_player.name))
         self.set_label1(rotulo1)
@@ -1062,6 +1061,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                     self.opening_mandatory = None
                 else:
                     self.board.ponFlechasTmp(((apdesde, aphasta, False),))
+                    self.beepError()
                     self.sigueHumano()
                     return False
 

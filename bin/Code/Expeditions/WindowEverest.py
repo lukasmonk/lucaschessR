@@ -17,16 +17,17 @@ from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.QT import LCDialog
 
 
-class WNewExpedition(QTVarios.WDialogo):
+class WNewExpedition(LCDialog.LCDialog):
     def __init__(self, owner, file):
         self.litourneys = Everest.str_file(file)
         self.configuration = owner.configuration
         titulo = _("New expedition")
         icono = Iconos.Trekking()
         extparam = "newexpedition"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         self.selected = None
 
@@ -135,7 +136,7 @@ class WNewExpedition(QTVarios.WDialogo):
             form.checkbox(_("Reverse"), reverse)
 
             form.separador()
-            form.spinbox(_("Max. plies"), 0, 999, 50, 0)
+            form.spinbox(_("Maximum movements"), 0, 999, 50, 0)
 
             resultado = form.run()
             if resultado:
@@ -184,7 +185,7 @@ class WNewExpedition(QTVarios.WDialogo):
         db.close()
 
 
-class WExpedition(QTVarios.WDialogo):
+class WExpedition(LCDialog.LCDialog):
     def __init__(self, wowner, configuration, recno):
         expedition = Everest.Expedition(configuration, recno)
         self.li_routes, self.current, svg, label = expedition.gen_routes()
@@ -192,7 +193,7 @@ class WExpedition(QTVarios.WDialogo):
         titulo = _("Everest")
         icono = Iconos.Trekking()
         extparam = "expedition"
-        QTVarios.WDialogo.__init__(self, wowner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, wowner, titulo, icono, extparam)
 
         self.selected = False
 
@@ -226,7 +227,7 @@ class WExpedition(QTVarios.WDialogo):
         o_columns.nueva("DONE", _("Done"), 80, centered=True)
         o_columns.nueva("TIME", _("Time"), 80, centered=True)
         o_columns.nueva("MTIME", _("Average time"), 80, centered=True)
-        o_columns.nueva("MPOINTS", _("Av. centipawns lost"), 80, centered=True)
+        o_columns.nueva("MPOINTS", _("Average centipawns lost"), 80, centered=True)
         o_columns.nueva("TRIES", _("Max tries"), 80, centered=True)
         o_columns.nueva("TOLERANCE", _("Tolerance"), 80, centered=True)
         grid = Grid.Grid(self, o_columns, siSelecFilas=True, siSeleccionMultiple=False)
@@ -293,10 +294,10 @@ class WExpedition(QTVarios.WDialogo):
         self.reject()
 
 
-class WEverest(QTVarios.WDialogo):
+class WEverest(LCDialog.LCDialog):
     def __init__(self, procesador):
 
-        QTVarios.WDialogo.__init__(
+        LCDialog.LCDialog.__init__(
             self, procesador.main_window, _("Expeditions to the Everest"), Iconos.Trekking(), "everestBase"
         )
 

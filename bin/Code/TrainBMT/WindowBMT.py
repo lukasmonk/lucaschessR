@@ -3,8 +3,9 @@ import time
 
 from PySide2 import QtCore
 
-from Code.TrainBMT import BMT
 import Code
+from Code.TrainBMT import BMT
+
 Code.BMT = BMT
 from Code import ControlPGN
 from Code import Util
@@ -29,9 +30,10 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2, SelectFiles
 from Code.QT import QTVarios
 from Code.Translations import TrListas
+from Code.QT import LCDialog
 
 
-class WHistorialBMT(QTVarios.WDialogo):
+class WHistorialBMT(LCDialog.LCDialog):
     def __init__(self, owner, dbf):
 
         # Variables
@@ -53,7 +55,7 @@ class WHistorialBMT(QTVarios.WDialogo):
         icono = Iconos.Historial()
         titulo = _("Track record") + ": " + dbf.NOMBRE
         extparam = "bmthistorial"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
         tb = QTVarios.LCTB(self)
@@ -113,7 +115,7 @@ class WHistorialBMT(QTVarios.WDialogo):
             return "%d' %d\"" % (m, s) if m else '%d"' % s
 
 
-class WEntrenarBMT(QTVarios.WDialogo):
+class WEntrenarBMT(LCDialog.LCDialog):
     def __init__(self, owner, dbf):
 
         # Variables
@@ -155,7 +157,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         icono = Iconos.BMT()
         titulo = dbf.NOMBRE
         extparam = "bmtentrenar"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Juegan ---------------------------------------------------------------
         self.lbJuegan = Controles.LB(self, "").set_foreground_backgound("white", "black").align_center()
@@ -183,9 +185,9 @@ class WEntrenarBMT(QTVarios.WDialogo):
         # Grid-PGN ---------------------------------------------------------------
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("NUMBER", _("N."), 35, centered=True)
-        si_figurines_pgn = self.configuration.x_pgn_withfigurines
-        o_columns.nueva("WHITE", _("White"), 100, edicion=Delegados.EtiquetaPGN(True if si_figurines_pgn else None))
-        o_columns.nueva("BLACK", _("Black"), 100, edicion=Delegados.EtiquetaPGN(False if si_figurines_pgn else None))
+        with_figurines = self.configuration.x_pgn_withfigurines
+        o_columns.nueva("WHITE", _("White"), 100, edicion=Delegados.EtiquetaPGN(True if with_figurines else None))
+        o_columns.nueva("BLACK", _("Black"), 100, edicion=Delegados.EtiquetaPGN(False if with_figurines else None))
         self.pgn = Grid.Grid(self, o_columns, siCabeceraMovible=False)
         nAnchoPgn = self.pgn.anchoColumnas() + 20
         self.pgn.setMinimumWidth(nAnchoPgn)
@@ -547,10 +549,10 @@ class WEntrenarBMT(QTVarios.WDialogo):
         else:
             is_white = key != "BLACK"
 
-        if_starts_with_black = game.if_starts_with_black
+        starts_with_black = game.starts_with_black
 
         lj = len(game)
-        if if_starts_with_black:
+        if starts_with_black:
             lj += 1
         ultFila = (lj - 1) / 2
         siUltBlancas = lj % 2 == 1
@@ -562,7 +564,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
             pos = row * 2
             if not is_white:
                 pos += 1
-            if row < 0 or (row == 0 and pos == 0 and if_starts_with_black):
+            if row < 0 or (row == 0 and pos == 0 and starts_with_black):
                 self.ponteAlPrincipio()
                 return
         elif tipo == GO_FORWARD:
@@ -583,7 +585,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         if row < 0 or row > ultFila:
             self.refresh()
             return
-        if row == 0 and is_white and if_starts_with_black:
+        if row == 0 and is_white and starts_with_black:
             is_white = False
 
         self.pgnColocate(row, is_white)
@@ -907,7 +909,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         pos = row * 2
         if not is_white:
             pos += 1
-        if self.game.if_starts_with_black:
+        if self.game.starts_with_black:
             pos -= 1
         tam_lj = len(self.game)
         if tam_lj == 0:
@@ -930,7 +932,7 @@ class WEntrenarBMT(QTVarios.WDialogo):
         Analysis.show_analysis(self.procesador, self.procesador.XTutor(), move, is_white, max_recursion, pos, main_window=self)
 
 
-class WBMT(QTVarios.WDialogo):
+class WBMT(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         self.procesador = procesador
@@ -944,7 +946,7 @@ class WBMT(QTVarios.WDialogo):
         icono = Iconos.BMT()
         titulo = self.titulo()
         extparam = "bmt"
-        QTVarios.WDialogo.__init__(self, owner, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
 
         # Toolbar
         li_acciones = [
@@ -1443,13 +1445,7 @@ class WBMT(QTVarios.WDialogo):
         um.final()
 
     def cambiar(self):
-        fbmt = SelectFiles.salvaFichero(
-            self,
-            _("Select/create another file of training"),
-            self.configuration.ficheroBMT,
-            _("File") + " bmt (*.bmt)",
-            siConfirmarSobreescritura=False,
-        )
+        fbmt = SelectFiles.salvaFichero(self, _("Select/create another file of training"), self.configuration.ficheroBMT, "bmt", False)
         if fbmt:
             fbmt = Util.relative_path(fbmt)
             abmt = self.bmt
@@ -1472,8 +1468,7 @@ class WBMT(QTVarios.WDialogo):
         if recno >= 0:
             regActual = dbf.registroActual()
             carpeta = "%s/%s.bm1" % (os.path.dirname(self.configuration.ficheroBMT), dbf.NOMBRE)  # @Lucas: ya tienes este cambio
-            filtro = _("File") + " bm1 (*.bm1)"
-            fbm1 = SelectFiles.salvaFichero(self, _("Export the current training"), carpeta, filtro, siConfirmarSobreescritura=True)
+            fbm1 = SelectFiles.salvaFichero(self, _("Export the current training"), carpeta, "bm1", True)
             if fbm1:
                 if siLimpiar:
                     regActual.ESTADO = "0"
@@ -1527,8 +1522,7 @@ class WBMT(QTVarios.WDialogo):
 
     def importar(self):
         carpeta = os.path.dirname(self.configuration.ficheroBMT)
-        filtro = _("File") + " bm1 (*.bm1)"
-        fbm1 = SelectFiles.leeFichero(self, carpeta, filtro, titulo=_("Import a training"))
+        fbm1 = SelectFiles.leeFichero(self, carpeta, "bm1", titulo=_("Import a training"))
         if fbm1:
 
             reg = Util.restore_pickle(fbm1)

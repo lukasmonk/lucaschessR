@@ -5,11 +5,11 @@ from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Grid
 from Code.QT import Iconos
-from Code.QT import QTVarios
+from Code.QT import LCDialog
 from Code.Themes import Themes
 
 
-class WDBMoveAnalysis(QTVarios.WDialogo):
+class WDBMoveAnalysis(LCDialog.LCDialog):
     """
     The WDBMoveAnalysis class is used to show outputs of the move analysis
 
@@ -24,7 +24,7 @@ class WDBMoveAnalysis(QTVarios.WDialogo):
     def __init__(self, w_parent, li_output_dic, titulo, missing_tags_output):
         icono = Iconos.Tacticas()
         extparam = "themeanalysis"
-        QTVarios.WDialogo.__init__(self, w_parent, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, w_parent, titulo, icono, extparam)
         self.owner = w_parent
         self.li_output_dic = li_output_dic
 

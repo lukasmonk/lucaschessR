@@ -9,7 +9,7 @@ from Code.Base.Constantes import (
     VERY_GOOD_MOVE,
     NO_RATING,
     BAD_MOVE,
-    VERY_POOR_MOVE,
+    VERY_BAD_MOVE,
     SPECULATIVE_MOVE,
     QUESTIONABLE_MOVE,
 )
@@ -102,7 +102,7 @@ class BoardLines(QtWidgets.QWidget):
         self.dicValoracion[GOOD_MOVE] = (dic_nags[1], WindowColors.nag2ico(1, 16))
         self.dicValoracion[BAD_MOVE] = (dic_nags[2], WindowColors.nag2ico(2, 16))
         self.dicValoracion[VERY_GOOD_MOVE] = (dic_nags[3], WindowColors.nag2ico(3, 16))
-        self.dicValoracion[VERY_POOR_MOVE] = (dic_nags[4], WindowColors.nag2ico(4, 16))
+        self.dicValoracion[VERY_BAD_MOVE] = (dic_nags[4], WindowColors.nag2ico(4, 16))
         self.dicValoracion[SPECULATIVE_MOVE] = (dic_nags[5], WindowColors.nag2ico(5, 16))
         self.dicValoracion[QUESTIONABLE_MOVE] = (dic_nags[6], WindowColors.nag2ico(6, 16))
         self.dicValoracion[NO_RATING] = (_("No rating"), QtGui.QIcon())

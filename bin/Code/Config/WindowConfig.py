@@ -93,7 +93,6 @@ def options(parent, configuration):
     form.spinbox(_("Minimum difference in centipawns"), 0, 1000, 70, configuration.x_tutor_difpoints)
     form.spinbox(_("Minimum difference in %"), 0, 1000, 70, configuration.x_tutor_difporc)
     form.separador()
-    form.separador()
     form.folder(_("Gaviota Tablebases"), configuration.x_carpeta_gaviota, configuration.carpeta_gaviota_defecto())
     form.separador()
 
@@ -103,7 +102,7 @@ def options(parent, configuration):
     form.separador()
     form.checkbox(_("Visual effects"), configuration.x_show_effects)
 
-    drap = {1: 100, 2: 150, 3: 200, 4: 250, 5: 300, 6: 350, 7: 400, 8: 450, 9: 500}
+    drap = {1: 100, 2: 125, 3: 150, 4: 175, 5: 200, 6: 225, 7: 250, 8: 275, 9: 300}
     drap_v = {}
     for x in drap:
         drap_v[drap[x]] = x
@@ -131,7 +130,7 @@ def options(parent, configuration):
         li_db = [
             (_("None"), ""),
             (_("DGT"), "DGT"),
-            (_("DGT Alternate") + x, "DGT-gon"),
+            (_("Alternative to DGT driver") + x, "DGT-gon"),
             (_("Certabo") + x, "Certabo"),
             (_("Millennium") + x, "Millennium"),
             (_("Novag Citrine") + x, "Citrine"),
@@ -190,14 +189,12 @@ def options(parent, configuration):
     form.separador()
     form.checkbox(_("By default"), False)
     form.separador()
-    form.separador()
     form.apart(_("PGN table"))
     form.spinbox(_("Width"), 283, 1000, 70, configuration.x_pgn_width)
     form.spinbox(_("Height of each row"), 18, 99, 70, configuration.x_pgn_rowheight)
     form.spinbox(_("Font size"), 3, 99, 70, configuration.x_pgn_fontpoints)
     form.checkbox(_("PGN always in English"), configuration.x_pgn_english)
     form.checkbox(_("PGN with figurines"), configuration.x_pgn_withfigurines)
-    form.separador()
     form.separador()
 
     form.checkbox(_("Enable captured material window by default"), configuration.x_captures_activate)
@@ -218,6 +215,7 @@ def options(parent, configuration):
 
     form.separador()
     form.apart(_("Bad moves: lost centipawns to consider a move as bad"))
+    form.spinbox(_("Questionable move") + d(30), 0, 200, 60, perf.questionable)
     form.spinbox(_("Bad move") + d(90), 20, 1000, 60, perf.bad_lostp)
     form.spinbox(_("Very bad move") + d(200), 50, 1000, 60, perf.very_bad_lostp)
     form.separador()
@@ -371,7 +369,7 @@ def options(parent, configuration):
                     dboard = ""
             configuration.x_digital_board = dboard
 
-        perf.bad_lostp, perf.very_bad_lostp, perf.bad_factor, perf.good_depth, perf.very_good_depth = li_pr
+        perf.questionable, perf.bad_lostp, perf.very_bad_lostp, perf.bad_factor, perf.good_depth, perf.very_good_depth = li_pr
         perf.very_bad_factor = perf.bad_factor * 4
 
         return True

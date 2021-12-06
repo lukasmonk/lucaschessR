@@ -11,9 +11,10 @@ from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.QT import LCDialog
 
 
-class WUsuarios(QTVarios.WDialogo):
+class WUsuarios(LCDialog.LCDialog):
     def __init__(self, procesador):
 
         self.configuration = procesador.configuration
@@ -23,7 +24,7 @@ class WUsuarios(QTVarios.WDialogo):
         titulo = _("Users")
         icono = Iconos.Usuarios()
         extparam = "users"
-        QTVarios.WDialogo.__init__(self, procesador.main_window, titulo, icono, extparam)
+        LCDialog.LCDialog.__init__(self, procesador.main_window, titulo, icono, extparam)
 
         # Toolbar
         li_acciones = (

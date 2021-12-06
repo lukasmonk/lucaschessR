@@ -4,14 +4,15 @@ from PySide2 import QtCore, QtWidgets
 
 import Code
 from Code.Base import Position
-from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
 from Code.Board import Board
+from Code.QT import Colocacion, Controles, Iconos, QTUtil, QTVarios, QTUtil2
+from Code.QT import LCDialog
 
 
-class WRunCoordinatesBlocks(QTVarios.WDialogo):
+class WRunCoordinatesBlocks(LCDialog.LCDialog):
     def __init__(self, owner, db_coordinates, coordinates):
 
-        QTVarios.WDialogo.__init__(self, owner, _("Coordinates by blocks"), Iconos.Blocks(), "runcoordinatesblocks")
+        LCDialog.LCDialog.__init__(self, owner, _("Coordinates by blocks"), Iconos.Blocks(), "runcoordinatesblocks")
 
         self.configuration = Code.configuration
         self.coordinates = coordinates
@@ -93,9 +94,11 @@ class WRunCoordinatesBlocks(QTVarios.WDialogo):
         QtCore.QTimer.singleShot(1000, self.comprueba_time)
 
     def show_data(self):
+        self.board.ponerPiezasAbajo(self.coordinates.current_side())
+        self.board.set_position(self.cp_initial)
         self.lb_block.set_text("%d/%d" % (self.coordinates.current_block + 1, self.coordinates.num_blocks()))
         self.lb_try.set_text("%d" % self.coordinates.current_try_in_block)
-        self.lb_minimum_score.set_text("%d" % self.coordinates.min_score)
+        self.lb_minimum_score.set_text("%d" % self.coordinates.min_score_side())
         self.lb_current_score_block.set_text("%d" % self.coordinates.current_max_in_block)
 
     def end_block(self):
@@ -105,7 +108,7 @@ class WRunCoordinatesBlocks(QTVarios.WDialogo):
         si_pasa_block, si_final = self.coordinates.new_done(self.current_score)
         self.db_coordinates.save(self.coordinates)
         if si_final:
-            QTUtil2.message(self, "%s\n\n%s: %d\n" % (_("Ended"), _("Result"), self.coordinates.min_score))
+            QTUtil2.message(self, "%s\n\n%s: %d/%d\n" % (_("Ended"), _("Result"), self.coordinates.min_score_white, self.coordinates.min_score_black))
             self.terminar()
             return
         else:
@@ -131,6 +134,7 @@ class WRunCoordinatesBlocks(QTVarios.WDialogo):
         self.new_try()
         self.show_tb(self.terminar)
         self.lb_active_score.set_text("0")
+        self.show_data()
         self.go_next()
 
     def go_next(self):
@@ -140,10 +144,14 @@ class WRunCoordinatesBlocks(QTVarios.WDialogo):
             QTUtil.refresh_gui()
 
     def pulsada_celda(self, celda):
-        if celda == self.square_object and self.working:
-            self.current_score += 1
-            self.lb_active_score.set_text("%d" % self.current_score)
-            self.go_next()
+        if self.working:
+            if celda == self.square_object:
+                self.current_score += 1
+                self.lb_active_score.set_text("%d" % self.current_score)
+                self.go_next()
+            else:
+                QTUtil2.message_error(self, "%s - %s ≠ %s" % (_("Error"), celda, self.square_object))
+                self.end_block()
 
     def closeEvent(self, event):
         self.working = False
