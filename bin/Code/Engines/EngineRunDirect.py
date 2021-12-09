@@ -193,7 +193,6 @@ class DirectEngine(object):
 
     def close(self):
         if self.pid is not None:
-            # yl - use wait with timeout to close engine process gracefully with quit instruction, the stdin.close is extra for engines which detect close
             try:
                 if self.process.poll() is None:
                     self.put_line("quit")
@@ -206,7 +205,6 @@ class DirectEngine(object):
                             continue
             except:
                 sys.stderr.write("EngineRunDirect close in except: %s\n" % sys.exc_info()[0])
-            # yl - ###
             try:
                 if self.process.poll() is None:
                     self.put_line("quit")
