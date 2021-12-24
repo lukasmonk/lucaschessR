@@ -34,11 +34,17 @@ class ToolbarMoves(QtWidgets.QWidget):
         bt_nf3 = Controles.PB(self, "Nf3", self.run_nf3, plano=False).anchoFijo(ancho)
         bt_other = Controles.PB(self, _("Others"), self.run_other, plano=False).anchoFijo(ancho + 16)
 
-        ply1 = Controles.PB(self, _("%d ply") % 1, self.run_p1, plano=False).anchoFijo(ancho)
-        ply2 = Controles.PB(self, _("%d ply") % 2, self.run_p2, plano=False).anchoFijo(ancho)
-        ply3 = Controles.PB(self, _("%d ply") % 3, self.run_p3, plano=False).anchoFijo(ancho)
-        ply4 = Controles.PB(self, _("%d ply") % 4, self.run_p4, plano=False).anchoFijo(ancho)
-        ply5 = Controles.PB(self, _("%d ply") % 5, self.run_p5, plano=False).anchoFijo(ancho)
+        ply1 = Controles.PB(self, "^1", self.run_p1, plano=False).anchoFijo(ancho)
+        ply2 = Controles.PB(self, "^2", self.run_p2, plano=False).anchoFijo(ancho)
+        ply3 = Controles.PB(self, "^3", self.run_p3, plano=False).anchoFijo(ancho)
+        ply4 = Controles.PB(self, "^4", self.run_p4, plano=False).anchoFijo(ancho)
+        ply5 = Controles.PB(self, "^5", self.run_p5, plano=False).anchoFijo(ancho)
+
+        ply1.setToolTip(_("%d ply") % 1)
+        ply2.setToolTip(_("%d ply") % 2)
+        ply3.setToolTip(_("%d ply") % 3)
+        ply4.setToolTip(_("%d ply") % 4)
+        ply5.setToolTip(_("%d ply") % 5)
 
         self.sbply = Controles.SB(self, 0, 0, 100)
         self.sbply.capture_changes(self.run_p)
@@ -313,6 +319,9 @@ class WPlayer(QtWidgets.QWidget):
             grid.gotop()
         elif k == QtCore.Qt.Key_End:
             grid.gobottom()
+        else:
+            return True # que siga con el resto de teclas
+
 
     def leeVariable(self, var, default=None):
         return self.dbGames.read_config(var, default)

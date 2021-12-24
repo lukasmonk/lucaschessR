@@ -135,7 +135,7 @@ class TabEngine(QtWidgets.QWidget):
         for rm in mrm.li_rm:
             game = Game.Game(self.position)
             game.read_pv(rm.pv)
-            pgn = game.pgnBaseRAW()
+            pgn = game.pgnBaseRAW(translated=False)
             lit = pgn.split(" ")
             is_white = self.position.is_white
             if is_white:
@@ -638,8 +638,8 @@ class TabTree(QtWidgets.QWidget):
             elif resp == "collapseall":
                 quien, siExpand = None, False
 
-            else:
-                return
+        else:
+            return
 
         def work(data):
             item = data.item

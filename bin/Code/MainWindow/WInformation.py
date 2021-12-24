@@ -22,6 +22,7 @@ class Information(QtWidgets.QWidget):
         puntos = configuration.x_pgn_fontpoints
 
         font = Controles.TipoLetra(puntos=puntos)
+        font7 = Controles.TipoLetra(puntos=7)
         font_bold = Controles.TipoLetra(puntos=puntos, peso=75)
 
         self.themes = Themes.Themes()
@@ -35,14 +36,15 @@ class Information(QtWidgets.QWidget):
         self.w_rating = QtWidgets.QWidget(self)
         ly_rating = Colocacion.V().margen(0)
 
+        self.lb_cpws_lost = Controles.LB(self).ponFuente(font7).set_wrap()
+        self.lb_cpws_lost.hide()
+        self.lb_cpws_lost.setStyleSheet("*{ border: 1px solid lightgray; padding:1px; background: #f7f2f0}")
+        ly_rating.control(self.lb_cpws_lost)
+
         li_acciones = [(_("Rating"), Iconos.Mas(), self.edit_rating), None, (_("Theme"), Iconos.MasR(), self.edit_theme)]
         tb = QTVarios.LCTB(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
         ly_rating.control(tb)
 
-        self.lb_cpws_lost = Controles.LB(self).ponFuente(font_bold).set_wrap()
-        self.lb_cpws_lost.hide()
-        self.lb_cpws_lost.setStyleSheet("*{ border: 1px solid lightgray; padding:2px; background: #f7f2f0}")
-        ly_rating.control(self.lb_cpws_lost)
         self.lb_rating = Controles.LB(self).ponFuente(font_bold).set_wrap()
         self.lb_rating.hide()
         self.lb_rating.setStyleSheet("*{ border: 1px solid lightgray; padding:2px; background: #f7f2f0}")
@@ -103,6 +105,7 @@ class Information(QtWidgets.QWidget):
             if cpws_lost is not None and cpws_lost > 0:
                 analysis_depth = self.move.analysis[0].li_rm[0].depth
                 str_cpws_lost = "%.02f %s (%s %s)" % (cpws_lost / 100.0, _("pawns lost"), _("Depth"), analysis_depth)
+                # str_cpws_lost = "%.02f (^%s)" % (cpws_lost / 100.0, analysis_depth)
                 self.lb_cpws_lost.set_text(str_cpws_lost)
                 visible = True
         self.lb_cpws_lost.setVisible(visible)

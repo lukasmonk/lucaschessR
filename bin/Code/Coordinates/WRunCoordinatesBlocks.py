@@ -150,7 +150,7 @@ class WRunCoordinatesBlocks(LCDialog.LCDialog):
                 self.lb_active_score.set_text("%d" % self.current_score)
                 self.go_next()
             else:
-                QTUtil2.message_error(self, "%s - %s ≠ %s" % (_("Error"), celda, self.square_object))
+                QTUtil2.message_error(self, "%s: %s ≠ %s" % (_("Error"), celda, self.square_object))
                 self.end_block()
 
     def closeEvent(self, event):

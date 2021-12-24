@@ -65,6 +65,7 @@ class WGames(QtWidgets.QWidget):
         o_columns = self.lista_columnas()
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, altoFila=24, siSeleccionMultiple=True, xid="wgames")
 
+
         # Status bar
         self.status = QtWidgets.QStatusBar(self)
         self.status.setFixedHeight(22)
@@ -303,6 +304,8 @@ class WGames(QtWidgets.QWidget):
             self.tw_gotop()
         elif k == QtCore.Qt.Key_End:
             self.tw_gobottom()
+        else:
+            return True # que siga con el resto de teclas
 
     def closeEvent(self, event):
         self.tw_terminar()
@@ -650,14 +653,44 @@ class WGames(QtWidgets.QWidget):
             self.dbGames.save_config("SUMMARY_DEPTH", new_depth)
 
         # Si ha cambiado la localización, se cierra, se mueve y se reabre en la nueva
+        # Internal -> Internal
+        old_is_internal = Util.same_path(self.dbGames.nom_fichero, self.dbGames.link_file)
+        old_is_external = not old_is_internal
+        new_is_internal = len(dic_data["EXTERNAL_FOLDER"]) == 0
+        new_is_external = not new_is_internal
+
+        reinit = False
+
+        if new_is_external and old_is_external:
+            new_link = dic_data["FILEPATH"]
+            old_link = self.dbGames.link_file
+            if not Util.same_path(new_link, old_link):
+                self.configuration.set_last_database(new_link)
+                Util.remove_file(new_link)
+                shutil.move(old_link, new_link)
+                reinit = True
+
+        if new_is_internal and old_is_external:
+            os.remove(self.dbGames.link_file)
+
         new_path = dic_data["FILEPATH"]
+        if new_is_external:
+            new_path = os.path.abspath(os.path.join(dic_data["EXTERNAL_FOLDER"], os.path.basename(new_path)[:-4]))
         old_path = self.dbGames.nom_fichero
         if not Util.same_path(new_path, old_path):
             self.dbGames.close()
-            self.configuration.set_last_database(new_path)
+            if new_is_internal:
+                self.configuration.set_last_database(new_path)
             shutil.move(old_path, new_path)
             shutil.move(old_path + ".st1", new_path + ".st1")
+            reinit = True
+            if new_is_external:
+                with open(dic_data["FILEPATH"], "wt", encoding="utf-8", errors="ignore") as q:
+                    q.write(new_path)
+
+        if reinit:
             self.wb_database.reinit_sinsalvar()  # para que no cree de nuevo al salvar configuración
+
 
     def tw_tags(self):
         w = WTags(self, self.dbGames)
@@ -1036,6 +1069,7 @@ class WGames(QtWidgets.QWidget):
         if dbn.allows_duplicates:
             dlTmp.hide_duplicates()
         dbn.append_db(self.dbGames, lista, dlTmp)
+        dbn.close()
         self.changes = False
 
     def tw_exportar_pgn(self, only_selected):
@@ -1253,7 +1287,7 @@ class WOptionsDatabase(QtWidgets.QDialog):
         def d_false(key):
             return dic_data.get(key, False)
 
-        title = _("New database") if len(dic_data) == 0 else "%s: %s" % (_("Database"), d_str("NAME"))
+        title = _("New database") if self.new else "%s: %s" % (_("Database"), d_str("NAME"))
         self.setWindowTitle(title)
         self.setWindowIcon(Iconos.DatabaseMas())
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
@@ -1268,7 +1302,8 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         ly_name = Colocacion.H().control(lb_name).control(self.ed_name)
 
-        folder = os.path.dirname(Util.relative_path(d_str("FILEPATH")))
+        link_file = d_str("LINK_FILE")
+        folder = os.path.dirname(Util.relative_path(link_file))
         folder = folder[len(configuration.folder_databases()) :]
         if folder.strip():
             folder = folder.strip(os.sep)
@@ -1336,7 +1371,8 @@ class WOptionsDatabase(QtWidgets.QDialog):
         self.bt_external.setSizePolicy(
             QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         )
-        ly_external = Colocacion.H().control(lb_external).control(self.bt_external)
+        bt_remove_external = Controles.PB(self, "", self.remove_external).ponIcono(Iconos.Remove1(), 16)
+        ly_external = Colocacion.H().control(lb_external).control(self.bt_external).espacio(-8).control(bt_remove_external)
 
         self.chb_complete = Controles.CHB(self, _("Allow complete games"), d_true("ALLOWS_COMPLETE_GAMES"))
         self.chb_positions = Controles.CHB(self, _("Allow positions"), d_true("ALLOWS_POSITIONS"))
@@ -1386,6 +1422,10 @@ class WOptionsDatabase(QtWidgets.QDialog):
             self.external_folder = folder
 
         self.bt_external.set_text(self.external_folder)
+
+    def remove_external(self):
+        self.external_folder = ""
+        self.bt_external.set_text("")
 
     def menu_groups(self, carpeta):
         if Util.exist_folder(carpeta):
@@ -1497,6 +1537,7 @@ def new_database(owner, configuration):
 def modify_database(owner, configuration, db):
     dic_data = {
         "NAME": db.get_name(),
+        "LINK_FILE": db.link_file,
         "FILEPATH": db.nom_fichero,
         "EXTERNAL_FOLDER": db.external_folder,
         "SUMMARY_DEPTH": db.depth_stat(),

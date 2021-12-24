@@ -16,11 +16,11 @@ from Code.QT import LCDialog
 
 
 class WJuicio(LCDialog.LCDialog):
-    def __init__(self, manager, xengine, nombreOP, position, mrm, rmOP, rmUsu, analysis, is_competitive=None):
+    def __init__(self, manager, xengine, nombreOP, position, mrm, rmObj, rmUsu, analysis, is_competitive=None):
         self.is_competitive = manager.is_competitive if is_competitive is None else is_competitive
         self.nombreOP = nombreOP
         self.position = position
-        self.rmOP = rmOP
+        self.rmObj = rmObj
         self.rmUsu = rmUsu
         self.mrm = mrm
         self.analysis = analysis
@@ -70,7 +70,7 @@ class WJuicio(LCDialog.LCDialog):
         self.ponPuntos()
 
     def difPuntos(self):
-        return self.rmUsu.puntosABS_5() - self.rmOP.puntosABS_5()
+        return self.rmUsu.puntosABS_5() - self.rmObj.puntosABS_5()
 
     def difPuntosMax(self):
         return self.mrm.mejorMov().puntosABS_5() - self.rmUsu.puntosABS_5()
@@ -135,7 +135,7 @@ class WJuicio(LCDialog.LCDialog):
                 ultPts = p
                 posReal += 1
 
-            siOP = rm.pv == self.rmOP.pv
+            siOP = rm.pv == self.rmObj.pv
             siUsu = rm.pv == self.rmUsu.pv
             if siOP and siUsu:
                 txt = _("Both")
@@ -237,16 +237,16 @@ class WJuicio(LCDialog.LCDialog):
 
         self.rmUsu = rmUsuN
 
-        rmOPN, pos = mrm.buscaRM(self.rmOP.movimiento())
-        if rmOPN is None:
+        rmObjN, pos = mrm.buscaRM(self.rmObj.movimiento())
+        if rmObjN is None:
             um = QTUtil2.analizando(self)
             self.manager.analizaFinal()
-            rmOPN = self.xengine.valora(self.position, self.rmOP.from_sq, self.rmOP.to_sq, self.rmOP.promotion)
-            pos = mrm.agregaRM(rmOPN)
+            rmObjN = self.xengine.valora(self.position, self.rmObj.from_sq, self.rmObj.to_sq, self.rmObj.promotion)
+            pos = mrm.agregaRM(rmObjN)
             self.manager.analizaInicio()
             um.final()
 
-        self.rmOP = rmOPN
+        self.rmObj = rmObjN
         self.analysis = self.mrm, pos
         self.siAnalisisCambiado = True
 

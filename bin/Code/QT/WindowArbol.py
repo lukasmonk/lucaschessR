@@ -545,7 +545,7 @@ class TreeMoves(QtWidgets.QTreeWidget):
         k = event.key()
         if k == 43:
             self.mas()
-        elif k == 16777223:
+        elif k in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):
             self.menos()
         elif 48 <= k <= 52:
             item = self.currentItem()

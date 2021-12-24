@@ -133,7 +133,7 @@ class ManagerEverest(Manager.Manager):
 
     def restart(self, lost_points):
         self.terminaNoContinuo()
-        change_game = self.expedition.add_try(False, self.vtime, self.puntos)
+        change_game, is_last = self.expedition.add_try(False, self.vtime, self.puntos)
         self.vtime = 0.0
         licoment = []
         if lost_points:
@@ -312,14 +312,14 @@ class ManagerEverest(Manager.Manager):
             self.ponPuntos()
 
             if posUsu != posObj:
-                comentarioUsu = " %s" % (rmUsu.abrTexto())
-                comentarioObj = " %s" % (rmObj.abrTexto())
+                comentarioUsu = " %s" % (w.rmUsu.abrTexto())
+                comentarioObj = " %s" % (w.rmObj.abrTexto())
 
                 comentarioPuntos = "%s = %d %+d %+d = %d" % (
                     _("Score"),
                     self.puntos - dpts,
-                    rmUsu.centipawns_abs(),
-                    -rmObj.centipawns_abs(),
+                    w.rmUsu.centipawns_abs(),
+                    -w.rmObj.centipawns_abs(),
                     self.puntos,
                 )
                 comment = "%s: %s %s\n%s: %s %s\n%s" % (
@@ -366,9 +366,13 @@ class ManagerEverest(Manager.Manager):
 
         self.state = ST_ENDGAME
 
-        mensaje = _("Congratulations you have passed this game.")
-        self.expedition.add_try(True, self.vtime, self.puntos)
+        change_game, is_last = self.expedition.add_try(True, self.vtime, self.puntos)
 
-        self.mensajeEnPGN(mensaje)
+        if is_last:
+            mensaje = _("Congratulations, goal achieved") + "\n\n" + _("You have climbed Everest!")
+            self.mensaje(mensaje)
+        else:
+            mensaje = _("Congratulations you have passed this game.")
+            self.mensajeEnPGN(mensaje)
 
         self.terminar()

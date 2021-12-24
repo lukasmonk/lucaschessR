@@ -56,10 +56,10 @@ from Code.GM import ManagerGM
 from Code.Kibitzers import KibitzersManager
 from Code.MainWindow import MainWindow, Presentacion
 from Code.Menus import MenuTrainings, BasicMenus
-from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd, \
-    ManagerOpeningLines
-from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine, ManagerPerson, Albums, ManagerAlbum, \
-    WindowAlbumes
+from Code.Openings import WindowOpenings, WindowOpeningLine, WindowOpeningLines, OpeningLines, OpeningsStd
+from Code.Openings import ManagerOPLPositions, ManagerOPLEngines, ManagerOPLSequential, ManagerOPLStatic
+from Code.PlayAgainstEngine import ManagerPlayAgainstEngine, WPlayAgainstEngine
+from Code.PlayAgainstEngine import ManagerPerson, Albums, ManagerAlbum, WindowAlbumes
 from Code.Polyglots import WFactory, WPolyglot, Books, WindowBooksTrain, ManagerTrainBooks
 from Code.QT import Delegados
 from Code.QT import Iconos
@@ -87,6 +87,7 @@ class Procesador:
     configuration = None
     manager = None
     version = None
+    entrenamientos = None
 
     def __init__(self):
         if Code.list_engine_managers is None:
@@ -352,8 +353,6 @@ class Procesador:
     def desactivarDGT(self):
         if Code.dgt:
             DGT.desactivar()
-
-    # ------------
 
     def menuplay(self):
         resp = BasicMenus.menuplay(self)
@@ -793,34 +792,34 @@ class Procesador:
             else:
                 pathFichero = os.path.join(self.configuration.folder_openings(), dicline["file"])
                 if resp == "tr_sequential":
-                    self.openingsTrainingSequential(pathFichero)
+                    self.openings_training_sequential(pathFichero)
                 elif resp == "tr_static":
-                    self.openingsTrainingStatic(pathFichero)
+                    self.openings_training_static(pathFichero)
                 elif resp == "tr_positions":
-                    self.openingsTrainingPositions(pathFichero)
+                    self.openings_training_positions(pathFichero)
                 elif resp == "tr_engines":
-                    self.openingsTrainingEngines(pathFichero)
+                    self.openings_training_engines(pathFichero)
 
-    def openingsTrainingSequential(self, pathFichero):
-        self.manager = ManagerOpeningLines.ManagerOpeningLinesSequential(self)
+    def openings_training_sequential(self, pathFichero):
+        self.manager = ManagerOPLSequential.ManagerOpeningLinesSequential(self)
         self.manager.start(pathFichero)
 
-    def openingsTrainingEngines(self, pathFichero):
-        self.manager = ManagerOpeningLines.ManagerOpeningEngines(self)
+    def openings_training_engines(self, pathFichero):
+        self.manager = ManagerOPLEngines.ManagerOpeningEngines(self)
         self.manager.start(pathFichero)
 
-    def openingsTrainingStatic(self, pathFichero):
+    def openings_training_static(self, pathFichero):
         dbop = OpeningLines.Opening(pathFichero)
         num_linea = WindowOpeningLines.selectLine(self, dbop)
         dbop.close()
         if num_linea is not None:
-            self.manager = ManagerOpeningLines.ManagerOpeningLinesStatic(self)
+            self.manager = ManagerOPLStatic.ManagerOpeningLinesStatic(self)
             self.manager.start(pathFichero, "static", num_linea)
         else:
             self.openings()
 
-    def openingsTrainingPositions(self, pathFichero):
-        self.manager = ManagerOpeningLines.ManagerOpeningLinesPositions(self)
+    def openings_training_positions(self, pathFichero):
+        self.manager = ManagerOPLPositions.ManagerOpeningLinesPositions(self)
         self.manager.start(pathFichero)
 
     def externBMT(self, file):

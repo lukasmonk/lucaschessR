@@ -429,7 +429,7 @@ class MenuTrainings:
                     #     titentreno = titentreno[:-1]
                     with Util.OpenCodec(entreno) as f:
                         todo = f.read().strip()
-                    liEntrenamientos = todo.split("\n")
+                    liEntrenamientos = [(linea, pos) for pos, linea in enumerate(todo.split("\n"),1)]
                     nPosiciones = len(liEntrenamientos)
                     um.final()
                     if nPosiciones == 0:

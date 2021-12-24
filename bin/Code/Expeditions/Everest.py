@@ -183,10 +183,15 @@ class Expedition:
         ex.save_next(self.recno, next_game, self.tries_used, times)
 
         self.reg = ex.goto(self.recno)
-        self.run()
+        if len(self.reg.GAMES) >= self.reg.NEXT_GAME:
+            is_last = True
+        else:
+            is_last = False
+            self.run()
+
         ex.close()
 
-        return change_game
+        return change_game, is_last
 
 
 class Expeditions:

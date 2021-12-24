@@ -5,6 +5,7 @@ import time
 import FasterCode
 
 import Code
+import Code.DGT
 from Code import ControlPGN
 from Code import DGT
 from Code import Util
@@ -740,6 +741,7 @@ class Manager:
         if self.informacionActivable:
             self.main_window.activaInformacionPGN()
             self.put_view()
+            self.refresh()
 
     def remove_info(self, is_activatable=False):
         self.main_window.activaInformacionPGN(False)
@@ -1150,7 +1152,7 @@ class Manager:
 
     def compruebaDGT(self, set_position):
         if self.configuration.x_digital_board:
-            if not DGT.activarSegunON_OFF(self.dgt):  # Error
+            if not DGT.activate_according_on_off(self.dgt):  # Error
                 QTUtil2.message_error(
                     self.main_window,
                     _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board,
@@ -1252,7 +1254,7 @@ class Manager:
         dboard = self.configuration.x_digital_board
         if dboard:
             menu.opcion(
-                "dgt", _("Disable %s board") % dboard if DGT.siON() else _("Enable %s board") % dboard, Iconos.DGT()
+                "dgt", _("Disable %s board") % dboard if DGT.eboard_is_on() else _("Enable %s board") % dboard, Code.DGT.icon_eboard()
             )
             menu.separador()
 

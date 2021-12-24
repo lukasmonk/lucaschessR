@@ -419,7 +419,7 @@ class WBase(QtWidgets.QWidget):
         self.teclaPulsada("G", k)
 
     def grid_wheel_event(self, ogrid, forward):
-        self.teclaPulsada("T", 16777236 if not forward else 16777234)
+        self.teclaPulsada("T", QtCore.Qt.Key.Key_Left if forward else QtCore.Qt.Key.Key_Right)
 
     def grid_dato(self, grid, row, o_columna):
         controlPGN = self.manager.pgn
@@ -511,7 +511,7 @@ class WBase(QtWidgets.QWidget):
         self.teclaPulsada("V", event.key(), int(event.modifiers()))
 
     def boardWheelEvent(self, board, forward):
-        self.teclaPulsada("T", 16777236 if forward else 16777234)
+        self.teclaPulsada("T", QtCore.Qt.Key.Key_Left if forward else QtCore.Qt.Key.Key_Right)
 
     def teclaPulsada(self, tipo, tecla, modifiers=None):
         if self.procesandoEventos:
@@ -523,15 +523,15 @@ class WBase(QtWidgets.QWidget):
         if tecla in dic:
             if hasattr(self.manager, "mueveJugada"):
                 self.manager.mueveJugada(dic[tecla])
-        elif tecla in (16777220, 16777221):  # intros
+        elif tecla in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
             row, column = self.pgn.current_position()
             if column.key != "NUMBER":
                 if hasattr(self.manager, "analizaPosicion"):
                     self.manager.analizaPosicion(row, column.key)
         else:
             if hasattr(self.manager, "control_teclado"):
-
                 self.manager.control_teclado(tecla, modifiers)
+
         self.procesandoEventos = False
 
     def pgnRefresh(self):
@@ -596,7 +596,7 @@ class WBase(QtWidgets.QWidget):
                 self.lb_clock_black,
                 self.lb_capt_white,
                 self.lb_capt_black,
-                self.parent().parent().informacionPGN,
+                self.parent.informacionPGN,
             ):
                 if widget.isVisible():
                     nonDistract.append(widget)

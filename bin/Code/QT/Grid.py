@@ -288,6 +288,8 @@ class Grid(QtWidgets.QTableView):
         if not siCabeceraVisible:
             hh.setVisible(False)
 
+        self.cabecera = hh
+
         self.ponAltoFila(altoFila)
 
         self.seleccionaFilas(siSelecFilas, siSeleccionMultiple)
@@ -304,6 +306,11 @@ class Grid(QtWidgets.QTableView):
 
     def buscaCabecera(self, key):
         return self.o_columns.buscaColumna(key)
+
+    def selectAll(self):
+        if self.w_parent.grid_num_datos(self) > 10000:
+            return
+        QtWidgets.QTableView.selectAll(self)
 
     def coloresAlternados(self):
         self.setAlternatingRowColors(True)
@@ -346,9 +353,9 @@ class Grid(QtWidgets.QTableView):
             if not (is_control or is_alt) and k < 256:
                 self.w_parent.grid_tecla_pulsada(self, event.text())
         if hasattr(self.w_parent, "grid_tecla_control"):
-            self.w_parent.grid_tecla_control(self, k, is_shift, is_control, is_alt)
-            event.ignore()
-            return
+            if self.w_parent.grid_tecla_control(self, k, is_shift, is_control, is_alt) is None:
+                event.ignore()
+                return
 
         QtWidgets.QTableView.keyPressEvent(self, event)
 

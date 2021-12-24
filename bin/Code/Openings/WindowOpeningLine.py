@@ -312,7 +312,7 @@ class WLines(LCDialog.LCDialog):
             return
         if resp.startswith("tr_"):
             self.resultado = resp
-            self.accept()
+            self.terminar()
         elif resp == "new_ssp":
             self.trainNewSSP()
         elif resp == "new_eng":
@@ -420,7 +420,7 @@ class WLines(LCDialog.LCDialog):
         )
         li_gen.append((config, num_engines))
 
-        likeys = [(dic_engines[x].name, x) for x in li_engines if x in dic_engines]
+        likeys = [("%s %d" %(_("Group"), pos), x) for pos, x in enumerate(li_engines,1) if x in dic_engines]
         config = FormLayout.Combobox("%s: %s" % (_("Automatic selection"), _("bunch of engines")), likeys)
         li_gen.append((config, key_engine))
         li_gen.append(separador)
@@ -846,7 +846,8 @@ class WLines(LCDialog.LCDialog):
             game = self.dbop[linea]
             if self.num_jg_inicial <= njug < len(game):
                 move = game.move(njug)
-                pgn = move.pgnFigurinesSP()
+                pgn = move.pgnFigurinesSP() if self.configuration.x_pgn_withfigurines else move.pgn_translated()
+
                 if linea:
                     game_ant = self.dbop[linea - 1]
                     if game_ant.pv_hasta(njug) == game.pv_hasta(njug):
@@ -867,6 +868,7 @@ class WLines(LCDialog.LCDialog):
                             li_nags.append(str(v))
             else:
                 pgn = ""
+
 
         return pgn, iswhite, color, info, indicadorInicial, li_nags, agrisar, siLine
 
@@ -1204,6 +1206,7 @@ class WLines(LCDialog.LCDialog):
         self.tabsanalisis.saveConfig()
         self.dbop.close()
         self.save_video()
+        self.procesador.stop_engines()
 
     def terminar(self):
         self.procesosFinales()

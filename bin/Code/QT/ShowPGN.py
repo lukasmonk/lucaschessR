@@ -17,7 +17,7 @@ class LBPGN(Controles.LB):
 
     def keyPressEvent(self, event):
         k = event.key()
-        self.parentWidget().tecla_pulsada(k)
+        self.wparent.tecla_pulsada(k)
 
     def mouseDoubleClickEvent(self, event):
         self.wparent.double_click(self)

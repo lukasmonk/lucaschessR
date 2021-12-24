@@ -248,6 +248,8 @@ class WAnalisisGraph(LCDialog.LCDialog):
         elif k == QtCore.Qt.Key_Left:
             if nrecno > 0:
                 grid.goto(nrecno - 1, 0)
+        else:
+            return True # que siga con el resto de teclas
 
     def grid_color_fondo(self, grid, row, o_column):
         if grid.id == "A":

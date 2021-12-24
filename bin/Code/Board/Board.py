@@ -21,6 +21,7 @@ from Code.Base.Constantes import (
 )
 from Code.Board import BoardElements, BoardMarkers, BoardBoxes, BoardSVGs, BoardTypes, BoardArrows, BoardCircles
 from Code.Director import TabVisual, WindowDirector
+from Code.Translations import TrListas
 from Code.QT import Colocacion
 from Code.QT import Controles
 from Code.QT import Delegados
@@ -99,6 +100,7 @@ class Board(QtWidgets.QGraphicsView):
 
         self.kb_buffer = []
         self.cad_buffer = ""
+        self.dic_tr_keymoves = TrListas.dConv()
 
         self.hard_focus = True  # Controla que cada vez que se indique una posición active el foco al board
 
@@ -222,6 +224,11 @@ class Board(QtWidgets.QGraphicsView):
                 if exmove_ok is None:
                     for exmove in li:
                         san = exmove.san().replace("+", "").replace("#", "")
+                        if len(san) > 2:
+                            if san[-1].upper() in self.dic_tr_keymoves:
+                                san = san[:-1] + self.dic_tr_keymoves[san[-1].upper()]
+                            elif san[0].upper() in self.dic_tr_keymoves:
+                                san = self.dic_tr_keymoves[san[0].upper()] + san[1:]
                         if (
                             busca.endswith(san.lower())
                             or busca.endswith(san.lower().replace("=", ""))

@@ -88,19 +88,19 @@ class WAnalisisVariations(QtWidgets.QDialog):
 
     def keyPressEvent(self, event):
         k = event.key()
-        if k == 16777237:  # abajo
+        if k == QtCore.Qt.Key.Key_Down:  # abajo
             key = "MoverAtras"
-        elif k == 16777235:  # arriba
+        elif k == QtCore.Qt.Key.Key_Up:  # arriba
             key = "MoverAdelante"
-        elif k == 16777234:  # izda
+        elif k == QtCore.Qt.Key.Key_Left:  # izda
             key = "MoverAtras"
-        elif k == 16777236:  # dcha
+        elif k == QtCore.Qt.Key.Key_Right:  # dcha
             key = "MoverAdelante"
-        elif k == 16777232:  # start
+        elif k == QtCore.Qt.Key.Key_Home:  # start
             key = "MoverInicio"
-        elif k == 16777233:  # final
+        elif k == QtCore.Qt.Key.Key_End:  # final
             key = "MoverFinal"
-        elif k == 16777216:  # esc
+        elif k == QtCore.Qt.Key.Key_Escape:  # esc
             self.stop_clock()
             self.accept()
             return

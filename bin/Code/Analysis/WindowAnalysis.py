@@ -320,25 +320,25 @@ class WAnalisis(LCDialog.LCDialog):
     def keyPressEvent(self, event):
         k = event.key()
 
-        if k == 16777237:  # abajo
+        if k == QtCore.Qt.Key_Down:
             self.muestraActual.wmu.abajo()
-        elif k == 16777235:  # arriba
+        elif k == QtCore.Qt.Key_Up:
             self.muestraActual.wmu.arriba()
-        elif k == 16777234:  # izda
+        elif k == QtCore.Qt.Key_Left:
             self.muestraActual.wmu.process_toolbar("MoverAtras")
-        elif k == 16777236:  # dcha
+        elif k == QtCore.Qt.Key_Right:
             self.muestraActual.wmu.process_toolbar("MoverAdelante")
-        elif k == 16777232:  # start
+        elif k == QtCore.Qt.Key_Home:
             self.muestraActual.wmu.process_toolbar("MoverInicio")
-        elif k == 16777233:  # final
+        elif k == QtCore.Qt.Key_End:
             self.muestraActual.wmu.process_toolbar("MoverFinal")
-        elif k == 16777238:  # avpag
+        elif k == QtCore.Qt.Key_PageUp:
             self.muestraActual.wmu.primero()
-        elif k == 16777239:  # dnpag
+        elif k == QtCore.Qt.Key_PageDown:
             self.muestraActual.wmu.ultimo()
-        elif k == 16777220:  # enter
+        elif k in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
             self.muestraActual.wmu.process_toolbar("MoverLibre")
-        elif k == 16777216:  # esc
+        elif k == QtCore.Qt.Key_Escape:
             self.terminar()
 
     def closeEvent(self, event):  # Cierre con X

@@ -376,6 +376,7 @@ class Opening:
             liTrainPositions.append(data)
         random.shuffle(liTrainPositions)
         reg["LITRAINPOSITIONS"] = liTrainPositions
+        reg["POS_TRAINPOSITIONS"] = 0
 
     def recalcFenM2(self):
         lilipv = [FasterCode.xpv_pv(xpv).split(" ") for xpv in self.li_xpv]
@@ -422,7 +423,10 @@ class Opening:
         reg["DICFENM2"] = self.recalcFenM2()
         reg["TIMES"] = [500, 1000, 2000, 4000, 8000]
 
-        reg["ENGINES"] = EnginesBunch.bunch(reg["KEY_ENGINE"], reg["NUM_ENGINES"], configuration.dic_engines)
+        if reg["NUM_ENGINES"] == 0:
+            reg["ENGINES"] = []
+        else:
+            reg["ENGINES"] = EnginesBunch.bunch(reg["KEY_ENGINE"], reg["NUM_ENGINES"], configuration.dic_engines)
 
     def updateTrainingEngines(self):
         reg = self.trainingEngines()

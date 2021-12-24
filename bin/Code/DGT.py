@@ -1,17 +1,15 @@
-"""
-Rutinas internas para la conexion con DGTEBDLL.dll
-"""
 import ctypes
 import os
 
 import Code
 from Code import Util
+from Code.QT import Iconos
 
 DGT_ON = "DGT.ON"
 
 
-def activarSegunON_OFF(dispatch):
-    if siON():
+def activate_according_on_off(dispatch):
+    if eboard_is_on():
         if Code.dgt is None:
             if activar():
                 showDialog()
@@ -27,7 +25,7 @@ def activarSegunON_OFF(dispatch):
     return True
 
 
-def siON():
+def eboard_is_on():
     return Util.exist_file(DGT_ON)
 
 
@@ -41,7 +39,7 @@ def ponOFF():
 
 
 def cambiarON_OFF():
-    if siON():
+    if eboard_is_on():
         Util.remove_file(DGT_ON)
     else:
         ponON()
@@ -154,10 +152,14 @@ def activar():
             except:
                 dgt = None
                 from Code.QT import QTUtil2
-                QTUtil2.message(None, """It is not possible to install the driver for the board, one way to solve the problem is to install the libraries:
+
+                QTUtil2.message(
+                    None,
+                    """It is not possible to install the driver for the board, one way to solve the problem is to install the libraries:
  sudo apt install libqt5pas1
  or
- sudo dnf install qt5pas-devel""")
+ sudo dnf install qt5pas-devel""",
+                )
 
     else:
         functype = ctypes.WINFUNCTYPE
@@ -445,3 +447,19 @@ def _dgt2pv(datobyte):
 #         resp += str(num)
 #     li[0] = resp
 #     return " ".join(li)
+
+
+def icon_eboard():
+    board = Code.configuration.x_digital_board
+    if board == "DGT":
+        return Iconos.DGT()
+    elif board == "DGT-gon":
+        return Iconos.DGTB()
+    elif board == "Certabo":
+        return Iconos.Certabo()
+    elif board == "Millennium":
+        return Iconos.Millenium()
+    elif board == "Citrine":
+        return Iconos.Novag()
+    else:
+        return Iconos.DGT()

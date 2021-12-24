@@ -19,8 +19,12 @@ from Code.QT import QTVarios
 
 
 def dic_keys():
-    dic = {16777234: GO_BACK, 16777236: GO_FORWARD, 16777235: GO_BACK, 16777237: GO_FORWARD, 16777232: GO_START, 16777233: GO_END}
-    return dic
+    return {QtCore.Qt.Key.Key_Left: GO_BACK,
+            QtCore.Qt.Key.Key_Right: GO_FORWARD,
+            QtCore.Qt.Key.Key_Up: GO_BACK,
+            QtCore.Qt.Key.Key_Down: GO_FORWARD,
+            QtCore.Qt.Key.Key_Home: GO_START,
+            QtCore.Qt.Key.Key_End: GO_END}
 
 
 class MensEspera(QtWidgets.QWidget):
@@ -641,3 +645,5 @@ def preguntaCancelar123(parent, title, mens, si, no, cancel):
     else:
         resp = 0
     return resp
+
+

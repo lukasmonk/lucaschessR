@@ -197,6 +197,7 @@ class WPlay1(LCDialog.LCDialog):
         self.registro = self.db.leeRegistro(recno)
 
         self.game = Game.Game()
+        um = QTUtil2.unMomento(self)
         self.game.restore(self.registro["GAME"])
 
         self.lbRotulo = Controles.LB(self, self.db.label(recno)).ponTipoLetra(puntos=12).set_foreground_backgound("#076C9F", "#EFEFEF")
@@ -232,6 +233,7 @@ class WPlay1(LCDialog.LCDialog):
         self.restore_video(siTam=False)
 
         self.grid.gotop()
+        um.final()
 
     def grid_num_datos(self, grid):
         return len(self.liIntentos)

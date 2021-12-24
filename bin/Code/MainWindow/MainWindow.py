@@ -9,15 +9,6 @@ from Code.QT import LCDialog
 from Code.QT import QTUtil
 
 
-class EstadoWindow:
-    def __init__(self, x):
-        self.noEstado = x == QtCore.Qt.WindowNoState
-        self.minimizado = x == QtCore.Qt.WindowMinimized
-        self.maximizado = x == QtCore.Qt.WindowMaximized
-        self.fullscreen = x == QtCore.Qt.WindowFullScreen
-        self.active = x == QtCore.Qt.WindowActive
-
-
 class MainWindow(LCDialog.LCDialog):
     signal_notify = QtCore.Signal()
     signal_routine_connected = None
@@ -177,8 +168,8 @@ class MainWindow(LCDialog.LCDialog):
         if event.type() != QtCore.QEvent.WindowStateChange:
             return
 
-        nue = EstadoWindow(self.windowState())
-        ant = EstadoWindow(event.oldState())
+        nue = QTUtil.EstadoWindow(self.windowState())
+        ant = QTUtil.EstadoWindow(event.oldState())
 
         ct = self.board.config_board
 

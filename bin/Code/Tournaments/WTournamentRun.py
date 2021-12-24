@@ -132,6 +132,9 @@ class WTournamentRun(QtWidgets.QWidget):
         self.board.crea()
         Delegados.generaPM(self.board.piezas)
 
+        ct = self.board.config_board
+        self.antiguoAnchoPieza = ct.anchoPieza()
+
         # PGN
         self.configuration = Code.configuration
         self.game = Game.Game()
@@ -705,3 +708,36 @@ class WTournamentRun(QtWidgets.QWidget):
                     self.board.muevePieza(movim[1], movim[2])
                 elif movim[0] == "c":
                     self.board.cambiaPieza(movim[1], movim[2])
+
+    def changeEvent(self, event):
+        QtWidgets.QWidget.changeEvent(self, event)
+        if event.type() != QtCore.QEvent.WindowStateChange:
+            return
+
+        nue = QTUtil.EstadoWindow(self.windowState())
+        ant = QTUtil.EstadoWindow(event.oldState())
+
+        ct = self.board.config_board
+
+        if nue.fullscreen:
+            self.board.siF11 = True
+            self.antiguoAnchoPieza = 1000 if ant.maximizado else ct.anchoPieza()
+            self.board.maximizaTam(True)
+        else:
+            if ant.fullscreen:
+                self.base.tb.show()
+                self.board.normalTam(self.antiguoAnchoPieza)
+                self.ajustaTam()
+                if self.antiguoAnchoPieza == 1000:
+                    self.setWindowState(QtCore.Qt.WindowMaximized)
+            elif nue.maximizado:
+                self.antiguoAnchoPieza = ct.anchoPieza()
+                self.board.maximizaTam(False)
+            elif ant.maximizado:
+                if not self.antiguoAnchoPieza or self.antiguoAnchoPieza == 1000:
+                    self.antiguoAnchoPieza = self.board.calculaAnchoMXpieza()
+                self.board.normalTam(self.antiguoAnchoPieza)
+                self.ajustaTam()
+
+    def ajustaTam(self):
+        QTUtil.shrink(self)

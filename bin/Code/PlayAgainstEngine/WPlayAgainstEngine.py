@@ -167,7 +167,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         _label(lyG, _("Side you play with"), hbox)
 
         if self.configuration.x_digital_board:
-            self.chb_dgt = Controles.CHB(self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.siON()).ponFuente(
+            self.chb_dgt = Controles.CHB(self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.eboard_is_on()).ponFuente(
                 Controles.TipoLetra(puntos=14)
             )
             lyH = Colocacion.H().control(self.chb_dgt)

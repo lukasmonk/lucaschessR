@@ -145,8 +145,8 @@ class WEntrenarBMT(LCDialog.LCDialog):
         # Datos ----------------------------------------------------------------
         self.dbf = dbf
         self.recnoActual = self.dbf.recno
-        x = dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA")
-        self.bmt_lista = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA")).patch()
+        self.bmt_lista = Util.zip2var_change_import(dbf.leeOtroCampo(self.recnoActual, "BMT_LISTA"), b"Code.BMT", b"Code.TrainBMT.BMT")
+        self.bmt_lista.patch()
         self.bmt_lista.check_color()
         self.historial = Util.zip2var(dbf.leeOtroCampo(self.recnoActual, "HISTORIAL"))
         self.siTerminadaAntes = self.is_finished = self.bmt_lista.is_finished()
@@ -213,11 +213,11 @@ class WEntrenarBMT(LCDialog.LCDialog):
         lyBT = Colocacion.G()
         number = 0
         nposic = len(self.bmt_lista)
-        for x in range(nposic):
-            bt = Controles.PB(self, str(x + 1), rutina=self.number).anchoFijo(36).altoFijo(20)
+        for bmt_lista in range(nposic):
+            bt = Controles.PB(self, str(bmt_lista + 1), rutina=self.number).anchoFijo(36).altoFijo(20)
             bt.number = number
             number += 1
-            estado = self.bmt_lista.state(x)
+            estado = self.bmt_lista.state(bmt_lista)
             bt.ponIcono(self.dicIconos[estado])
             self.liBT.append(bt)
 
@@ -237,7 +237,7 @@ class WEntrenarBMT(LCDialog.LCDialog):
         ncolumna = 0
         lyRM = Colocacion.G()
         number = 0
-        for x in range(16):
+        for bmt_lista in range(16):
             btRM = Controles.PB(self, "", rutina=self.pulsadoRM).anchoFijo(180).altoFijo(24).ponPlano(True)
             btRM.number = number
             btRM.setEnabled(False)
@@ -504,7 +504,7 @@ class WEntrenarBMT(LCDialog.LCDialog):
         self.teclaPulsada("V", event.key())
 
     def boardWheelEvent(self, nada, forward):
-        self.teclaPulsada("T", 16777234 if forward else 16777236)
+        self.teclaPulsada("T", QtCore.Qt.Key.Key_Left if forward else QtCore.Qt.Key.Key_Right)
 
     def grid_dato(self, grid, row, o_column):
         return self.controlPGN.dato(row, o_column.key)
@@ -524,7 +524,7 @@ class WEntrenarBMT(LCDialog.LCDialog):
         self.teclaPulsada("G", k)
 
     def grid_wheel_event(self, ogrid, forward):
-        self.teclaPulsada("T", 16777236 if not forward else 16777234)
+        self.teclaPulsada("T", QtCore.Qt.Key.Key_Left if forward else QtCore.Qt.Key.Key_Right)
 
     def teclaPulsada(self, tipo, tecla):
         if self.siMostrarPGN:
@@ -535,7 +535,7 @@ class WEntrenarBMT(LCDialog.LCDialog):
             self.abandonar()
         elif tecla == 78 and tipo == "V":  # N = next
             self.seguir()
-        elif tecla == 16777223:  # Del
+        elif tecla in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):  # Del
             self.borrar()
 
     def mueveJugada(self, tipo):
@@ -677,7 +677,10 @@ class WEntrenarBMT(LCDialog.LCDialog):
         game.restore(rm.txtPartida)
 
         bt = self.liBTrm[num]
-        txt = "%d: %s = %s" % (rm.nivelBMT + 1, game.move(0).pgn_translated(), rm.abrTexto())
+        txt = "%d: %s" % (rm.nivelBMT + 1, game.move(0).pgn_translated())
+        mas = rm.abrTexto()
+        if mas:
+            txt += " = %s" % rm.abrTexto()
         if rm.siPrimero:
             txt = "%s *" % txt
             self.lbPrimera.setVisible(True)
@@ -710,7 +713,6 @@ class WEntrenarBMT(LCDialog.LCDialog):
             self.activaJugada1(num)
 
     def activaPosicion(self, num):
-
         self.finalizaTiempo()  # Para que guarde el vtime, si no es el primero
 
         self.bmt_uno = bmt_uno = self.bmt_lista.dame_uno(num)
@@ -867,7 +869,6 @@ class WEntrenarBMT(LCDialog.LCDialog):
         self.pgn.refresh()
 
     def muestra(self, num):
-
         for n, bt in enumerate(self.liBTrm):
             f = bt.font()
             siBold = f.bold()
@@ -920,7 +921,6 @@ class WEntrenarBMT(LCDialog.LCDialog):
         return move, is_white, siUltimo, tam_lj, pos
 
     def analizaPosicion(self, row, key):
-
         if row < 0:
             return
 

@@ -97,6 +97,7 @@ class EngineManager:
 
     def update_multipv(self, xmultipv):
         self.confMotor.update_multipv(xmultipv)
+        self.num_multipv = self.confMotor.multiPV
         self.check_engine()
         self.engine.ponMultiPV(self.confMotor.multiPV)
 
@@ -262,7 +263,7 @@ class EngineManager:
             return mrm, n
 
         # No esta considerado, obliga a hacer el analysis de nuevo from_sq position
-        if move.is_mate or move.is_draw:
+        if move.game is not None and (move.is_mate or move.is_draw):
             rm = EngineResponse.EngineResponse(self.name, move.position_before.is_white)
             rm.from_sq = mv[:2]
             rm.to_sq = mv[2:4]

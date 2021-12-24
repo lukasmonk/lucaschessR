@@ -208,3 +208,14 @@ def kbdPulsado():
     is_control = modifiers == QtCore.Qt.ControlModifier
     is_alt = modifiers == QtCore.Qt.AltModifier
     return is_shift, is_control, is_alt
+
+
+class EstadoWindow:
+    def __init__(self, x):
+        self.noEstado = x == QtCore.Qt.WindowNoState
+        self.minimizado = x == QtCore.Qt.WindowMinimized
+        self.maximizado = x == QtCore.Qt.WindowMaximized
+        self.fullscreen = x == QtCore.Qt.WindowFullScreen
+        self.active = x == QtCore.Qt.WindowActive
+
+

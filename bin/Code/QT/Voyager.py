@@ -5,6 +5,7 @@ from PIL import Image
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import Code
+import Code.DGT
 from Code import Util
 from Code import DGT
 from Code.Base import Game, Move, Position
@@ -72,7 +73,7 @@ class WPosicion(QtWidgets.QWidget):
         ]
         if self.configuration.x_digital_board:
             li_acciones.append(None)
-            li_acciones.append((self.dgt_title_icon(), Iconos.DGT(), self.dgt_active))
+            li_acciones.append((self.dgt_title_icon(), Code.DGT.icon_eboard(), self.dgt_active))
 
         self.tb = Controles.TBrutina(self, li_acciones, with_text=False, icon_size=20)
 
@@ -194,11 +195,11 @@ class WPosicion(QtWidgets.QWidget):
         self.pb_scanner_learn_quit.hide()
         self.gb_scanner.hide()
 
-        DGT.activarSegunON_OFF(self.dispatch_dgt)
+        DGT.activate_according_on_off(self.dispatch_dgt)
 
     def compruebaDGT(self, set_position):
         if self.configuration.x_digital_board:
-            if not DGT.activarSegunON_OFF(self.dispatch_dgt):  # Error
+            if not DGT.activate_according_on_off(self.dispatch_dgt):  # Error
                 QTUtil2.message_error(
                     self.main_window,
                     _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board,
@@ -215,7 +216,7 @@ class WPosicion(QtWidgets.QWidget):
     def dgt_title_icon(self):
         return (
             _("Disable %s board") % self.configuration.x_digital_board
-            if DGT.siON()
+            if DGT.eboard_is_on()
             else _("Enable %s board") % self.configuration.x_digital_board
         )
 

@@ -356,6 +356,8 @@ class ManagerGM(Manager.Manager):
                 rm, pos_gm = w.analysis[0].buscaRM(jgGM.movimiento())
                 analysis = w.analysis[0], pos_gm
 
+                rmUsu = w.rmUsu
+                rmGM = w.rmObj
                 dpts = w.difPuntos()
 
             self.puntos += dpts

@@ -41,7 +41,7 @@ class DBgames:
             self.external_folder = os.path.dirname(nom_fichero)
         else:
             self.external_folder = ""
-        self.nom_fichero = Util.relative_path(nom_fichero)
+        self.nom_fichero = os.path.abspath(nom_fichero)
 
         self.conexion = sqlite3.connect(self.nom_fichero)
         self.conexion.row_factory = sqlite3.Row
@@ -278,7 +278,10 @@ class DBgames:
             self.rowidReader = None
 
     def label(self):
-        return Util.relative_path(self.nom_fichero)
+        if Util.same_path(self.nom_fichero, self.link_file):
+            return Code.relative_root(self.nom_fichero)
+        else:
+            return "%s (%s)" % (Code.relative_root(self.nom_fichero), Code.relative_root(self.link_file))
 
     def depth_stat(self):
         return self.db_stat.depth if self.db_stat else 0

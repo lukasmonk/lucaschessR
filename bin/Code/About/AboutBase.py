@@ -80,7 +80,6 @@ class ThanksTo:
 
     def contributors(self):
         txt = self.dl_ini()
-        txt += "<br><b>Michele Tumbarello</b><hr>"
 
         def version(num, li_basex, li_restox, sim=True):
             random.shuffle(li_basex)
@@ -111,7 +110,7 @@ class ThanksTo:
             "Johannes Bolzano",
         ]
         li_resto = []
-        txt += version("R", li_base, li_resto, False)
+        txt += version("R", li_base, li_resto, True)
 
         # Version 11
         li_base = [
@@ -469,7 +468,7 @@ class ThanksTo:
             ("The Week in Chess", "http://theweekinchess.com/"),
             ("Wikipedia", "http://en.wikipedia.org/wiki/List_of_chess_games"),
             ("fics", "http://ficsgames.org/cgi-bin/download.cgi"),
-            ("Norman Pollock", "http://40h.000webhostapp.com/"),
+            ("Norman Pollock", "http://www.nk-qy.info/40h/"),
             ("STS<br>" + _X(_("Created by %1"), "Dan Corbit,Swaminathan"), "https://sites.google.com/site/strategictestsuite/about-1"),
             ("liChess database", "https://database.lichess.org"),
         )
@@ -501,7 +500,7 @@ class ThanksTo:
                 "https://github.com/python-pillow/Pillow",
             ),
             ("photohash", "Chris Pickett and others", "https://github.com/bunchesofdonald/photohash"),
-            ("cython", "Cython 0.29.14", "http://cython.org/"),
+            ("cython", "Stefan Behnel, Robert Bradshaw, Lisandro Dalcín,<br>Mark Florisson, Vitja Makarov, Dag Sverre Seljebotn", "http://cython.org/"),
             ("formlayout", _X(_("Created by %1"), "Pierre Raybaut"), "https://github.com/PierreRaybaut/formlayout"),
             ("sortedcontainers", _X(_("Created by %1"), "Grant Jenks"), "http://www.grantjenks.com/docs/sortedcontainers/"),
             ("lichess-puzzler", _X(_("Created by %1"), "Thibault Duplessis"), "https://github.com/ornicar/lichess-puzzler"),

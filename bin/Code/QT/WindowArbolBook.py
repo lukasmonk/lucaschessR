@@ -414,7 +414,7 @@ class WindowArbolBook(LCDialog.LCDialog):
         self.save_video()
 
     def keyPressEvent(self, event):
-        if event.key() == 16777266:  # F3
+        if event.key() == QtCore.Qt.Key_F3:
             self.buscaSiguiente()
 
     def cancelar(self):

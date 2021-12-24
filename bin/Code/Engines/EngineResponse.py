@@ -219,7 +219,7 @@ class EngineResponse:
         if self.depth:
             c += "/%d" % self.depth
         if self.time:
-            c += '/%0.02f"' % (1.0 * self.time / 1000.0,)
+            c += '/%0.01f"' % (self.time / 1000.0,)
         return c
 
     def abrTextoBase(self):

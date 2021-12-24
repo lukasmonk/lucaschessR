@@ -49,6 +49,13 @@ from Code.Openings import OpeningsStd, Opening
 
 
 class Game:
+    li_moves = None
+    opening = None
+    rotuloTablasRepeticion = None
+    pending_opening = True
+    termination = TERMINATION_UNKNOWN
+    result = RESULT_UNKNOWN
+
     def __init__(self, first_position=None, fen=None, li_tags=None):
         self.first_comment = ""
         self.li_tags = li_tags if li_tags else []
@@ -71,8 +78,10 @@ class Game:
     def set_position(self, first_position=None):
         self.li_moves = []
         self.opening = None
-        self.result = RESULT_UNKNOWN
         self.termination = TERMINATION_UNKNOWN
+        self.result = RESULT_UNKNOWN
+        self.del_tag("Termination")
+        self.del_tag("Result")
         self.rotuloTablasRepeticion = None
         self.pending_opening = False
 
@@ -203,6 +212,13 @@ class Game:
         if not found:
             self.li_tags.append([key, value])
 
+    def del_tag(self, key):
+        for n, (xkey, xvalue) in enumerate(self.li_tags):
+            if xkey == key:
+                del self.li_tags[n]
+                return
+
+
     def set_extend_tags(self):
         if self.result:
             self.set_tag("Result", self.result)
@@ -230,17 +246,6 @@ class Game:
         if self.num_moves():
             self.set_tag("PlyCount", "%d" % self.num_moves())
 
-    def readPGN(self, pgn):
-        ok, game_tmp = pgn_game(pgn)
-        self.restore(game_tmp.save())
-        return self
-
-    def pgn(self):
-        li = ['[%s "%s"]\n' % (k, v) for k, v in self.li_tags]
-        txt = "".join(li)
-        txt += "\n%s" % self.pgnBase()
-        return txt
-
     def sort_tags(self):
         st_hechos = set()
         li_nuevo = []
@@ -254,6 +259,17 @@ class Game:
             if k not in st_hechos:
                 li_nuevo.append((k, v))
         self.li_tags = li_nuevo
+
+    def readPGN(self, pgn):
+        ok, game_tmp = pgn_game(pgn)
+        self.restore(game_tmp.save())
+        return self
+
+    def pgn(self):
+        li = ['[%s "%s"]\n' % (k, v) for k, v in self.li_tags]
+        txt = "".join(li)
+        txt += "\n%s" % self.pgnBase()
+        return txt
 
     def titulo(self, *litags):
         li = []
@@ -397,7 +413,7 @@ class Game:
     def is_draw(self):
         return self.result == RESULT_DRAW
 
-    def pgnBaseRAW(self, numJugada=None):
+    def pgnBaseRAW(self, numJugada=None, translated=False):
         resp = ""
         if numJugada is None:
             if self.first_comment:
@@ -413,7 +429,10 @@ class Game:
             if n % 2 == salta:
                 resp += " %d." % numJugada
                 numJugada += 1
-            resp += move.pgnEN() + " "
+            if translated:
+                resp += move.pgn_translated() + " "
+            else:
+                resp += move.pgnEN() + " "
 
         resp = resp.replace("\r\n", " ").replace("\n", " ").replace("\r", " ").strip()
         while "  " in resp:

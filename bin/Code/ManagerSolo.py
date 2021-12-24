@@ -90,11 +90,11 @@ class ManagerSolo(Manager.Manager):
         self.pon_rotulo()
         self.set_dispatcher(self.player_has_moved)
         self.show_side_indicator(True)
-        self.put_pieces_bottom(dic.get("WHITEBOTTOM", True))
         self.pgnRefresh(True)
         self.ponCapInfoPorDefecto()
 
         self.check_boards_setposition()
+        self.put_pieces_bottom(dic.get("WHITEBOTTOM", True))
 
         self.goto_end()
 
@@ -258,6 +258,7 @@ class ManagerSolo(Manager.Manager):
         dic["PLAY_AGAINST_ENGINE"] = self.play_against_engine
         if self.dicRival and self.play_against_engine:
             dic["ROTULO1"] = self.dicRival["ROTULO1"]
+        dic["WHITEBOTTOM"] = self.board.is_white_bottom
         return dic
 
     def reiniciar(self, dic=None):

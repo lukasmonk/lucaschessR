@@ -367,14 +367,14 @@ class ManagerFideFics(Manager.Manager):
             self.puntos += dpts
             self.ponPuntos()
 
-            comentarioUsu += " %s" % (rmUsu.abrTexto())
-            comentarioObj += " %s" % (rmObj.abrTexto())
+            comentarioUsu += " %s" % (w.rmUsu.abrTexto())
+            comentarioObj += " %s" % (w.rmObj.abrTexto())
 
             comentarioPuntos = "%s = %d %+d %+d = %d" % (
                 _("Score"),
                 self.puntos - dpts,
-                rmUsu.centipawns_abs(),
-                -rmObj.centipawns_abs(),
+                w.rmUsu.centipawns_abs(),
+                -w.rmObj.centipawns_abs(),
                 self.puntos,
             )
 

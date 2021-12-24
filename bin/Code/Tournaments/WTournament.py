@@ -651,7 +651,7 @@ class WTournament(LCDialog.LCDialog):
         self.rotulos_tabs()
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
-        if k == 16777223:
+        if k in (QtCore.Qt.Key_Delete, QtCore.Qt.Key_Backspace):
             if grid == self.gridGamesQueued:
                 self.gm_borrar_queued()
             elif grid == self.gridEnginesAlias:

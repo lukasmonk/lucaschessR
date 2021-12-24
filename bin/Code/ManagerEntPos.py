@@ -70,7 +70,8 @@ class ManagerEntPos(Manager.Manager):
 
         self.hints = 99999
 
-        self.line_fns = FNSLine.FNSLine(self.li_trainings[self.pos_training - 1])
+        linea, self.pos_training_origin = self.li_trainings[self.pos_training - 1]
+        self.line_fns = FNSLine.FNSLine(linea)
 
         self.game_obj = self.line_fns.game_obj
         self.pos_obj = 0
@@ -124,7 +125,10 @@ class ManagerEntPos(Manager.Manager):
         if self.line_fns.label:
             titulo += "<br>%s" % self.line_fns.label
         self.set_label1(titulo)
-        self.set_label2("%d / %d" % (pos_training, num_trainings))
+        if pos_training != self.pos_training_origin:
+            self.set_label2("[%d] %d / %d" % (self.pos_training_origin, pos_training, num_trainings))
+        else:
+            self.set_label2("%d / %d" % (pos_training, num_trainings))
         self.pgnRefresh(True)
         QTUtil.refresh_gui()
 

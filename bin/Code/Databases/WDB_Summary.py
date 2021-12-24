@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 
 from Code.Base import Game
 from Code.Databases import WDB_Analysis
@@ -102,7 +102,11 @@ class WSummary(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-        self.qtColor = (QTUtil.qtColorRGB(221, 255, 221), QTUtil.qtColorRGB(247, 247, 247), QTUtil.qtColorRGB(255, 217, 217))
+        self.qtColor = (
+            QTUtil.qtColorRGB(221, 255, 221),
+            QTUtil.qtColorRGB(247, 247, 247),
+            QTUtil.qtColorRGB(255, 217, 217),
+        )
         self.qtColorTotales = QTUtil.qtColorRGB(170, 170, 170)
 
     def close_db(self):
@@ -159,8 +163,14 @@ class WSummary(QtWidgets.QWidget):
         return len(self.liMoves)
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
-        if k == 16777220:
+        if k in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
             self.siguiente()
+        elif k == QtCore.Qt.Key_Left:
+            self.infoMove.MoverAtras()
+        elif k == QtCore.Qt.Key_Right:
+            self.infoMove.MoverAdelante()
+        else:
+            return True  # que siga con el resto de teclas
 
     def grid_dato(self, grid, nfila, ocol):
         key = ocol.key
@@ -437,7 +447,11 @@ class WSummaryBase(QtWidgets.QWidget):
 
         self.setLayout(layout)
 
-        self.qtColor = (QTUtil.qtColorRGB(221, 255, 221), QTUtil.qtColorRGB(247, 247, 247), QTUtil.qtColorRGB(255, 217, 217))
+        self.qtColor = (
+            QTUtil.qtColorRGB(221, 255, 221),
+            QTUtil.qtColorRGB(247, 247, 247),
+            QTUtil.qtColorRGB(255, 217, 217),
+        )
         self.qtColorTotales = QTUtil.qtColorRGB(170, 170, 170)
 
     def grid_doble_clickCabecera(self, grid, o_column):
@@ -556,7 +570,7 @@ class WSummaryBase(QtWidgets.QWidget):
             self.actualizaPV(resp.PV)
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
-        if k == 16777220:
+        if k in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
             self.siguiente()
 
     def grid_doble_click(self, grid, fil, col):

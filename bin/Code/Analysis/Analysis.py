@@ -259,6 +259,8 @@ class CreateAnalysis:
 def show_analysis(procesador, xtutor, move, is_white, max_recursion, pos_move, main_window=None, must_save=True):
     main_window = procesador.main_window if main_window is None else main_window
 
+    max_recursion = 9999 # TODO comprobar que este cambio es correcto, es decir la anulación de restricciones
+
     ma = CreateAnalysis(procesador, move, max_recursion, pos_move)
     if xtutor is None:
         xtutor = procesador.XTutor()

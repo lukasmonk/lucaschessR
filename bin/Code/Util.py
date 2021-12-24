@@ -48,7 +48,11 @@ def create_folder(carpeta: str):
 
 
 def same_path(path1: str, path2: str) -> bool:
-    return os.path.realpath(path1) == os.path.realpath(path2)
+    return os.path.abspath(path1) == os.path.abspath(path2)
+
+
+def norm_path(path):
+    return os.path.abspath(path)
 
 
 def filesize(file: str) -> int:
@@ -211,6 +215,24 @@ def zip2var(blob):
         return pickle.loads(varp)
     except:
         return None
+
+
+def zip2var_change_import(blob, replace_from, replace_to):
+    if blob is None:
+        return None
+    try:
+        varp = zlib.decompress(blob)
+    except:
+        return None
+
+    try:
+        return pickle.loads(varp)
+    except:
+        try:
+            varp = varp.replace(replace_from, replace_to)
+            return pickle.loads(varp)
+        except:
+            return None
 
 
 class Record:
@@ -828,3 +850,4 @@ def div_list(list, max_group):
         li_groups.append(list[xfrom : xfrom + max_group])
         xfrom += max_group
     return li_groups
+
