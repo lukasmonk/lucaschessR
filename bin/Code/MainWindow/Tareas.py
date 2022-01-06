@@ -2,6 +2,8 @@ import copy
 
 from PySide2 import QtCore
 
+import Code
+
 VTEXTO = 0
 VENTERO = 1
 VDECIMAL = 2
@@ -134,11 +136,15 @@ class TareaBorraPiezaSecs(Tarea):
 
 
 class TareaMuevePieza(Tarea):
-    def __init__(self, from_a1h8, to_a1h8, seconds=0.0):
+    def __init__(self, from_a1h8, to_a1h8, seconds=0.0, with_beep=False):
         self.pieza = None
         self.from_a1h8 = from_a1h8
         self.to_a1h8 = to_a1h8
         self.seconds = seconds
+        self.with_beep = with_beep
+
+    def set_beep(self):
+        self.with_beep = True
 
     def enlaza(self, cpu):
         Tarea.enlaza(self, cpu)
@@ -156,6 +162,8 @@ class TareaMuevePieza(Tarea):
             self.liPuntos.append(linea.pointAt(float(x) / pasos))
         self.nPaso = 0
         self.totalPasos = len(self.liPuntos)
+        if self.with_beep:
+            self.paso_beep = self.totalPasos * 4 // 5
 
     def a1h8_xy(self, a1h8):
         row = int(a1h8[1])
@@ -181,6 +189,8 @@ class TareaMuevePieza(Tarea):
         self.pieza.rehazPosicion()
         self.nPaso += 1
         siUltimo = self.nPaso >= self.totalPasos
+        if siUltimo and self.with_beep:
+            Code.runSound.playBeep()
         if siUltimo:
             # Para que este al final en la physical_pos correcta
             self.board.colocaPieza(bp, self.to_a1h8)

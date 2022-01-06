@@ -185,13 +185,15 @@ class Expedition:
         self.reg = ex.goto(self.recno)
         if len(self.reg.GAMES) >= self.reg.NEXT_GAME:
             is_last = True
+            is_last_last = self.tramo == 11
         else:
             is_last = False
+            is_last_last = False
             self.run()
 
         ex.close()
 
-        return change_game, is_last
+        return change_game, is_last, is_last_last
 
 
 class Expeditions:

@@ -143,6 +143,8 @@ class ManagerSingularM(Manager.Manager):
             self.move_the_pieces(jgSel.liMovs)
 
             self.game.add_move(jgSel)
+            self.check_boards_setposition()
+
             self.put_arrow_sc(jgSel.from_sq, jgSel.to_sq)
             if not ok:
                 self.board.creaFlechaTmp(bm[:2], bm[2:], False)
@@ -150,6 +152,7 @@ class ManagerSingularM(Manager.Manager):
 
         else:
             self.put_arrow_sc(bm[:2], bm[2:])
+            self.check_boards_setposition()
 
         self.pgnRefresh(self.game.last_position.is_white)
 
@@ -162,8 +165,6 @@ class ManagerSingularM(Manager.Manager):
         self.main_window.pon_toolbar(li)
 
         self.state = ST_ENDGAME
-
-        self.check_boards_setposition()
 
         self.refresh()
 

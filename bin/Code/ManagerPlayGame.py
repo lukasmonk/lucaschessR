@@ -303,6 +303,7 @@ class ManagerPlayGame(Manager.Manager):
             move.comment = comment
 
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.move_the_pieces(move.liMovs, True)
         self.board.set_position(move.position)
@@ -311,8 +312,6 @@ class ManagerPlayGame(Manager.Manager):
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
-
-        self.check_boards_setposition()
 
     def put_result(self):
         self.analizaTerminar()

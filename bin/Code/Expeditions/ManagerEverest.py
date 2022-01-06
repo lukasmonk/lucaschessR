@@ -350,14 +350,14 @@ class ManagerEverest(Manager.Manager):
             move.comment = comment
 
         self.game.add_move(move)
+        self.check_boards_setposition()
+
         self.move_the_pieces(move.liMovs, True)
         self.board.set_position(move.position)
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
         self.pgnRefresh(self.game.last_position.is_white)
-
-        self.check_boards_setposition()
 
     def put_result(self):
         self.analizaTerminar()
@@ -366,10 +366,12 @@ class ManagerEverest(Manager.Manager):
 
         self.state = ST_ENDGAME
 
-        change_game, is_last = self.expedition.add_try(True, self.vtime, self.puntos)
+        change_game, is_last, is_last_last = self.expedition.add_try(True, self.vtime, self.puntos)
 
         if is_last:
-            mensaje = _("Congratulations, goal achieved") + "\n\n" + _("You have climbed Everest!")
+            mensaje = _("Congratulations, goal achieved")
+            if is_last_last:
+                mensaje += "\n\n" + _("You have climbed Everest!")
             self.mensaje(mensaje)
         else:
             mensaje = _("Congratulations you have passed this game.")

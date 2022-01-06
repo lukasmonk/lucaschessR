@@ -406,7 +406,7 @@ class ManagerGM(Manager.Manager):
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
-        self.game.check()
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
@@ -420,8 +420,6 @@ class ManagerGM(Manager.Manager):
         self.refresh()
 
         self.motorGM.play(move.movimiento())
-
-        self.check_boards_setposition()
 
     def put_result(self):
         self.state = ST_ENDGAME

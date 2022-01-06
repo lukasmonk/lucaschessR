@@ -220,6 +220,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
+            self.beepError()
             return False
         pvSel = from_sq + to_sq + promotion
         lipvObj = self.trposition["MOVES"]
@@ -229,6 +230,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
             mens = "%s: %d" % (_("Error"), self.errores)
             QTUtil2.mensajeTemporal(self.main_window, mens, 2, physical_pos="ad", background="#FF9B00")
             self.muestraInformacion()
+            self.beepError()
             self.sigueHumano()
             return False
 
@@ -240,6 +242,7 @@ class ManagerOpeningLinesPositions(Manager.Manager):
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
@@ -247,4 +250,3 @@ class ManagerOpeningLinesPositions(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.check_boards_setposition()

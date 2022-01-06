@@ -30,6 +30,7 @@ from Code.Base.Constantes import (
     TB_TAKEBACK,
     TB_CONFIG,
     TB_UTILITIES,
+    TB_EBOARD,
     RS_DRAW_50,
     RESULT_DRAW,
     RS_DRAW_MATERIAL,
@@ -52,8 +53,7 @@ from Code.Kibitzers import Kibitzers
 from Code.Openings import OpeningsStd
 from Code.QT import FormLayout
 from Code.QT import Iconos
-from Code.QT import QTUtil
-from Code.QT import QTUtil2, SelectFiles
+from Code.QT import QTUtil2, QTUtil, SelectFiles
 from Code.QT import QTVarios
 from Code.QT import Replay
 from Code.QT import WindowArbol
@@ -1015,6 +1015,13 @@ class Manager:
             self.xRutinaAccionDef(key)
         elif key == TB_CLOSE:
             self.procesador.reset()
+        elif key == TB_EBOARD:
+            dboard = self.configuration.x_digital_board
+            if dboard:
+                DGT.cambiarON_OFF()
+                self.compruebaDGT(True)
+                self.main_window.set_title_toolbar_eboard()
+
         else:
             self.procesador.run_action(key)
 
@@ -1116,6 +1123,7 @@ class Manager:
     def sigueHumano(self):
         self.human_is_playing = True
         self.activate_side(self.game.last_position.is_white)
+        QTUtil.refresh_gui()
 
     def check_human_move(self, from_sq, to_sq, promotion, with_premove=False):
         if self.human_is_playing:
@@ -1152,14 +1160,14 @@ class Manager:
 
     def compruebaDGT(self, set_position):
         if self.configuration.x_digital_board:
-            if not DGT.activate_according_on_off(self.dgt):  # Error
+            if DGT.activate_according_on_off(self.dgt):
+                if set_position:
+                    DGT.set_position(self.game)
+            else:
                 QTUtil2.message_error(
                     self.main_window,
                     _("Error, could not detect the %s board driver.") % self.configuration.x_digital_board,
                 )
-            else:
-                if set_position:
-                    DGT.set_position(self.game)
 
     def dgt(self, quien, a1h8):
         if self.board.mensajero and self.board.pieces_are_active:

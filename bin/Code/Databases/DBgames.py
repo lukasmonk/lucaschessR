@@ -69,6 +69,8 @@ class DBgames:
 
         self.with_plycount = "PLYCOUNT" in self.read_config("dcabs", {})
 
+
+
     def read_options(self):
         self.allows_duplicates = self.read_config("ALLOWS_DUPLICATES", True)
         self.allows_positions = self.read_config("ALLOWS_POSITIONS", True)

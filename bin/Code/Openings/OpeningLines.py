@@ -226,6 +226,8 @@ class Opening:
     def reinit_cache_engines(self):
         self.open_cache_engines()
         self.db_cache_engines.zap()
+        self.db_cache_engines.close()
+        self.db_cache_engines = None
 
     def init_database(self):
         cursor = self._conexion.cursor()
@@ -759,8 +761,6 @@ class Opening:
 
     def close(self):
         if self._conexion:
-            conexion = self._conexion
-            self._conexion = None
             ult_pack = self.getconfig("ULT_PACK", 0)
             si_pack = ult_pack > 50
             self.setconfig("ULT_PACK", 0 if si_pack else ult_pack + 1)
@@ -774,6 +774,7 @@ class Opening:
                 self.db_cache_engines.close()
                 self.db_cache_engines = None
 
+
             if self.board:
                 self.board.dbvisual_close()
                 self.board = None
@@ -786,15 +787,16 @@ class Opening:
                         del self.db_history[k]
                 self.db_history.close()
 
-                cursor = conexion.cursor()
+                cursor = self._conexion.cursor()
                 cursor.execute("VACUUM")
                 cursor.close()
-                conexion.commit()
+                self._conexion.commit()
 
             else:
                 self.db_history.close()
 
-            conexion.close()
+            self._conexion.close()
+            self._conexion = None
 
     def importarPGN(self, owner, gamebase, ficheroPGN, maxDepth, with_variations, with_comments):
 

@@ -230,6 +230,7 @@ class ManagerOpeningEngines(Manager.Manager):
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
+            self.beepError()
             return False
 
         fenm2 = self.game.last_position.fenm2()
@@ -267,6 +268,7 @@ class ManagerOpeningEngines(Manager.Manager):
                 move.add_nag(GOOD_MOVE)
                 move.es_linea = True
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
@@ -274,7 +276,6 @@ class ManagerOpeningEngines(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
 
-        self.check_boards_setposition()
 
     def muestraInformacion(self):
         li = []

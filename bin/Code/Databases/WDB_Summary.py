@@ -283,7 +283,7 @@ class WSummary(QtWidgets.QWidget):
             li_gen.append((None, _("Select the number of half-moves <br> for each game to be considered")))
             li_gen.append((None, None))
 
-            config = FormLayout.Spinbox(_("Depth"), 0, 255, 50)
+            config = FormLayout.Spinbox(_("Depth"), 0, 999, 50)
             li_gen.append((config, self.dbGames.depth_stat()))
 
             resultado = FormLayout.fedit(li_gen, title=_("Rebuild"), parent=self, icon=Iconos.Reindexar())

@@ -1175,6 +1175,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
+        self.check_boards_setposition()
         self.beepExtendido(siNuestra)
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
@@ -1182,8 +1183,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.ponAyudasEM()
 
         self.pgnRefresh(self.game.last_position.is_white)
-
-        self.check_boards_setposition()
 
         self.refresh()
 

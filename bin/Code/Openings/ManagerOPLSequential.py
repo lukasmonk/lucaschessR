@@ -62,7 +62,7 @@ class ManagerOpeningLinesSequential(Manager.Manager):
         self.is_human_side_white = self.training["COLOR"] == "WHITE"
         self.is_engine_side_white = not self.is_human_side_white
 
-        self.main_window.pon_toolbar((TB_CLOSE, TB_HELP, TB_REINIT))
+        self.main_window.pon_toolbar([TB_CLOSE, TB_HELP, TB_REINIT])
         self.main_window.activaJuego(True, False, siAyudas=False)
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
@@ -267,6 +267,7 @@ class ManagerOpeningLinesSequential(Manager.Manager):
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
+            self.beepError()
             return False
         if promotion:
             pass
@@ -274,6 +275,7 @@ class ManagerOpeningLinesSequential(Manager.Manager):
         pvObj = self.li_pv[len(self.game)]
 
         if pvSel != pvObj:
+            self.beepError()
             fenm2 = move.position_before.fenm2()
             li = self.dicFENm2.get(fenm2, set())
             if pvSel in li:
@@ -299,14 +301,13 @@ class ManagerOpeningLinesSequential(Manager.Manager):
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
-
-        self.check_boards_setposition()
 
     def play_rival(self, engine_response):
         from_sq = engine_response.from_sq

@@ -197,8 +197,11 @@ class RunEngine:
 
         self.pid = self.process.pid
         if self.priority is not None:
-            p = psutil.Process(self.pid)
-            p.nice(Priorities.priorities.value(self.priority))
+            try:
+                p = psutil.Process(self.pid)
+                p.nice(Priorities.priorities.value(self.priority))
+            except:
+                pass
 
         self.stdin = self.process.stdin
         self.stdout = self.process.stdout

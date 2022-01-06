@@ -13,6 +13,7 @@ from Code.Engines import EnginesBunch
 from Code.Engines import Priorities
 from Code.Openings import WindowOpenings, POLAnalisis, POLBoard, OpeningLines
 from Code.Polyglots import Books
+from Code.Databases import DBgames
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Delegados
@@ -653,7 +654,7 @@ class WLines(LCDialog.LCDialog):
         form.separador()
 
         form.apart(_("Select the number of half-moves <br> for each game to be considered"))
-        form.spinbox(_("Depth"), 3, 99, 50, dicData.get("DEPTH", 30))
+        form.spinbox(_("Depth"), 3, 999, 50, dicData.get("DEPTH", 30))
         form.separador()
 
         li = [(_("Only white best movements"), True), (_("Only black best movements"), False)]
@@ -693,7 +694,9 @@ class WLines(LCDialog.LCDialog):
         if nomfichgames:
             dicData = self.import_param_books(_("Database opening explorer"), False)
             if dicData:
-                ficheroSummary = nomfichgames + ".st1"
+                db = DBgames.DBgames(nomfichgames) # por el problema de los externos
+                ficheroSummary = db.db_stat.nom_fichero
+                db.close()
                 depth, siWhite, onlyone, minMoves = (
                     dicData["DEPTH"],
                     dicData["SIWHITE"],

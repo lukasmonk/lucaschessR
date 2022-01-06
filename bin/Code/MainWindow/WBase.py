@@ -51,6 +51,7 @@ from Code.Base.Constantes import (
     TB_TRAIN,
     TB_UTILITIES,
     TB_VARIATIONS,
+    TB_EBOARD,
     NAG_0,
     NAG_1,
     NAG_2,
@@ -60,6 +61,7 @@ from Code.Base.Constantes import (
     NAG_6,
 )
 from Code.Board import Board
+from Code import DGT
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -173,6 +175,8 @@ class WBase(QtWidgets.QWidget):
             TB_SEND: (_("Send"), Iconos.Enviar()),
             TB_STOP: (_("Play now"), Iconos.Stop()),
         }
+        if self.configuration.x_digital_board:
+            dic_opciones[TB_EBOARD] = ["%s/%s"%(_("Enable"),_("Disable")), DGT.icon_eboard()]
 
         cf = self.manager.configuration
         peso = 75 if cf.x_tb_bold else 50
@@ -332,10 +336,19 @@ class WBase(QtWidgets.QWidget):
     def run_action(self):
         self.manager.run_action(self.sender().key)
 
-    def pon_toolbar(self, li_acciones, separator=False, conAtajos=False):
+    def pon_toolbar(self, li_acciones, separator=False, conAtajos=False, with_eboard=False):
         self.conAtajos = conAtajos
 
         self.tb.clear()
+        if (TB_CLOSE in li_acciones or TB_RESIGN in li_acciones or TB_CANCEL in li_acciones) and self.configuration.x_digital_board:
+            li_acciones = list(li_acciones)
+            if TB_CONFIG in li_acciones:
+                pos = li_acciones.index(TB_CONFIG)
+                li_acciones.insert(pos, TB_EBOARD)
+            else:
+                li_acciones.append(TB_EBOARD)
+            title = _("Disable") if DGT.eboard_is_on() else _("Enable")
+            self.dic_toolbar[TB_EBOARD].setIconText(title)
         last = len(li_acciones) - 1
         for n, k in enumerate(li_acciones):
             self.dic_toolbar[k].setVisible(True)
@@ -360,6 +373,11 @@ class WBase(QtWidgets.QWidget):
 
     def show_option_toolbar(self, kopcion, must_show):
         self.dic_toolbar[kopcion].setVisible(must_show)
+
+    def set_title_toolbar_eboard(self):
+        if self.configuration.x_digital_board:
+            title = _("Disable") if DGT.eboard_is_on() else _("Enable")
+            self.dic_toolbar[TB_EBOARD].setIconText(title)
 
     def set_activate_tutor(self, siActivar):
         self.si_tutor = siActivar

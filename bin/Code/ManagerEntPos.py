@@ -126,7 +126,7 @@ class ManagerEntPos(Manager.Manager):
             titulo += "<br>%s" % self.line_fns.label
         self.set_label1(titulo)
         if pos_training != self.pos_training_origin:
-            self.set_label2("[%d] %d / %d" % (self.pos_training_origin, pos_training, num_trainings))
+            self.set_label2("%s: %d\n %d / %d" % (_("Original position"), self.pos_training_origin, pos_training, num_trainings))
         else:
             self.set_label2("%d / %d" % (pos_training, num_trainings))
         self.pgnRefresh(True)
@@ -473,14 +473,13 @@ class ManagerEntPos(Manager.Manager):
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
-
-        self.check_boards_setposition()
 
     def pon_resultado(self):
         mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)

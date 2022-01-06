@@ -463,6 +463,7 @@ class MenuTrainings:
                             if tipo == "rk":
                                 random.seed(pos)
                             random.shuffle(liEntrenamientos)
+                            pos = 1
                     self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump)
 
                 elif resp == "learnPGN":

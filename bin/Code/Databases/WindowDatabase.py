@@ -170,7 +170,8 @@ class WBDatabase(LCDialog.LCDialog):
         self.reiniciar = True
         self.accept()
 
-    def reinit_sinsalvar(self):
-        self.dbGames.close()
+    def reinit_sinsalvar(self, must_close=True):
+        if must_close:
+            self.dbGames.close()
         self.reiniciar = True
         self.accept()

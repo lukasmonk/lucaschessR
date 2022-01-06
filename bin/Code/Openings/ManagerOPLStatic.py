@@ -267,6 +267,7 @@ class ManagerOpeningLinesStatic(Manager.Manager):
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
+            self.beepError()
             return False
         if promotion:
             pass
@@ -274,6 +275,7 @@ class ManagerOpeningLinesStatic(Manager.Manager):
         pvObj = self.li_pv[len(self.game)]
 
         if pvSel != pvObj:
+            self.beepError()
             fenm2 = move.position_before.fenm2()
             li = self.dicFENm2.get(fenm2, set())
             if pvSel in li:
@@ -291,22 +293,21 @@ class ManagerOpeningLinesStatic(Manager.Manager):
             self.sigueHumano()
             return False
 
+        self.add_move(move, True)
         self.move_the_pieces(move.liMovs)
 
-        self.add_move(move, True)
         self.play_next_move()
         return True
 
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
-
-        self.check_boards_setposition()
 
     def play_rival(self, engine_response):
         from_sq = engine_response.from_sq

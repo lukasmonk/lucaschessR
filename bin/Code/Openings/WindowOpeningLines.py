@@ -270,6 +270,7 @@ class WOpeningLines(LCDialog.LCDialog):
             for num, row in enumerate(li, 1):
                 mens += "\n%d. %s" % (num, self.listaOpenings[row]["title"])
             if QTUtil2.pregunta(self, mens):
+                self.wtrain.setVisible(False)
                 li.sort(reverse=True)
                 for row in li:
                     del self.listaOpenings[row]

@@ -42,6 +42,23 @@ class WOpenings(LCDialog.LCDialog):
 
         # Current pgn
         self.lbPGN = Controles.LB(self, "").set_wrap().ponTipoLetra(puntos=10, peso=75)
+        ly = Colocacion.H().control(self.lbPGN)
+        gb = Controles.GB(self, _("Selected opening"), ly).ponTipoLetra(puntos=11, peso=75).align_center()
+        gb.setStyleSheet("""QGroupBox {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #E0E0E0, stop: 1 #FFFFFF);
+    border: 2px solid gray;
+    border-radius: 5px;
+    margin-top: 10px; /* leave space at the top for the title */
+    margin-bottom: 5px; /* leave space at the top for the title */
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center; /* position at the top center */
+    padding: 3px;
+    margin-top: -3px; /* leave space at the top for the title */
+}
+""")
 
         # Movimiento
         self.is_moving_time = False
@@ -50,8 +67,8 @@ class WOpenings(LCDialog.LCDialog):
         self.tbBM = tbBM
 
         # Tool bar
-        tb = QTVarios.LCTB(self)
-        tb.new(_("Accept"), Iconos.Aceptar(), self.aceptar)
+        tb = QTVarios.LCTB(self, icon_size=24)
+        tb.new(_("Select"), Iconos.Aceptar(), self.aceptar)
         tb.new(_("Cancel"), Iconos.Cancelar(), self.cancelar)
         tb.new(_("Reinit"), Iconos.Reiniciar(), self.resetPartida)
         tb.new(_("Takeback"), Iconos.Atras(), self.atras)
@@ -67,11 +84,11 @@ class WOpenings(LCDialog.LCDialog):
         self.register_grid(self.grid)
 
         # # Derecha
-        lyD = Colocacion.V().control(tb).control(self.grid)
+        lyD = Colocacion.V().control(tb).control(gb).control(self.grid)
         gbDerecha = Controles.GB(self, "", lyD)
 
         # # Izquierda
-        lyI = Colocacion.V().control(self.board).otro(lyBM).control(self.lbPGN)
+        lyI = Colocacion.V().control(self.board).otro(lyBM)
         gbIzquierda = Controles.GB(self, "", lyI)
 
         splitter = QtWidgets.QSplitter(self)
@@ -146,8 +163,10 @@ class WOpenings(LCDialog.LCDialog):
 
         self.game.assign_opening()
         txt = self.game.pgn_translated()
+        if not txt:
+            txt = _("None")
         if self.game.opening:
-            txt = '<span style="color:gray;">%s</span><br>%s' % (self.game.opening.name, txt)
+            txt = '%s<br><span style="color:gray;">%s</span>' % (txt, self.game.opening.name)
 
         self.lbPGN.set_text(txt)
         self.posCurrent = len(self.game) - 1

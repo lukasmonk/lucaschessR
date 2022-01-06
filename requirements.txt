@@ -6,3 +6,4 @@ psutil>=5.7.0
 pillow>=7.0.0
 pyside2>=5.14.0
 cython>=0.29.14
+psutil>=5.8.0

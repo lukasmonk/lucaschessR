@@ -165,7 +165,7 @@ class ManagerFideFics(Manager.Manager):
         self.set_label2("%s : <b>%d</b>" % (_("Score"), self.puntos))
 
     def pon_toolbar(self):
-        liTool = (TB_RESIGN, TB_ADJOURN, TB_CONFIG, TB_UTILITIES)
+        liTool = [TB_RESIGN, TB_ADJOURN, TB_CONFIG, TB_UTILITIES]
         self.main_window.pon_toolbar(liTool)
 
     def run_action(self, key):
@@ -411,6 +411,7 @@ class ManagerFideFics(Manager.Manager):
                 self.comment = None
 
         self.game.add_move(move)
+        self.check_boards_setposition()
         self.move_the_pieces(move.liMovs, True)
         self.board.set_position(move.position)
         self.put_arrow_sc(move.from_sq, move.to_sq)
@@ -418,8 +419,6 @@ class ManagerFideFics(Manager.Manager):
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
-
-        self.check_boards_setposition()
 
     def muestra_resultado(self):
         self.analizaTerminar()

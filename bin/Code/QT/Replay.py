@@ -1,4 +1,5 @@
-import Code
+import time
+
 from Code.Base.Constantes import (
     TB_CONTINUE_REPLAY,
     TB_END_REPLAY,
@@ -108,6 +109,9 @@ class Replay:
 
         move = self.li_moves[self.current_position]
         self.board.set_position(move.position_before)
+        if self.current_position == 0:
+            QTUtil.refresh_gui()
+            time.sleep(self.seconds)
         liMovs = [("b", move.to_sq), ("m", move.from_sq, move.to_sq)]
         if move.position.li_extras:
             liMovs.extend(move.position.li_extras)
@@ -129,6 +133,7 @@ class Replay:
         self.main_window.base.pgnRefresh()
 
         # primero los movimientos
+        beep = self.if_beep
         for movim in liMovs:
             if movim[0] == "m":
                 from_sq, to_sq = movim[1], movim[2]
@@ -139,7 +144,8 @@ class Replay:
                     dist = (dc ** 2 + df ** 2) ** 0.5
                     rp = self.rapidez if self.rapidez > 1.0 else 1.0
                     secs = 4.0 * dist / (9.9 * rp)
-                cpu.muevePieza(from_sq, to_sq, secs)
+                cpu.muevePieza(from_sq, to_sq, secs, with_beep=beep)
+                beep = False
         # return
         if secs is None:
             secs = 1.0
@@ -155,8 +161,8 @@ class Replay:
                 cpu.cambiaPieza(movim[1], movim[2], siExclusiva=True)
 
         cpu.runLineal()
-        if self.if_beep:
-            Code.runSound.playBeep()
+        # if self.if_beep:
+        #     Code.runSound.playBeep()
         self.manager.put_arrow_sc(move.from_sq, move.to_sq)
 
         self.board.set_position(move.position)

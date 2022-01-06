@@ -286,6 +286,9 @@ class MainWindow(LCDialog.LCDialog):
     def is_enabled_option_toolbar(self, opcion):
         return self.base.is_enabled_option_toolbar(opcion)
 
+    def set_title_toolbar_eboard(self):
+        self.base.set_title_toolbar_eboard()
+
     def pgnRefresh(self, is_white):
         self.base.pgnRefresh()
         self.base.pgn.gobottom(2 if is_white else 1)

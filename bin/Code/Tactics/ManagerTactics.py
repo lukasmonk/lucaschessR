@@ -253,6 +253,7 @@ class ManagerTactics(Manager.Manager):
 
     def add_move(self, move, si_nuestra):
         self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.pos_obj += 1
 
@@ -262,8 +263,6 @@ class ManagerTactics(Manager.Manager):
         self.pgnRefresh(self.game.last_position.is_white)
         self.board.set_position(move.position)
         self.refresh()
-
-        self.check_boards_setposition()
 
     def cambiar(self):
         if self.tactic.w_next_position >= 0:

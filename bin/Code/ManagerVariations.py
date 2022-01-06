@@ -165,12 +165,11 @@ class ManagerVariations(Manager.Manager):
         return True
 
     def add_move(self, move):
+        self.game.add_move(move)
 
         self.beepExtendido(True)
 
         self.changed = True
-
-        self.game.add_move(move)
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
 

@@ -70,7 +70,7 @@ def update(main_window):
                     if base == base_version:
                         if current_version < version:
                             if not update_file(_X(_("version %1"), version.decode()), urlfichero.decode(), int(tam)):
-                                mens_error = _X(_("An error has occurred during the upgrade to version %1"), version)
+                                mens_error = _X(_("An error has occurred during the upgrade to version %1"), version.decode())
                             else:
                                 done_update = True
 

@@ -437,16 +437,14 @@ class ManagerMicElo(Manager.Manager):
 
     def add_move(self, move, siNuestra):
 
-        self.game.li_moves.append(move)
-        self.game.check()
+        self.game.add_move(move)
+        self.check_boards_setposition()
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
         self.beepExtendido(siNuestra)
 
         self.pgnRefresh(self.game.last_position.is_white)
         self.refresh()
-
-        self.check_boards_setposition()
 
         if self.pte_tool_resigndraw:
             if len(self.game) > self.maxPlyRendirse:

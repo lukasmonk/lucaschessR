@@ -65,7 +65,6 @@ class WGames(QtWidgets.QWidget):
         o_columns = self.lista_columnas()
         self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, altoFila=24, siSeleccionMultiple=True, xid="wgames")
 
-
         # Status bar
         self.status = QtWidgets.QStatusBar(self)
         self.status.setFixedHeight(22)
@@ -305,7 +304,7 @@ class WGames(QtWidgets.QWidget):
         elif k == QtCore.Qt.Key_End:
             self.tw_gobottom()
         else:
-            return True # que siga con el resto de teclas
+            return True  # que siga con el resto de teclas
 
     def closeEvent(self, event):
         self.tw_terminar()
@@ -640,10 +639,23 @@ class WGames(QtWidgets.QWidget):
             resp()
 
     def tw_options(self):
-        dic_data = modify_database(self, self.configuration, self.dbGames)
-        if dic_data is None:
-            return
+        db = self.dbGames
+        dic_data = {
+            "NAME": db.get_name(),
+            "LINK_FILE": db.link_file,
+            "FILEPATH": db.nom_fichero,
+            "EXTERNAL_FOLDER": db.external_folder,
+            "SUMMARY_DEPTH": db.depth_stat(),
+            "ALLOWS_DUPLICATES": db.read_config("ALLOWS_DUPLICATES", True),
+            "ALLOWS_POSITIONS": db.read_config("ALLOWS_POSITIONS", True),
+            "ALLOWS_COMPLETE_GAMES": db.read_config("ALLOWS_COMPLETE_GAMES", True),
+            "ALLOWS_ZERO_MOVES": db.read_config("ALLOWS_ZERO_MOVES", True),
+        }
+        w = WOptionsDatabase(self, self.configuration, dic_data)
+        if not w.exec_():
+            return None
 
+        dic_data = w.dic_data_resp
         self.dbGames.read_options()
 
         # Comprobamos depth
@@ -659,37 +671,35 @@ class WGames(QtWidgets.QWidget):
         new_is_internal = len(dic_data["EXTERNAL_FOLDER"]) == 0
         new_is_external = not new_is_internal
 
+        path_old_data = self.dbGames.nom_fichero
+        path_new_data = dic_data["FILEPATH_WITH_DATA"]
+
         reinit = False
+        must_close = True
 
         if new_is_external and old_is_external:
             new_link = dic_data["FILEPATH"]
             old_link = self.dbGames.link_file
             if not Util.same_path(new_link, old_link):
                 self.configuration.set_last_database(new_link)
-                Util.remove_file(new_link)
-                shutil.move(old_link, new_link)
+                Util.remove_file(old_link)
                 reinit = True
+                must_close = True
+
 
         if new_is_internal and old_is_external:
             os.remove(self.dbGames.link_file)
 
-        new_path = dic_data["FILEPATH"]
-        if new_is_external:
-            new_path = os.path.abspath(os.path.join(dic_data["EXTERNAL_FOLDER"], os.path.basename(new_path)[:-4]))
-        old_path = self.dbGames.nom_fichero
-        if not Util.same_path(new_path, old_path):
+        if not Util.same_path(path_old_data, path_new_data):
             self.dbGames.close()
-            if new_is_internal:
-                self.configuration.set_last_database(new_path)
-            shutil.move(old_path, new_path)
-            shutil.move(old_path + ".st1", new_path + ".st1")
+            shutil.move(path_old_data, path_new_data)
+            shutil.move(path_old_data + ".st1", path_new_data + ".st1")
+            self.configuration.set_last_database(dic_data["FILEPATH"])
             reinit = True
-            if new_is_external:
-                with open(dic_data["FILEPATH"], "wt", encoding="utf-8", errors="ignore") as q:
-                    q.write(new_path)
+            must_close = False
 
         if reinit:
-            self.wb_database.reinit_sinsalvar()  # para que no cree de nuevo al salvar configuración
+            self.wb_database.reinit_sinsalvar(must_close)  # para que no cree de nuevo al salvar configuración
 
 
     def tw_tags(self):
@@ -1174,21 +1184,16 @@ class WGames(QtWidgets.QWidget):
             mensaje += "<li>%s</li>" % mens_unzip
 
         mensaje += "<li>%s" % mens_eco
-        mensaje += '<ul>'
+        mensaje += "<ul>"
         mensaje += '<li><a href="%s">%s</a></li>' % (link_eco, link_eco)
         mensaje += '<li>%s: <a href="%s">%s</a></li>' % (idea, link_idea, link_idea)
-        mensaje += '</ul>'
+        mensaje += "</ul>"
         mensaje += "</li>"
 
         mensaje += "</ol>"
         mensaje += "<br>%s" % _("The import takes a long time.")
 
-        if not QTUtil2.pregunta(
-            self,
-            mensaje,
-            label_yes=_("Continue"),
-            label_no=_("Cancel"),
-        ):
+        if not QTUtil2.pregunta(self, mensaje, label_yes=_("Continue"), label_no=_("Cancel")):
             return
 
         path = SelectFiles.leeFichero(
@@ -1372,7 +1377,9 @@ class WOptionsDatabase(QtWidgets.QDialog):
             QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         )
         bt_remove_external = Controles.PB(self, "", self.remove_external).ponIcono(Iconos.Remove1(), 16)
-        ly_external = Colocacion.H().control(lb_external).control(self.bt_external).espacio(-8).control(bt_remove_external)
+        ly_external = (
+            Colocacion.H().control(lb_external).control(self.bt_external).espacio(-8).control(bt_remove_external)
+        )
 
         self.chb_complete = Controles.CHB(self, _("Allow complete games"), d_true("ALLOWS_COMPLETE_GAMES"))
         self.chb_positions = Controles.CHB(self, _("Allow positions"), d_true("ALLOWS_POSITIONS"))
@@ -1486,25 +1493,25 @@ class WOptionsDatabase(QtWidgets.QDialog):
 
         filename = "%s.lcdb" % name
         if self.external_folder:
-            filepath = os.path.join(self.external_folder, filename)
+            filepath_with_data = os.path.join(self.external_folder, filename)
         else:
-            filepath = os.path.join(folder, filename)
+            filepath_with_data = os.path.join(folder, filename)
 
         test_exist = self.new
         if not self.new:
             previous = self.dic_data["FILEPATH"]
-            test_exist = not Util.same_path(previous, filepath)
+            test_exist = not Util.same_path(previous, filepath_with_data)
 
-        if test_exist and Util.exist_file(filepath):
-            QTUtil2.message_error(self, "%s\n%s" % (_("This database already exists."), filepath))
+        if test_exist and Util.exist_file(filepath_with_data):
+            QTUtil2.message_error(self, "%s\n%s" % (_("This database already exists."), filepath_with_data))
             return
 
         if self.external_folder:
-            file = os.path.join(folder, "%s.lcdblink" % name)
-            with open(file, "wt", encoding="utf-8", errors="ignore") as q:
-                q.write(filepath)
+            filepath_in_databases = os.path.join(folder, "%s.lcdblink" % name)
+            with open(filepath_in_databases, "wt", encoding="utf-8", errors="ignore") as q:
+                q.write(filepath_with_data)
         else:
-            file = filepath
+            filepath_in_databases = filepath_with_data
 
         self.dic_data_resp = {
             "ALLOWS_DUPLICATES": self.chb_duplicate.valor(),
@@ -1514,13 +1521,10 @@ class WOptionsDatabase(QtWidgets.QDialog):
             "SUMMARY_DEPTH": self.sb_summary.valor(),
         }
 
-        db = DBgames.DBgames(filepath)
-        for key, value in self.dic_data_resp.items():
-            db.save_config(key, value)
-        db.close()
-
-        self.dic_data_resp["FILEPATH"] = file
+        self.dic_data_resp["FILEPATH"] = filepath_in_databases
         self.dic_data_resp["EXTERNAL_FOLDER"] = self.external_folder
+
+        self.dic_data_resp["FILEPATH_WITH_DATA"] = filepath_with_data
 
         self.accept()
 
@@ -1529,26 +1533,15 @@ def new_database(owner, configuration):
     dic_data = {}
     w = WOptionsDatabase(owner, configuration, dic_data)
     if w.exec_():
-        return w.dic_data_resp["FILEPATH"]
-    else:
-        return None
-
-
-def modify_database(owner, configuration, db):
-    dic_data = {
-        "NAME": db.get_name(),
-        "LINK_FILE": db.link_file,
-        "FILEPATH": db.nom_fichero,
-        "EXTERNAL_FOLDER": db.external_folder,
-        "SUMMARY_DEPTH": db.depth_stat(),
-        "ALLOWS_DUPLICATES": db.read_config("ALLOWS_DUPLICATES", True),
-        "ALLOWS_POSITIONS": db.read_config("ALLOWS_POSITIONS", True),
-        "ALLOWS_COMPLETE_GAMES": db.read_config("ALLOWS_COMPLETE_GAMES", True),
-        "ALLOWS_ZERO_MOVES": db.read_config("ALLOWS_ZERO_MOVES", True),
-    }
-    w = WOptionsDatabase(owner, configuration, dic_data)
-    if w.exec_():
-        return w.dic_data_resp
+        filepath = w.dic_data_resp["FILEPATH"]
+        if w.external_folder:
+            with open(filepath, "wt", encoding="utf-8", errors="ignore") as q:
+                q.write(filepath)
+        db = DBgames.DBgames(filepath)
+        for key, value in w.dic_data_resp.items():
+            db.save_config(key, value)
+        db.close()
+        return filepath
     else:
         return None
 
