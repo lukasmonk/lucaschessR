@@ -24,8 +24,6 @@ def run_gui(procesador):
     # Usuarios
     list_users = Usuarios.Usuarios().list_users
     if len(list_users) > 1:
-        main_config.releeTRA()
-
         user = pide_usuario(list_users)
         if user == list_users[0]:
             user = None
@@ -103,7 +101,7 @@ def run_gui(procesador):
                 lng = lng_default
             configuration.set_translator(lng)
             configuration.graba()
-            configuration.releeTRA()
+            configuration.load_translation()
 
     # Estilo
     # https://github.com/gmarull/qtmodern/blob/master/qtmodern/styles.py

@@ -27,6 +27,10 @@ class Log:
         with open(self.logname, "at") as ferr:
             ferr.write(buf)
 
+    def writeln(self, buf):
+        with open(self.logname, "at") as ferr:
+            ferr.write(buf + "\n")
+
     def flush(self):
         pass  # To remove error 120 at exit
 
@@ -37,6 +41,19 @@ def remove_file(file: str) -> bool:
     except:
         pass
     return not os.path.isfile(file)
+
+
+def remove_folder_files(folder: str) -> bool:
+    entry: os.DirEntry
+    for entry in os.scandir(folder):
+        if entry.is_file():
+            if not remove_file(entry.path):
+                return False
+    try:
+        os.rmdir(folder)
+    except:
+        pass
+    return not os.path.isdir(folder)
 
 
 def create_folder(carpeta: str):

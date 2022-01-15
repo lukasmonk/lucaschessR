@@ -425,7 +425,7 @@ def massive_analysis_parameters(parent, configuration, siVariosSeleccionados, si
         (
             '<div align="right">'
             + _("Only player moves")
-            + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcard * )"),
+            + ":<br>%s</div>" % _("(You can add multiple aliases separated by ; and wildcards with *)"),
             "",
         )
     )

@@ -133,7 +133,7 @@ class ManagerEverest(Manager.Manager):
 
     def restart(self, lost_points):
         self.terminaNoContinuo()
-        change_game, is_last = self.expedition.add_try(False, self.vtime, self.puntos)
+        change_game, is_last, is_last_last = self.expedition.add_try(False, self.vtime, self.puntos)
         self.vtime = 0.0
         licoment = []
         if lost_points:

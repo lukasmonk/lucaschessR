@@ -158,7 +158,7 @@ class WEngines(LCDialog.LCDialog):
     def grid_doble_click(self, grid, fil, col):
         self.modificar()
 
-    def grid_doble_clickCabecera(self, grid, o_column):
+    def grid_doubleclick_header(self, grid, o_column):
         key = o_column.key
         if key == "ALIAS":
             key = "key"

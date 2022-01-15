@@ -55,7 +55,7 @@ from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil2, QTUtil, SelectFiles
 from Code.QT import QTVarios
-from Code.QT import Replay
+from Code.QT import WReplay
 from Code.QT import WindowArbol
 from Code.QT import WindowArbolBook
 from Code.QT import WindowSavePGN
@@ -377,8 +377,8 @@ class Manager:
             self.configuration.x_show_effects = ant
             self.board.set_position(move.position)
 
-    def move_the_pieces(self, liMovs, timed_movement=False):
-        if timed_movement and self.configuration.x_show_effects:
+    def move_the_pieces(self, liMovs, is_rival=False):
+        if is_rival and self.configuration.x_show_effects:
 
             rapidez = self.configuration.pieces_speed_porc()
             cpu = self.procesador.cpu
@@ -430,7 +430,6 @@ class Manager:
                     self.board.muevePieza(movim[1], movim[2])
                 elif movim[0] == "c":
                     self.board.cambiaPieza(movim[1], movim[2])
-
         # Aprovechamos que esta operacion se hace en cada move
         self.atajosRatonReset()
 
@@ -573,7 +572,7 @@ class Manager:
         if self.configuration.x_sound_move:
             if len(self.game):
                 move = self.game.move(-1)
-                self.runSound.playLista(move.listaSonidos(), siEsperar=True)
+                self.runSound.play_list(move.listaSonidos())
         elif self.configuration.x_sound_beep:
             self.runSound.playBeep()
 
@@ -598,13 +597,13 @@ class Manager:
             RS_WIN_OPPONENT_TIME: "GANARIVALTIEMPO",
         }
         if resfinal in dic:
-            self.runSound.playClave(dic[resfinal])
+            self.runSound.play_key(dic[resfinal])
 
-    def beepResultado(self, beep):
-        if beep:
+    def beepResultado(self, beep_result):
+        if beep_result:
             if not self.configuration.x_sound_results:
                 return
-            self.runSound.playClave(beep)
+            self.runSound.play_key(beep_result)
 
     def pgnRefresh(self, is_white):
         self.main_window.pgnRefresh(is_white)
@@ -999,13 +998,13 @@ class Manager:
             self.refresh()
 
     def replay(self):
-        resp = Replay.param_replay(self.configuration, self.main_window)
+        resp = WReplay.param_replay(self.configuration, self.main_window)
         if resp is None:
             return
 
-        seconds, if_start, if_pgn, if_beep = resp
+        seconds, if_start, if_pgn, if_beep, seconds_before = resp
 
-        self.xpelicula = Replay.Replay(self, seconds, if_start, if_pgn, if_beep)
+        self.xpelicula = WReplay.Replay(self, seconds, if_start, if_pgn, if_beep, seconds_before)
 
     def ponRutinaAccionDef(self, rutina):
         self.xRutinaAccionDef = rutina
@@ -1122,6 +1121,7 @@ class Manager:
 
     def sigueHumano(self):
         self.human_is_playing = True
+        self.check_boards_setposition()
         self.activate_side(self.game.last_position.is_white)
         QTUtil.refresh_gui()
 

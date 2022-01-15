@@ -100,15 +100,6 @@ def menu_tools_savemenu(procesador, dic_data=None):
 
     savemenu.separador()
 
-    if Code.is_windows and Code.configuration.x_show_version11:
-        menu1 = savemenu.submenu(_("Conversion from version 11"), Iconos.Bridge())
-        menu1.opcion("version11_databases", _("Databases"), Iconos.Database())
-        menu1.separador()
-        menu1.opcion("version11_openinglines", _("Opening lines"), Iconos.OpeningLines())
-        menu1.separador()
-        menu1.opcion("version11_transsiberian", _("Transsiberian Railway"), Iconos.Train())
-        menu1.separador()
-
     return savemenu
 
 
@@ -255,7 +246,7 @@ class WAtajos(LCDialog.LCDialog):
         o_columnas = Columnas.ListaColumnas()
         o_columnas.nueva("KEY", _("Key"), 80, centered=True)
         o_columnas.nueva("OPCION", _("Option"), 300)
-        o_columnas.nueva("LABEL", _("Label"), 300, edicion=Delegados.LineaTextoUTF8(siPassword=False))
+        o_columnas.nueva("LABEL", _("Label"), 300, edicion=Delegados.LineaTextoUTF8(siPassword=False), siEditable=True)
 
         self.grid = Grid.Grid(self, o_columnas, siSelecFilas=True, siEditable=True)
         self.grid.setMinimumWidth(self.grid.anchoColumnas() + 20)
@@ -301,16 +292,17 @@ class WAtajos(LCDialog.LCDialog):
         return dic.get("LABEL", name) if o_column.key == "LABEL" else name
 
     def grid_setvalue(self, grid, row, o_column, valor):  # ? necesario al haber delegados
-        dic = self.li_favoritos[row]
-        dato = self.dic_data.get(dic["OPCION"], None)
-        if dato is not None:
-            if valor:
-                dic["LABEL"] = valor.strip()
-            else:
-                if "LABEL" in dic:
-                    del dic["LABEL"]
+        if 0 <= row < len(self.favoritos):
+            dic = self.li_favoritos[row]
+            dato = self.dic_data.get(dic["OPCION"], None)
+            if dato is not None:
+                if valor:
+                    dic["LABEL"] = valor.strip()
+                else:
+                    if "LABEL" in dic:
+                        del dic["LABEL"]
 
-            self.graba(row)
+                self.graba(row)
 
     def graba(self, row):
         self.procesador.configuration.save_favoritos(self.li_favoritos)
@@ -351,7 +343,7 @@ class WAtajos(LCDialog.LCDialog):
             self.graba(row + 1)
 
     def grid_doble_click(self, grid, fila, col):
-        if fila >= 0:
+        if fila >= 0 and col.key != "LABEL":
             self.save_video()
             self.accept()
             atajos_alt(self.procesador, fila + 1)

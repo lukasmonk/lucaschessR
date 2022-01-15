@@ -305,7 +305,7 @@ class WPuenteBase(LCDialog.LCDialog):
 
         self.ghistorico.gotop()
 
-    def grid_doble_clickCabecera(self, grid, o_column):
+    def grid_doubleclick_header(self, grid, o_column):
         self.historico.put_order(o_column.key)
         self.ghistorico.gotop()
         self.ghistorico.refresh()
@@ -444,7 +444,7 @@ class WPuente(LCDialog.LCDialog):
 
         # Botones
         f = Controles.TipoLetra(puntos=12, peso=75)
-        self.btComprobar = Controles.PB(self, _("Check"), self.comprobar, plano=False).ponIcono(Iconos.Check(), icon_size=32).ponFuente(f)
+        self.btComprobar = Controles.PB(self, _("Verify"), self.comprobar, plano=False).ponIcono(Iconos.Check(), icon_size=32).ponFuente(f)
         self.btSeguir = (
             Controles.PB(self, _("Continue"), self.seguir, plano=False).ponIcono(Iconos.Pelicula_Seguir(), icon_size=32).ponFuente(f)
         )

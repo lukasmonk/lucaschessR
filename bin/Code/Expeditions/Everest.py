@@ -76,7 +76,7 @@ class Expedition:
             d["MPOINTS"] = "%d" % (int(times[x][1] / done) if done else 0)
             li_routes.append(d)
 
-        label = (self.reg.NAME, xtrayecto, "%s: %s" % (_("Height"), height))
+        label = (self.reg.NAME, xtrayecto, "%s: %s" % (_("Height"), int(height)))
 
         return li_routes, xcurrent, svg, label
 

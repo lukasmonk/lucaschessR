@@ -22,7 +22,7 @@ def init():
     run_sound.close()
     # Added by GON
     main_procesador.desactivarDGT()
-    # ------------
+
     main_procesador.stop_engines()
     main_procesador.kibitzers_manager.close()
 

@@ -67,12 +67,11 @@ class WRunCaptures(LCDialog.LCDialog):
             .ponTipoLetra(puntos=self.configuration.x_menu_points)
         )
 
-        # Botones
         li_acciones = (
             (_("Close"), Iconos.MainMenu(), self.terminar),
             None,
             (_("Begin"), Iconos.Empezar(), self.begin),
-            (_("Check"), Iconos.Check(), self.check),
+            (_("Verify"), Iconos.Check(), self.check),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
         self.tb = QTVarios.LCTB(self, li_acciones, icon_size=32)

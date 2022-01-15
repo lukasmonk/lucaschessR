@@ -216,7 +216,7 @@ class WOpeningLines(LCDialog.LCDialog):
     def new(self):
         si_expl = len(self.listaOpenings) < 4
         if si_expl:
-            QTUtil2.message_bold(self, _("First you must select the initial moves."))
+            QTUtil2.message_bold(self, _("In the next dialog box, play the moves for your opening."))
         w = WindowOpenings.WOpenings(self, self.configuration, None)
         if w.exec_():
             ap = w.resultado()
@@ -226,7 +226,7 @@ class WOpeningLines(LCDialog.LCDialog):
             return
 
         if si_expl:
-            QTUtil2.message_bold(self, _("Secondly you have to choose a name for this opening studio."))
+            QTUtil2.message_bold(self, _("Now choose a name for this opening."))
 
         name = self.get_nombre(name)
         if name:

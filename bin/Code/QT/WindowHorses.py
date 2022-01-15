@@ -151,7 +151,7 @@ class WHorsesBase(LCDialog.LCDialog):
 
         self.ghistorico.gotop()
 
-    def grid_doble_clickCabecera(self, grid, o_column):
+    def grid_doubleclick_header(self, grid, o_column):
         key = o_column.key
         if key in ("FECHA", "MOVES", "HINTS"):
             self.historico.put_order(key)

@@ -5,11 +5,7 @@ from PySide2 import QtCore, QtWidgets
 from Code import DGT
 from Code import Util
 from Code.Base import Position
-from Code.Base.Constantes import (
-    FEN_INITIAL,
-    ADJUST_BETTER,
-    ADJUST_HIGH_LEVEL,
-)
+from Code.Base.Constantes import FEN_INITIAL, ADJUST_BETTER, ADJUST_HIGH_LEVEL
 from Code.Engines import WEngines, SelectEngines
 from Code.Openings import WindowOpenings
 from Code.PlayAgainstEngine import Personalities
@@ -71,7 +67,9 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         tab.dispatchChange(self.cambiada_tab)
 
         self.tab_advanced = 4  # está en la posición 4
-        self.tab_advanced_active = False  # Para no tener que leer las options uci to_sq que no sean necesarias, afecta a gridNumDatos
+        self.tab_advanced_active = (
+            False
+        )  # Para no tener que leer las options uci to_sq que no sean necesarias, afecta a gridNumDatos
 
         def nueva_tab(layout, titulo):
             ly = Colocacion.V()
@@ -117,7 +115,9 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         self.btRival = Controles.PB(self, "", self.cambiaRival, plano=False).ponFuente(font).altoFijo(48)
 
         lbTiempoSegundosR = Controles.LB2P(self, _("Fixed time in seconds")).ponFuente(font)
-        self.edRtiempo = Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font).capture_changes(self.change_time)
+        self.edRtiempo = (
+            Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font).capture_changes(self.change_time)
+        )
         bt_cancelar_tiempo = Controles.PB(self, "", rutina=self.cancelar_tiempo).ponIcono(Iconos.S_Cancelar())
         ly_tiempo = Colocacion.H().control(self.edRtiempo).control(bt_cancelar_tiempo).relleno(1)
 
@@ -130,24 +130,8 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         ly.controld(lbTiempoSegundosR, 0, 0).otro(ly_tiempo, 0, 1)
         ly.controld(lb_depth, 1, 0).otro(ly_depth, 1, 1)
         self.gb_thinks = Controles.GB(self, _("Limits of engine thinking"), ly)
-        self.gb_thinks.setStyleSheet(
-            """
-            QGroupBox {
-                font: bold %d;
-                background-color: #F2F2EC;/*qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #E0E0E0, stop: 1 #FFFFFF);*/
-                border: 1px solid gray;
-                border-radius: 3px;
-                padding: 18px;
-                margin-top: 5ex; /* leave space at the top for the title */
-            }
-            QGroupBox::title {
-                subcontrol-position: top center; /* position at the top center */
-                padding: 8px;
-                border: 1px solid gray;
-             }
-        """
-            % procesador.configuration.x_menu_points
-        )
+        self.gb_thinks.setStyleSheet(Common.gb_style_sub(procesador.configuration.x_menu_points))
+
         lyV = Colocacion.V().espacio(20).control(self.btRival).espacio(20).control(self.gb_thinks)
 
         _label(lyG, _("Opponent"), lyV)
@@ -162,14 +146,21 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         self.rbRandom = Controles.RB(self, _("Random"))
         self.rbRandom.setFont(Controles.TipoLetra(puntos=14))
         hbox = (
-            Colocacion.H().relleno().control(self.rb_white).espacio(30).control(self.rb_black).espacio(30).control(self.rbRandom).relleno()
+            Colocacion.H()
+            .relleno()
+            .control(self.rb_white)
+            .espacio(30)
+            .control(self.rb_black)
+            .espacio(30)
+            .control(self.rbRandom)
+            .relleno()
         )
         _label(lyG, _("Side you play with"), hbox)
 
         if self.configuration.x_digital_board:
-            self.chb_dgt = Controles.CHB(self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.eboard_is_on()).ponFuente(
-                Controles.TipoLetra(puntos=14)
-            )
+            self.chb_dgt = Controles.CHB(
+                self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.eboard_is_on()
+            ).ponFuente(Controles.TipoLetra(puntos=14))
             lyH = Colocacion.H().control(self.chb_dgt)
             _label(lyG, "", lyH)
 
@@ -178,7 +169,9 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         # ##################################################################################################################################
         # TAB Ayudas
         # ##################################################################################################################################
-        self.chbSummary = Controles.CHB(self, _("Save a summary when the game is finished in the main comment"), False).ponFuente(font)
+        self.chbSummary = Controles.CHB(
+            self, _("Save a summary when the game is finished in the main comment"), False
+        ).ponFuente(font)
 
         self.chbTakeback = Controles.CHB(self, _("Option takeback activated"), True).ponFuente(font)
 
@@ -192,7 +185,9 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         self.cbAyudas = Controles.CB(self, liAyudas, 999).ponFuente(font)
         self.chbChance = Controles.CHB(self, _("Second chance"), True).ponFuente(font)
         btTutorChange = (
-            Controles.PB(self, _("Tutor change"), self.tutorChange, plano=False).ponIcono(Iconos.Tutor(), icon_size=16).ponFuente(font)
+            Controles.PB(self, _("Tutor change"), self.tutorChange, plano=False)
+            .ponIcono(Iconos.Tutor(), icon_size=16)
+            .ponFuente(font)
         )
 
         liThinks = [(_("Nothing"), -1), (_("Score"), 0)]
@@ -269,21 +264,39 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         lyG = nuevoG()
 
         # Posicion
-        self.btPosicion = Controles.PB(self, " " * 5 + _("Change") + " " * 5, self.posicionEditar).ponPlano(False).ponFuente(font)
+        self.btPosicion = (
+            Controles.PB(self, " " * 5 + _("Change") + " " * 5, self.posicionEditar).ponPlano(False).ponFuente(font)
+        )
         self.fen = ""
         self.btPosicionQuitar = Controles.PB(self, "", self.posicionQuitar).ponIcono(Iconos.Motor_No()).ponFuente(font)
         self.btPosicionPegar = (
             Controles.PB(self, "", self.posicionPegar).ponIcono(Iconos.Pegar16()).ponToolTip(_("Paste FEN position"))
         ).ponFuente(font)
-        hbox = Colocacion.H().relleno().control(self.btPosicionQuitar).control(self.btPosicion).control(self.btPosicionPegar).relleno()
+        hbox = (
+            Colocacion.H()
+            .relleno()
+            .control(self.btPosicionQuitar)
+            .control(self.btPosicion)
+            .control(self.btPosicionPegar)
+            .relleno()
+        )
         _label(lyG, _("Start position"), hbox)
 
         # Openings
-        self.btOpening = Controles.PB(self, " " * 5 + _("Undetermined") + " " * 5, self.editOpening).ponPlano(False).ponFuente(font)
+        self.btOpening = (
+            Controles.PB(self, " " * 5 + _("Undetermined") + " " * 5, self.editOpening).ponPlano(False).ponFuente(font)
+        )
         self.opening_block = None
         self.btOpeningsFavoritas = Controles.PB(self, "", self.preferred_openings).ponIcono(Iconos.Favoritos())
         self.btOpeningsQuitar = Controles.PB(self, "", self.aperturasQuitar).ponIcono(Iconos.Motor_No())
-        hbox = Colocacion.H().relleno().control(self.btOpeningsQuitar).control(self.btOpening).control(self.btOpeningsFavoritas).relleno()
+        hbox = (
+            Colocacion.H()
+            .relleno()
+            .control(self.btOpeningsQuitar)
+            .control(self.btOpening)
+            .control(self.btOpeningsFavoritas)
+            .relleno()
+        )
         _label(lyG, _("Opening"), hbox)
 
         # Libros
@@ -321,12 +334,16 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         self.lbDepthBookP = Controles.LB2P(self, _("Max depth")).ponFuente(font)
         self.edDepthBookP = Controles.ED(self).ponFuente(font).tipoInt(0).anchoFijo(30)
         hbox = (
-            Colocacion.H().control(self.cbBooksP)
-                .control(self.btNuevoBookP).relleno()
-                .control(self.lbDepthBookP)
-                .control(self.edDepthBookP)
+            Colocacion.H()
+            .control(self.cbBooksP)
+            .control(self.btNuevoBookP)
+            .relleno()
+            .control(self.lbDepthBookP)
+            .control(self.edDepthBookP)
         )
-        self.chbBookP = _label(lyG, "%s: %s" % (_("Activate book"), self.configuration.nom_player()), hbox, checkable=True)
+        self.chbBookP = _label(
+            lyG, "%s: %s" % (_("Activate book"), self.configuration.nom_player()), hbox, checkable=True
+        )
 
         nueva_tab(lyG, _("Initial moves"))
 
@@ -336,10 +353,14 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         lyG = nuevoG()
 
         liAjustes = self.personalidades.listaAjustes(True)
-        self.cbAjustarRival = Controles.CB(self, liAjustes, ADJUST_BETTER).capture_changes(self.ajustesCambiado).ponFuente(font)
+        self.cbAjustarRival = (
+            Controles.CB(self, liAjustes, ADJUST_BETTER).capture_changes(self.ajustesCambiado).ponFuente(font)
+        )
         lbAjustarRival = Controles.LB2P(self, _("Set strength")).ponFuente(font)
         self.btAjustarRival = (
-            Controles.PB(self, _("Personality"), self.cambiaPersonalidades, plano=True).ponIcono(Iconos.Mas(), icon_size=16).ponFuente(font)
+            Controles.PB(self, _("Personality"), self.cambiaPersonalidades, plano=True)
+            .ponIcono(Iconos.Mas(), icon_size=16)
+            .ponFuente(font)
         )
 
         # ## Resign
@@ -360,12 +381,29 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         o_columns.nueva("OPTION", _("UCI option"), 240, centered=True)
         o_columns.nueva("VALUE", _("Value"), 200, centered=True, edicion=Delegados.MultiEditor(self))
         self.grid_uci = Grid.Grid(self, o_columns, siEditable=True)
+        # self.grid_uci.setFixedHeight(320)
         self.grid_uci.ponFuente(font)
         self.register_grid(self.grid_uci)
 
-        lyH2 = Colocacion.H().control(lbAjustarRival).control(self.cbAjustarRival).control(self.btAjustarRival).relleno()
+        # Humanize
+        lb_humanize = Controles.LB2P(self, _("Humanize fast responses (range in seconds)")).ponFuente(font)
+        self.ed_htime_min = Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font)
+        lb_sep = Controles.LB(self, "-").ponFuente(font)
+        self.ed_htime_max = Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font)
+
+        def cancel_humanize():
+            self.ed_htime_min.ponFloat(0.0)
+            self.ed_htime_max.ponFloat(0.0)
+
+        bt_cancel_htime = Controles.PB(self, "", rutina=cancel_humanize).ponIcono(Iconos.S_Cancelar())
+        ly_humanize = Colocacion.H().control(lb_humanize)
+        ly_humanize.control(self.ed_htime_min).control(lb_sep).control(self.ed_htime_max).espacio(3).control(bt_cancel_htime).relleno().margen(0)
+
+        lyH2 = (
+            Colocacion.H().control(lbAjustarRival).control(self.cbAjustarRival).control(self.btAjustarRival).relleno()
+        )
         lyH3 = Colocacion.H().control(lbResign).control(self.cbResign).relleno()
-        ly = Colocacion.V().otro(lyH2).otro(lyH3).espacio(16).control(self.lb_path_engine).control(self.grid_uci)
+        ly = Colocacion.V().otro(lyH2).otro(lyH3).otro(ly_humanize).espacio(16).control(self.lb_path_engine).control(self.grid_uci)
         _label(lyG, _("Opponent"), ly)
 
         nueva_tab(lyG, _("Advanced"))
@@ -673,7 +711,11 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
             elif menu.siDer:
                 pos, opening_block = resp
                 if QTUtil2.pregunta(
-                    self, _X(_("Do you want to delete the opening %1 from the list of favourite openings?"), opening_block.trNombre)
+                    self,
+                    _X(
+                        _("Do you want to delete the opening %1 from the list of favourite openings?"),
+                        opening_block.trNombre,
+                    ),
                 ):
                     del self.li_preferred_openings[pos]
 
@@ -739,6 +781,9 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         # Avanzado
         dic["ADJUST"] = self.cbAjustarRival.valor()
         dic["RESIGN"] = self.cbResign.valor()
+
+        dic["HUMANIZE_MIN"] = self.ed_htime_min.textoFloat()
+        dic["HUMANIZE_MAX"] = self.ed_htime_max.textoFloat()
 
         if self.configuration.x_digital_board:
             if self.chb_dgt.isChecked():
@@ -848,6 +893,8 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         # Avanzado
         self.cbAjustarRival.ponValor(dic.get("ADJUST", ADJUST_BETTER))
         self.cbResign.ponValor(dic.get("RESIGN", -800))
+        self.ed_htime_min.ponFloat(dic.get("HUMANIZE_MIN", 0.0))
+        self.ed_htime_max.ponFloat(dic.get("HUMANIZE_MAX", 0.0))
 
         self.muestraOpening()
         self.muestraPosicion()
@@ -941,7 +988,12 @@ class WCambioRival(QtWidgets.QDialog):
         self.personalidades = Personalities.Personalities(self, configuration)
 
         # Toolbar
-        li_acciones = [(_("Accept"), Iconos.Aceptar(), "aceptar"), None, (_("Cancel"), Iconos.Cancelar(), "cancelar"), None]
+        li_acciones = [
+            (_("Accept"), Iconos.Aceptar(), "aceptar"),
+            None,
+            (_("Cancel"), Iconos.Cancelar(), "cancelar"),
+            None,
+        ]
         tb = Controles.TB(self, li_acciones)
 
         # Blancas o negras
@@ -968,7 +1020,9 @@ class WCambioRival(QtWidgets.QDialog):
         liAjustes = self.personalidades.listaAjustes(True)
         self.cbAjustarRival = Controles.CB(self, liAjustes, ADJUST_BETTER).capture_changes(self.ajustesCambiado)
         lbAjustarRival = Controles.LB2P(self, _("Set strength"))
-        self.btAjustarRival = Controles.PB(self, "", self.cambiaPersonalidades, plano=False).ponIcono(Iconos.Nuevo(), icon_size=16)
+        self.btAjustarRival = Controles.PB(self, "", self.cambiaPersonalidades, plano=False).ponIcono(
+            Iconos.Nuevo(), icon_size=16
+        )
         self.btAjustarRival.ponToolTip(_("Personalities"))
 
         # Layout

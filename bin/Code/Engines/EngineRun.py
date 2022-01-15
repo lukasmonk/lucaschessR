@@ -7,7 +7,7 @@ import threading
 import time
 
 import psutil
-from PySide2 import QtCore
+from PySide2 import QtCore, QtWidgets
 
 import Code
 from Code import Util
@@ -627,6 +627,7 @@ class MaiaEngine(RunEngine):
             tini = time.time()
             while not (self.stopping or (time.time() - tini) * 1000 > ms_time):
                 QtCore.QCoreApplication.processEvents()
+                QtWidgets.QApplication.processEvents()
                 time.sleep(0.1)
         self.stopping = False
 

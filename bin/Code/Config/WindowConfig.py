@@ -45,11 +45,12 @@ def options(parent, configuration):
         (_("Both"), MENU_PLAY_BOTH),
     ]
     form.combobox(_("Menu Play"), li, configuration.x_menu_play)
-    form.separador()
 
-    if Code.is_windows:
-        form.checkbox(_("Show the option to import from version 11"), configuration.x_show_version11)
-        form.separador()
+    form.separador()
+    form.checkbox(_("Activate translator help mode"), configuration.x_translation_mode)
+
+    form.separador()
+    form.separador()
 
     form.checkbox(_("Check for updates at startup"), configuration.x_check_for_update)
 
@@ -248,23 +249,14 @@ def options(parent, configuration):
 
         li_gen, li_son, li_tt, li_b, li_asp1, li_asp2, li_pr, li_nc = resp
 
-        if Code.is_windows:
-            (
-                configuration.x_player,
-                configuration.x_style,
-                translator,
-                configuration.x_menu_play,
-                configuration.x_show_version11,
-                configuration.x_check_for_update,
-            ) = li_gen
-        else:
-            (
-                configuration.x_player,
-                configuration.x_style,
-                translator,
-                configuration.x_menu_play,
-                configuration.x_check_for_update,
-            ) = li_gen
+        (
+            configuration.x_player,
+            configuration.x_style,
+            translator,
+            configuration.x_menu_play,
+            configuration.x_translation_mode,
+            configuration.x_check_for_update,
+        ) = li_gen
 
         configuration.set_translator(translator)
 
@@ -369,7 +361,9 @@ def options(parent, configuration):
                     dboard = ""
             configuration.x_digital_board = dboard
 
-        perf.questionable, perf.bad_lostp, perf.very_bad_lostp, perf.bad_factor, perf.good_depth, perf.very_good_depth = li_pr
+        perf.questionable, perf.bad_lostp, perf.very_bad_lostp, perf.bad_factor, perf.good_depth, perf.very_good_depth = (
+            li_pr
+        )
         perf.very_bad_factor = perf.bad_factor * 4
 
         return True

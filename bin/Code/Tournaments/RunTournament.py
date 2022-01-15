@@ -17,8 +17,7 @@ def run(user, file_tournament, file_work):
     configuration = Configuration.Configuration(user)
     configuration.lee()
     configuration.leeConfBoards()
-    configuration.releeTRA()
-    Code.configuration = configuration
+    configuration.load_translation()
     OpeningsStd.reset()
     Code.todasPiezas = Piezas.TodasPiezas()
 

@@ -44,8 +44,6 @@ class WKibIndex(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuration = cpu.configuration
-
         Code.todasPiezas = Piezas.TodasPiezas()
         config_board = cpu.configuration.config_board("kib" + cpu.kibitzer.huella, 24)
         self.board = Board.Board(self, config_board)

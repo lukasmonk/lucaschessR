@@ -92,7 +92,6 @@ class MainWindow(LCDialog.LCDialog):
         if not self.manager.finalX0():
             event.ignore()
 
-
     def onTopWindow(self):
         self.onTop = not self.onTop
         self.muestra()
@@ -143,6 +142,10 @@ class MainWindow(LCDialog.LCDialog):
         self.board.cierraGuion()
         self.board.terminar()
 
+        if Code.win_translator:
+            Code.win_translator.save()
+            Code.win_translator.accept()
+
     def set_manager_active(self, manager):
         self.manager = manager
         self.base.set_manager_active(manager)
@@ -162,6 +165,17 @@ class MainWindow(LCDialog.LCDialog):
             self.show()
 
         self.ponTitulo()
+
+        if Code.configuration.x_translation_mode:
+            self.translate_mode()
+
+    def translate_mode(self):
+        from Code.Translations import WindowTranslate
+
+        w = WindowTranslate.WTranslate(self)
+        w.show()
+        Code.win_translator = w
+        self.base.translate_again_tb()
 
     def changeEvent(self, event):
         QtWidgets.QWidget.changeEvent(self, event)

@@ -1,16 +1,17 @@
-import sys
-import time
-from io import BytesIO
 import audioop
+import os
+import time
 import wave
+import queue
+from io import BytesIO
 
-import pyaudio
-
-from PySide2 import QtCore
-
+from PySide2 import QtCore, QtMultimedia
+from PySide2.QtMultimedia import QAudioDeviceInfo, QAudioFormat, QAudioInput, QSound
+import Code
+from Code import Util
 from Code.QT import QTUtil
 from Code.SQL import UtilSQL
-import Code
+from Code.Translations import TrListas
 
 DATABASE = "D"
 PLAY_ESPERA = "P"
@@ -25,52 +26,144 @@ class RunSound:
         self.replay = None
         self.replayBeep = None
         self.replayError = None
+        self.dic_sounds = {}
 
-    def compruebaReplay(self):
-        if self.replay is None:
-            self.replay = Replay()
+        self.queue = queue.Queue()
+        self.current = None
+
+        self.working = False
+
+    def siguiente(self):
+        if not self.queue.empty():
+            if self.current and not self.current.isFinished():
+                QtCore.QTimer.singleShot(100, self.siguiente)
+                return
+            key = self.queue.get()
+            self.current, mseconds = self.dic_sounds[key]
+            self.current.play()
+            if not self.queue.empty():
+                QtCore.QTimer.singleShot(mseconds, self.siguiente)
+                return
+
+    def play_key(self, key, start=True):
+        if key not in self.dic_sounds:
+            name_wav = self.relations[key]["WAV_KEY"] + ".wav"
+            path_wav = os.path.join(Code.configuration.carpeta_sounds(), name_wav)
+            if os.path.isfile(path_wav):
+                wf = wave.open(path_wav)
+                seconds = 1000.0 * wf.getnframes() / wf.getframerate()
+                wf.close()
+                qsound = QtMultimedia.QSound(path_wav)
+                self.dic_sounds[key] = (qsound, seconds)
+            else:
+                self.dic_sounds[key] = (None, 0)
+                return
+        else:
+            seconds = self.dic_sounds[key][1]
+
+        if seconds > 0:
+            self.queue.put(key)
+            if start:
+                self.siguiente()
+
+    def write_sounds(self):
+        configuration = Code.configuration
+        folder_sounds = configuration.carpeta_sounds()
+
+        if not Util.create_folder(folder_sounds):
+            for key in self.relations:
+                wav = self.relations[key]["WAV_KEY"] + ".wav"
+                path_wav = os.path.join(folder_sounds, wav)
+                if os.path.isfile(path_wav):
+                    os.remove(path_wav)
+
+        db = UtilSQL.DictSQL(configuration.file_sounds(), "general")
+        for key in db.keys():
+            wav = self.relations[key]["WAV_KEY"] + ".wav"
+            path_wav = os.path.join(folder_sounds, wav)
+            with open(path_wav, "wb") as q:
+                q.write(db[key])
+        db.close()
+
+    def save_wav(self, key, wav):
+        folder_sounds = Code.configuration.carpeta_sounds()
+        path_wav = os.path.join(folder_sounds, self.relations[key]["WAV_KEY"] + ".wav")
+        with open(path_wav, "wb") as q:
+            q.write(wav)
+
+    def remove_wav(self, key):
+        folder_sounds = Code.configuration.carpeta_sounds()
+        path_wav = os.path.join(folder_sounds, self.relations[key]["WAV_KEY"] + ".wav")
+        Util.remove_file(path_wav)
+
+    def read_sounds(self):
+        configuration = Code.configuration
+        folder_sounds = configuration.carpeta_sounds()
+
+        if not os.path.isdir(folder_sounds):
+            self.write_sounds()
 
     def close(self):
-        if self.replay:
-            self.replay.terminar()
-            self.replay = None
+        self.working = False
+        if self.current:
+            self.current.stop()
+        self.queue = queue.Queue()
 
-    def terminarSonidoActual(self):
-        if self.replay:
-            self.replay.terminar()
-
-    def playLista(self, li, siEsperar=False):
-        self.compruebaReplay()
-        self.replay.playLista(li, siEsperar)
-
-    def playClave(self, key, siEsperar=False):
-        self.compruebaReplay()
-        self.replay.playClave(key, siEsperar)
+    def play_list(self, li):
+        for key in li:
+            self.play_key(key, False)
+        if self.queue:
+            self.working = True
+            self.siguiente()
 
     def playZeitnot(self):
-        self.playClave("ZEITNOT")
+        self.play_key("ZEITNOT")
 
     def playError(self):
-        if self.replayError is None:
-            db = UtilSQL.DictSQL(Code.configuration.file_sounds(), "general")
-            keys = db.keys()
-            self.replayError = "ERROR" in keys
-
-        if self.replayError:
-            self.playClave("ERROR", False)
-        else:
+        self.play_key("ERROR")
+        if self.dic_sounds["ERROR"][0] is None:
             QTUtil.beep()
 
     def playBeep(self):
-        if self.replayBeep is None:
-            db = UtilSQL.DictSQL(Code.configuration.file_sounds(), "general")
-            keys = db.keys()
-            self.replayBeep = "MC" in keys
-
-        if self.replayBeep:
-            self.playClave("MC", False)
-        else:
+        self.play_key("MC")
+        if self.dic_sounds["MC"][0] is None:
             QTUtil.beep()
+
+    @property
+    def relations(self):
+        dic = {}
+
+        def add(key, txt, wav_key):
+            dic[key] = {"NAME": txt, "WAV_KEY": key if wav_key is None else wav_key}
+
+        add("MC", _("Beep after move"), "BEEP")
+        add("ERROR", _("Error"), "ERROR")
+        add("ZEITNOT", _("Zeitnot"), "ZEITNOT")
+
+        add("GANAMOS", _("You win"), "WIN")
+        add("GANARIVAL", _("Opponent wins"), "LOST")
+        add("TABLAS", _("Stalemate"), "STALEMATE")
+        add("TABLASREPETICION", _("Draw by threefold repetition"), "DRAW_THREEFOLD")
+        add("TABLAS50", _("Draw by fifty-move rule"), "DRAW_FIFTYRULE")
+        add("TABLASFALTAMATERIAL", _("Draw by insufficient material"), "DRAW_MATERIAL")
+        add("GANAMOSTIEMPO", _("You win on time"), "WIN_TIME")
+        add("GANARIVALTIEMPO", _("Opponent has won on time"), "LOST_TIME")
+
+        for c in "abcdefgh12345678":
+            add(c, c, "COORD_" + c)
+
+        d = TrListas.dicNomPiezas()
+        for c in "KQRBNP":
+            add(c, d[c], "PIECE_" + c)
+
+        add("O-O", _("Short castling"), "SHORT_CASTLING")
+        add("O-O-O", _("Long castling"), "LONG_CASTLING")
+        add("=", _("Promote to"), "PROMOTE_TO")
+        add("x", _("Capture"), "CAPTURE")
+        add("+", _("Check"), "CHECK")
+        add("#", _("Checkmate"), "CHECKMATE")
+
+        return dic
 
 
 def msc(centesimas):
@@ -84,9 +177,14 @@ def msc(centesimas):
 
 
 class TallerSonido:
-    def __init__(self, wav):
+    FORMAT = 16
+    CHANNELS = 2
+    SAMPLE_RATE = 22500
+
+    def __init__(self, owner, wav):
         self.wav = wav
-        self.CHUNK = 1024
+
+        self.owner = owner
 
         if not wav:
             self.centesimas = 0
@@ -97,43 +195,52 @@ class TallerSonido:
             self.centesimas = int(round(100.0 * wf.getnframes() / wf.getframerate(), 0))
             wf.close()
 
-    def siDatos(self):
+    def with_data(self):
         return self.wav is not None
 
-    def limpiar(self):
+    def reset_to_0(self):
         self.wav = None
         self.centesimas = 0
 
-    def micInicio(self):
-        self.p = pyaudio.PyAudio()
-        self.FORMAT = pyaudio.paInt16
-        self.CHANNELS = 2
-        self.RATE = 22050
-        self.stream = self.p.open(format=self.FORMAT, channels=self.CHANNELS, rate=self.RATE, input=True, frames_per_buffer=self.CHUNK)
+    def mic_start(self, owner):
+        device = QAudioDeviceInfo.defaultInputDevice()
+        if device.isNull():
+            return False
+
+        format_audio = QAudioFormat()
+        format_audio.setSampleRate(self.SAMPLE_RATE)
+        format_audio.setChannelCount(self.CHANNELS)
+        format_audio.setSampleSize(self.FORMAT)
+        format_audio.setCodec("audio/pcm")
+        format_audio.setByteOrder(QAudioFormat.LittleEndian)
+        format_audio.setSampleType(QAudioFormat.UnSignedInt)
+
         self.datos = []
+        self.audio_input = QAudioInput(device, format_audio, owner)
+        self.ioDevice = self.audio_input.start()
+        self.ioDevice.readyRead.connect(self.mic_record)
 
-    def micGraba(self):
-        self.datos.append(self.stream.read(self.CHUNK))
 
-    def micFinal(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.p.terminate()
+    def mic_record(self):
+        self.datos.append(self.ioDevice.readAll())
+
+    def mic_end(self):
+        self.audio_input.stop()
+
         resp = b"".join(self.datos)
         tx = audioop.lin2alaw(resp, 2)
         frames = audioop.alaw2lin(tx, 2)
         io = BytesIO()
         wf = wave.open(io, "wb")
         wf.setnchannels(self.CHANNELS)
-        wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
-        wf.setframerate(self.RATE)
+        wf.setsampwidth(self.FORMAT//8)
+        wf.setframerate(self.SAMPLE_RATE)
         wf.writeframes(frames)
         self.wav = io.getvalue()
+        self.centesimas = round(100.0 * wf.getnframes() / wf.getframerate(), 0)
         wf.close()
 
-        self.centesimas = len(self.datos) * self.CHUNK * 100 / self.RATE
-
-    def leeWAV(self, file):
+    def read_wav_from_disk(self, file):
         try:
             wf = wave.open(file, "rb")
             self.centesimas = round(100.0 * wf.getnframes() / wf.getframerate(), 0)
@@ -147,48 +254,37 @@ class TallerSonido:
             self.centesimas = 0
             return False
 
-    def playInicio(self, cent_desde, cent_hasta):
+    def play(self, cent_desde, cent_hasta):
+        io_wav = self.io_wav(cent_desde, cent_hasta)
+        path_wav = Code.configuration.ficheroTemporal("wav")
+        with open(path_wav, "wb") as q:
+            q.write(io_wav)
+        self.qsound = QSound(path_wav)
+        self.qsound.play()
 
-        f = BytesIO(self.wav)
+        self.cent_desde = cent_desde
+        self.cent_hasta = cent_hasta
+        self.ini_time = time.time()
+        self.playing()
 
-        wf = self.wf = wave.open(f, "rb")
+    def playing(self):
+        if self.owner.is_canceled:
+            return
+        t1 = time.time()
+        centesimas = (t1 - self.ini_time)*100 + self.cent_desde
+        try:
+            if centesimas >= self.cent_hasta:
+                centesimas = self.cent_desde
+            self.owner.mesa.ponCentesimasActual(centesimas)
+            QTUtil.refresh_gui()
+            if not self.owner.siPlay:
+                self.qsound.stop()
+            elif not self.qsound.isFinished():
+                QtCore.QTimer.singleShot(100, self.playing)
+        except RuntimeError:
+            self.qsound.stop()
 
-        self.kfc = kfc = 1.0 * wf.getframerate() / 100.0  # n. de frames por cada centesima
-
-        minFrame = int(kfc * cent_desde)
-        self.maxFrame = int(kfc * cent_hasta)
-
-        if minFrame < self.maxFrame - 100:
-            wf.setpos(minFrame)
-        else:
-            minFrame = self.maxFrame
-
-        self.posFrame = minFrame
-
-        p = self.p = pyaudio.PyAudio()
-
-        # open stream
-        self.stream = p.open(
-            format=p.get_format_from_width(wf.getsampwidth()), channels=wf.getnchannels(), rate=wf.getframerate(), output=True
-        )
-
-    def play(self):
-        if self.posFrame >= self.maxFrame:
-            return False, 0
-        self.posFrame += self.CHUNK
-        data = self.wf.readframes(self.CHUNK)
-        if data:
-            self.stream.write(data)
-            return True, int(self.posFrame / self.kfc)
-        else:
-            return False, 0
-
-    def playFinal(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.p.terminate()
-
-    def recorta(self, centDesde, centHasta):
+    def io_wav(self, centDesde, centHasta):
         f = BytesIO(self.wav)
 
         wf = wave.open(f, "rb")
@@ -208,215 +304,11 @@ class TallerSonido:
         wf.setsampwidth(sampwidth)
         wf.setframerate(framerate)
         wf.writeframes(frames)
-        self.wav = io.getvalue()
+        data = io.getvalue()
         wf.close()
 
+        return data
+
+    def recorta(self, centDesde, centHasta):
+        self.wav = self.io_wav(centDesde, centHasta)
         self.centesimas = centHasta - centDesde
-
-
-class Replay:
-    def __init__(self):
-        self.io = IO()
-        self.io.start()
-
-        orden = Orden()
-        orden.key = DATABASE
-        orden.ponVar("FICHERO", Code.configuration.file_sounds())
-        orden.ponVar("TABLA", "general")
-
-        self.push(orden)
-        self.siSonando = False
-
-    def push(self, orden):
-        self.io.push(orden.bloqueEnvio())
-
-    def terminar(self):
-        orden = Orden()
-        orden.key = TERMINAR
-        self.push(orden)
-        self.io.stop()
-
-    def playClave(self, key, siEspera):
-        orden = Orden()
-        orden.key = PLAY_ESPERA if siEspera else PLAY_SINESPERA
-        orden.ponVar("CLAVE", key)
-        self.siSonando = True
-
-        self.push(orden)
-
-    def playLista(self, lista, siEspera):
-        orden = Orden()
-        orden.key = PLAY_ESPERA if siEspera else PLAY_SINESPERA
-        orden.ponVar("LISTACLAVES", lista)
-        self.siSonando = True
-
-        self.push(orden)
-
-    def stop(self):
-        if self.siSonando:
-            orden = Orden()
-            orden.key = STOP
-            self.siSonando = False
-
-            self.push(orden)
-
-
-class Orden:
-    def __init__(self):
-        self.key = ""
-        self.dv = {}
-
-    def ponVar(self, name, valor):
-        self.dv[name] = valor
-
-    def bloqueEnvio(self):
-        self.dv["__CLAVE__"] = self.key
-        return self.dv
-
-
-class RunReplay:
-    def __init__(self):
-        self.CHUNK = 1024
-
-        self.dbw = {}
-        self.lock = 0
-
-    def procesa(self, io, orden):
-        dv = orden.dv
-        if orden.key == DATABASE:
-            file = dv["FICHERO"]
-            tabla = dv["TABLA"]
-
-            self.dbw = {}  # como un reset
-            self.add_db(file, tabla)
-        elif orden.key in (PLAY_ESPERA, PLAY_SINESPERA):
-
-            if "CLAVE" in dv:
-                li = (dv["CLAVE"],)
-            else:
-                li = dv["LISTACLAVES"]
-
-            return self.play(io, li)
-
-        elif orden.key == TERMINAR:
-            sys.exit(1)
-
-        return None
-
-    def add_db(self, file, tabla):
-        db = UtilSQL.DictSQL(file, tabla)
-        keys = db.keys()
-
-        for k in keys:
-            self.add_bin(k, db[k])
-
-        db.close()
-
-    def add_bin(self, key, xbin):
-
-        f = BytesIO(xbin)
-        self.add_wav(key, f)
-
-    def add_wav(self, key, wav):
-
-        wf = wave.open(wav, "rb")
-
-        if self.dbw is None:
-            self.dbw = {}
-
-        p = pyaudio.PyAudio()
-        xformat = p.get_format_from_width(wf.getsampwidth())
-        channels = wf.getnchannels()
-        rate = wf.getframerate()
-        p.terminate()
-
-        self.dbw[key] = (xformat, channels, rate, wf.readframes(wf.getnframes()))
-        wf.close()
-
-    def siClave(self, key):
-        return key in self.dbw
-
-    def play(self, io, liClaves):
-        li = []
-        for key in liClaves:
-            if key in self.dbw:
-                xformat, channels, rate, frames = self.dbw[key]
-                li.append(frames)
-        frames = b"".join(li)
-
-        if not frames:
-            if not ("MC" in liClaves):
-                return self.play(io, ("MC",))
-            else:
-                return None
-
-        p = pyaudio.PyAudio()
-        stream = p.open(format=xformat, channels=channels, rate=rate, output=True)
-
-        nTam = len(frames)
-        nPos = 0
-        orden = None
-
-        t0 = time.time()
-        for n in range(nTam):
-            to_sq = nPos + self.CHUNK
-            stream.write(frames[nPos:to_sq])
-            nPos = to_sq
-            t1 = time.time()
-            if (t1 - t0) > 0.2:
-                if io.orden_acabar():
-                    break
-                t0 = t1
-
-        if orden is None:
-            stream.stop_stream()
-        stream.close()
-        p.terminate()
-
-        return orden
-
-
-class IO(QtCore.QObject):
-    def __init__(self):
-        super().__init__()
-        self.ipc = []
-        self.continuar = True
-
-    def push(self, orden):
-        self.ipc.append(orden)
-
-    def siguiente(self):
-        if not self.continuar:
-            return
-        orden = self.pop()
-        if orden:
-            orden = self.xreplay.procesa(self, orden)
-        if self.ipc:
-            self.siguiente()
-        else:
-            QtCore.QTimer.singleShot(100, self.siguiente)
-
-    def start(self):
-        self.ipc = []
-        self.continuar = True
-        self.xreplay = RunReplay()
-        self.siguiente()
-
-    def stop(self):
-        self.continuar = False
-
-    def pop(self):
-        dv = self.ipc.pop(0) if self.ipc else None
-        if not dv:
-            return None
-
-        orden = Orden()
-        orden.key = dv["__CLAVE__"]
-        orden.dv = dv
-        return orden
-
-    def orden_acabar(self):
-        for orden in self.ipc:
-            if orden["__CLAVE__"] in (STOP, PLAY_SINESPERA, TERMINAR):
-                return True
-        return False

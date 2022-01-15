@@ -271,7 +271,7 @@ class WDailyTest(LCDialog.LCDialog):
     def process_toolbar(self):
         accion = self.sender().key
         if accion == "abandonar":
-            if QTUtil2.pregunta(self, _("Are you sure you want to resign?")):
+            if QTUtil2.pregunta(self, _("Do you want to resign?")):
                 self.terminar()
         elif accion == "cancelar":
             if QTUtil2.pregunta(self, _("Are you sure you want to cancel?")):

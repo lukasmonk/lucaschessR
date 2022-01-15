@@ -53,8 +53,6 @@ class WKibLinea(QtWidgets.QDialog):
 
         self.setBackgroundRole(QtGui.QPalette.Light)
 
-        Code.configuration = cpu.configuration
-
         self.setStyleSheet(
             """QLineEdit {
     color: rgb(127, 0, 63);
@@ -289,6 +287,8 @@ class WKibLinea(QtWidgets.QDialog):
             self.em.setText("")
 
     def valid_to_play(self):
+        if self.game is None:
+            return False
         siw = self.game.last_position.is_white
         if not self.siPlay or (siw and not self.is_white) or (not siw and not self.is_black):
             return False

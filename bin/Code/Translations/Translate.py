@@ -1,13 +1,13 @@
 import builtins
 import gettext
-import os
 import locale
+import os
 
 import Code
 
 
 def _F(txt):
-    return _(txt) if txt else ""
+    return Code.bridge_translation(txt) if txt else ""
 
 
 def _SP(key):
@@ -40,6 +40,13 @@ DOMAIN = "lucaschess"
 DIR_LOCALE = Code.path_resource("Locale")
 
 
+def bridge(txt):
+    if Code.win_translator:
+        return Code.win_translator.current(txt)
+    else:
+        return Code.bridge_translation(txt)
+
+
 def install(lang=None):
     if not lang:
         lang = "en"
@@ -57,4 +64,9 @@ def install(lang=None):
     builtins.__dict__["_F"] = _F
     builtins.__dict__["_SP"] = _SP
 
+    Code.bridge_translation = _
+    if Code.configuration and Code.configuration.x_translation_mode:
+        builtins.__dict__["_"] = bridge
+
     Code.lucas_chess = "%s %s" % (_("Lucas Chess"), Code.VERSION)
+

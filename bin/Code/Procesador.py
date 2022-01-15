@@ -74,10 +74,10 @@ from Code.QT import WindowManualSave
 from Code.QT import WindowPlayGame
 from Code.QT import WindowSingularM
 from Code.QT import WindowWorkMap
+from Code.QT import WindowLearnGame
 from Code.Routes import Routes, WindowRoutes, ManagerRoutes
 from Code.Sound import WindowSonido
 from Code.Tournaments import WTournaments
-from Code.Version11 import Version11
 from Code.Washing import ManagerWashing, WindowWashing
 
 
@@ -116,12 +116,12 @@ class Procesador:
 
         self.configuration = Configuration.Configuration(user)
         self.configuration.start()
-        Code.configuration = self.configuration
         Code.procesador = self
+        Code.runSound.read_sounds()
         OpeningsStd.reset()
 
-        if len(sys.argv) == 1:  # si no nofuncionan los kibitzers en linux
-            self.configuration.limpiaTemporal()
+        if len(sys.argv) == 1:  # si no no funcionan los kibitzers en linux
+            self.configuration.clean_tmp_folder()
 
         # Tras crear configuración miramos si hay Adjournments
         self.test_opcion_Adjournments()
@@ -773,13 +773,6 @@ class Procesador:
         elif resp == "openings":
             self.openings()
 
-        elif resp.startswith("version11"):
-            self.version11(resp[10:])
-
-    def version11(self, tipo):
-        b = Version11.Version11(self)
-        b.run(tipo)
-
     def openings(self):
         dicline = WindowOpeningLines.openingLines(self)
         if dicline:
@@ -1100,6 +1093,10 @@ class Procesador:
                 self.manager = ManagerPlayGame.ManagerPlayGame(self)
                 self.manager.start(w.recno, is_white)
         db.close()
+
+    def learn_game(self):
+        w = WindowLearnGame.WLearnBase(self)
+        w.exec_()
 
     def showTurnOnLigths(self, name):
         self.entrenamientos.turn_on_lights(name)

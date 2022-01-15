@@ -3,7 +3,6 @@ import time
 
 from PySide2 import QtWidgets
 
-import Code
 from Code import Util
 from Code.Base import Game
 from Code.Base.Constantes import (
@@ -80,7 +79,6 @@ class CPU:
             self.configuration = Configuration.Configuration(user)
             self.configuration.lee()
             self.configuration.leeConfBoards()
-            Code.configuration = self.configuration
             OpeningsStd.reset()
 
             kibitzers = Kibitzers.Kibitzers()
@@ -133,7 +131,7 @@ class CPU:
         app.setStyle(QtWidgets.QStyleFactory.create(self.configuration.x_style))
         QtWidgets.QApplication.setPalette(QtWidgets.QApplication.style().standardPalette())
 
-        self.configuration.releeTRA()
+        self.configuration.load_translation()
 
         if self.tipo == KIB_BESTMOVE:
             self.ventana = WKibEngine.WKibEngine(self)

@@ -497,7 +497,7 @@ class OpeningsPersonales(LCDialog.LCDialog):
     def grid_doble_click(self, grid, fil, col):
         self.edit(fil)
 
-    def grid_doble_clickCabecera(self, grid, o_column):
+    def grid_doubleclick_header(self, grid, o_column):
         key = o_column.key
 
         li = sorted(self.lista, key=lambda x: x[key].upper())

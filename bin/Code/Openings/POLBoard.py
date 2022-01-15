@@ -84,8 +84,9 @@ class BoardLines(QtWidgets.QWidget):
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
         self.lbPGN = LBKey(self).set_wrap()
+        self.lbPGN.setAlignment(QtCore.Qt.AlignTop)
         self.lbPGN.setStyleSheet(
-            "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}"
+            "QLabel{ border-style: groove; border-width: 1px; border-color: LightSlateGray; padding-right: 18px;}"
         )
         self.lbPGN.ponFuente(tipo_letra)
         self.lbPGN.setOpenExternalLinks(False)
@@ -94,6 +95,17 @@ class BoardLines(QtWidgets.QWidget):
             self.colocatePartida(int(txt))
 
         self.lbPGN.linkActivated.connect(muestraPos)
+
+        scroll = QtWidgets.QScrollArea()
+        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameStyle(QtWidgets.QFrame.NoFrame)
+
+        # ly = Colocacion.V().control(self.lbPGN).margen(0)
+        # w_pgn = QtWidgets.QWidget()
+        # w_pgn.setLayout(ly)
+        scroll.setWidget(self.lbPGN)
+        scroll.setMaximumHeight(configuration.x_pgn_fontpoints*6)
 
         self.with_figurines = configuration.x_pgn_withfigurines
 
@@ -130,7 +142,7 @@ class BoardLines(QtWidgets.QWidget):
         # Comentario
         self.emComentario = Controles.EM(self, siHTML=False).capturaCambios(self.cambiadoComentario)
         self.emComentario.ponFuente(tipo_letra)
-        self.emComentario.altoFijo(5 * configuration.x_pgn_rowheight)
+        self.emComentario.altoMinimo(2 * configuration.x_pgn_rowheight)
         lyVal = Colocacion.H().control(self.cbValoracion).control(self.cbVentaja)
         lyEd = Colocacion.V().otro(lyVal).control(self.emComentario)
 
@@ -139,7 +151,7 @@ class BoardLines(QtWidgets.QWidget):
 
         lyt = Colocacion.H().relleno().control(self.board).relleno()
 
-        lya = Colocacion.H().relleno().control(self.lbPGN).relleno()
+        lya = Colocacion.H().relleno().control(scroll).relleno()
 
         layout = Colocacion.V()
         layout.otro(lyt)
@@ -147,7 +159,7 @@ class BoardLines(QtWidgets.QWidget):
         layout.otro(lya)
         layout.otro(lyEd)
         layout.control(self.lb_opening)
-        layout.relleno().margen(0)
+        layout.margen(0)
         self.setLayout(layout)
 
         self.ajustaAncho()

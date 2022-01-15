@@ -124,7 +124,32 @@ class WBase(QtWidgets.QWidget):
 
         self.dic_toolbar = {}
 
-        dic_opciones = {
+        dic_opciones = self.dic_opciones_tb()
+        if self.configuration.x_digital_board:
+            dic_opciones[TB_EBOARD] = ["%s/%s"%(_("Enable"),_("Disable")), DGT.icon_eboard()]
+
+        cf = self.manager.configuration
+        peso = 75 if cf.x_tb_bold else 50
+        puntos = cf.x_tb_fontpoints
+        font = Controles.TipoLetra(puntos=puntos, peso=peso)
+
+        for key, (titulo, icono) in dic_opciones.items():
+            accion = QtWidgets.QAction(titulo, None)
+            accion.setIcon(icono)
+            accion.setIconText(titulo)
+            accion.setFont(font)
+            accion.triggered.connect(self.run_action)
+            accion.key = key
+            self.dic_toolbar[key] = accion
+
+    def translate_again_tb(self):
+        dic_opciones = self.dic_opciones_tb()
+        for key, action in self.dic_toolbar.items():
+            if key in dic_opciones:
+                action.setIconText(dic_opciones[key][0])
+
+    def dic_opciones_tb(self):
+        return {
             TB_PLAY: (_("Play"), Iconos.Libre()),
             TB_COMPETE: (_("Compete"), Iconos.NuevaPartida()),
             TB_TRAIN: (_("Train"), Iconos.Entrenamiento()),
@@ -175,22 +200,6 @@ class WBase(QtWidgets.QWidget):
             TB_SEND: (_("Send"), Iconos.Enviar()),
             TB_STOP: (_("Play now"), Iconos.Stop()),
         }
-        if self.configuration.x_digital_board:
-            dic_opciones[TB_EBOARD] = ["%s/%s"%(_("Enable"),_("Disable")), DGT.icon_eboard()]
-
-        cf = self.manager.configuration
-        peso = 75 if cf.x_tb_bold else 50
-        puntos = cf.x_tb_fontpoints
-        font = Controles.TipoLetra(puntos=puntos, peso=peso)
-
-        for key, (titulo, icono) in dic_opciones.items():
-            accion = QtWidgets.QAction(titulo, None)
-            accion.setIcon(icono)
-            accion.setIconText(titulo)
-            accion.setFont(font)
-            accion.triggered.connect(self.run_action)
-            accion.key = key
-            self.dic_toolbar[key] = accion
 
     def lanzaAtajos(self):
         if self.conAtajos:

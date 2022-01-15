@@ -14,7 +14,7 @@ from Code.CountsCaptures import WRunCommon
 class WRunMate15(LCDialog.LCDialog):
     def __init__(self, owner, db_mate15, mate15):
 
-        LCDialog.LCDialog.__init__(self, owner, _("Mate in 1½"), Iconos.Mate15(), "runmate15")
+        LCDialog.LCDialog.__init__(self, owner, _X(_("Mate in %1"), "1½"), Iconos.Mate15(), "runmate15")
 
         self.configuration = Code.configuration
         self.mate15 = mate15
@@ -32,7 +32,7 @@ class WRunMate15(LCDialog.LCDialog):
 
         self.lb_first_move = Controles.LB(self).ponTipoLetra(puntos=12, peso=500)
 
-        self.bt_check = Controles.PB(self, _("Check"), self.check, False).ponIcono(Iconos.Check(), icon_size=20)
+        self.bt_check = Controles.PB(self, _("Verify"), self.check, False).ponIcono(Iconos.Check(), icon_size=20)
 
         self.lb_result = Controles.LB(self).ponTipoLetra(puntos=12, peso=500)
 

@@ -119,7 +119,7 @@ class WMemoria(LCDialog.LCDialog):
         li_acciones = (
             (_("Start"), Iconos.Empezar(), "empezar"),
             (_("Continue"), Iconos.Pelicula_Seguir(), "seguir"),
-            (_("Check"), Iconos.Check(), "comprobar"),
+            (_("Verify"), Iconos.Check(), "comprobar"),
             (_("Target"), Iconos.Verde32(), "objetivo"),
             (_("Wrong"), Iconos.Rojo32(), "nuestro"),
             (_("Repeat"), Iconos.Pelicula_Repetir(), "repetir"),

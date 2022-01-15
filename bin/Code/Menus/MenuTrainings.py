@@ -28,7 +28,6 @@ from Code.QT import QTVarios
 from Code.TrainBMT import WindowBMT
 from Code.QT import WindowDailyTest
 from Code.QT import WindowHorses
-from Code.QT import WindowLearnPGN
 from Code.QT import WindowPotencia
 from Code.QT import WindowPuente
 from Code.QT import WindowVisualiza
@@ -213,7 +212,7 @@ class MenuTrainings:
 
         menu_games.separador()
         menu2 = menu_games.submenu(_("Learn a game"), Iconos.School())
-        xopcion(menu2, "learnPGN", _("Memorizing their moves"), Iconos.LearnGame())
+        xopcion(menu2, "learnGame", _("Memorizing their moves"), Iconos.LearnGame())
         menu2.separador()
         xopcion(menu2, "playGame", _("Playing against"), Iconos.Law())
 
@@ -231,10 +230,11 @@ class MenuTrainings:
         dicTraining = TrListas.dicTraining()
 
         def trTraining(txt):
-            return dicTraining.get(txt, txt)
+            return dicTraining.get(txt, _F(txt))
 
         def menu_tacticas(submenu, tipo, carpeta_base, lista):
             if os.path.isdir(carpeta_base):
+                entry: os.DirEntry
                 for entry in os.scandir(carpeta_base):
                     if entry.is_dir():
                         carpeta = entry.path
@@ -304,7 +304,7 @@ class MenuTrainings:
             menu1.separador()
         menu_endings.separador()
 
-        xopcion(menu_endings, "15mate", _("Mate in 1½"), Iconos.Mate15())
+        xopcion(menu_endings, "15mate", _X(_("Mate in %1"), "1½"), Iconos.Mate15())
         menu_endings.separador()
 
         xopcion(menu_endings, "endings_gtb", _("Endings with Gaviota Tablebases"), Iconos.Finales())
@@ -466,8 +466,8 @@ class MenuTrainings:
                             pos = 1
                     self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump)
 
-                elif resp == "learnPGN":
-                    self.learnPGN()
+                elif resp == "learnGame":
+                    self.procesador.learn_game()
 
                 elif resp == "playGame":
                     self.procesador.play_game()
@@ -629,10 +629,6 @@ class MenuTrainings:
             numEngine, key = resp
             self.procesador.manager = ManagerResistance.ManagerResistance(self.procesador)
             self.procesador.manager.start(resistance, numEngine, key)
-
-    def learnPGN(self):
-        w = WindowLearnPGN.WLearnBase(self.procesador)
-        w.exec_()
 
     def everest(self):
         WindowEverest.everest(self.procesador)

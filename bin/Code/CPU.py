@@ -39,8 +39,8 @@ class CPU:
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
-    def muevePieza(self, from_a1h8, to_a1h8, seconds=1.0, padre=0, siExclusiva=False, with_beep=False):
-        tarea = Tareas.TareaMuevePieza(from_a1h8, to_a1h8, seconds, with_beep)
+    def muevePieza(self, from_a1h8, to_a1h8, seconds=1.0, padre=0, siExclusiva=False):
+        tarea = Tareas.TareaMuevePieza(from_a1h8, to_a1h8, seconds)
         tarea.enlaza(self)
         return self.masTarea(tarea, padre, siExclusiva)
 
@@ -87,7 +87,6 @@ class CPU:
 
     def run(self):
         li = sorted(self.dicTareas.keys())
-        # li.sort()
         nPasos = 0
         for tid in li:
             tarea = self.dicTareas[tid]

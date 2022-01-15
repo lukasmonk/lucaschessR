@@ -14,7 +14,7 @@ O el comercial Chessbase
 http://chessbase-shop.com/es
 
 Quiero agradecer la mucha gente que publica información sobre programación de módulos de análisis de ajedrez en internet, especialmente http://chessprogramming.wikispaces.com/, http://talkchess.com!
-También hacer mención especial a módulos de código abierto que son muy instructivos, como Stockfish, Crafty, Protector, Discocheck, Gull, Texel...
+También hacer mención especial a módulos de código abierto que son muy instructivos, como Stockfish, Crafty, Protector, Discocheck, Gull...
 
 
 Versiones

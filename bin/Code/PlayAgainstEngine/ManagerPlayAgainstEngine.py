@@ -1,5 +1,6 @@
 import os
 import time
+import random
 
 import FasterCode
 
@@ -93,6 +94,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     premove = None
     last_time_show_arrows = None
     rival_is_thinking = False
+    humanize = None
+    humanize_ini_time = None
 
     def start(self, dic_var):
         self.base_inicio(dic_var)
@@ -179,6 +182,13 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.continueTt = not Code.configuration.x_engine_notbackground
         self.nArrowsTt = dic_var.get("ARROWSTT", 0)
         self.chance = dic_var.get("2CHANCE", True)
+
+        humanize_min = dic_var.get("HUMANIZE_MIN", 0.0)
+        humanize_max = dic_var.get("HUMANIZE_MAX", 0.0)
+        if (humanize_min + humanize_max) == 0.0:
+            self.humanize = None
+        else:
+            self.humanize = (min(humanize_min, humanize_max)*1000, max(humanize_min, humanize_max)*1000)
 
         if self.nArrowsTt != 0 and self.hints == 0:
             self.nArrowsTt = 0
@@ -900,8 +910,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         fen_ultimo = self.last_fen()
         if fen_ultimo in self.cache:
             move = self.cache[fen_ultimo]
-            self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
+            self.add_move(move, False)
             if self.siTiempo:
                 self.vtime[self.is_engine_side_white].restore(move.cacheTime)
                 self.show_clocks()
@@ -945,6 +955,8 @@ class ManagerPlayAgainstEngine(Manager.Manager):
                 seconds_white = seconds_black = 10 * 60
                 seconds_move = 0
 
+            if self.humanize:
+                self.humanize_ini_time = time.time()
             self.xrival.play_time_routine(
                 self.game, self.main_window.notify, seconds_white, seconds_black, seconds_move, nAjustado=self.nAjustarFuerza
             )
@@ -954,6 +966,14 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         Manager.Manager.sigueHumano(self)
 
     def mueve_rival_base(self):
+        if self.humanize_ini_time:
+            mscs = (time.time() - self.humanize_ini_time)*1000
+            mscs_select = random.randint(self.humanize[0], self.humanize[1])
+            while mscs < mscs_select:
+                mscs = (time.time() - self.humanize_ini_time) * 1000
+                QTUtil.refresh_gui()
+                time.sleep(0.05)
+
         self.play_rival(self.main_window.dato_notify)
 
     def play_rival(self, rm_rival):
@@ -982,7 +1002,7 @@ class ManagerPlayAgainstEngine(Manager.Manager):
             move.set_time_ms(int(time_s * 1000))
             self.add_move(move, False)
             self.move_the_pieces(move.liMovs, True)
-
+            self.beepExtendido(False)
             if with_cache:
                 if self.siTiempo:
                     move.cacheTime = self.vtime[self.is_engine_side_white].save()
@@ -1161,14 +1181,15 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.setSummary("TIMEUSER", self.timekeeper.stop())
         self.reloj_stop(True)
 
-        self.move_the_pieces(move.liMovs)
-
         if si_analisis:
             rm, nPos = self.mrmTutor.buscaRM(move.movimiento())
             if rm:
                 move.analysis = self.mrmTutor, nPos
 
         self.add_move(move, True)
+        self.move_the_pieces(move.liMovs, False)
+        self.beepExtendido(True)
+
         self.error = ""
         self.play_next_move()
         return True
@@ -1176,7 +1197,6 @@ class ManagerPlayAgainstEngine(Manager.Manager):
     def add_move(self, move, siNuestra):
         self.game.add_move(move)
         self.check_boards_setposition()
-        self.beepExtendido(siNuestra)
 
         self.put_arrow_sc(move.from_sq, move.to_sq)
 

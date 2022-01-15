@@ -1,4 +1,3 @@
-import collections
 import os
 import time
 
@@ -15,10 +14,10 @@ from Code.QT import Iconos
 from Code.QT import LCDialog
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
+from Code.QT import QTVarios
 from Code.QT import SelectFiles
 from Code.SQL import UtilSQL
 from Code.Sound import Sound
-from Code.Translations import TrListas
 
 
 class MesaSonido(QtWidgets.QGraphicsView):
@@ -127,12 +126,9 @@ class MesaSonido(QtWidgets.QGraphicsView):
         self.txtActual.setphysical_pos(centesimas)
         self.escena.update()
 
-    def limites(self, siTotal):
+    def limites(self):
         to_sq = self.txtFinal.calcCentesimas()
-        if siTotal:
-            from_sq = self.txtInicio.calcCentesimas()
-        else:
-            from_sq = self.txtActual.calcCentesimas()
+        from_sq = self.txtActual.calcCentesimas()
         return from_sq, to_sq
 
     def siHayQueRecortar(self):
@@ -172,9 +168,12 @@ class WEdicionSonido(LCDialog.LCDialog):
 
         # MesaSonido
         self.mesa = MesaSonido(self)
-        self.taller = Sound.TallerSonido(wav)
+        self.taller = Sound.TallerSonido(self, wav)
 
         self.mesa.ponCentesimas(self.taller.centesimas)
+
+        self.siGrabando = False
+        self.is_canceled = False
 
         self.maxTime = maxTime if maxTime else 300.0  # seconds=5 minutos
 
@@ -199,7 +198,7 @@ class WEdicionSonido(LCDialog.LCDialog):
 
     def ponBaseTB(self):
         li = [self.ks_aceptar, self.ks_cancelar, None]
-        if self.taller.siDatos():
+        if self.taller.with_data():
             li.extend([self.ks_limpiar, None, self.ks_play, None, self.ks_grabar])
             self.mesa.activaEdicion(True)
         else:
@@ -208,7 +207,6 @@ class WEdicionSonido(LCDialog.LCDialog):
         self.pon_toolbar(li)
 
     def prepare_toolbar(self):
-
         self.dic_toolbar = {}
 
         li_options = (
@@ -253,8 +251,9 @@ class WEdicionSonido(LCDialog.LCDialog):
     def procesaTB(self):
         accion = self.sender().key
         if accion == self.ks_aceptar:
+            self.is_canceled = True
             if self.mesa.siHayQueRecortar():
-                from_sq, to_sq = self.mesa.limites(True)
+                from_sq, to_sq = self.mesa.limites()
                 self.taller.recorta(from_sq, to_sq)
             self.wav = self.taller.wav
             self.centesimas = self.taller.centesimas
@@ -266,7 +265,7 @@ class WEdicionSonido(LCDialog.LCDialog):
             return
 
         elif accion == self.ks_limpiar:
-            self.limpiar()
+            self.reset_to_0()
 
         elif accion == self.ks_microfono:
             self.microfono()
@@ -298,12 +297,12 @@ class WEdicionSonido(LCDialog.LCDialog):
 
         self.mesa.ponCentesimas(0)
 
-        self.taller.micInicio()
+        self.taller.mic_start(self)
 
         iniTime = time.time()
 
         while self.siGrabando:
-            self.taller.micGraba()
+            self.taller.mic_record()
             QTUtil.refresh_gui()
             t = time.time() - iniTime
             self.mesa.ponCentesimas(t * 100)
@@ -311,17 +310,17 @@ class WEdicionSonido(LCDialog.LCDialog):
                 break
 
         self.siGrabando = False
-        self.taller.micFinal()
+        self.taller.mic_end()
         if self.is_canceled:
-            self.taller.limpiar()
+            self.taller.reset_to_0()
             self.mesa.ponCentesimas(0)
         else:
             self.mesa.ponCentesimas(self.taller.centesimas)
 
         self.ponBaseTB()
 
-    def limpiar(self):
-        self.taller.limpiar()
+    def reset_to_0(self):
+        self.taller.reset_to_0()
         self.mesa.ponCentesimas(0)
         self.ponBaseTB()
 
@@ -331,7 +330,7 @@ class WEdicionSonido(LCDialog.LCDialog):
         if file:
             carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
-            if self.taller.leeWAV(file):
+            if self.taller.read_wav_from_disk(file):
                 self.mesa.ponCentesimas(self.taller.centesimas)
             else:
                 QTUtil2.message_error(self, _("It is impossible to read this file, it is not compatible."))
@@ -341,35 +340,23 @@ class WEdicionSonido(LCDialog.LCDialog):
         carpeta = Util.restore_pickle(self.confich)
         file = SelectFiles.salvaFichero(self, _("Save wav"), carpeta, "wav", True)
         if file:
+            if not file.lower().endswith(".wav"):
+                file = file + ".wav"
             carpeta = os.path.dirname(file)
             Util.save_pickle(self.confich, carpeta)
-            f = open(file, "wb")
-            f.write(self.taller.wav)
-            f.close()
+            with open(file, "wb") as q:
+                q.write(self.taller.wav)
             self.ponBaseTB()
 
     def play(self):
         self.mesa.activaEdicion(False)
         self.pon_toolbar((self.ks_stopplay,))
 
-        centDesde, centHasta = self.mesa.limites(False)
-        self.taller.playInicio(centDesde, centHasta)
-
+        centDesde, centHasta = self.mesa.limites()
         self.siPlay = True
+        self.taller.play(centDesde, centHasta)
 
-        while self.siPlay:
-            siSeguir, centActual = self.taller.play()
-            if siSeguir:
-                self.mesa.ponCentesimasActual(centActual)
-                QTUtil.refresh_gui()
-            else:
-                self.mesa.ponCentesimasActual(centDesde)
-                QTUtil.refresh_gui()
-                break
-
-        self.siPlay = False
-
-        self.taller.playFinal()
+        QTUtil.refresh_gui()
 
         self.ponBaseTB()
 
@@ -388,7 +375,7 @@ class WSonidos(LCDialog.LCDialog):
         self.procesador = procesador
 
         self.db = UtilSQL.DictSQL(procesador.configuration.file_sounds(), "general")
-        self.creaListaSonidos()
+        self.li_sounds = self.create_soundslist()
 
         titulo = _("Custom sounds")
         icono = Iconos.S_Play()
@@ -397,20 +384,22 @@ class WSonidos(LCDialog.LCDialog):
 
         # Toolbar
         li_acciones = (
-            (_("Close"), Iconos.MainMenu(), "terminar"),
+            (_("Close"), Iconos.MainMenu(), self.terminar),
             None,
-            (_("Modify"), Iconos.Modificar(), "modificar"),
+            (_("Modify"), Iconos.Modificar(), self.modificar),
             None,
-            (_("Listen"), Iconos.S_Play(), "play"),
+            (_("Listen"), Iconos.S_Play(), self.play),
         )
-        tb = Controles.TB(self, li_acciones)
+        tb = QTVarios.LCTB(self, li_acciones)
 
         # Lista
         o_columns = Columnas.ListaColumnas()
         o_columns.nueva("SONIDO", _("Sound"), 300, centered=True)
-        o_columns.nueva("DURACION", _("Duration"), 60, centered=True)
+        o_columns.nueva("DURACION", _("Duration"), 80, centered=True)
 
-        self.grid = Grid.Grid(self, o_columns, siSelecFilas=True)
+        self.grid = Grid.Grid(self, o_columns, siSelecFilas=True, altoFila=Code.configuration.x_pgn_rowheight)
+        font = Controles.TipoLetra(puntos=Code.configuration.x_pgn_fontpoints)
+        self.grid.ponFuente(font)
 
         # Layout
         layout = Colocacion.V().control(tb).control(self.grid).margen(3)
@@ -429,46 +418,42 @@ class WSonidos(LCDialog.LCDialog):
     def closeEvent(self, event):
         self.save_video()
 
-    def process_toolbar(self):
-        self.siPlay = False
-        accion = self.sender().key
-        if accion == "terminar":
-            self.save_video()
-            self.accept()
-            self.db.close()
+    def terminar(self):
+        self.save_video()
+        self.accept()
+        self.db.close()
 
-        elif accion == "modificar":
-            self.grid_doble_click(None, self.grid.recno(), None)
-
-        elif accion == "play":
-            self.play()
+    def modificar(self):
+       self.grid_doble_click(None, self.grid.recno(), None)
 
     def grid_num_datos(self, grid):
-        return len(self.liSonidos)
+        return len(self.li_sounds)
 
     def grid_doble_click(self, grid, row, o_column):
         self.siPlay = False
 
-        cl = self.liSonidos[row][0]
+        cl = self.li_sounds[row][0]
         if cl is None:
             return
 
         wav = self.db[cl]
 
-        resp = editSonido(self, self.liSonidos[row][1], wav)
+        resp = editSonido(self, self.li_sounds[row][1], wav)
         if resp is not None:
             wav, cent = resp
             if wav is None:
-                self.liSonidos[row][2] = None
+                self.li_sounds[row][2] = None
                 del self.db[cl]
+                Code.runSound.remove_wav(cl)
             else:
                 self.db[cl] = wav
-                self.liSonidos[row][2] = cent
+                self.li_sounds[row][2] = cent
+                Code.runSound.save_wav(cl, wav)
             self.grid.refresh()
 
     def grid_dato(self, grid, row, o_column):
         key = o_column.key
-        li = self.liSonidos[row]
+        li = self.li_sounds[row]
         if key == "DURACION":
             if li[0] is None:
                 return ""
@@ -480,7 +465,7 @@ class WSonidos(LCDialog.LCDialog):
                     if wav is None:
                         t = 0
                     else:
-                        ts = Sound.TallerSonido(wav)
+                        ts = Sound.TallerSonido(self, wav)
                         t = ts.centesimas
                 return "%02d:%02d:%02d" % Sound.msc(t)
 
@@ -488,193 +473,51 @@ class WSonidos(LCDialog.LCDialog):
             return li[1]
 
     def play(self):
-        li = self.liSonidos[self.grid.recno()]
+        li = self.li_sounds[self.grid.recno()]
         if li[0]:
-            wav = self.db[li[0]]
-            if wav is not None:
-                ts = Sound.TallerSonido(wav)
-                ts.playInicio(0, ts.centesimas)
-                self.siPlay = True
-                while self.siPlay:
-                    siSeguir, pos = ts.play()
-                    if not siSeguir:
-                        break
-                ts.playFinal()
+            Code.runSound.play_key(li[0])
 
     def grid_color_fondo(self, grid, row, o_column):
-        li = self.liSonidos[row]
+        li = self.li_sounds[row]
         if li[0] is None:
             return QTUtil.qtColor(4294836181)
         else:
             return None
 
-    def creaListaSonidos(self):
+    def create_soundslist(self):
+        dic_relations = Code.runSound.relations
+        li_sounds = []
+        
+        def xadd(key):
+            li_sounds.append([key, dic_relations[key]["NAME"], None])
 
-        self.liSonidos = [["MC", _("After rival move"), None]]
+        def xapart(txt):
+            li_sounds.append([None, "- " + txt + " -", None])
 
-        # self.liSonidos.append( [ None, "", None ] )
-        self.liSonidos.append([None, "- " + _("Results") + " -", None])
+        xadd("MC")
+        xadd("ERROR")
+        xadd("ZEITNOT")
 
-        d = collections.OrderedDict()
-        d["GANAMOS"] = _("You win")
-        d["GANARIVAL"] = _("Opponent wins")
-        d["TABLAS"] = _("Stalemate")
-        d["TABLASREPETICION"] = _("Draw by threefold repetition")
-        d["TABLAS50"] = _("Draw by fifty-move rule")
-        d["TABLASFALTAMATERIAL"] = _("Draw by insufficient material")
-        d["GANAMOSTIEMPO"] = _("You win on time")
-        d["GANARIVALTIEMPO"] = _("Opponent has won on time")
+        xapart(_("Results"))
+        xadd("GANAMOS")
+        xadd("GANARIVAL")
+        xadd("TABLAS")
+        xadd("TABLASREPETICION")
+        xadd("TABLAS50")
+        xadd("TABLASFALTAMATERIAL")
+        xadd("GANAMOSTIEMPO")
+        xadd("GANARIVALTIEMPO")
 
-        for c, tr in d.items():
-            self.liSonidos.append([c, tr, None])
-
-        # self.liSonidos.append( [ None, "", None ] )
-        self.liSonidos.append([None, "- " + _("Rival moves") + " -", None])
-
+        xapart(_("Coordinates"))
         for c in "abcdefgh12345678":
-            self.liSonidos.append([c, c, None])
+            xadd(c)
 
+        xapart(_("Pieces"))
         for c in "KQRBNP":
-            t = TrListas.letterPiece(c)
-            self.liSonidos.append([c, t, None])
+            xadd(c)
 
+        xapart(_("Operations"))
         for c in ("O-O", "O-O-O", "=", "x", "#", "+"):
-            self.liSonidos.append([c, c, None])
+            xadd(c)
 
-        self.liSonidos.append([None, "", None])
-        self.liSonidos.append(["ZEITNOT", _("Zeitnot"), None])
-        self.liSonidos.append(["ERROR", _("Error"), None])
-
-        # for c in "abcdefgh":
-        # for f in "12345678":
-        # self.liSonidos.append( [ c+f, c+f, None ] )
-
-class WSonidosGuion(LCDialog.LCDialog):
-    def __init__(self, owner, db):
-
-        self.db = db
-
-        self.liSonidos = owner.listaSonidos()
-
-        titulo = _("Custom sounds")
-        icono = Iconos.S_Play()
-        extparam = "sounds"
-        LCDialog.LCDialog.__init__(self, owner, titulo, icono, extparam)
-
-        # Toolbar
-        li_acciones = (
-            (_("Close"), Iconos.MainMenu(), "terminar"),
-            None,
-            (_("New"), Iconos.Nuevo(), "nuevo"),
-            (_("Modify"), Iconos.Modificar(), "modificar"),
-            None,
-            (_("Remove"), Iconos.Borrar(), "borrar"),
-            None,
-            (_("Up"), Iconos.Arriba(), "arriba"),
-            (_("Down"), Iconos.Abajo(), "abajo"),
-            None,
-            (_("Listen"), Iconos.S_Play(), "play"),
-        )
-        tb = Controles.TB(self, li_acciones)
-
-        # Lista
-        o_columns = Columnas.ListaColumnas()
-        o_columns.nueva("NOMBRE", _("Sound"), 300, centered=True)
-        o_columns.nueva("DURACION", _("Duration"), 60, centered=True)
-
-        self.grid = Grid.Grid(self, o_columns, siSelecFilas=True)
-
-        # Layout
-        layout = Colocacion.V().control(tb).control(self.grid).margen(3)
-        self.setLayout(layout)
-
-        self.grid.gotop()
-        self.grid.setFocus()
-
-        self.siPlay = False
-
-        self.register_grid(self.grid)
-
-        if not self.restore_video():
-            self.resize(self.grid.anchoColumnas() + 30, 600)
-
-    def closeEvent(self, event):
-        self.save_video()
-
-    def grid_num_datos(self, grid):
-        return len(self.liSonidos)
-
-    def process_toolbar(self):
-        accion = self.sender().key
-        eval("self.%s()" % accion)
-
-    def terminar(self):
-        self.save_video()
-        self.accept()
-
-    def modificar(self):
-        pass
-        # self.grid_doble_click( None, self.grid.recno(), None )
-
-    def nuevo(self):
-        wav = None
-        name = ""
-        while True:
-            w = WEdicionSonido(self, _("New"), wav=wav, maxTime=600000, name=name)
-            resp = w.exec_()
-            if resp:
-                centesimas = w.centesimas
-                if not centesimas:
-                    return
-                name = w.name().strip()
-                if not name:
-                    QTUtil2.message_error(self, _("Name missing"))
-                    continue
-
-                reg = Util.Record()
-                reg.name = name
-                reg.centesimas = centesimas
-                reg.id = Util.new_id()
-                reg.wav = w.wav
-                reg.ordenVista = (self.liSonidos[-1].ordenVista + 1) if self.liSonidos else 1
-                self.db[reg.id] = reg
-                self.liSonidos.append(reg)
-                self.grid.refresh()
-                return
-
-    def grid_doble_click(self, grid, row, o_column):
-        self.siPlay = False
-
-        cl = self.db[row][0]
-        if cl is None:
-            return
-
-        wav = self.db[cl]
-
-        resp = editSonido(self, self.liSonidos[row][1], wav)
-        if resp is not None:
-            wav, cent = resp
-            self.db[cl] = wav
-            self.liSonidos[row][2] = cent
-            self.grid.refresh()
-
-    def grid_dato(self, grid, row, o_column):
-        key = o_column.key
-        reg = self.liSonidos[row]
-        if key == "DURACION":
-            return "%02d:%02d:%02d" % Sound.msc(reg.centesimas)
-        elif key == "NOMBRE":
-            return reg.name
-
-    def play(self):
-        if self.grid.recno() >= 0:
-            reg = self.db[self.grid.recno()]
-            wav = reg.wav
-            ts = Sound.TallerSonido(wav)
-            ts.playInicio(0, ts.centesimas)
-            self.siPlay = True
-            while self.siPlay:
-                siSeguir, pos = ts.play()
-                if not siSeguir:
-                    break
-            ts.playFinal()
+        return li_sounds

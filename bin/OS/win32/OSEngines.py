@@ -145,7 +145,7 @@ def read_engines(folder_engines):
 
     mas("monarch", "Steve Maughan", "1.7", "http://www.monarchchess.com/", "Monarch(v1.7).exe", 2100)
 
-    mas("andscacs", "Daniel José Queraltó", "0.9532n", "http://www.amateurschach.de/main/_download.htm", "andscacs_32_no_popcnt.exe", 3264)
+    mas("andscacs", "Daniel José Queraltó", "0.9432n", "http://www.amateurschach.de/main/_download.htm", "andscacs_32_no_popcnt.exe", 3264)
 
     mas(
         "arminius", "Volker Annus", "2017-01-01", "http://www.nnuss.de/Hermann/Arminius2017-01-01.zip", "Arminius2017-01-01-32Bit.exe", 2662
