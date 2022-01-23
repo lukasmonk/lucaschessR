@@ -53,7 +53,7 @@ class WBDatabase(LCDialog.LCDialog):
         self.tab.ponTipoLetra(puntos=procesador.configuration.x_tb_fontpoints)
 
         if self.owner and not self.is_temporary:
-            liAccionesWork = [(_("Select other"), Iconos.Database(), self.tw_select_other)]
+            liAccionesWork = [(_("Select another database"), Iconos.Database(), self.tw_select_other)]
             self.tbWork = QTVarios.LCTB(self, liAccionesWork, icon_size=20)
             self.tbWork.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
             self.tab.setCornerWidget(self.tbWork)

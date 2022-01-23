@@ -271,7 +271,7 @@ class InfoMove(QtWidgets.QWidget):
         config_board = Code.configuration.config_board("INFOMOVE", 32)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.ponerPiezasAbajo(is_white_bottom)
+        self.board.set_side_bottom(is_white_bottom)
 
         self.cpDefecto = Position.Position()
         self.cpDefecto.read_fen(fenActivo)
@@ -458,7 +458,7 @@ class WindowArbolBook(LCDialog.LCDialog):
                 if not book.pordefecto:
                     menub.opcion(("b", book), book.name, Iconos.Delete())
             menu.separador()
-            menu.opcion(("1", None), _("Find Next") + " <F3>", Iconos.Buscar())
+            menu.opcion(("1", None), _("Next book") + " <F3>", Iconos.Buscar())
 
         resp = menu.lanza()
         if resp:

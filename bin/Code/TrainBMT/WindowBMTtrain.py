@@ -433,7 +433,7 @@ class WTrainBMT(LCDialog.LCDialog):
     def grid_doble_click(self, grid, row, column):
         if column.key == "NUMBER":
             return
-        self.analizaPosicion(row, column.key)
+        self.analize_position(row, column.key)
 
     def grid_tecla_control(self, grid, k, is_shift, is_control, is_alt):
         self.teclaPulsada("G", k)
@@ -745,7 +745,7 @@ class WTrainBMT(LCDialog.LCDialog):
         self.pgn.refresh()
         siW = self.position.is_white
         self.board.set_position(self.position)
-        self.board.ponerPiezasAbajo(siW)
+        self.board.set_side_bottom(siW)
         self.board.set_side_indicator(siW)
         self.board.activate_side(siW)
         self.lbJuegan.set_text(_("White to play") if siW else _("Black to play"))
@@ -780,7 +780,7 @@ class WTrainBMT(LCDialog.LCDialog):
         self.pgnMueveBase(row, "WHITE" if siW else "BLACK")
         self.pgn.goto(row, 1 if siW else 2)
 
-        self.board.ponerPiezasAbajo(siW)
+        self.board.set_side_bottom(siW)
 
         self.pgn.refresh()
 
@@ -804,7 +804,7 @@ class WTrainBMT(LCDialog.LCDialog):
         self.pgnMueveBase(0, "WHITE" if siW else "BLACK")
         self.pgn.goto(0, 1 if siW else 2)
 
-        self.board.ponerPiezasAbajo(siW)
+        self.board.set_side_bottom(siW)
 
         self.pgn.refresh()
 
@@ -836,7 +836,7 @@ class WTrainBMT(LCDialog.LCDialog):
         move = self.game.move(pos)
         return move, is_white, siUltimo, tam_lj, pos
 
-    def analizaPosicion(self, row, key):
+    def analize_position(self, row, key):
         if row < 0:
             return
 

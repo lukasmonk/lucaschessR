@@ -556,11 +556,11 @@ def datefile(pathfile):
 
 
 class Timer:
-    def __init__(self, tiempoPendiente):
-        self.tiempoPendiente = tiempoPendiente
-        self.marcaTiempo = None
+    def __init__(self, pending_time):
+        self.pending_time = pending_time
+        self.time_init = None
         self.txt = ""
-        self.marcaZeitnot = 0
+        self.zeitnot_marker = 0
 
     def texto(self, segs):
         if segs <= 0.0:
@@ -569,34 +569,34 @@ class Timer:
         txt = "%02d:%02d" % (int(tp / 60), tp % 60)
         return txt
 
-    def ponSegExtra(self, segs):
-        self.tiempoPendiente += segs
+    def add_extra_seconds(self, segs):
+        self.pending_time += segs
 
-    def dameSegundos(self):
-        if self.marcaTiempo:
-            tp = self.tiempoPendiente - (time.time() - self.marcaTiempo)
+    def get_seconds(self):
+        if self.time_init:
+            tp = self.pending_time - (time.time() - self.time_init)
         else:
-            tp = self.tiempoPendiente
+            tp = self.pending_time
         if tp <= 0.0:
             tp = 0
         return int(tp)
 
-    def dameSegundos2(self):
-        if self.marcaTiempo:
-            tp2 = int(time.time() - self.marcaTiempo)
-            tp = int(self.tiempoPendiente) - tp2
+    def get_seconds2(self):
+        if self.time_init:
+            tp2 = int(time.time() - self.time_init)
+            tp = int(self.pending_time) - tp2
         else:
-            tp = self.tiempoPendiente
+            tp = self.pending_time
             tp2 = 0
         if tp <= 0.0:
             tp = 0
         return int(tp), tp2
 
     def etiqueta(self):
-        return self.texto(self.dameSegundos())
+        return self.texto(self.get_seconds())
 
     def etiqueta2(self):
-        tp, tp2 = self.dameSegundos2()
+        tp, tp2 = self.get_seconds2()
         return self.texto(tp), self.texto(tp2)
 
     def etiquetaDif(self):
@@ -615,8 +615,8 @@ class Timer:
 
         return None, None
 
-    def etiquetaDGT(self):
-        segs = self.dameSegundos()
+    def label_dgt(self):
+        segs = self.get_seconds()
         mins = segs // 60
         segs -= mins * 60
         hors = mins // 60
@@ -624,51 +624,181 @@ class Timer:
 
         return "%d:%02d:%02d" % (hors, mins, segs)
 
-    def siAgotado(self):
-        if self.marcaTiempo:
-            if (self.tiempoPendiente - (time.time() - self.marcaTiempo)) <= 0.0:
+    def time_is_consumed(self):
+        if self.time_init:
+            if (self.pending_time - (time.time() - self.time_init)) <= 0.0:
                 return True
         else:
-            return self.tiempoPendiente <= 0.0
+            return self.pending_time <= 0.0
         return False
 
-    def isZeitnot(self):
-        if self.marcaZeitnot:
-            if self.marcaTiempo:
-                t = self.tiempoPendiente - (time.time() - self.marcaTiempo)
+    def is_zeitnot(self):
+        if self.zeitnot_marker:
+            if self.time_init:
+                t = self.pending_time - (time.time() - self.time_init)
             else:
-                t = self.tiempoPendiente
+                t = self.pending_time
             if t > 0:
-                resp = t < self.marcaZeitnot
+                resp = t < self.zeitnot_marker
                 if resp:
-                    self.marcaZeitnot = None
+                    self.zeitnot_marker = None
                 return resp
         return False
 
-    def setZeitnot(self, segs):
-        self.marcaZeitnot = segs
+    def set_zeinot(self, segs):
+        self.zeitnot_marker = segs
 
-    def iniciaMarcador(self):
-        self.marcaTiempo = time.time()
+    def start_marker(self):
+        self.time_init = time.time()
 
-    def paraMarcador(self, tiempoJugada):
-        if self.marcaTiempo:
-            self.tiempoPendiente -= (time.time() - self.marcaTiempo) - tiempoJugada
-            self.marcaTiempo = None
+    def stop_marker(self, tiempoJugada):
+        if self.time_init:
+            self.pending_time -= (time.time() - self.time_init) - tiempoJugada
+            self.time_init = None
 
-    def anulaMarcador(self):
-        self.marcaTiempo = None
-
-    def tiempoAplazamiento(self):
-        self.paraMarcador(0.00)
-        return self.tiempoPendiente
+    def remove_marker(self):
+        self.time_init = None
 
     def save(self):
-        return (self.tiempoPendiente, self.marcaZeitnot)
+        return (self.pending_time, self.zeitnot_marker)
 
     def restore(self, tvar):
-        self.tiempoPendiente, self.marcaZeitnot = tvar
-        self.marcaTiempo = None
+        self.pending_time, self.zeitnot_marker = tvar
+        self.time_init = None
+        self.txt = ""
+
+
+class Timer2:
+    def __init__(self, game, side, total_time, seconds_per_move):
+        self.game = game
+        self.side = side
+        self.total_time = total_time
+        self.pending_time = total_time
+        self.seconds_per_move = seconds_per_move
+        self.time_init = None
+        self.txt = ""
+        self.zeitnot_marker = 0
+
+        self.recalc()
+
+    @staticmethod
+    def texto(segs):
+        if segs <= 0.0:
+            segs = 0.0
+        tp = int(segs)
+        txt = "%02d:%02d" % (int(tp / 60), tp % 60)
+        return txt
+
+    def add_extra_seconds(self, segs):
+        self.pending_time += segs
+        self.total_time += segs
+
+    def get_seconds(self):
+        if self.time_init:
+            tp = self.pending_time - (time.time() - self.time_init)
+        else:
+            tp = self.pending_time
+        if tp <= 0.0:
+            tp = 0
+        return int(tp)
+
+    def get_seconds2(self):
+        if self.time_init:
+            tp2 = int(time.time() - self.time_init)
+            tp = int(self.pending_time) - tp2
+        else:
+            tp = self.pending_time
+            tp2 = 0
+        if tp <= 0.0:
+            tp = 0
+        return int(tp), tp2
+
+    def etiqueta(self):
+        return self.texto(self.get_seconds())
+
+    def etiqueta2(self):
+        tp, tp2 = self.get_seconds2()
+        return self.texto(tp), self.texto(tp2)
+
+    def etiquetaDif(self):
+        nvEti = self.etiqueta()
+        if nvEti != self.txt:
+            self.txt = nvEti
+            return nvEti
+
+        return None
+
+    def etiquetaDif2(self):
+        nvEti, nvEti2 = self.etiqueta2()
+        if nvEti != self.txt:
+            self.txt = nvEti
+            return nvEti, nvEti2
+
+        return None, None
+
+    def label_dgt(self):
+        segs = self.get_seconds()
+        mins = segs // 60
+        segs -= mins * 60
+        hors = mins // 60
+        mins -= hors * 60
+
+        return "%d:%02d:%02d" % (hors, mins, segs)
+
+    def time_is_consumed(self):
+        if self.time_init:
+            if (self.pending_time - (time.time() - self.time_init)) <= 0.0:
+                return True
+        else:
+            return self.pending_time <= 0.0
+        return False
+
+    def is_zeitnot(self):
+        if self.zeitnot_marker:
+            if self.time_init:
+                t = self.pending_time - (time.time() - self.time_init)
+            else:
+                t = self.pending_time
+            if t > 0:
+                resp = t < self.zeitnot_marker
+                if resp:
+                    self.zeitnot_marker = None
+                return resp
+        return False
+
+    def set_zeinot(self, segs):
+        self.zeitnot_marker = segs
+
+    def start_marker(self):
+        self.recalc()
+        self.time_init = time.time()
+
+    def stop_marker(self):
+        if self.time_init:
+            self.pending_time -= (time.time() - self.time_init) - self.seconds_per_move
+            self.time_init = None
+
+    def remove_marker(self):
+        self.recalc()
+        self.time_init = None
+
+    def recalc(self):
+        ms = 0
+        num_moves = 0
+        for move in self.game.li_moves:
+            if move.is_white() == self.side:
+                ms += move.time_ms
+                num_moves += 1
+        self.pending_time = self.total_time - ms/1000.0 + num_moves * self.seconds_per_move
+
+    def save(self):
+        self.recalc()
+        return self.total_time, self.pending_time, self.zeitnot_marker
+
+    def restore(self, tvar):
+        self.total_time, self.pending_time, self.zeitnot_marker = tvar
+        self.recalc()
+        self.time_init = None
         self.txt = ""
 
 
@@ -717,23 +847,27 @@ def listdir(txt):
 class Timekeeper:
     def __init__(self):
         self._begin = None
+        self._accumulated = 0.0
 
     def start(self):
         self._begin = time.time()
+        self._accumulated = 0.0
 
     def stop(self):
         if self._begin:
-            b = self._begin
+            secs = time.time() - self._begin + self._accumulated
             self._begin = None
-            return time.time() - b
+            return secs
         else:
-            return 0
+            return self._accumulated
 
-    def stop_ms(self):
+    def pause(self):
         if self._begin:
-            b = self._begin
+            self._accumulated = time.time() - self._begin
             self._begin = None
-            return int(1000 * (time.time() - b))
+
+    def restart(self):
+        self._begin = time.time()
 
 
 class OpenCodec:

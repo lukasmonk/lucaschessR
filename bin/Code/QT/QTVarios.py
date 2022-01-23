@@ -61,7 +61,7 @@ class WDialogo(QtWidgets.QDialog):
             dic = dicDef
 
         if QtWidgets.QDesktopWidget().screenCount() > 1:
-            wE = hE = 1024*1024
+            wE = hE = 1024 * 1024
         else:
             wE, hE = QTUtil.tamEscritorio()
         if dic:
@@ -183,7 +183,9 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
 
         # Tiempo
         self.edMinutos, self.lbMinutos = QTUtil2.spinBoxLB(self, 10, 0, 999, maxTam=50, etiqueta=_("Total minutes"))
-        self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(self, 0, 0, 999, maxTam=50, etiqueta=_("Seconds added per move"))
+        self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(
+            self, 0, 0, 999, maxTam=50, etiqueta=_("Seconds added per move")
+        )
         ly = Colocacion.G()
         ly.controld(self.lbMinutos, 0, 0).control(self.edMinutos, 0, 1)
         ly.controld(self.lbSegundos, 0, 2).control(self.edSegundos, 0, 3)
@@ -223,7 +225,13 @@ class BlancasNegrasTiempo(QtWidgets.QDialog):
         Code.configuration.write_variables(self.key_saved, dic)
 
     def resultado(self):
-        return (self.color, self.gbT.isChecked(), self.edMinutos.valor(), self.edSegundos.valor(), self.chb_fastmoves.valor())
+        return (
+            self.color,
+            self.gbT.isChecked(),
+            self.edMinutos.valor(),
+            self.edSegundos.valor(),
+            self.chb_fastmoves.valor(),
+        )
 
     def change_time(self):
         self.muestra_tiempo(self.gbT.isChecked())
@@ -251,7 +259,7 @@ def blancasNegrasTiempo(owner):
 
 
 class Tiempo(QtWidgets.QDialog):
-    def __init__(self, parent, minMinutos, minSegundos, maxMinutos, maxSegundos, default_minutes=10, default_seconds=0):
+    def __init__(self, parent, minMinutos, minSegundos, maxMinutos, max_seconds, default_minutes=10, default_seconds=0):
         super(Tiempo, self).__init__(parent)
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.WindowTitleHint)
 
@@ -267,7 +275,7 @@ class Tiempo(QtWidgets.QDialog):
             self, default_minutes, minMinutos, maxMinutos, maxTam=50, etiqueta=_("Total minutes"), fuente=f
         )
         self.edSegundos, self.lbSegundos = QTUtil2.spinBoxLB(
-            self, default_seconds, minSegundos, maxSegundos, maxTam=50, etiqueta=_("Seconds added per move"), fuente=f
+            self, default_seconds, minSegundos, max_seconds, maxTam=50, etiqueta=_("Seconds added per move"), fuente=f
         )
 
         # # Tiempo
@@ -288,8 +296,16 @@ class Tiempo(QtWidgets.QDialog):
         return minutos, seconds
 
 
-def vtime(owner, minMinutos=1, minSegundos=0, maxMinutos=999, maxSegundos=999, default_minutes=10, default_seconds=0):
-    w = Tiempo(owner, minMinutos, minSegundos, maxMinutos, maxSegundos, default_minutes=default_minutes, default_seconds=default_seconds)
+def vtime(owner, minMinutos=1, minSegundos=0, maxMinutos=999, max_seconds=999, default_minutes=10, default_seconds=0):
+    w = Tiempo(
+        owner,
+        minMinutos,
+        minSegundos,
+        maxMinutos,
+        max_seconds,
+        default_minutes=default_minutes,
+        default_seconds=default_seconds,
+    )
     if w.exec_():
         return w.resultado()
     return None
@@ -504,7 +520,12 @@ class ListaPiezas(QtWidgets.QWidget):
 
 def rondoPuntos(shuffle=True):
     nico = Util.Rondo(
-        Iconos.PuntoAmarillo(), Iconos.PuntoNaranja(), Iconos.PuntoVerde(), Iconos.PuntoAzul(), Iconos.PuntoMagenta(), Iconos.PuntoRojo()
+        Iconos.PuntoAmarillo(),
+        Iconos.PuntoNaranja(),
+        Iconos.PuntoVerde(),
+        Iconos.PuntoAzul(),
+        Iconos.PuntoMagenta(),
+        Iconos.PuntoRojo(),
     )
     if shuffle:
         nico.shuffle()
@@ -512,15 +533,23 @@ def rondoPuntos(shuffle=True):
 
 
 def rondoColores(shuffle=True):
-    nico = Util.Rondo(Iconos.Amarillo(), Iconos.Naranja(), Iconos.Verde(), Iconos.Azul(), Iconos.Magenta(), Iconos.Rojo())
+    nico = Util.Rondo(
+        Iconos.Amarillo(), Iconos.Naranja(), Iconos.Verde(), Iconos.Azul(), Iconos.Magenta(), Iconos.Rojo()
+    )
     if shuffle:
         nico.shuffle()
     return nico
 
 
 def rondoFolders(shuffle=True):
-    nico = Util.Rondo(Iconos.FolderAnil(), Iconos.FolderBlack(), Iconos.FolderBlue(), Iconos.FolderGreen(),
-                      Iconos.FolderMagenta(), Iconos.FolderRed())
+    nico = Util.Rondo(
+        Iconos.FolderAnil(),
+        Iconos.FolderBlack(),
+        Iconos.FolderBlue(),
+        Iconos.FolderGreen(),
+        Iconos.FolderMagenta(),
+        Iconos.FolderRed(),
+    )
     if shuffle:
         nico.shuffle()
     return nico
@@ -542,7 +571,6 @@ class LCMenu(Controles.Menu):
 
     def separador_blank(self):
         self.opcion(None, "")
-
 
 
 class LCMenuRondo(LCMenu):
@@ -723,7 +751,9 @@ class MensajeFics(QtWidgets.QDialog):
         self.mostrar()
 
     def colocaCentrado(self, owner):
-        self.move(owner.x() + owner.width() // 2 - self.width() // 2, owner.y() + owner.height() // 2 - self.height() // 2)
+        self.move(
+            owner.x() + owner.width() // 2 - self.width() // 2, owner.y() + owner.height() // 2 - self.height() // 2
+        )
         QTUtil.refresh_gui()
         self.show()
         QTUtil.refresh_gui()
@@ -905,7 +935,7 @@ class ReadAnnotation(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self, parent)
         self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.Dialog | QtCore.Qt.FramelessWindowHint)
 
-        self.edAnotacion = Controles.ED(self, "").ponTipoLetra(puntos=Code.configuration.x_menu_points)
+        self.edAnotacion = Controles.ED(self, "").ponTipoLetra(puntos=Code.configuration.x_menu_points).anchoFijo(70)
         btAceptar = Controles.PB(self, "", rutina=self.aceptar).ponIcono(Iconos.Aceptar(), 32)
         btCancelar = Controles.PB(self, "", rutina=self.cancelar).ponIcono(Iconos.MainMenu(), 32)
         btAyuda = Controles.PB(self, "", rutina=self.ayuda).ponIcono(Iconos.AyudaGR(), 32)
@@ -915,9 +945,21 @@ class ReadAnnotation(QtWidgets.QDialog):
         self.errores = 0
         self.resultado = None
 
-        layout = Colocacion.H().relleno(1).control(btAyuda).control(self.edAnotacion).control(btAceptar).control(btCancelar).margen(3)
+        layout = (
+            Colocacion.H()
+            .relleno(1)
+            .control(btAyuda)
+            .control(self.edAnotacion)
+            .control(btAceptar)
+            .control(btCancelar)
+            .margen(3)
+        )
         self.setLayout(layout)
-        self.move(parent.x() + parent.board.width() - 308, parent.y() + parent.board.y() - 18)
+        self.show()
+        self.move(
+            parent.x() + parent.board.width() - self.edAnotacion.width() - btAceptar.width() * 3 - 20,
+            parent.y() + parent.board.y() - self.edAnotacion.height() + 8,
+        )
 
     def aceptar(self):
         txt = self.edAnotacion.texto()
@@ -940,7 +982,9 @@ class ReadAnnotation(QtWidgets.QDialog):
 
 
 class LCTB(Controles.TBrutina):
-    def __init__(self, parent, li_acciones=None, with_text=True, icon_size=None, puntos=None, background=None, style=None):
+    def __init__(
+        self, parent, li_acciones=None, with_text=True, icon_size=None, puntos=None, background=None, style=None
+    ):
         configuration = Code.configuration
         Controles.TBrutina.__init__(
             self,

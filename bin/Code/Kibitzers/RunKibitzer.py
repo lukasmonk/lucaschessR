@@ -104,6 +104,8 @@ class CPU:
         elif key == KIBRUN_GAME:
             game = Game.Game()
             game.restore(orden.dv["GAME"])
+            if hasattr(self.ventana, "board"):
+                self.ventana.board.set_side_bottom(orden.dv["IS_WHITE_BOTTOM"])
             if self.kibitzer.pointofview == KIB_BEFORE_MOVE:
                 game.anulaSoloUltimoMovimiento()
             if self.tipo == KIB_THREATS:

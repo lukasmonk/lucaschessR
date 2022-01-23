@@ -49,7 +49,7 @@ class WindowTutor(LCDialog.LCDialog):
                 return None, None, None
             board = Board.Board(self, config_board)
             board.crea()
-            board.ponerPiezasAbajo(is_white)
+            board.set_side_bottom(is_white)
             lytb, tb = QTVarios.lyBotonesMovimiento(self, name, siLibre, siMas=siMas)
             return board, lytb, tb
 

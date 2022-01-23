@@ -327,6 +327,8 @@ class MainWindow(LCDialog.LCDialog):
     def activaCapturas(self, siActivar=None):
         if siActivar is None:
             self.siCapturas = not self.siCapturas
+            Code.configuration.x_captures_activate = self.siCapturas
+            Code.configuration.graba()
         else:
             self.siCapturas = siActivar
         self.base.lb_capt_white.setVisible(self.siCapturas)
@@ -335,8 +337,11 @@ class MainWindow(LCDialog.LCDialog):
     def activaInformacionPGN(self, siActivar=None):
         if siActivar is None:
             self.siInformacionPGN = not self.siInformacionPGN
+            Code.configuration.x_info_activate = self.siInformacionPGN
+            Code.configuration.graba()
         else:
             self.siInformacionPGN = siActivar
+
         self.informacionPGN.setVisible(self.siInformacionPGN)
         self.ajustaTamH()
         sizes = self.informacionPGN.splitter.sizes()
@@ -359,11 +364,11 @@ class MainWindow(LCDialog.LCDialog):
     def ponDatosReloj(self, bl, rb, ng, rn):
         self.base.ponDatosReloj(bl, rb, ng, rn)
 
-    def ponRelojBlancas(self, tm, tm2):
-        self.base.ponRelojBlancas(tm, tm2)
+    def set_clock_white(self, tm, tm2):
+        self.base.set_clock_white(tm, tm2)
 
-    def ponRelojNegras(self, tm, tm2):
-        self.base.ponRelojNegras(tm, tm2)
+    def set_clock_black(self, tm, tm2):
+        self.base.set_clock_black(tm, tm2)
 
     def change_player_labels(self, bl, ng):
         self.base.change_player_labels(bl, ng)

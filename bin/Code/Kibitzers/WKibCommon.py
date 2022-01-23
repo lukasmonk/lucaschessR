@@ -191,3 +191,8 @@ class WKibCommon(QtWidgets.QDialog):
 
     def reset(self):
         self.orden_game(self.game)
+
+    def stop(self):
+        # Para que no den error los que no lo incluyen
+        pass
+

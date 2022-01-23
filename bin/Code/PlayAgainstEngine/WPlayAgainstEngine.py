@@ -80,7 +80,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
             w.setFont(font)
             tab.nuevaTab(w, titulo)
 
-        def nuevoG():
+        def nuevoG() -> Colocacion.G:
             ly_g = Colocacion.G()
             ly_g.filaActual = 0
             ly_g.margen(10)
@@ -88,7 +88,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
 
         gb_style = Common.gb_style()
 
-        def _label(ly_g, txt, xlayout, checkable: object = False):
+        def _label(ly_g: Colocacion.G, txt, xlayout, checkable: object = False):
             groupbox = Controles.GB(self, txt, xlayout)
             if checkable:
                 groupbox.setCheckable(True)
@@ -157,14 +157,17 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         )
         _label(lyG, _("Side you play with"), hbox)
 
+        ly = Colocacion.V()
+        ly.otro(lyG)
         if self.configuration.x_digital_board:
             self.chb_dgt = Controles.CHB(
                 self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.eboard_is_on()
             ).ponFuente(Controles.TipoLetra(puntos=14))
-            lyH = Colocacion.H().control(self.chb_dgt)
-            _label(lyG, "", lyH)
+            ly.control(self.chb_dgt)
+        self.chb_humanize = Controles.CHB(self, _("Humanizing the time it takes for the engine to respond"), False).ponFuente(Controles.TipoLetra(puntos=14))
+        ly.control(self.chb_humanize)
 
-        nueva_tab(lyG, _("Basic configuration"))
+        nueva_tab(ly, _("Basic configuration"))
 
         # ##################################################################################################################################
         # TAB Ayudas
@@ -385,25 +388,11 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         self.grid_uci.ponFuente(font)
         self.register_grid(self.grid_uci)
 
-        # Humanize
-        lb_humanize = Controles.LB2P(self, _("Humanize fast responses (range in seconds)")).ponFuente(font)
-        self.ed_htime_min = Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font)
-        lb_sep = Controles.LB(self, "-").ponFuente(font)
-        self.ed_htime_max = Controles.ED(self).tipoFloat().anchoMaximo(50).ponFuente(font)
-
-        def cancel_humanize():
-            self.ed_htime_min.ponFloat(0.0)
-            self.ed_htime_max.ponFloat(0.0)
-
-        bt_cancel_htime = Controles.PB(self, "", rutina=cancel_humanize).ponIcono(Iconos.S_Cancelar())
-        ly_humanize = Colocacion.H().control(lb_humanize)
-        ly_humanize.control(self.ed_htime_min).control(lb_sep).control(self.ed_htime_max).espacio(3).control(bt_cancel_htime).relleno().margen(0)
-
         lyH2 = (
             Colocacion.H().control(lbAjustarRival).control(self.cbAjustarRival).control(self.btAjustarRival).relleno()
         )
         lyH3 = Colocacion.H().control(lbResign).control(self.cbResign).relleno()
-        ly = Colocacion.V().otro(lyH2).otro(lyH3).otro(ly_humanize).espacio(16).control(self.lb_path_engine).control(self.grid_uci)
+        ly = Colocacion.V().otro(lyH2).otro(lyH3).espacio(16).control(self.lb_path_engine).control(self.grid_uci)
         _label(lyG, _("Opponent"), ly)
 
         nueva_tab(lyG, _("Advanced"))
@@ -745,6 +734,8 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         dr["ENGINE_TIME"] = int(self.edRtiempo.textoFloat() * 10)
         dr["ENGINE_DEPTH"] = self.edRdepth.textoInt()
 
+        dic["HUMANIZE"] = self.chb_humanize.valor()
+
         # Ayudas
         dic["HINTS"] = self.cbAyudas.valor() if self.gbTutor.isChecked() else 0
         dic["ARROWS"] = self.sbArrows.valor()
@@ -782,9 +773,6 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         dic["ADJUST"] = self.cbAjustarRival.valor()
         dic["RESIGN"] = self.cbResign.valor()
 
-        dic["HUMANIZE_MIN"] = self.ed_htime_min.textoFloat()
-        dic["HUMANIZE_MAX"] = self.ed_htime_max.textoFloat()
-
         if self.configuration.x_digital_board:
             if self.chb_dgt.isChecked():
                 DGT.ponON()
@@ -812,6 +800,8 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         tm_s = float(dr.get("ENGINE_TIME", 0)) / 10.0
         self.edRtiempo.ponFloat(tm_s)
         self.edRdepth.ponInt(dr.get("ENGINE_DEPTH", 0))
+
+        self.chb_humanize.ponValor(dic.get("HUMANIZE", False))
 
         # Ayudas
         hints = dic.get("HINTS", 7)
@@ -893,8 +883,6 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         # Avanzado
         self.cbAjustarRival.ponValor(dic.get("ADJUST", ADJUST_BETTER))
         self.cbResign.ponValor(dic.get("RESIGN", -800))
-        self.ed_htime_min.ponFloat(dic.get("HUMANIZE_MIN", 0.0))
-        self.ed_htime_max.ponFloat(dic.get("HUMANIZE_MAX", 0.0))
 
         self.muestraOpening()
         self.muestraPosicion()

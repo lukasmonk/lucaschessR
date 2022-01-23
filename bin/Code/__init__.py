@@ -85,8 +85,8 @@ bridge_translation = None
 win_translator = None
 
 BASE_VERSION = "B"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R2.pre-release.0"
-DEBUG = False
+VERSION = "R2.pre-release.1"
+DEBUG = True
 DEBUG_ENGINE = False
 
 if DEBUG:

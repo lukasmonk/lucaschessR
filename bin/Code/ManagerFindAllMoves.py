@@ -348,7 +348,7 @@ class ManagerFindAllMoves(Manager.Manager):
         else:
             QTUtil2.mensajeTemporal(self.main_window, mensaje, 3 if siRecord else 2, background="#FFCD43" if siRecord else None)
 
-    def analizaPosicion(self, row, key):
+    def analize_position(self, row, key):
         if self.state == ST_PLAYING:
             self.finJuego()
             return

@@ -49,7 +49,7 @@ class ManagerChallenge101:
         self.board.bloqueaRotacion(False)
         self.board.set_dispatcher(self.player_has_moved)
         self.board.set_position(self.cp)
-        self.board.ponerPiezasAbajo(self.is_white)
+        self.board.set_side_bottom(self.is_white)
         self.board.activate_side(self.is_white)
         self.board.set_side_indicator(self.is_white)
 

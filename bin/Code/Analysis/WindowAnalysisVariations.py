@@ -30,11 +30,11 @@ class WAnalisisVariations(QtWidgets.QDialog):
         config_board = Code.configuration.config_board("ANALISISVARIANTES", 32)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.ponerPiezasAbajo(is_white)
+        self.board.set_side_bottom(is_white)
 
         self.boardT = Board.Board(self, config_board)
         self.boardT.crea()
-        self.boardT.ponerPiezasAbajo(is_white)
+        self.boardT.set_side_bottom(is_white)
 
         btTerminar = Controles.PB(self, _("Close"), self.close).ponPlano(False)
         btReset = Controles.PB(self, _("Another change"), oBase.reset).ponIcono(Iconos.MoverLibre()).ponPlano(False)
@@ -63,7 +63,7 @@ class WAnalisisVariations(QtWidgets.QDialog):
 
         self.move(ventana.x() + 20, ventana.y() + 20)
 
-    def dameSegundos(self):
+    def get_seconds(self):
         return int(self.seconds.value())
 
     def ponPuntuacion(self, pts):

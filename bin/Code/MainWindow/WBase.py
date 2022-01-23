@@ -70,6 +70,7 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
+from Code.MainWindow import WindowSolve
 
 
 class WBase(QtWidgets.QWidget):
@@ -126,7 +127,7 @@ class WBase(QtWidgets.QWidget):
 
         dic_opciones = self.dic_opciones_tb()
         if self.configuration.x_digital_board:
-            dic_opciones[TB_EBOARD] = ["%s/%s"%(_("Enable"),_("Disable")), DGT.icon_eboard()]
+            dic_opciones[TB_EBOARD] = ["%s/%s" % (_("Enable"), _("Disable")), DGT.icon_eboard()]
 
         cf = self.manager.configuration
         peso = 75 if cf.x_tb_bold else 50
@@ -171,7 +172,7 @@ class WBase(QtWidgets.QWidget):
             TB_QUIT: (_("Quit"), Iconos.FinPartida()),
             TB_PASTE_PGN: (_("Paste PGN"), Iconos.Pegar()),
             TB_READ_PGN: (_("Read PGN file"), Iconos.Fichero()),
-            TB_PGN_LABELS: (_("PGN Labels"), Iconos.InformacionPGN()),
+            TB_PGN_LABELS: (_("PGN labels"), Iconos.InformacionPGN()),
             TB_OTHER_GAME: (_("Other game"), Iconos.FicheroRepite()),
             TB_MY_GAMES: (_("My games"), Iconos.NuestroFichero()),
             TB_DRAW: (_("Draw"), Iconos.Tablas()),
@@ -277,7 +278,7 @@ class WBase(QtWidgets.QWidget):
         self.lb_capt_black.setStyleSheet(style)
 
         # Relojes
-        f = Controles.TipoLetra("Arial Black" if Code.is_windows else Code.font_mono, puntos=26, peso=500)
+        f = Controles.TipoLetra(puntos=26, peso=500)
 
         def lbReloj():
             lb = (
@@ -306,6 +307,9 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo3.setStyleSheet("*{ border: 1px solid darkgray }")
         self.lbRotulo3.altoFijo(48)
 
+        self.wsolve = WindowSolve.WSolve(self)
+        self.wsolve.hide()
+
         # Lo escondemos
         self.lb_player_white.hide()
         self.lb_player_black.hide()
@@ -320,6 +324,7 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo1.hide()
         self.lbRotulo2.hide()
         self.lbRotulo3.hide()
+        self.wsolve.hide()
 
         # Layout
 
@@ -337,7 +342,7 @@ class WBase(QtWidgets.QWidget):
         ly_abajo.control(self.bt_active_tutor)
         ly_abajo.control(self.lbRotulo1).control(self.lbRotulo2).control(self.lbRotulo3)
 
-        ly_v = Colocacion.V().otro(ly_color).control(self.pgn)
+        ly_v = Colocacion.V().otro(ly_color).control(self.wsolve).control(self.pgn)
         ly_v.otro(ly_abajo)
 
         return ly_v
@@ -349,7 +354,9 @@ class WBase(QtWidgets.QWidget):
         self.conAtajos = conAtajos
 
         self.tb.clear()
-        if (TB_CLOSE in li_acciones or TB_RESIGN in li_acciones or TB_CANCEL in li_acciones) and self.configuration.x_digital_board:
+        if (
+            TB_CLOSE in li_acciones or TB_RESIGN in li_acciones or TB_CANCEL in li_acciones
+        ) and self.configuration.x_digital_board:
             li_acciones = list(li_acciones)
             if TB_CONFIG in li_acciones:
                 pos = li_acciones.index(TB_CONFIG)
@@ -421,7 +428,7 @@ class WBase(QtWidgets.QWidget):
     def grid_doble_click(self, grid, row, column):
         if column.key == "NUMBER":
             return
-        self.manager.analizaPosicion(row, column.key)
+        self.manager.analize_position(row, column.key)
 
     def grid_pulsada_cabecera(self, grid, column):
         col_white = self.pgn.o_columns.column(1)
@@ -554,7 +561,7 @@ class WBase(QtWidgets.QWidget):
             row, column = self.pgn.current_position()
             if column.key != "NUMBER":
                 if hasattr(self.manager, "analizaPosicion"):
-                    self.manager.analizaPosicion(row, column.key)
+                    self.manager.analize_position(row, column.key)
         else:
             if hasattr(self.manager, "control_teclado"):
                 self.manager.control_teclado(tecla, modifiers)
@@ -574,6 +581,7 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo3.setVisible(False)
         self.lb_capt_white.setVisible(False)
         self.lb_capt_black.setVisible(False)
+        self.wsolve.setVisible(False)
 
         self.lb_player_white.setVisible(siReloj)
         self.lb_player_black.setVisible(siReloj)
@@ -594,6 +602,7 @@ class WBase(QtWidgets.QWidget):
             self.lb_player_black,
             self.lb_clock_white,
             self.lb_clock_black,
+            self.wsolve.setVisible,
         ):
             if control.isVisible():
                 self.li_hide_replay.append(control)
@@ -631,8 +640,8 @@ class WBase(QtWidgets.QWidget):
         return nonDistract
 
     def ponDatosReloj(self, bl, rb, ng, rn):
-        self.ponRelojBlancas(rb, "00:00")
-        self.ponRelojNegras(rn, "00:00")
+        self.set_clock_white(rb, "00:00")
+        self.set_clock_black(rn, "00:00")
         self.change_player_labels(bl, ng)
 
     def change_player_labels(self, bl, ng):
@@ -724,12 +733,12 @@ class WBase(QtWidgets.QWidget):
 
         return get(self.lbRotulo1), get(self.lbRotulo2), get(self.lbRotulo3)
 
-    def ponRelojBlancas(self, tm, tm2):
+    def set_clock_white(self, tm, tm2):
         if tm2 is not None:
             tm += '<br><FONT SIZE="-4">' + tm2
         self.lb_clock_white.set_text(tm)
 
-    def ponRelojNegras(self, tm, tm2):
+    def set_clock_black(self, tm, tm2):
         if tm2 is not None:
             tm += '<br><FONT SIZE="-4">' + tm2
         self.lb_clock_black.set_text(tm)

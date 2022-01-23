@@ -96,7 +96,7 @@ class WEndingsGTB(LCDialog.LCDialog):
         self.board = BoardEndings(self, config_board)
         self.board.set_startup_control(self.startup_control)
         self.board.crea()
-        self.board.ponerPiezasAbajo(True)
+        self.board.set_side_bottom(True)
         self.board.set_dispatcher(self.player_has_moved)
 
         self.pzs = self.board.piezas

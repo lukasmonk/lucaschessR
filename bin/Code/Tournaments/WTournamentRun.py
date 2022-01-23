@@ -406,7 +406,7 @@ class WTournamentRun(QtWidgets.QWidget):
         if eti:
             self.pon_reloj_side(self.current_side, eti, eti2)
 
-        if ot.siAgotado():
+        if ot.time_is_consumed():
             self.game.set_termination_time()
             return False
 
@@ -418,15 +418,15 @@ class WTournamentRun(QtWidgets.QWidget):
             tm += '<br><FONT SIZE="-4">' + tm2
         self.lb_reloj[side].set_text(tm)
 
-    def reloj_start(self, is_white):
-        self.vtime[is_white].iniciaMarcador()
+    def start_clock(self, is_white):
+        self.vtime[is_white].start_marker()
 
-    def reloj_stop(self, is_white):
-        self.vtime[is_white].paraMarcador(self.segundos_jugada)
+    def stop_clock(self, is_white):
+        self.vtime[is_white].stop_marker(self.segundos_jugada)
         self.pon_reloj()
 
     def reloj_pause(self, is_white):
-        self.vtime[is_white].anulaMarcador()
+        self.vtime[is_white].remove_marker()
         self.pon_reloj()
 
     def eligeJugadaBook(self, book, tipo):
@@ -498,16 +498,16 @@ class WTournamentRun(QtWidgets.QWidget):
 
         if not move_found:
             xrival = self.xengine[is_white]
-            tiempoBlancas = self.vtime[True].tiempoPendiente
-            tiempoNegras = self.vtime[False].tiempoPendiente
+            tiempoBlancas = self.vtime[True].pending_time
+            tiempoNegras = self.vtime[False].pending_time
             segundosJugada = xrival.mstime_engine
-            self.reloj_start(is_white)
+            self.start_clock(is_white)
             mrm = xrival.play_time_tourney(self.game, tiempoBlancas, tiempoNegras, segundosJugada)
             if self.state == ST_PAUSE:
                 self.reloj_pause(is_white)
                 self.board.borraMovibles()
                 return True
-            self.reloj_stop(is_white)
+            self.stop_clock(is_white)
             if mrm is None:
                 return False
             rm = mrm.mejorMov()
@@ -585,10 +585,10 @@ class WTournamentRun(QtWidgets.QWidget):
         return self.pon_reloj()
 
     def clocks_finished(self):
-        if self.vtime[WHITE].siAgotado():
+        if self.vtime[WHITE].time_is_consumed():
             self.game.set_termination(TERMINATION_WIN_ON_TIME, RESULT_WIN_BLACK)
             return True
-        if self.vtime[BLACK].siAgotado():
+        if self.vtime[BLACK].time_is_consumed():
             self.game.set_termination(TERMINATION_WIN_ON_TIME, RESULT_WIN_WHITE)
             return True
         return False

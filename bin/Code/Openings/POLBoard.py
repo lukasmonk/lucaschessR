@@ -66,14 +66,14 @@ class BoardLines(QtWidgets.QWidget):
         config_board = configuration.config_board("POSLINES", 32)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.ponerPiezasAbajo(True)
+        self.board.set_side_bottom(True)
         self.board.set_dispatcher(self.player_has_moved)
         self.board.dispatchSize(self.ajustaAncho)
         self.board.dbvisual_set_file(self.dbop.nom_fichero)
         self.board.dbvisual_set_show_allways(True)
         self.board.dbvisual_set_save_allways(True)
 
-        self.board.ponerPiezasAbajo(self.dbop.getconfig("WHITEBOTTOM", True))
+        self.board.set_side_bottom(self.dbop.getconfig("WHITEBOTTOM", True))
 
         self.dbop.setdbVisual_Board(self.board)  # To close
 

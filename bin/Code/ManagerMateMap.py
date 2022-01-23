@@ -213,6 +213,6 @@ class ManagerMateMap(Manager.Manager):
         self.disable_all()
         self.refresh()
 
-    def analizaPosicion(self, row, key):
+    def analize_position(self, row, key):
         if self.player_win:
-            Manager.Manager.analizaPosicion(self, row, key)
+            Manager.Manager.analize_position(self, row, key)

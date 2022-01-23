@@ -108,7 +108,7 @@ class WAnalisisGraph(LCDialog.LCDialog):
         config_board = Code.configuration.config_board("ANALISISGRAPH", 48)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.ponerPiezasAbajo(alm.is_white_bottom)
+        self.board.set_side_bottom(alm.is_white_bottom)
         self.board.dispatchSize(self.boardSizeChanged)
 
         # self.capturas = WCapturas.CapturaLista(self, self.board)

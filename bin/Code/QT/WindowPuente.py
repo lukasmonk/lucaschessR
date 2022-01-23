@@ -414,14 +414,14 @@ class WPuente(LCDialog.LCDialog):
         is_white = cpIni.is_white
         self.boardIni = Board.BoardEstatico(self, config_board)
         self.boardIni.crea()
-        self.boardIni.ponerPiezasAbajo(is_white)
+        self.boardIni.set_side_bottom(is_white)
         self.boardIni.set_position(cpIni)
 
         cpFin = Position.Position()
         cpFin.read_fen(fenFin)
         self.boardFin = Board.BoardEstatico(self, config_board)
         self.boardFin.crea()
-        self.boardFin.ponerPiezasAbajo(is_white)  # esta bien
+        self.boardFin.set_side_bottom(is_white)  # esta bien
         self.boardFin.set_position(cpFin)
 
         # Rotulo informacion
@@ -536,12 +536,12 @@ class WPuente(LCDialog.LCDialog):
         cpIni = Position.Position()
         cpIni.read_fen(fenIni)
         is_white = cpIni.is_white
-        self.boardIni.ponerPiezasAbajo(is_white)
+        self.boardIni.set_side_bottom(is_white)
         self.boardIni.set_position(cpIni)
 
         cpFin = Position.Position()
         cpFin.read_fen(fenFin)
-        self.boardFin.ponerPiezasAbajo(is_white)  # esta bien
+        self.boardFin.set_side_bottom(is_white)  # esta bien
         self.boardFin.set_position(cpFin)
 
         # Rotulo informacion

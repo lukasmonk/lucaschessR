@@ -90,15 +90,15 @@ class ManagerSingularM(Manager.Manager):
         self.set_side_indicator(is_white)
         self.main_window.change_player_labels("%d/10" % (self.pos_bloque + 1,), _("Complete"))
 
-        self.main_window.ponRelojBlancas("", None)
-        self.main_window.ponRelojNegras(self.singularMoves.rotulo_media(), None)
+        self.main_window.set_clock_white("", None)
+        self.main_window.set_clock_black(self.singularMoves.rotulo_media(), None)
 
         self.refresh()
 
         self.human_is_playing = True
         self.activate_side(is_white)
 
-        self.main_window.start_clock(self.set_clock, transicion=1500)
+        self.main_window.start_clock(self.set_clock, transicion=1000)
         self.time_inicio = time.time()
         self.set_clock()
 
@@ -113,7 +113,7 @@ class ManagerSingularM(Manager.Manager):
 
     def set_clock(self):
         p = self.calc_puntuacion(time.time() - self.time_inicio)
-        self.main_window.ponRelojBlancas("%0.2f" % p, None)
+        self.main_window.set_clock_white("%0.2f" % p, None)
 
     def resign(self):
         self.add_move(None)
@@ -134,10 +134,10 @@ class ManagerSingularM(Manager.Manager):
         bm = self.linea_bloque.bm
         ok = bm == resp
         self.linea_bloque.score = score if ok else 0
-        self.main_window.ponRelojBlancas("%0.2f" % self.linea_bloque.score, None)
+        self.main_window.set_clock_white("%0.2f" % self.linea_bloque.score, None)
 
         self.singularMoves.add_bloque_sol(self.linea_bloque)
-        self.main_window.ponRelojNegras(self.singularMoves.rotulo_media(), None)
+        self.main_window.set_clock_black(self.singularMoves.rotulo_media(), None)
 
         if jgSel:
             self.move_the_pieces(jgSel.liMovs)

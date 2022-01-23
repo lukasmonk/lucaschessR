@@ -240,7 +240,7 @@ class WHorses(LCDialog.LCDialog):
 
     def reset(self):
         self.preparaTest()
-        self.board.ponerPiezasAbajo(True)
+        self.board.set_side_bottom(True)
         self.board.set_position(self.cpInicial)
         self.board.remove_arrows()
         self.min_moves = 0

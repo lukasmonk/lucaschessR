@@ -442,7 +442,12 @@ class Manager:
         row, column = self.main_window.pgnPosActual()
         pos_move, move = self.pgn.move(row, column.key)
 
-        if self.main_window.siCapturas or self.main_window.siInformacionPGN or self.kibitzers_manager.some_working():
+        if (
+            self.main_window.siCapturas
+            or self.main_window.siInformacionPGN
+            or self.kibitzers_manager.some_working()
+            or self.configuration.x_show_bestmove
+        ):
             if move:
                 dic = move.position.capturas_diferencia()
                 if move.analysis and self.configuration.x_show_bestmove:
@@ -486,10 +491,10 @@ class Manager:
         if column.key == "NUMBER":
             pos_move -= 1
         game_run = self.game.copy_raw(pos_move)
-        self.kibitzers_manager.put_game(game_run, not all_kibitzers)
+        self.kibitzers_manager.put_game(game_run, self.board.is_white_bottom, not all_kibitzers)
 
     def put_pieces_bottom(self, is_white):
-        self.board.ponerPiezasAbajo(is_white)
+        self.board.set_side_bottom(is_white)
 
     def remove_hints(self, siTambienTutorAtras=True, siQuitarAtras=True):
         self.main_window.remove_hints(siTambienTutorAtras, siQuitarAtras)
@@ -870,7 +875,7 @@ class Manager:
             self.is_analyzed_by_tutor = False
 
             if self.game_type == GT_AGAINST_ENGINE:
-                self.analizaInicio()
+                self.analyze_begin()
 
     def is_finished(self):
         return self.game.is_finished()
@@ -899,7 +904,7 @@ class Manager:
                 self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, 0, must_save=False
             )
 
-    def analizaPosicion(self, row, key):
+    def analize_position(self, row, key):
         if row < 0:
             return
 
@@ -934,7 +939,12 @@ class Manager:
             siCancelar = self.xanalyzer.mstime_engine > 5000 or self.xanalyzer.depth_engine > 5
             mens = _("Analyzing the move....")
             me = QTUtil2.mensEspera.start(
-                self.main_window, mens, physical_pos="ad", siCancelar=siCancelar, titCancelar=_("Stop"), siParentNone=True
+                self.main_window,
+                mens,
+                physical_pos="ad",
+                siCancelar=siCancelar,
+                titCancelar=_("Stop"),
+                siParentNone=True,
             )
             self.main_window.setDisabled(True)
             if siCancelar:
@@ -1251,18 +1261,24 @@ class Manager:
 
         # Vista
         menuVista = menu.submenu(_("Show/hide"), Iconos.Vista())
-        menuVista.opcion("vista_pgn", _("PGN information"), Iconos.InformacionPGNUno())
+        menuVista.opcion("vista_pgn", _("PGN information"), siChecked=self.configuration.x_info_activate)
         menuVista.separador()
-        menuVista.opcion("vista_capturas", _("Captured material"), Iconos.Capturas())
+        menuVista.opcion("vista_capturas", _("Captured material"), siChecked=self.configuration.x_captures_activate)
         menuVista.separador()
-        menuVista.opcion("vista_bestmove", _("Arrow with the best move when there is an analysis"), Iconos.Flechas())
+        menuVista.opcion(
+            "vista_bestmove",
+            _("Arrow with the best move when there is an analysis"),
+            siChecked=self.configuration.x_show_bestmove,
+        )
         menu.separador()
 
         # DGT
         dboard = self.configuration.x_digital_board
         if dboard:
             menu.opcion(
-                "dgt", _("Disable %s board") % dboard if DGT.eboard_is_on() else _("Enable %s board") % dboard, Code.DGT.icon_eboard()
+                "dgt",
+                _("Disable %s board") % dboard if DGT.eboard_is_on() else _("Enable %s board") % dboard,
+                Code.DGT.icon_eboard(),
             )
             menu.separador()
 
@@ -1571,7 +1587,9 @@ class Manager:
         elif resp.startswith("vol"):
             accion = resp[3:]
             if accion == "fichero":
-                resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, "png", False)
+                resp = SelectFiles.salvaFichero(
+                    self.main_window, _("File to save"), self.configuration.x_save_folder, "png", False
+                )
                 if resp:
                     self.board.save_as_img(resp, "png")
 
@@ -1688,7 +1706,9 @@ class Manager:
         dato = self.listado("fen")
         if siFichero:
             extension = "fns"
-            resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, extension, False)
+            resp = SelectFiles.salvaFichero(
+                self.main_window, _("File to save"), self.configuration.x_save_folder, extension, False
+            )
             if resp:
                 try:
 
@@ -1985,7 +2005,7 @@ class Manager:
                 self.main_window.pgnColocate(row, is_white)
                 self.put_view()
                 link_variation_pressed("%d|%d|0" % (num_var_move, len(var_move.variations) - 1))
-                self.kibitzers_manager.put_game(game_var)
+                self.kibitzers_manager.put_game(game_var, self.board.is_white_bottom)
         else:
             # si tiene mas movimientos se check si coincide con el siguiente
             if len(variation) > num_var_move + 1:
@@ -2007,7 +2027,7 @@ class Manager:
                 link_variation_pressed(
                     "%s|%d|%d|%d" % (cvariation_move, (num_var_move + 1), len(var_move.variations) - 1, 0)
                 )
-                self.kibitzers_manager.put_game(game_var)
+                self.kibitzers_manager.put_game(game_var, self.board.is_white_bottom)
 
             # si no tiene mas movimientos se añade al final
             else:
@@ -2019,4 +2039,4 @@ class Manager:
                 variation.add_move(new_move)
                 cvariation_move = "|".join([cnum for cnum in self.board.variation_history.split("|")][:-1])
                 link_variation_pressed("%s|%d" % (cvariation_move, (num_var_move + 1)))
-                self.kibitzers_manager.put_game(variation)
+                self.kibitzers_manager.put_game(variation, self.board.is_white_bottom)

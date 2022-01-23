@@ -30,7 +30,7 @@ class WRunCoordinatesBasic(LCDialog.LCDialog):
         self.board.bloqueaRotacion(True)
         self.cp_initial = Position.Position()
         self.cp_initial.set_pos_initial()
-        self.board.ponerPiezasAbajo(self.is_white)
+        self.board.set_side_bottom(self.is_white)
         self.board.set_position(self.cp_initial)
 
         font = Controles.TipoLetra(puntos=26, peso=500)

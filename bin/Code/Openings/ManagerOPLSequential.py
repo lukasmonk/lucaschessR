@@ -136,7 +136,7 @@ class ManagerOpeningLinesSequential(Manager.Manager):
     def game_finished(self, is_complete):
         self.state = ST_ENDGAME
         tm = time.time() - self.ini_time
-        li = [_("Line finished.")]
+        li = [_("Line completed")]
         if self.siAyuda:
             li.append(_("Help activated"))
         if self.errores > 0:

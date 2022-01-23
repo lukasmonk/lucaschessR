@@ -305,7 +305,7 @@ class WUnSTSMap(LCDialog.LCDialog):
 
         siW = cp.is_white
         self.board.set_position(cp)
-        self.board.ponerPiezasAbajo(siW)
+        self.board.set_side_bottom(siW)
         self.board.set_side_indicator(siW)
         self.board.activate_side(siW)
 

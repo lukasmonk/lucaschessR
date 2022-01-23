@@ -108,13 +108,11 @@ class Content(XML.XML):
         element17.add_param("text:display-outline-level", "0")
         element17.add_param("text:name", "Figure")
         element12.add_content(element17)
-        element18 = XML.Element("text:p")
-        element18.add_param("text:style-name", "Standard")
-        element11.add_content(element18)
-
-        self.basic_styles()
 
         self.office_text = self.seek("office:text")
+        self.automatic_styles = self.seek("office:automatic-styles")
+
+        self.basic_styles()
 
         self.pos_png = 0
         self.li_path_png = []
@@ -131,70 +129,41 @@ class Content(XML.XML):
         path_content = os.path.join(folder, "content.xml")
         self.save(path_content)
 
+    def add_style_paragraph(self, name, bold, align=None, fontsize=None):
+        element = XML.Element("style:style")
+        element.add_param("style:name", name)
+        element.add_param("style:family", "paragraph")
+        element.add_param("style:parent-style-name", "Standard")
+
+        fontweight = "bold" if bold else "normal"
+        element1 = XML.Element("style:text-properties")
+        element1.add_param("fo:font-weight", fontweight)
+        element1.add_param("officeooo:rsid", "00036ce6")
+        element1.add_param("officeooo:paragraph-rsid", "00036ce6")
+        element1.add_param("style:font-weight-asian", fontweight)
+        element1.add_param("style:font-weight-complex", fontweight)
+        element.add_content(element1)
+
+        if align:
+            element2 = XML.Element("style:paragraph-properties")
+            element2.add_param("fo:text-align", align)
+            element2.add_param("style:justify-single-word", "false")
+            element.add_content(element2)
+
+        if fontsize:
+            element3 = XML.Element("style:text-properties")
+            element3.add_param("fo:font-size", fontsize)
+            element3.add_param("style:font-size-asian", fontsize)
+            element3.add_param("style:font-size-complex", fontsize)
+            element.add_content(element3)
+
+        self.automatic_styles.add_content(element)
+
     def basic_styles(self):
-        automatic_styles = self.seek("office:automatic-styles")
-
-        # Paragraph centered
-        element1 = XML.Element("style:style")
-        element1.add_param("style:name", "PARA_CENTERED")
-        element1.add_param("style:family", "paragraph")
-        element1.add_param("style:parent-style-name", "Standard")
-        element2 = XML.Element("style:paragraph-properties")
-        element2.add_param("fo:text-align", "center")
-        element2.add_param("style:justify-single-word", "false")
-        element1.add_content(element2)
-        element3 = XML.Element("style:text-properties")
-        element3.add_param("fo:font-weight", "normal")
-        element3.add_param("officeooo:rsid", "00036ce6")
-        element3.add_param("officeooo:paragraph-rsid", "00036ce6")
-        element3.add_param("style:font-weight-asian", "normal")
-        element3.add_param("style:font-weight-complex", "normal")
-        element1.add_content(element3)
-        automatic_styles.add_content(element1)
-
-        # Paragraph bold
-        element1 = XML.Element("style:style")
-        element1.add_param("style:name", "PARA_BOLD")
-        element1.add_param("style:family", "paragraph")
-        element1.add_param("style:parent-style-name", "Standard")
-        element2 = XML.Element("style:text-properties")
-        element2.add_param("fo:font-weight", "bold")
-        element2.add_param("officeooo:rsid", "00036ce6")
-        element2.add_param("officeooo:paragraph-rsid", "00036ce6")
-        element2.add_param("style:font-weight-asian", "bold")
-        element2.add_param("style:font-weight-complex", "bold")
-        element1.add_content(element2)
-        automatic_styles.add_content(element1)
-
-        # Paragraph bold centered
-        element1 = XML.Element("style:style")
-        element1.add_param("style:name", "PARA_BOLD_CENTERED")
-        element1.add_param("style:family", "paragraph")
-        element1.add_param("style:parent-style-name", "Standard")
-        element2 = XML.Element("style:paragraph-properties")
-        element2.add_param("fo:text-align", "center")
-        element2.add_param("style:justify-single-word", "false")
-        element1.add_content(element2)
-        element3 = XML.Element("style:text-properties")
-        element3.add_param("fo:font-weight", "bold")
-        element3.add_param("officeooo:rsid", "00036ce6")
-        element3.add_param("officeooo:paragraph-rsid", "00036ce6")
-        element3.add_param("style:font-weight-asian", "bold")
-        element3.add_param("style:font-weight-complex", "bold")
-        element1.add_content(element3)
-        automatic_styles.add_content(element1)
-
-        # Paragraph 8 pt
-        element1 = XML.Element("style:style")
-        element1.add_param("style:name", "PARA_8")
-        element1.add_param("style:family", "paragraph")
-        element1.add_param("style:parent-style-name", "Standard")
-        element2 = XML.Element("style:text-properties")
-        element2.add_param("fo:font-size", "8pt")
-        element2.add_param("style:font-size-asian", "8pt")
-        element2.add_param("style:font-size-complex", "8pt")
-        element1.add_content(element2)
-        automatic_styles.add_content(element1)
+        self.add_style_paragraph("PARA_CENTERED", False, "center")
+        self.add_style_paragraph("PARA_BOLD", True)
+        self.add_style_paragraph("PARA_BOLD_CENTERED", True, "center")
+        self.add_style_paragraph("PARA_8", False, fontsize="8pt")
 
         # Page break
         element1 = XML.Element("style:style")
@@ -204,7 +173,7 @@ class Content(XML.XML):
         element2 = XML.Element("style:paragraph-properties")
         element2.add_param("fo:text-align", "start")
         element2.add_param("style:justify-single-word", "false")
-        element2.add_param("fo:break-before", "page")
+        element2.add_param("fo:break-after", "page")
         element1.add_content(element2)
         element3 = XML.Element("style:text-properties")
         element3.add_param("fo:font-weight", "normal")
@@ -213,7 +182,7 @@ class Content(XML.XML):
         element3.add_param("style:font-weight-asian", "normal")
         element3.add_param("style:font-weight-complex", "normal")
         element1.add_content(element3)
-        automatic_styles.add_content(element1)
+        self.automatic_styles.add_content(element1)
 
         # Graphics
         element1 = XML.Element("style:style")
@@ -237,7 +206,11 @@ class Content(XML.XML):
         element2.add_param("draw:image-opacity", "100%")
         element2.add_param("draw:color-mode", "standard")
         element1.add_content(element2)
-        automatic_styles.add_content(element1)
+        self.automatic_styles.add_content(element1)
+
+    def table_styles(self):
+        pass
+
 
     def writeln(self, txt, bold, centered):
         if bold:

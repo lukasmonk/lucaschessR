@@ -271,7 +271,7 @@ class ManagerCompeticion(Manager.Manager):
         else:
             self.human_is_playing = True
             self.activate_side(is_white)
-            self.analizaInicio()
+            self.analyze_begin()
 
     def muestra_resultado(self):
         self.state = ST_ENDGAME
@@ -305,7 +305,7 @@ class ManagerCompeticion(Manager.Manager):
         self.ponFinJuego()
         self.autosave()
 
-    def analizaInicio(self):
+    def analyze_begin(self):
         self.siAnalizando = False
         self.is_analyzed_by_tutor = False
         if self.is_tutor_enabled:
@@ -317,7 +317,7 @@ class ManagerCompeticion(Manager.Manager):
                 else:
                     self.xtutor.ac_inicio_limit(self.game)
 
-    def analizaFinal(self):
+    def analyze_end(self):
         if self.siAnalizando:
             self.mrmTutor = self.xtutor.ac_final(-1)
             self.is_analyzed_by_tutor = True
@@ -328,16 +328,16 @@ class ManagerCompeticion(Manager.Manager):
         self.is_tutor_enabled = not previous
         self.set_activate_tutor(self.is_tutor_enabled)
         if previous:
-            self.analizaFinal()
+            self.analyze_end()
         elif self.human_is_playing:
-            self.analizaInicio()
+            self.analyze_begin()
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
         move = self.check_human_move(from_sq, to_sq, promotion)
         if not move:
             return False
         movimiento = move.movimiento()
-        self.analizaFinal()
+        self.analyze_end()
 
         siMirarTutor = self.is_tutor_enabled
         if self.in_the_opening:

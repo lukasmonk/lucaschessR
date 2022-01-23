@@ -21,7 +21,6 @@ Dependencies
 
 * Python 3.7
 * PySide2
-* PyAudio
 * psutil
 * Python for windows extensions
 * chardet
@@ -30,6 +29,7 @@ Dependencies
 * photohash
 * cython
 * sortedcontainers
+* polib
 
 
 Links
@@ -37,6 +37,7 @@ Links
 
 * Web: [https://lucaschess.pythonanywhere.com/](https://lucaschess.pythonanywhere.com/).
 * Blog: [https://lucaschess.blogspot.com.es/](https://lucaschess.blogspot.com.es/).
+* Wiki: [https://chessionate.com/lucaswiki](https://chessionate.com/lucaswiki/).
 
 
 Legal Details

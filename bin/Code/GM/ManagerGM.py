@@ -155,7 +155,7 @@ class ManagerGM(Manager.Manager):
             self.game.set_position()
             self.start(self.record)
 
-    def analizaInicio(self):
+    def analyze_begin(self):
         if not self.is_finished():
             if self.continueTt:
                 self.xtutor.ac_inicio(self.game)
@@ -163,16 +163,16 @@ class ManagerGM(Manager.Manager):
                 self.xtutor.ac_inicio_limit(self.game)
             self.siAnalizando = True
 
-    def analizaEstado(self):
+    def analyze_state(self):
         self.xtutor.engine.ac_lee()
         self.mrm = copy.deepcopy(self.xtutor.ac_estado())
         return self.mrm
 
-    def analizaMinimo(self, minTime):
+    def analyze_minimum(self, minTime):
         self.mrm = copy.deepcopy(self.xtutor.ac_minimo(minTime, False))
         return self.mrm
 
-    def analizaFinal(self):
+    def analyze_end(self):
         if self.siAnalizando:
             self.siAnalizando = False
             if self.continueTt:
@@ -181,7 +181,7 @@ class ManagerGM(Manager.Manager):
                 self.mrmTutor = self.xtutor.ac_final_limit()
 
     def play_next_move(self):
-        self.analizaFinal()
+        self.analyze_end()
         self.disable_all()
 
         if self.state == ST_ENDGAME:
@@ -278,7 +278,7 @@ class ManagerGM(Manager.Manager):
             self.human_is_playing = True
             if self.with_adjudicator:
                 self.thinking(True)
-                self.analizaInicio()
+                self.analyze_begin()
                 self.thinking(False)
             self.activate_side(is_white)
 
@@ -324,23 +324,23 @@ class ManagerGM(Manager.Manager):
 
         if siAnalizaJuez:
             um = QTUtil2.analizando(self.main_window)
-            mrm = self.analizaMinimo(self.vtime * 100)
+            mrm = self.analyze_minimum(self.vtime * 100)
 
             rmUsu, nada = mrm.buscaRM(jgUsu.movimiento())
             if rmUsu is None:
                 um = QTUtil2.analizando(self.main_window)
-                self.analizaFinal()
+                self.analyze_end()
                 rmUsu = self.xtutor.valora(position, from_sq, to_sq, promotion)
                 mrm.agregaRM(rmUsu)
-                self.analizaInicio()
+                self.analyze_begin()
                 um.final()
 
             rmGM, pos_gm = mrm.buscaRM(jgGM.movimiento())
             if rmGM is None:
-                self.analizaFinal()
+                self.analyze_end()
                 rmGM = self.xtutor.valora(position, desdeGM, hastaGM, promotionGM)
                 pos_gm = mrm.agregaRM(rmGM)
-                self.analizaInicio()
+                self.analyze_begin()
 
             um.final()
 
@@ -372,7 +372,7 @@ class ManagerGM(Manager.Manager):
             if not isValid:
                 jgGM.comment = (comentario0 + comentario1 + comentario2).replace("<b>", "").replace("</b>", "").replace("<br>", "\n")
 
-        self.analizaFinal()
+        self.analyze_end()
 
         self.move_the_pieces(jgGM.liMovs)
 
@@ -382,10 +382,10 @@ class ManagerGM(Manager.Manager):
         self.play_next_move()
         return True
 
-    def analizaPosicion(self, row, key):
+    def analize_position(self, row, key):
         if self.state != ST_ENDGAME:
             return
-        Manager.Manager.analizaPosicion(self, row, key)
+        Manager.Manager.analize_position(self, row, key)
 
     def play_rival(self, move):
         from_sq = move[:2]

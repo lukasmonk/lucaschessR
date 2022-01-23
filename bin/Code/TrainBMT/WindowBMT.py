@@ -225,7 +225,7 @@ class WBMT(LCDialog.LCDialog):
         menu1 = menu.submenu(_("Import") + "/" + _("Export"), Iconos.PuntoMagenta())
         menu1.opcion("exportar", _("Export the current training"), Iconos.PuntoVerde())
         menu1.separador()
-        menu1.opcion("exportarLimpio", _("Export Current training with no history"), Iconos.PuntoAzul())
+        menu1.opcion("exportarLimpio", _("Export current training with no history"), Iconos.PuntoAzul())
         menu1.separador()
         menu1.opcion("importar", _("Import a training"), Iconos.PuntoNaranja())
 
@@ -240,7 +240,7 @@ class WBMT(LCDialog.LCDialog):
         menu2.opcion("rehacer", _("Analyze again"), Iconos.PuntoAmarillo())
 
         menu.separador()
-        menu.opcion("odt", "%s: %s (*.odf)" % (_("Export to"), _("Open Document File")), Iconos.ODT())
+        menu.opcion("odt", "%s: %s (*.odf)" % (_("Export to"), _("Open Document Format")), Iconos.ODT())
 
         resp = menu.lanza()
         if resp:
@@ -287,7 +287,7 @@ class WBMT(LCDialog.LCDialog):
             total = dic["TOTAL"]
             if current_pos == -1:
                 wodt.create_document(
-                    "%s - %s: %s" % (_("Lucas Chess"), _("Best Move Training"), dbf.NOMBRE), True
+                    "%s - %s: %s" % (_("Lucas Chess"), _("Find best move"), dbf.NOMBRE), True
                 )
                 current_pos += 1
             else:
@@ -299,16 +299,15 @@ class WBMT(LCDialog.LCDialog):
             position = Position.Position()
             position.read_fen(bmt_uno.fen)
             board.set_position(position)
-            board.ponerPiezasAbajo(position.is_white)
+            board.set_side_bottom(position.is_white)
 
             wodt.odt_doc.add_paragraph("%s %d" % (_("Position"), current_pos + 1), bold=True)
             wodt.odt_doc.add_linebreak()
-            wodt.odt_doc.add_linebreak()
             path_img = self.configuration.ficheroTemporal("png")
             board.save_as_img(path_img, "png", False, True)
-            wodt.odt_doc.add_png(path_img, 12.0)
-            wodt.odt_doc.add_paragraph8(bmt_uno.fen)
+            wodt.odt_doc.add_png(path_img, 13.4)
             wodt.odt_doc.add_pagebreak()
+            wodt.odt_doc.add_paragraph8("FEN: " + bmt_uno.fen)
             mrm = bmt_uno.mrm
             best_score = 0
 
@@ -359,7 +358,7 @@ class WBMT(LCDialog.LCDialog):
                 wodt.odt_doc.add_linebreak()
                 wodt.odt_doc.add_linebreak()
 
-                tag_txt = _("Actual game: ")
+                tag_txt = _("Actual game") + ": "
                 if "White" in di_tags and "Black" in di_tags:
                     tag_txt += "%s vs %s" % (di_tags["White"], di_tags["Black"])
                 if "Date" in di_tags:

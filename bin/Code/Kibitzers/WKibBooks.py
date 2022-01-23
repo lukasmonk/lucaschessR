@@ -105,3 +105,4 @@ class WPolyglot(WKibCommon.WKibCommon):
             self.grid.gotop()
             self.grid.refresh()
             self.ponFlecha(0)
+

@@ -250,7 +250,7 @@ class Procesador:
         self.siPresentacion = siEmpezar
         if not siEmpezar:
             self.cpu.stop()
-            self.board.ponerPiezasAbajo(True)
+            self.board.set_side_bottom(True)
             self.board.activaMenuVisual(True)
             self.board.set_position(self.posicionInicial)
             self.board.setToolTip("")
@@ -491,7 +491,7 @@ class Procesador:
                 minMinutos=1,
                 minSegundos=0,
                 maxMinutos=999,
-                maxSegundos=999,
+                max_seconds=999,
                 default_minutes=default_minutes,
                 default_seconds=default_seconds,
             )
@@ -982,7 +982,7 @@ class Procesador:
             texto = texto.strip()
             if not texto.startswith("["):
                 texto = '[Event "%s"]\n\n %s' % (_("Paste PGN"), texto)
-            with open(path, "wt") as q:
+            with open(path, "wt", encoding="utf-8", errors="ignore") as q:
                 q.write(texto)
             self.read_pgn(path)
 
@@ -1048,10 +1048,10 @@ class Procesador:
         self.manager = ManagerSolo.ManagerSolo(self)
         self.manager.start()
 
-    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump):
+    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, with_tutor, jump, advanced):
         self.manager = ManagerEntPos.ManagerEntPos(self)
         self.manager.set_training(entreno)
-        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump)
+        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, with_tutor, jump, advanced)
 
     def playRoute(self, route):
         if route.state == Routes.BETWEEN:

@@ -982,6 +982,21 @@ class Game:
         fen_inicial = self.first_position.fen()
         self.set_tag("FEN", fen_inicial)
 
+    def average_mstime_user(self, num):
+        # solo se pregunta cuando le toca jugar al usuario
+        is_white = self.last_position.is_white
+        li = [move.time_ms for move in self.li_moves if move.is_white() == is_white and move.time_ms > 0]
+        if len(li) > 0:
+            li = li[-num:]
+            return sum(li)/len(li)
+        else:
+            return 0
+
+
+
+
+
+
 
 def pv_san(fen, pv):
     p = Game(fen=fen)

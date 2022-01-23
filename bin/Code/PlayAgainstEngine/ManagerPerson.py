@@ -79,17 +79,17 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
 
         self.xrival.is_white = self.is_engine_side_white
 
-        self.siTiempo = dic_var["SITIEMPO"]
-        if self.siTiempo:
-            self.maxSegundos = dic_var["MINUTOS"] * 60.0
-            self.segundosJugada = dic_var["SEGUNDOS"]
+        self.timed = dic_var["SITIEMPO"]
+        if self.timed:
+            self.max_seconds = dic_var["MINUTOS"] * 60.0
+            self.seconds_per_move = dic_var["SEGUNDOS"]
             self.secs_extra = dic_var.get("MINEXTRA", 0) * 60.0
 
-            self.vtime = {WHITE: Util.Timer(self.maxSegundos), BLACK: Util.Timer(self.maxSegundos)}
+            self.vtime = {WHITE: Util.Timer(self.max_seconds), BLACK: Util.Timer(self.max_seconds)}
 
-            time_control = "%d" % int(self.maxSegundos)
-            if self.segundosJugada:
-                time_control += "+%d" % self.segundosJugada
+            time_control = "%d" % int(self.max_seconds)
+            if self.seconds_per_move:
+                time_control += "+%d" % self.seconds_per_move
             self.game.set_tag("TimeControl", time_control)
 
         self.thinking(False)
@@ -97,7 +97,7 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         li = [TB_CANCEL, TB_RESIGN, TB_TAKEBACK, TB_REINIT, TB_ADJOURN, TB_PAUSE, TB_CONFIG, TB_UTILITIES]
         self.main_window.pon_toolbar(li)
 
-        self.main_window.activaJuego(True, self.siTiempo)
+        self.main_window.activaJuego(True, self.timed)
 
         self.set_dispatcher(self.player_has_moved)
         self.set_position(self.game.last_position)
@@ -119,12 +119,12 @@ class ManagerPerson(ManagerPlayAgainstEngine.ManagerPlayAgainstEngine):
         bl, ng = player, rival
         if self.is_engine_side_white:
             bl, ng = ng, bl
-        if self.siTiempo:
+        if self.timed:
             tpBL = self.vtime[True].etiqueta()
             tpNG = self.vtime[False].etiqueta()
             self.main_window.ponDatosReloj(bl, tpBL, ng, tpNG)
             self.refresh()
-            self.main_window.start_clock(self.set_clock, 400)
+            self.main_window.start_clock(self.set_clock, 1000)
         else:
             self.main_window.base.change_player_labels(bl, ng)
 

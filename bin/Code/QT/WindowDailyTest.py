@@ -389,7 +389,7 @@ class WDailyTest(LCDialog.LCDialog):
     def sigueHumano(self):
         siW = self.position.is_white
         self.board.set_position(self.position)
-        self.board.ponerPiezasAbajo(siW)
+        self.board.set_side_bottom(siW)
         self.board.set_side_indicator(siW)
         self.board.activate_side(siW)
 

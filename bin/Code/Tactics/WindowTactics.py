@@ -323,6 +323,9 @@ class WConfTactics(QtWidgets.QWidget):
         )
         gb_reinforcement = Controles.GB(self, _("Reinforcement"), ly).ponFuente(f)
 
+        self.chb_advanced = Controles.CHB(self, _("Advanced mode"), False).ponFuente(f)
+        ly_gb_adv = Colocacion.H().control(gb_reinforcement).espacio(20).control(self.chb_advanced)
+
         # Files
         if reg_historico:
             self.liFILES = reg_historico["FILESW"][:]
@@ -359,7 +362,7 @@ class WConfTactics(QtWidgets.QWidget):
         ly.controld(gb_repeat, 4, 0)
         ly.control(gbShow, 4, 1)
         ly.filaVacia(5, 5)
-        ly.control(gb_reinforcement, 6, 0, 1, 2)
+        ly.otro(ly_gb_adv, 6, 0, 1, 2)
         ly.filaVacia(6, 5)
         ly.control(gb_files, 7, 0, 1, 2)
 
@@ -461,6 +464,7 @@ class WConfTactics(QtWidgets.QWidget):
         tactica.filesw = self.liFILES
         tactica.reinforcement_errors = self.cb_reinf_errors.valor()
         tactica.reinforcement_cycles = self.sb_reinf_cycles.valor()
+        tactica.advanced = self.chb_advanced.valor()
         return tactica
 
     def jumps_add(self):
@@ -642,6 +646,7 @@ def edit1tactica(owner, tactica, ncopia):
         tactica.repeat = tresp.repeat
         tactica.penalization = tresp.penalization
         tactica.showtext = tresp.showtext
+        tactica.advanced = tresp.advanced
 
         return True
     else:

@@ -142,7 +142,11 @@ class Board(QtWidgets.QGraphicsView):
                 QTUtil.ponPortapapeles(self.last_position.fen())
                 QTUtil2.message_bold(self, _("FEN is in clipboard"))
 
-            if is_ctrl and (key in (Qt.Key_Plus, Qt.Key_Minus)):
+            # ALT-B : Menu visual
+            elif is_alt and key == Qt.Key_B:
+                self.lanzaMenuVisual()
+
+            elif is_ctrl and (key in (Qt.Key_Plus, Qt.Key_Minus)):
                 ap = self.config_board.anchoPieza()
                 ap += 2 * (1 if key == Qt.Key_Plus else -1)
                 if ap >= 10:
@@ -152,7 +156,7 @@ class Board(QtWidgets.QGraphicsView):
                     return
 
             # ALT-F -> Rota board
-            if key == Qt.Key_F:
+            elif is_alt and key == Qt.Key_F:
                 self.intentaRotarBoard(None)
 
             # ALT-I Save image to clipboard (CTRL->no border)
@@ -700,8 +704,12 @@ class Board(QtWidgets.QGraphicsView):
 
     def showKeys(self):
         liKeys = [
+            (_("ALT") + " B", _("Board menu")),
+            (None, None),
             (_("ALT") + " F", _("Flip the board")),
+            (None, None),
             (_("CTRL") + " C", _("Copy FEN to clipboard")),
+            (None, None),
             (_("ALT") + " I", _("Copy board as image to clipboard")),
             (_("CTRL") + " I", _("Copy board as image to clipboard") + " (%s)" % _("without border")),
             (
@@ -723,6 +731,7 @@ class Board(QtWidgets.QGraphicsView):
             if hasattr(self.main_window.manager, "gridRightMouse"):
                 liKeys.append((None, None))
                 liKeys.append((_("ALT") + "-P", _("Show/Hide PGN information")))
+            liKeys.append((None, None))
             liKeys.append((_("ALT") + "-N", _("Activate/Deactivate non distract mode")))
 
             if hasattr(self.main_window.manager, "listHelpTeclado"):
@@ -1902,7 +1911,7 @@ class Board(QtWidgets.QGraphicsView):
         self.liFlechas = []
         self.update()
 
-    def ponerPiezasAbajo(self, is_white_bottom):
+    def set_side_bottom(self, is_white_bottom):
         if self.is_white_bottom == is_white_bottom:
             return
         self.is_white_bottom = is_white_bottom
@@ -2099,7 +2108,7 @@ class Board(QtWidgets.QGraphicsView):
             self.rotaBoard()
 
     def rotaBoard(self):
-        self.ponerPiezasAbajo(not self.is_white_bottom)
+        self.set_side_bottom(not self.is_white_bottom)
         if self.flechaSC:
             # self.put_arrow_sc( self.ultMovFlecha[0], self.ultMovFlecha[1])
             self.resetFlechaSC()

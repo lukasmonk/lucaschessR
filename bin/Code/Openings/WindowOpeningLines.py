@@ -216,7 +216,7 @@ class WOpeningLines(LCDialog.LCDialog):
     def new(self):
         si_expl = len(self.listaOpenings) < 4
         if si_expl:
-            QTUtil2.message_bold(self, _("In the next dialog box, play the moves for your opening."))
+            QTUtil2.message_bold(self, _("In the next dialog box, play the initial fixed moves for your opening."))
         w = WindowOpenings.WOpenings(self, self.configuration, None)
         if w.exec_():
             ap = w.resultado()

@@ -268,7 +268,7 @@ class WMemoria(LCDialog.LCDialog):
         self.rotuloDispone1.show()
         self.gbTiempo.show()
 
-        self.tiempoPendiente = self.seconds
+        self.pending_time = self.seconds
         self.start_clock()
 
     def seguir(self):
@@ -363,12 +363,12 @@ class WMemoria(LCDialog.LCDialog):
         self.empezar()
 
     def reloj(self):
-        self.tiempoPendiente -= 1
+        self.pending_time -= 1
 
         self.rotuloDispone.set_text(
-            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.tiempoPendiente), str(self.nivel + 3))
+            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.pending_time), str(self.nivel + 3))
         )
-        if self.tiempoPendiente == 0:
+        if self.pending_time == 0:
             self.seguir()
 
     def start_clock(self):

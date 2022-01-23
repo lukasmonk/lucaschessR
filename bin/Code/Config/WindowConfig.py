@@ -274,6 +274,13 @@ def options(parent, configuration):
             qt_iconstb,
         ) = li_asp1
 
+        form.spinbox(_("Width"), 283, 1000, 70, configuration.x_pgn_width)
+        form.spinbox(_("Height of each row"), 18, 99, 70, configuration.x_pgn_rowheight)
+        form.spinbox(_("Font size"), 3, 99, 70, configuration.x_pgn_fontpoints)
+        form.checkbox(_("PGN always in English"), configuration.x_pgn_english)
+        form.checkbox(_("PGN with figurines"), configuration.x_pgn_withfigurines)
+        form.separador()
+
         por_defecto = li_asp2[0]
         if por_defecto:
             li_asp2 = (348, 24, 10, False, True, True, False, True, 10, True)

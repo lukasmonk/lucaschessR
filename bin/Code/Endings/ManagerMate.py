@@ -501,7 +501,7 @@ class ManagerMate(Manager.Manager):
         self.activate_side(cp.is_white)
         self.human_side = cp.is_white
         self.board.remove_arrows()
-        self.board.ponerPiezasAbajo(cp.is_white)
+        self.board.set_side_bottom(cp.is_white)
         self.game = Game.Game(cp)
         li = [TB_CLOSE]
         if self.mate > 1:
@@ -568,7 +568,7 @@ class ManagerMate(Manager.Manager):
             return
         self.activate_side(self.human_side)  # Caso en que hay promotion, sino no se activa la dama
 
-    def analizaPosicion(self, row, key):
+    def analize_position(self, row, key):
         # Doble click lanza el bloque
         if self.state == ST_PLAYING:
             self.finJuego()

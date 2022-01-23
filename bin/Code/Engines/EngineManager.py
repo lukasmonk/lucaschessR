@@ -1,10 +1,11 @@
 import os
+import random
 
 import FasterCode
 
 import Code
-from Code.Engines import Priorities, EngineResponse, EngineRunDirect, EngineRun
 from Code.Base.Constantes import ADJUST_SELECTED_BY_PLAYER
+from Code.Engines import Priorities, EngineResponse, EngineRunDirect, EngineRun
 from Code.SQL import UtilSQL
 
 
@@ -131,7 +132,14 @@ class EngineManager:
 
         if maia_level:
             self.engine = EngineRun.MaiaEngine(
-                self.name, exe, liUCI, self.num_multipv, priority=self.priority, args=args, log=self.ficheroLog, level=maia_level
+                self.name,
+                exe,
+                liUCI,
+                self.num_multipv,
+                priority=self.priority,
+                args=args,
+                log=self.ficheroLog,
+                level=maia_level,
             )
         elif self.direct:
             self.engine = EngineRunDirect.DirectEngine(
@@ -296,19 +304,35 @@ class EngineManager:
     def analysis_cached_end(self):
         self.cache_analysis.close()
 
-    def analizaJugadaPartida(self, game, njg, vtime, depth=0, brDepth=5, brPuntos=50, stability=False, st_centipawns=0, st_depths=0, st_timelimit=0):
+    def analizaJugadaPartida(
+        self,
+        game,
+        njg,
+        vtime,
+        depth=0,
+        brDepth=5,
+        brPuntos=50,
+        stability=False,
+        st_centipawns=0,
+        st_depths=0,
+        st_timelimit=0,
+    ):
         self.check_engine()
         if self.cache_analysis is not None:
             move = game.move(njg)
             key = move.position_before.fenm2() + move.movimiento()
             if key in self.cache_analysis:
                 return self.cache_analysis[key]
-        resp = self.analizaJugadaPartidaRaw(game, njg, vtime, depth, brDepth, brPuntos, stability, st_centipawns, st_depths, st_timelimit)
+        resp = self.analizaJugadaPartidaRaw(
+            game, njg, vtime, depth, brDepth, brPuntos, stability, st_centipawns, st_depths, st_timelimit
+        )
         if self.cache_analysis is not None:
             self.cache_analysis[key] = resp
         return resp
 
-    def analizaJugadaPartidaRaw(self, game, njg, vtime, depth, brDepth, brPuntos, stability, st_centipawns, st_depths, st_timelimit):
+    def analizaJugadaPartidaRaw(
+        self, game, njg, vtime, depth, brDepth, brPuntos, stability, st_centipawns, st_depths, st_timelimit
+    ):
         self.check_engine()
         if stability:
             mrm = self.engine.analysis_stable(game, njg, vtime, depth, True, st_centipawns, st_depths, st_timelimit)
@@ -415,7 +439,9 @@ class EngineManager:
         mrm.ordena()
         return mrm.mejorMov()
 
-    def play_time_routine(self, game, routine_return, seconds_white, seconds_black, seconds_move, nAjustado=0):
+    def play_time_routine(
+        self, game, routine_return, seconds_white, seconds_black, seconds_move, nAjustado=0, humanize=False
+    ):
         self.check_engine()
 
         def play_return(mrm):
@@ -436,11 +462,58 @@ class EngineManager:
                 resp = None
             routine_return(resp)
 
+        if humanize:
+            if self.mstime_engine or self.depth_engine:
+                seconds_white, seconds_black, seconds_move = 15.0*60, 15.0*60, 6
+            self.humanize(game, seconds_white, seconds_black, seconds_move)
+        else:
+            self.engine.not_humanize()
+
         if self.mstime_engine or self.depth_engine:
             self.engine.play_bestmove_game(play_return, game, self.mstime_engine, self.depth_engine)
-
         else:
-            self.engine.play_bestmove_time(play_return, game, seconds_white * 1000, seconds_black * 1000, seconds_move * 1000)
+            self.engine.play_bestmove_time(
+                play_return, game, seconds_white * 1000, seconds_black * 1000, seconds_move * 1000
+            )
+
+    def humanize(self, game, seconds_white, seconds_black, seconds_move):
+        # Hay que tener en cuenta
+        # Si estamos enla apertura -> mas rápido
+        # Si hay muchas opciones -> mas lento
+        # Si hay pocas piezas
+        # Si son las primeras 20 jugadas, el procentaje aumenta de 1 a 100
+        # para el resto
+        movestogo = 40
+        last_position = game.last_position
+        if last_position.is_white:
+            movetime = seconds_white + movestogo * seconds_move
+        else:
+            movetime = seconds_black + movestogo * seconds_move
+        movetime = movetime * 9 / (movestogo * 10)
+
+        porc = 100.0
+        if last_position.num_moves < 40:
+            porc = 10.0 + last_position.num_moves*90.0/30.0
+
+        nmoves = min(20, len(last_position.get_exmoves()))
+        if nmoves == 1:
+            self.engine.not_humanize()
+            return
+        x = 70.0 + nmoves * 30.0 / 20.0
+        porc *= x/100.0
+
+        x = 80.0 + random.randint(1, 40)
+        porc *= x/100.0
+
+        movetime *= porc/100.0
+
+        movetime = max(random.randint(1, 4), movetime)
+
+        average_previous_user = game.average_mstime_user(5)
+        if average_previous_user:
+            movetime = max(min(0.8*average_previous_user/1000, 60), movetime) # max 1 minute
+
+        self.engine.set_humanize(movetime)
 
     def log_open(self):
         if self.ficheroLog:

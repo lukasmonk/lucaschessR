@@ -491,20 +491,21 @@ class ManagerSolo(Manager.Manager):
         mt = _X(_("Disable %1"), mt) if self.play_against_engine else _X(_("Enable %1"), mt)
         sep = (None, None, None)
 
+        ctrl = _("CTRL") + " "
         liMasOpciones = (
             (None, _("Change the starting position"), Iconos.PGN()),
             sep,
-            ("position", _("Board editor") + " [S]", Iconos.Datos()),
+            ("position", _("Board editor") + " [%sS]"%ctrl, Iconos.Datos()),
             sep,
-            ("initial", _("Basic position") + " [B]", Iconos.Board()),
+            ("initial", _("Basic position") + " [%sB]"%ctrl, Iconos.Board()),
             sep,
             ("opening", _("Opening"), Iconos.Opening()),
             sep,
-            ("pasteposicion", _("Paste FEN position") + " [V]", Iconos.Pegar16()),
+            ("pasteposicion", _("Paste FEN position") + " [%sV]"%ctrl, Iconos.Pegar16()),
             sep,
             ("leerpgn", _("Read PGN file"), Iconos.PGN_Importar()),
             sep,
-            ("pastepgn", _("Paste PGN") + " [V]", Iconos.Pegar16()),
+            ("pastepgn", _("Paste PGN") + " [%sV]"%ctrl, Iconos.Pegar16()),
             sep,
             ("voyager", _("Voyager 2"), Iconos.Voyager()),
             (None, None, True),
@@ -610,24 +611,25 @@ class ManagerSolo(Manager.Manager):
         self.reiniciar()
 
     def control_teclado(self, nkey, modifiers):
-        if nkey == ord("V"):
-            self.paste(QTUtil.traePortapapeles())
-        elif nkey == ord("T"):
-            li = [self.game.first_position.fen(), "", self.game.pgnBaseRAW()]
-            self.saveSelectedPosition("|".join(li))
-        elif nkey == ord("S"):
-            self.startPosition()
-        elif nkey == ord("B") and modifiers is not None:
-            is_control = (modifiers & QtCore.Qt.ControlModifier) > 0
-            if is_control:
-                self.basic_initial_position()
+        if (modifiers & QtCore.Qt.ControlModifier) > 0:
+            if nkey == ord("V"):
+                self.paste(QTUtil.traePortapapeles())
+            elif nkey == ord("T"):
+                li = [self.game.first_position.fen(), "", self.game.pgnBaseRAW()]
+                self.saveSelectedPosition("|".join(li))
+            elif nkey == ord("S"):
+                self.startPosition()
+            elif nkey == ord("B"):
+                is_control = (modifiers & QtCore.Qt.ControlModifier) > 0
+                if is_control:
+                    self.basic_initial_position()
 
     def listHelpTeclado(self):
         return [
-            ("V", _("Paste position")),
-            ("T", _("Save position in 'Selected positions' file")),
-            ("S", _("Board editor")),
-            ("B", _("Basic position")),
+            (_("CTRL") + " V", _("Paste position")),
+            (_("CTRL") + " T", _("Save position in 'Selected positions' file")),
+            (_("CTRL") + " S", _("Board editor")),
+            (_("CTRL") + " B", _("Basic position")),
         ]
 
     def startPosition(self):

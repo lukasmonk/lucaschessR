@@ -129,7 +129,7 @@ class WGames(QtWidgets.QWidget):
         submenu = menu.submenu(_("Learn a game"), Iconos.School())
         submenu.opcion(self.tw_memorize, _("Memorizing their moves"), Iconos.LearnGame())
         submenu.separador()
-        submenu.opcion(self.tw_play_against, _("Play against"), Iconos.Law())
+        submenu.opcion(self.tw_play_against, _("Playing against"), Iconos.Law())
         menu.separador()
         menu.opcion(self.tw_play_against, _("Play against a game"), Iconos.Law())
         menu.separador()
@@ -872,7 +872,7 @@ class WGames(QtWidgets.QWidget):
             name, player, selected, side, result = li_gen
 
             if not name:
-                QTUtil2.message_error(self, _("Name is missing"))
+                QTUtil2.message_error(self, _("Name missing"))
                 continue
 
             name = Util.valid_filename(name)

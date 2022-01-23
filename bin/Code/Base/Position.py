@@ -100,8 +100,8 @@ class Position:
     def set_lce(self):
         return FasterCode.set_fen(self.fen())
 
-    @staticmethod
-    def get_exmoves():
+    def get_exmoves(self):
+        self.set_lce()
         return FasterCode.get_exmoves()
 
     def fenBase(self):

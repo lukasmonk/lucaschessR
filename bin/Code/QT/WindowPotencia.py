@@ -570,7 +570,7 @@ class WPotencia(LCDialog.LCDialog):
 
         self.board = Board.BoardEstatico(self, config_board)
         self.board.crea()
-        self.board.ponerPiezasAbajo(cp.is_white)
+        self.board.set_side_bottom(cp.is_white)
         self.board.set_position(cp)
 
         # Rotulo informacion
