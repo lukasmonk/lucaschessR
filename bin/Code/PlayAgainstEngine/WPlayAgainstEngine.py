@@ -164,7 +164,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
                 self, "%s: %s" % (_("Activate e-board"), self.configuration.x_digital_board), DGT.eboard_is_on()
             ).ponFuente(Controles.TipoLetra(puntos=14))
             ly.control(self.chb_dgt)
-        self.chb_humanize = Controles.CHB(self, _("Humanizing the time it takes for the engine to respond"), False).ponFuente(Controles.TipoLetra(puntos=14))
+        self.chb_humanize = Controles.CHB(self, _("To humanize the time it takes for the engine to respond"), False).ponFuente(Controles.TipoLetra(puntos=14))
         ly.control(self.chb_humanize)
 
         nueva_tab(ly, _("Basic configuration"))
@@ -197,7 +197,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         for i in range(1, 5):
             liThinks.append(("%d %s" % (i, _("ply") if i == 1 else _("plies")), i))
         liThinks.append((_("All"), 9999))
-        lbThoughtTt = Controles.LB(self, _("It is showed") + ":").ponFuente(font)
+        lbThoughtTt = Controles.LB(self, _("Show") + ":").ponFuente(font)
         self.cbThoughtTt = Controles.CB(self, liThinks, -1).ponFuente(font)
 
         lbArrows = Controles.LB2P(self, _("Arrows with the best moves")).ponFuente(font)
@@ -214,7 +214,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         self.gbTutor.setCheckable(True)
         self.gbTutor.setStyleSheet(gb_style)
 
-        lb = Controles.LB(self, _("It is showed") + ":").ponFuente(font)
+        lb = Controles.LB(self, _("Show") + ":").ponFuente(font)
         self.cbThoughtOp = Controles.CB(self, liThinks, -1).ponFuente(font)
         lbArrows = Controles.LB2P(self, _("Arrows to show")).ponFuente(font)
         self.sbArrows = Controles.SB(self, 0, 0, 999).tamMaximo(50).ponFuente(font)
@@ -223,7 +223,7 @@ class WPlayAgainstEngine(LCDialog.LCDialog):
         gbThoughtOp = Controles.GB(self, _("Opponent's thought information"), ly)
         gbThoughtOp.setStyleSheet(gb_style)
 
-        self.lbBoxHeight = Controles.LB2P(self, '%s ("%s")' % (_("Box height"), _("It is showed"))).ponFuente(font)
+        self.lbBoxHeight = Controles.LB2P(self, _("Height of displaying box")).ponFuente(font)
         self.sbBoxHeight = Controles.SB(self, 0, 0, 999).tamMaximo(50).ponFuente(font)
 
         lyBox = Colocacion.H().control(self.lbBoxHeight).control(self.sbBoxHeight).relleno()

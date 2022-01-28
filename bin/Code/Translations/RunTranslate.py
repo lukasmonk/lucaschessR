@@ -1,14 +1,14 @@
 import datetime
 import os
 import shutil
-import traceback
+import sys
 
 import polib
-from PySide2 import QtCore
+from PySide2 import QtCore, QtWidgets
 
 import Code
 from Code import Util
-from Code.Base.Constantes import TB_QUIT
+from Code.Config import Configuration
 from Code.QT import Colocacion
 from Code.QT import Columnas
 from Code.QT import Controles
@@ -21,6 +21,7 @@ from Code.QT import QTUtil
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
+from Code.Translations import WorkTranslate
 
 
 class WTranslate(LCDialog.LCDialog):
@@ -33,13 +34,12 @@ class WTranslate(LCDialog.LCDialog):
     MAIN_REFERENCE = "MAIN_REFERENCE"
     SECONDARY_REFERENCES = "SECONDARY_REFERENCES"
 
-    def __init__(self, owner):
+    def __init__(self, path_db):
         icono = Iconos.WorldMap()
         titulo = "Translation"
         extparam = "translation"
         LCDialog.LCDialog.__init__(self, None, titulo, icono, extparam)
 
-        self.main_window = owner
         self.configuration = Code.configuration
 
         self.automatic_reorder = self.get_param(self.AUTOMATIC_REORDER, True)
@@ -56,7 +56,10 @@ class WTranslate(LCDialog.LCDialog):
 
         self.dic_languages = {}
         self.read_languages()
-        self.dic_translate = self.read_labels()
+
+        self.work_translate = WorkTranslate.WorkTranslate(path_db, False, self.tr_actual)
+
+        self.dic_translate = self.work_translate.dic_wtranslate
         self.li_labels = list(self.dic_translate.keys())
         self.ult_where = ["?", "?", "?"]  # Que no encuentre a nadie
 
@@ -71,6 +74,9 @@ class WTranslate(LCDialog.LCDialog):
             ("Config", Iconos.Configurar(), self.config),
             None,
             ("Utilities", Iconos.Utilidades(), self.utilities),
+            None,
+            ("Help", Iconos.AyudaGR(), self.help),
+            None,
         )
         self.tb = QTVarios.LCTB(self, li_acciones, icon_size=24)
 
@@ -95,98 +101,15 @@ class WTranslate(LCDialog.LCDialog):
         layout = Colocacion.V().otro(laytb).control(self.grid).otro(ly_seek).margen(3)
         self.setLayout(layout)
 
-        self.restore_video(anchoDefecto=self.grid.anchoColumnas() + 28, altoDefecto=self.main_window.height())
+        self.restore_video(anchoDefecto=self.grid.anchoColumnas() + 28, altoDefecto=640)
         self.grid.setFocus()
 
         self.set_porcentage()
 
         self.orders = {"BASE": 0, "CURRENT": 0, "WHERE": 0}
         self.order_by_type("CURRENT")
-        # self.li_labels.sort(key=lambda x:x.upper())
 
-    def current(self, english_text):
-        dic = self.dic_translate[english_text]
-
-        x = traceback.format_stack()[-3]
-        x0 = x.split('"')[1]
-        li = x0.split(os.sep)
-        li = li[li.index("bin") + 1 :]
-        where = "\\".join(li)[:-3]
-        if where.startswith("Code"):
-            where = "." + where[4:] + ".py"
-        # xc = x.split(",")[1][6:]
-
-        dic["WHEN"] = datetime.datetime.now()
-        where = "|%s|" % where
-        if where not in self.ult_where:
-            del self.ult_where[0]
-            self.ult_where.append(where)
-
-        if dic["NEW"]:
-            traduccion = dic["NEW"]
-        elif dic["TRANS"]:
-            traduccion = dic["TRANS"]
-        else:
-            traduccion = Code.bridge_translation(english_text)
-
-        if self.automatic_reorder:
-            if self.reorder_type == self.REORDER_ALL:
-                ok = True
-            else:
-                ok = not (dic["NEW"] or dic["TRANS"])
-            if ok:
-                self.li_labels.remove(english_text)
-                self.li_labels.insert(0, english_text)
-
-        self.grid.refresh()
-
-        return traduccion
-
-    def read_labels(self):
-        path_po = Code.path_resource("IntFiles", "messages.po")
-        pofile = polib.pofile(path_po)
-
-        path_mo = Code.path_resource("Locale", self.tr_actual, "LC_MESSAGES", "lucaschess.mo")
-        mofile = polib.mofile(path_mo)
-        dmo = {entry.msgid: entry.msgstr for entry in mofile}
-
-        path_po_saved = self.configuration.po_saved()
-        if os.path.isfile(path_po_saved):
-            pofile_saved = polib.pofile(path_po_saved)
-            dpo_saved = {entry.msgid: entry.msgstr for entry in pofile_saved}
-        else:
-            dpo_saved = {}
-
-        dic_translate = {}
-        now = datetime.datetime.now()
-        for entry in pofile:
-            trans = dmo.get(entry.msgid, "")
-            new = dpo_saved.get(entry.msgid, "")
-            if entry.occurrences:
-                li_occurrences = []
-                li = []
-                for rut, linea in entry.occurrences:
-                    if rut in li:
-                        li_occurrences[li.index(rut)][1].append(int(linea))
-                    else:
-                        li.append(rut)
-                        li_occurrences.append([rut, [int(linea)]])
-            else:
-                li_occurrences = [("Web", [])]
-
-            where = "|".join(rut for rut, lineas in li_occurrences)
-
-            if trans == new:
-                new = ""
-            dic_translate[entry.msgid] = {
-                "TRANS": trans,
-                "NEW": new,
-                "WHERE": "|%s|" % where,
-                "LI_OCCURRENCES": li_occurrences,
-                "WHEN": now,
-            }
-
-        return dic_translate
+        self.check_sended_from_lucas()
 
     def set_porcentage(self):
         total = len(self.dic_translate)
@@ -197,8 +120,17 @@ class WTranslate(LCDialog.LCDialog):
 
         self.lb_porcentage.setText("%0.02f%%" % (traducidos * 100 / total))
 
+    def change_new(self, key, new_value):
+        trans = self.dic_translate[key]["TRANS"]
+        self.dic_translate[key]["NEW"] = new_value
+        if trans == new_value:
+            return
+        send = new_value if new_value else trans
+        self.work_translate.send_to_lucas(key, send)
+
     def save(self):
         self.create_po(self.configuration.po_saved())
+        self.work_translate.close()
 
     def create_po(self, path_po):
         po = polib.POFile()
@@ -213,20 +145,12 @@ class WTranslate(LCDialog.LCDialog):
                 po.append(entry)
         po.save(path_po)
 
-    def terminar(self):
-        self.save()
-        Code.win_translator = None
-        self.accept()
-        Code.procesador.run_action(TB_QUIT)
-
     def cerrar(self):
         self.save()
-        self.hide()
+        self.accept()
 
     def closeEvent(self, event):
         self.save()
-        Code.win_translator = None
-        Code.procesador.run_action(TB_QUIT)
 
     def grid_num_datos(self, grid):
         return len(self.li_labels)
@@ -268,20 +192,21 @@ class WTranslate(LCDialog.LCDialog):
                     QTUtil2.message_error(self, "The command %s does not match the English text." % k)
                     self.automatic_reorder = auto_reorder
                     return
-            if "{" in key:
-                if "{" in value or "}" in value:
-                    QTUtil2.message_error(
-                        self,
-                        "The text between braces should not be translated, it is only explanatory and to differentiate"
-                        " English words that have different meanings depending on the context.",
-                    )
-                    self.automatic_reorder = auto_reorder
-                    return
+            if "||" in value:
+                QTUtil2.message_error(
+                    self,
+                    "The text after || should not be translated, it is only explanatory and to differentiate"
+                    " English words that have different meanings depending on the context.",
+                )
+                self.automatic_reorder = auto_reorder
+                return
             if value != dic["TRANS"]:
-                dic["NEW"] = value
+                self.change_new(key, value)
                 self.set_porcentage()
+            else:
+                self.change_new(key, "")
         else:
-            dic["NEW"] = ""
+            self.change_new(key, "")
 
         self.automatic_reorder = auto_reorder
 
@@ -351,10 +276,10 @@ class WTranslate(LCDialog.LCDialog):
         auto = self.automatic_reorder
         self.automatic_reorder = False
 
-        def l80(txt):
-            if len(txt) > 80:
-                return txt[:76] + " ..."
-            return txt
+        def l80(xtxt):
+            if len(xtxt) > 80:
+                return xtxt[:76] + " ..."
+            return xtxt
 
         key = self.li_labels[row]
         current_new = self.dic_translate[key]["NEW"]
@@ -363,9 +288,9 @@ class WTranslate(LCDialog.LCDialog):
         li_opciones = []
 
         def add_opcion(xlng):
-            xvalue = self.dic_languages[xlng].get(key)
-            if xvalue and xvalue not in li_opciones and xvalue != current:
-                li_opciones.append(xvalue)
+            zvalue = self.dic_languages[xlng].get(key)
+            if zvalue and zvalue not in li_opciones and zvalue != current:
+                li_opciones.append(zvalue)
 
         for lng in self.secondary_references:
             add_opcion(lng)
@@ -403,7 +328,7 @@ class WTranslate(LCDialog.LCDialog):
                 ok = QTUtil2.pregunta(self, "Do you want to replace current translation?\n\nChange to:\n%s" % txt)
 
             if ok:
-                self.dic_translate[key]["NEW"] = "" if txt == current_trans else txt
+                self.change_new(key, "" if txt == current_trans else txt)
                 self.grid.refresh()
 
         self.automatic_reorder = auto
@@ -568,7 +493,7 @@ class WTranslate(LCDialog.LCDialog):
             row = self.grid.recno()
             if row >= 0:
                 key = self.li_labels[row]
-                self.dic_translate[key]["NEW"] = ""
+                self.change_new(key, "")
                 self.grid.refresh()
 
     def editar(self):
@@ -594,138 +519,17 @@ class WTranslate(LCDialog.LCDialog):
         accion, li_resp = resultado
         row = self.li_labels.index(label)  # necesario ya que puede cambiar
         self.grid_setvalue(None, row, None, li_resp[0])
+        self.grid.refresh()
 
     def utilities(self):
         menu = QTVarios.LCMenu(self)
         menu.opcion(self.export_po, "Export translated labels to a .po file", Iconos.Export8())
         menu.separador()
         menu.opcion(self.import_mo, "Import .mo file downloaded from poeditor", Iconos.Import8())
-        menu.separador()
-
-        submenu = menu.submenu("New language", Iconos.LanguageNew())
-        submenu.opcion(self.new_lng, "Register a new language", Iconos.Add())
-        submenu.separador()
-
-        li_traducciones = self.configuration.list_translations()
-        li_remove = []
-        for k, trad, porc, author in li_traducciones:
-            if k[1].isdigit() and k != self.tr_actual:
-                li_remove.append((k, trad))
-
-        if li_remove:
-            subsubmenu = submenu.submenu("Remove a created language", Iconos.Remove1())
-            for k, trad in li_remove:
-                subsubmenu.opcion((k, trad), trad, Iconos.PuntoRojo())
-                subsubmenu.separador()
 
         resp = menu.lanza()
         if resp:
-            if type(resp) == tuple:
-                self.remove_lng(resp[0], resp[1])
-            else:
-                resp( )
-
-    def remove_lng(self, lng, name):
-        if QTUtil2.pregunta(self, "Are you sure to remove %s?" % name):
-            folder_lng = Code.path_resource("Locale", lng)
-            folder_mo = os.path.join(folder_lng, "LC_MESSAGES")
-            path_po_saved = os.path.join(self.configuration.carpeta_translations(), "%s.po" % lng)
-            ok = Util.remove_folder_files(folder_mo)
-            if ok:
-                ok = Util.remove_folder_files(folder_lng)
-            if ok:
-                Util.remove_file(path_po_saved)
-                QTUtil2.message(self, "Language %s, removed" % name)
-
-            else:
-                QTUtil2.message_error(self, "It is not possible to remove %s language" % name)
-
-    def new_lng(self):
-        name = ""
-        lng_copy = None
-        li_traducciones = self.configuration.list_translations()
-        li_trans = [("None", None)]
-        for k, trad, porc, author in li_traducciones:
-            label = "%s (%s%%)" % (trad, porc)
-            li_trans.append((label, k))
-
-        while True:
-            form = FormLayout.FormLayout(
-                self, "New language", Iconos.WorldMap(), anchoMinimo=300, font_txt=Controles.TipoLetra(puntos=10)
-            )
-            form.separador()
-            form.edit("Language name", name)
-            form.separador()
-            form.combobox("Copy from", li_trans, lng_copy)
-            form.separador()
-            resultado = form.run()
-            if resultado is None:
-                return
-            accion, li_resp = resultado
-            name, lng_copy = li_resp
-            name = name.strip()
-            if not name:
-                return
-            problem = False
-            for k, trad, porc, author in li_traducciones:
-                if name.upper() == trad.upper():
-                    problem = True
-                    break
-            if problem:
-                QTUtil2.message_error(self, "This name is already in use")
-            else:
-                return self.create_lng(name, lng_copy)
-
-    def create_lng(self, name, lng_copy):
-        for c1 in "abcdefghijklmnopqrstuvwxyz":
-            for c2 in "123456789":
-                lng = c1 + c2
-                folder = Code.path_resource("Locale", lng)
-                if not os.path.isdir(folder) and not os.path.isfile(folder):
-                    break
-        folder_lng = Code.path_resource("Locale", lng)
-        Util.create_folder(folder_lng)
-        folder_mo = os.path.join(folder_lng, "LC_MESSAGES")
-        Util.create_folder(folder_mo)
-        path_mo = os.path.join(folder_mo, "lucaschess.mo")
-
-        po = polib.POFile()
-        po.metadata = {
-            "MIME-Version": "1.0",
-            "Content-Type": "text/plain; charset=utf-8",
-            "Content-Transfer-Encoding": "8bit",
-        }
-        po.save_as_mofile(path_mo)
-
-        path_ini = os.path.join(folder_lng, "lang.ini")
-        with open(path_ini, "wt", encoding="utf-8") as q:
-            q.write("NAME=%s\n" % name)
-            q.write("AUTHOR=%s\n" % self.configuration.nom_player())
-            q.write("%=100\n")
-
-        if lng_copy:
-            po = polib.POFile()
-            po.metadata = {
-                "MIME-Version": "1.0",
-                "Content-Type": "text/plain; charset=utf-8",
-                "Content-Transfer-Encoding": "8bit",
-            }
-
-            path_mo = Code.path_resource("Locale", lng_copy, "LC_MESSAGES", "lucaschess.mo")
-            mofile = polib.mofile(path_mo)
-            for entry in mofile:
-                nentry = polib.POEntry(msgid=entry.msgid, msgstr=entry.msgstr)
-                po.append(nentry)
-
-            path_po = os.path.join(self.configuration.carpeta_translations(), "%s.po" % lng)
-            po.save(path_po)
-
-        self.configuration.set_translator(lng)
-        self.configuration.graba()
-        QTUtil2.message(self, "Created the new language\n\n")
-        Code.win_translator = None
-        self.accept()
-        Code.procesador.reiniciar()
+            resp()
 
     def export_po(self):
         message = (
@@ -773,17 +577,17 @@ class WTranslate(LCDialog.LCDialog):
             self.configuration.write_variables("PATH_MO", folder)
             path_mo_ori = Code.path_resource("Locale", self.tr_actual, "LC_MESSAGES", "lucaschess.mo")
             shutil.copy(path_mo, path_mo_ori)
-            self.dic_translate = self.read_labels()
-            for dic in self.dic_translate.values():
+            self.dic_translate = self.work_translate.read_dic()
+            for key, dic in self.dic_translate.items():
                 if dic["NEW"]:
                     if QTUtil2.pregunta(
                         self,
                         "There are old translations that are different "
                         "from the imported labels, shall we delete them?",
                     ):
-                        for dic in self.dic_translate.values():
-                            if dic["NEW"]:
-                                dic["NEW"] = ""
+                        for xkey, xdic in self.dic_translate.items():
+                            if xdic["NEW"]:
+                                self.change_new(xkey, "")
                     break
 
             self.li_labels = list(self.dic_translate.keys())
@@ -813,3 +617,50 @@ class WTranslate(LCDialog.LCDialog):
             self.read_language(self.tr_actual)
         for lng in self.secondary_references:
             self.read_language(lng)
+
+    def check_sended_from_lucas(self):
+        li_received = self.work_translate.read_from_lucas()
+        if self.work_translate.is_closed:
+            self.cerrar()
+            return
+        if li_received:
+
+            for key, where in li_received:
+                dic = self.dic_translate[key]
+                dic["WHERE"] = where
+                dic["WHEN"] = datetime.datetime.now()
+                where = "|%s|" % where
+                if where not in self.ult_where:
+                    del self.ult_where[0]
+                    self.ult_where.append(where)
+
+                if self.automatic_reorder:
+                    if self.reorder_type == self.REORDER_ALL:
+                        ok = True
+                    else:
+                        ok = not (dic["NEW"] or dic["TRANS"])
+                    if ok:
+                        self.li_labels.remove(key)
+                        self.li_labels.insert(0, key)
+
+            self.grid.refresh()
+
+        QtCore.QTimer.singleShot(500 if li_received else 1000, self.check_sended_from_lucas)
+
+    def help(self):
+        path_pdf = Code.path_resource("IntFiles", "translation.pdf")
+        os.startfile(path_pdf)
+
+
+def run_wtranslation(path_db):
+    sys.stderr = Util.Log("./bug.wtranslation")
+    configuration = Code.configuration = Configuration.Configuration("")
+    configuration.lee()
+
+    app = QtWidgets.QApplication([])
+
+    app.setStyle(QtWidgets.QStyleFactory.create(configuration.x_style))
+    QtWidgets.QApplication.setPalette(QtWidgets.QApplication.style().standardPalette())
+
+    wtranslate = WTranslate(path_db)
+    wtranslate.exec_()

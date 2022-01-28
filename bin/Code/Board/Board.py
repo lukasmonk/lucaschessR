@@ -740,6 +740,9 @@ class Board(QtWidgets.QGraphicsView):
 
         liKeys.append((None, None))
         liKeys.append((_("ALT") + " L", _("Open position in LiChess")))
+        liKeys.append((None, None))
+        liKeys.append(("F11", _("Show in full screen")))
+        liKeys.append(("F12", _("Minimize to the tray icon")))
 
         rondo = QTVarios.rondoPuntos()
         menu = QTVarios.LCMenu(self)
@@ -762,7 +765,7 @@ class Board(QtWidgets.QGraphicsView):
         menu.separador()
         menu.opcion("pieces", _("Pieces"), self.piezas.icono("K"))
         menu.separador()
-        if not self.siMaximizado():
+        if not self.main_window.isMaximized():
             menu.opcion("size", _("Change board size"), Iconos.ResizeBoard())
             menu.separador()
 
@@ -859,7 +862,7 @@ class Board(QtWidgets.QGraphicsView):
         else:
             return False
 
-    def cierraGuion(self):
+    def close_visual_script(self):
         if self.guion is not None:
             self.guion.cierraPizarra()
             self.guion.cerrado = True
@@ -867,7 +870,7 @@ class Board(QtWidgets.QGraphicsView):
 
     def lanzaGuion(self):
         if self.guion is not None:
-            self.cierraGuion()
+            self.close_visual_script()
         else:
             self.guion = TabVisual.Guion(self)
             self.guion.recupera()
@@ -1314,7 +1317,7 @@ class Board(QtWidgets.QGraphicsView):
 
     def set_last_position(self, position):
         self.init_kb_buffer()
-        self.cierraGuion()
+        self.close_visual_script()
         self.last_position = position
         if self.siDirectorIcon or self.dbVisual.show_allways():
             fenm2 = position.fenm2()

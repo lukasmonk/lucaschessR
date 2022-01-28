@@ -5,6 +5,7 @@ import FasterCode
 
 from PySide2 import QtCore
 
+import Code
 from Code import Manager
 from Code import Util
 from Code.Base import Game, Position
@@ -385,7 +386,7 @@ class ManagerSolo(Manager.Manager):
             menu.separador()
             menuR = menu.submenu(_("Reopen"), Iconos.Historial())
             for path in li:
-                menuR.opcion("reopen_%s" % path, path, Iconos.PuntoNaranja())
+                menuR.opcion("reopen_%s" % path, Code.relative_root(path), Iconos.PuntoNaranja())
                 menuR.separador()
         resp = menu.lanza()
         if resp is None:

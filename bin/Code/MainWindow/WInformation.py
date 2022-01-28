@@ -16,6 +16,8 @@ class Information(QtWidgets.QWidget):
 
         self.move = None
         self.game = None
+        self.width_saved = None
+        self.parent_width_saved = None
 
         configuration = Code.configuration
 
@@ -43,7 +45,7 @@ class Information(QtWidgets.QWidget):
         sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Expanding)
         self.lb_cpws_lost.setSizePolicy(sp)
 
-        self.lb_time = Controles.LB(self).ponFuente(font7).set_wrap().align_right().anchoFijo(36)
+        self.lb_time = Controles.LB(self).ponFuente(font7).set_wrap().align_right().anchoFijo(42)
         self.lb_time.hide()
         self.lb_time.setStyleSheet("*{ border: 1px solid lightgray; padding:1px; background: #a7f2f5}")
         ly_pw_tm = Colocacion.H().control(self.lb_cpws_lost).espacio(-8).controld(self.lb_time)
@@ -214,6 +216,29 @@ class Information(QtWidgets.QWidget):
                     li.append(v)
             self.move.li_nags = li
             self.set_nags(li)
+
+    def resizeEvent(self, event):
+        if self.isVisible() and not self.w_parent.isMaximized():
+            self.width_saved = self.width()
+            self.parent_width_saved = self.w_parent.width()
+
+    def save_width(self):
+        self.saved_width = self.width_saved, self.parent_width_saved
+
+    def restore_width(self):
+        self.width_saved, self.parent_width_saved = self.saved_width
+        if self.isVisible():
+            self.activa(True)
+
+    def activa(self, to_activate):
+        if to_activate:
+            if not self.w_parent.isMaximized():
+                if self.width_saved:
+                    self.w_parent.resize(self.parent_width_saved, self.w_parent.height())
+                    self.resize(self.width_saved, self.height())
+            self.show()
+        else:
+            self.hide()
 
 
 class WVariations(QtWidgets.QWidget):

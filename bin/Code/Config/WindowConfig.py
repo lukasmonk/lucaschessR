@@ -132,6 +132,7 @@ def options(parent, configuration):
             (_("None"), ""),
             (_("DGT"), "DGT"),
             (_("Alternative to DGT driver") + x, "DGT-gon"),
+            (_("DGT Pegasus") + x, "Pegasus"),
             (_("Certabo") + x, "Certabo"),
             (_("Millennium") + x, "Millennium"),
             (_("Novag Citrine") + x, "Citrine"),

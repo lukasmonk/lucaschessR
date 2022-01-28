@@ -87,6 +87,8 @@ class ManagerTactics(Manager.Manager):
 
         self.num_bad_tries = 0
         if self.tactic.advanced:
+            self.board.showCoordenadas(False)
+
             self.ini_clock = time.time()
             self.wsolve = self.main_window.base.wsolve
             self.wsolve.set_game(self.game_obj, self.advanced_return)
@@ -97,6 +99,7 @@ class ManagerTactics(Manager.Manager):
     def advanced_return(self, solved):
         self.tactic.masSegundos(time.time()-self.ini_clock)
         self.wsolve.hide()
+        self.board.showCoordenadas(True)
         more_errors = self.wsolve.errors
         more_helps = self.wsolve.helps
         if more_errors > 0 or more_helps > 0:
@@ -105,6 +108,7 @@ class ManagerTactics(Manager.Manager):
             for move in self.game_obj.li_moves:
                 self.game.add_move(move)
             self.goto_end()
+            self.pgnRefresh(self.human_side)
             self.end_line()
 
         else:
@@ -143,7 +147,13 @@ class ManagerTactics(Manager.Manager):
             else:
                 liMasOpciones = [("lmo_jump", _("Jump to the next after solving"), Iconos.Jump())]
             liMasOpciones.append((None, None, None))
-            liMasOpciones.append(("lmo_advanced", "%s: %s" % (_("Disable") if self.tactic.advanced else _("Enable"), _("Advanced mode")), Iconos.Add()))
+            if self.tactic.advanced:
+                txt = _("Disable")
+                ico = Iconos.Remove1()
+            else:
+                txt = _("Enable")
+                ico = Iconos.Add()
+            liMasOpciones = [("lmo_advanced", "%s: %s" % (txt, _("Advanced mode")), ico)]
             resp = self.configurar(siSonidos=True, siCambioTutor=False, liMasOpciones=liMasOpciones)
             if resp in ("lmo_stop", "lmo_jump"):
                 self.with_automatic_jump = resp == "lmo_jump"
@@ -186,6 +196,7 @@ class ManagerTactics(Manager.Manager):
             self.start(self.tactic)
 
     def end_game(self):
+        self.board.showCoordenadas(True)
         self.procesador.start()
         self.procesador.entrenamientos.entrenaTactica(self.tactic)
 

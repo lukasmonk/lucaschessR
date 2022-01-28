@@ -172,6 +172,7 @@ class ManagerEntPos(Manager.Manager):
         self.current_helps = 0
 
         if self.is_playing_gameobj() and self.advanced:
+            self.board.showCoordenadas(False)
             self.wsolve = self.main_window.base.wsolve
             self.wsolve.set_game(self.game_obj, self.advanced_return)
 
@@ -180,6 +181,7 @@ class ManagerEntPos(Manager.Manager):
 
     def advanced_return(self, solved):
         self.wsolve.hide()
+        self.board.showCoordenadas(True)
         if solved:
             for move in self.game_obj.li_moves:
                 self.game.add_move(move)
@@ -200,7 +202,18 @@ class ManagerEntPos(Manager.Manager):
             self.reiniciar()
 
         elif key == TB_CONFIG:
-            self.configurar(siSonidos=True, siCambioTutor=True)
+            if self.advanced:
+                txt = _("Disable")
+                ico = Iconos.Remove1()
+            else:
+                txt = _("Enable")
+                ico = Iconos.Add()
+
+            liMasOpciones = [("lmo_advanced", "%s: %s" % (txt, _("Advanced mode")), ico)]
+            resp = self.configurar(siSonidos=True, siCambioTutor=True, liMasOpciones=liMasOpciones)
+            if resp == "lmo_advanced":
+                self.advanced = not self.advanced
+                self.reiniciar()
 
         elif key == TB_CHANGE:
             self.ent_otro()
@@ -297,6 +310,7 @@ class ManagerEntPos(Manager.Manager):
         ]
 
     def end_game(self):
+        self.board.showCoordenadas(True)
         self.procesador.start()
 
     def final_x(self):

@@ -81,12 +81,9 @@ def relative_root(path):
     return path
 
 
-bridge_translation = None
-win_translator = None
-
 BASE_VERSION = "B"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R2.pre-release.1"
-DEBUG = True
+VERSION = "R2.pre-release.2"
+DEBUG = False
 DEBUG_ENGINE = False
 
 if DEBUG:

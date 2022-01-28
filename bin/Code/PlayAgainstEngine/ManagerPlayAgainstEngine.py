@@ -1438,8 +1438,10 @@ class ManagerPlayAgainstEngine(Manager.Manager):
         self.put_view()
 
     def show_clocks(self, with_recalc=False):
+        if not self.vtime:
+            return
         if with_recalc:
-            for is_white in (WHITE, BLACK):
+            for is_white in (WHITE, BLACK) :
                 self.vtime[is_white].recalc()
 
         if Code.dgt:

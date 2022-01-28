@@ -116,7 +116,7 @@ class WAnalisisGraph(LCDialog.LCDialog):
         # .control(self.capturas)
 
         self.rbShowValues = Controles.RB(self, _("Values"), rutina=self.cambiadoShow).activa(True)
-        self.rbShowElo = Controles.RB(self, _("Elo performance"), rutina=self.cambiadoShow)
+        self.rbShowElo = Controles.RB(self, _("Elo average"), rutina=self.cambiadoShow)
         self.chbShowLostPoints = Controles.CHB(self, _("Show pawns lost"), self.getShowLostPoints()).capture_changes(
             self, self.showLostPointsChanged
         )

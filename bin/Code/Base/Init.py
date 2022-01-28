@@ -20,7 +20,6 @@ def init():
     run_sound = Sound.RunSound()
     resp = Gui.run_gui(main_procesador)
     run_sound.close()
-    # Added by GON
     main_procesador.desactivarDGT()
 
     main_procesador.stop_engines()

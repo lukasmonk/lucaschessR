@@ -84,8 +84,8 @@ padding: 2px;"""
         lb_info = (
             Controles.LB(
                 self,
-                "<b>%s - %s</b><br>%s - %s"
-                % (_("INTRO to add line"), _("F10 to check"), _("F1 help"), _("ESC to cancel this mode")),
+                "<b>%s<br>%s - %s</b>"
+                % (_("INTRO to add line"), _("F10 to check"), _("F1 help")),
             )
             .align_center()
             .ponTipoLetra(puntos=7)
@@ -129,6 +129,8 @@ padding: 2px;"""
             lb.setText("")
 
         self.li_current_moves = []
+        if not self.is_white:
+            self.li_moves[0].hide()
         for nmove, ed in enumerate(self.li_moves if self.is_white else self.li_moves[1:]):
             if nmove >= nmoves:
                 ed.hide()
@@ -149,13 +151,22 @@ padding: 2px;"""
             self.check()
         elif k == QtCore.Qt.Key_F1:
             self.help()
-        elif k == QtCore.Qt.Key_Escape:
-            self.cancel_mode()
         else:
             return
         event.ignore()  # Para que no salte Director
 
     def pressed_enter(self):
+        ed = self.sender()
+        pos = self.li_current_moves.index(ed) + 1
+        if pos == len(self.li_current_moves):
+            if pos == 1:
+                self.check()
+            else:
+                self.check_line()
+        else:
+            self.li_current_moves[pos].setFocus()
+
+    def check_line(self):
         d_conv = TrListas.dConv()
         for ed in self.li_current_moves:
             ed.setStyleSheet(self.style_normal)
@@ -192,12 +203,11 @@ padding: 2px;"""
             linea += info_move.pgntr + " "
             position.mover(info_move.xfrom(), info_move.xto(), info_move.promotion())
 
-        for ed in self.li_current_moves[1:]:
+        for ed in self.li_current_moves:
             ed.setText("")
             ed.setStyleSheet(self.style_normal)
 
-        if len(self.li_current_moves) > 1:
-            self.li_current_moves[1].setFocus()
+        self.li_current_moves[0].setFocus()
 
         linea = linea.strip()
         if linea in self.dic_lines_created:
@@ -246,7 +256,7 @@ padding: 2px;"""
                 break
 
     def check(self):
-        self.pressed_enter()
+        self.check_line()
 
         solution = None
         linea = None

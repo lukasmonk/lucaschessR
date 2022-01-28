@@ -167,6 +167,7 @@ class Procesador:
         self.main_window = MainWindow.MainWindow(self)
         self.main_window.set_manager_active(self)  # antes que muestra
         self.main_window.muestra()
+        self.main_window.check_translated_help_mode()
         self.kibitzers_manager = KibitzersManager.Manager(self)
 
         self.board = self.main_window.board
@@ -527,7 +528,7 @@ class Procesador:
         if key == TB_QUIT:
             if hasattr(self, "cpu"):
                 self.cpu.stop()
-            self.main_window.procesosFinales()
+            self.main_window.final_processes()
             self.main_window.accept()
 
         elif key == TB_PLAY:

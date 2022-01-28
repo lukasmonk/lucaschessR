@@ -100,7 +100,7 @@ class WBase(QtWidgets.QWidget):
 
         self.li_hide_replay = []
 
-        ly_ai = Colocacion.H().relleno(1).otroi(ly_t).otroi(ly_bi).relleno(1).margen(0)
+        ly_ai = Colocacion.H().relleno().otroi(ly_t).otroi(ly_bi).relleno().margen(0)
         ly = Colocacion.V().control(self.tb).relleno().otro(ly_ai).relleno().margen(2)
 
         self.setLayout(ly)
@@ -307,8 +307,11 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo3.setStyleSheet("*{ border: 1px solid darkgray }")
         self.lbRotulo3.altoFijo(48)
 
+        # Rotulo de mensajes de trabajo con un cancelar
+        self.wmessage = WMessage(self)
+
+        # Modo avanzado en tácticas
         self.wsolve = WindowSolve.WSolve(self)
-        self.wsolve.hide()
 
         # Lo escondemos
         self.lb_player_white.hide()
@@ -325,6 +328,7 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo2.hide()
         self.lbRotulo3.hide()
         self.wsolve.hide()
+        self.wmessage.hide()
 
         # Layout
 
@@ -340,7 +344,7 @@ class WBase(QtWidgets.QWidget):
         ly_abajo.setSizeConstraint(ly_abajo.SetFixedSize)
         ly_abajo.otro(ly_capturas)
         ly_abajo.control(self.bt_active_tutor)
-        ly_abajo.control(self.lbRotulo1).control(self.lbRotulo2).control(self.lbRotulo3)
+        ly_abajo.control(self.lbRotulo1).control(self.lbRotulo2).control(self.lbRotulo3).control(self.wmessage)
 
         ly_v = Colocacion.V().otro(ly_color).control(self.wsolve).control(self.pgn)
         ly_v.otro(ly_abajo)
@@ -582,6 +586,7 @@ class WBase(QtWidgets.QWidget):
         self.lb_capt_white.setVisible(False)
         self.lb_capt_black.setVisible(False)
         self.wsolve.setVisible(False)
+        self.wmessage.setVisible(False)
 
         self.lb_player_white.setVisible(siReloj)
         self.lb_player_black.setVisible(siReloj)
@@ -602,7 +607,8 @@ class WBase(QtWidgets.QWidget):
             self.lb_player_black,
             self.lb_clock_white,
             self.lb_clock_black,
-            self.wsolve.setVisible,
+            self.wsolve,
+            self.wmessage
         ):
             if control.isVisible():
                 self.li_hide_replay.append(control)
@@ -633,6 +639,8 @@ class WBase(QtWidgets.QWidget):
                 self.lb_capt_white,
                 self.lb_capt_black,
                 self.parent.informacionPGN,
+                self.wsolve,
+                self.wmessage
             ):
                 if widget.isVisible():
                     nonDistract.append(widget)
@@ -743,5 +751,46 @@ class WBase(QtWidgets.QWidget):
             tm += '<br><FONT SIZE="-4">' + tm2
         self.lb_clock_black.set_text(tm)
 
-    # def creaCapturas(self):
-    #     self.capturas = WCapturas.CapturaLista(self, self.board)
+    def show_message(self, txt, with_cancel):
+        self.wmessage.set_message(txt, with_cancel)
+        self.wmessage.show()
+
+    def change_message(self, txt):
+        self.wmessage.change_message(txt)
+        self.wmessage.show()
+
+    def hide_message(self):
+        self.wmessage.hide()
+
+    def is_canceled(self):
+        QTUtil.refresh_gui()
+        return self.wmessage.canceled
+
+
+class WMessage(QtWidgets.QWidget):
+    def __init__(self, owner):
+        QtWidgets.QWidget.__init__(self, owner)
+
+        self.lb_message = Controles.LB(self).ponTipoLetra(puntos=11, peso=400)
+        self.lb_message.setStyleSheet("background-color: #1f497d; color: #FFFFFF;padding: 16px;")
+
+        self.bt_cancel = Controles.PB(self, _("Cancel"), self.cancel, False)
+        self.canceled = False
+        layout = Colocacion.V().control(self.lb_message).controlc(self.bt_cancel)
+        self.setLayout(layout)
+
+    def set_message(self, message, with_cancel):
+        self.lb_message.setText(message)
+        if with_cancel:
+            self.canceled = False
+            self.bt_cancel.show()
+        else:
+            self.bt_cancel.hide()
+
+    def change_message(self, message):
+        self.lb_message.setText(message)
+
+    def cancel(self):
+        self.canceled = True
+        self.bt_cancel.setText(_("Canceled"))
+

@@ -908,7 +908,6 @@ class Manager:
         if row < 0:
             return
 
-        # is_shift, is_control, is_alt = QTUtil.kbdPulsado() # Antes de que analice
         move, is_white, siUltimo, tam_lj, pos_jg = self.dameJugadaEn(row, key)
         if not move:
             return
@@ -936,22 +935,15 @@ class Manager:
             else:
                 max_recursion = 9999
         if move.analysis is None:
-            siCancelar = self.xanalyzer.mstime_engine > 5000 or self.xanalyzer.depth_engine > 5
+            siCancelar = self.xanalyzer.mstime_engine > 5000 or self.xanalyzer.depth_engine > 10
             mens = _("Analyzing the move....")
-            me = QTUtil2.mensEspera.start(
-                self.main_window,
-                mens,
-                physical_pos="ad",
-                siCancelar=siCancelar,
-                titCancelar=_("Stop"),
-                siParentNone=True,
-            )
-            self.main_window.setDisabled(True)
+            self.main_window.base.show_message(_("Analyzing the move...."), siCancelar)
+            self.main_window.base.tb.setDisabled(True)
             if siCancelar:
                 ya_cancelado = [False]
 
                 def test_me(rm):
-                    if me.cancelado():
+                    if self.main_window.base.is_canceled():
                         if not ya_cancelado[0]:
                             self.xanalyzer.stop()
                             ya_cancelado[0] = True
@@ -959,7 +951,7 @@ class Manager:
                         tm = rm.time
                         if tm:
                             tm /= 1000
-                        me.label('%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm))
+                        self.main_window.base.change_message('%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm))
                     return True
 
                 self.xanalyzer.set_gui_dispatch(test_me)
@@ -967,8 +959,8 @@ class Manager:
                 self.game, pos_jg, self.xtutor.mstime_engine, self.xtutor.depth_engine
             )
             move.analysis = mrm, pos
-            self.main_window.setDisabled(False)
-            me.final()
+            self.main_window.base.tb.setDisabled(False)
+            self.main_window.base.hide_message()
 
         Analysis.show_analysis(self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, pos_jg)
         self.put_view()
