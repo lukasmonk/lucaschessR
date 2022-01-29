@@ -51,14 +51,7 @@ class ManagerEntPos(Manager.Manager):
         db.close()
 
     def start(
-        self,
-        pos_training,
-        num_trainings,
-        title_training,
-        li_trainings,
-        is_tutor_enabled,
-        is_automatic_jump,
-        advanced,
+        self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled, is_automatic_jump, advanced
     ):
         if hasattr(self, "reiniciando"):
             if self.reiniciando:
@@ -76,10 +69,10 @@ class ManagerEntPos(Manager.Manager):
         self.is_automatic_jump = is_automatic_jump
         self.advanced = advanced
 
-
         self.li_histo = [self.pos_training]
 
         self.hints = 99999
+        self.ponAyudas(self.hints)
 
         linea, self.pos_training_origin = self.li_trainings[self.pos_training - 1]
         self.line_fns = FNSLine.FNSLine(linea)
@@ -186,6 +179,7 @@ class ManagerEntPos(Manager.Manager):
             for move in self.game_obj.li_moves:
                 self.game.add_move(move)
             self.goto_end()
+            self.lineaTerminadaOpciones()
 
         else:
             self.advanced = False
@@ -269,7 +263,7 @@ class ManagerEntPos(Manager.Manager):
             self.li_trainings,
             self.is_tutor_enabled,
             self.is_automatic_jump,
-            self.advanced
+            self.advanced,
         )
 
     def ent_siguiente(self, tipo):
@@ -289,7 +283,7 @@ class ManagerEntPos(Manager.Manager):
             self.li_trainings,
             self.is_tutor_enabled,
             self.is_automatic_jump,
-            self.advanced
+            self.advanced,
         )
 
     def control_teclado(self, nkey, modifiers):

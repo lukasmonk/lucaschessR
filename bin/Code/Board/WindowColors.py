@@ -611,7 +611,7 @@ class WColores(LCDialog.LCDialog):
     def exportar(self):
         dr = self.configuration.read_variables("PCOLORES")
         dirBase = dr["DIRBASE"] if dr else ""
-        fich = SelectFiles.salvaFichero(self, _("Colors"), dirBase, "*.lktheme3", True)
+        fich = SelectFiles.salvaFichero(self, _("Colors"), dirBase, "lktheme3", True)
         if fich:
             dr["DIRBASE"] = os.path.dirname(fich)
             self.configuration.write_variables("PCOLORES", dr)

@@ -288,7 +288,7 @@ class WManualSave(LCDialog.LCDialog):
 
     def pgn_select(self):
         dirSalvados = self.configuration.x_save_folder
-        path = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, _("File") + " PGN (*.pgn)", False)
+        path = SelectFiles.salvaFichero(self, _("File to save"), dirSalvados, "pgn", False)
         if path:
             carpeta, file = os.path.split(path)
             if carpeta != self.configuration.x_save_folder:
@@ -305,7 +305,7 @@ class WManualSave(LCDialog.LCDialog):
 
     def fns_select(self):
         dir_inicial = self.configuration.personal_training_folder if self.fns is None else os.path.dirname(self.fns)
-        path = SelectFiles.salvaFichero(self, _("File to save"), dir_inicial, _("File") + " FNS (*.fns)", False)
+        path = SelectFiles.salvaFichero(self, _("File to save"), dir_inicial, "fns", False)
         if path:
             self.fns = path
             self.bt_fns.set_text(path)

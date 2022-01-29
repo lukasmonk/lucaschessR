@@ -498,7 +498,6 @@ class Manager:
 
     def remove_hints(self, siTambienTutorAtras=True, siQuitarAtras=True):
         self.main_window.remove_hints(siTambienTutorAtras, siQuitarAtras)
-        self.is_tutor_enabled = False
         self.set_activate_tutor(False)
 
     def ponAyudas(self, hints, siQuitarAtras=True):
@@ -951,7 +950,9 @@ class Manager:
                         tm = rm.time
                         if tm:
                             tm /= 1000
-                        self.main_window.base.change_message('%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm))
+                        self.main_window.base.change_message(
+                            '%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm)
+                        )
                     return True
 
                 self.xanalyzer.set_gui_dispatch(test_me)
@@ -1433,26 +1434,6 @@ class Manager:
 
         siJugadas = len(self.game) > 0
 
-        # Mas Opciones
-        if liMasOpciones:
-            submenu = menu
-            for key, label, icono in liMasOpciones:
-                if label is None:
-                    if icono is None:
-                        # liMasOpciones.append((None, None, None))
-                        submenu.separador()
-                    else:
-                        # liMasOpciones.append((None, None, True))  # Para salir del submenu
-                        submenu = menu
-                elif key is None:
-                    # liMasOpciones.append((None, titulo, icono))
-                    submenu = menu.submenu(label, icono)
-
-                else:
-                    # liMasOpciones.append((key, titulo, icono))
-                    submenu.opcion(key, label, icono)
-            menu.separador()
-
         # Grabar
         icoGrabar = Iconos.Grabar()
         icoFichero = Iconos.GrabarFichero()
@@ -1541,6 +1522,27 @@ class Manager:
         if siArbol:
             menu.separador()
             menu.opcion("arbol", _("Moves tree"), Iconos.Arbol())
+
+        # Mas Opciones
+        if liMasOpciones:
+            menu.separador()
+            submenu = menu
+            for key, label, icono in liMasOpciones:
+                if label is None:
+                    if icono is None:
+                        # liMasOpciones.append((None, None, None))
+                        submenu.separador()
+                    else:
+                        # liMasOpciones.append((None, None, True))  # Para salir del submenu
+                        submenu = menu
+                elif key is None:
+                    # liMasOpciones.append((None, titulo, icono))
+                    submenu = menu.submenu(label, icono)
+
+                else:
+                    # liMasOpciones.append((key, titulo, icono))
+                    submenu.opcion(key, label, icono)
+            menu.separador()
 
         resp = menu.lanza()
 

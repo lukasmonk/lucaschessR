@@ -240,7 +240,7 @@ class WBMT(LCDialog.LCDialog):
         menu2.opcion("rehacer", _("Analyze again"), Iconos.PuntoAmarillo())
 
         menu.separador()
-        menu.opcion("odt", "%s: %s (*.odf)" % (_("Export to"), _("Open Document Format")), Iconos.ODT())
+        menu.opcion("odt", "%s: %s (*.odt)" % (_("Export to"), _("Open Document Format")), Iconos.ODT())
 
         resp = menu.lanza()
         if resp:
@@ -268,7 +268,7 @@ class WBMT(LCDialog.LCDialog):
         if recno < 0:
             return
 
-        bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA")).patch()
+        bmt_lista = Util.zip2var(dbf.leeOtroCampo(recno, "BMT_LISTA"))
         bmt_lista.patch()
         bmt_lista.check_color()
 

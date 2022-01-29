@@ -85,7 +85,7 @@ padding: 2px;"""
             Controles.LB(
                 self,
                 "<b>%s<br>%s - %s</b>"
-                % (_("INTRO to add line"), _("F10 to check"), _("F1 help")),
+                % (_("<ENTER> to add line"), _("F10 to check"), _("F1 help")),
             )
             .align_center()
             .ponTipoLetra(puntos=7)

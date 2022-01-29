@@ -150,7 +150,7 @@ class MainWindow(LCDialog.LCDialog):
         self.board.close_visual_script()
         self.board.terminar()
 
-        if Code.configuration.x_translation_mode:
+        if self.work_translate:
             self.work_translate.close()
 
     def set_manager_active(self, manager):

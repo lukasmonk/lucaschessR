@@ -17,7 +17,7 @@ def path_saveas_odt(owner, name):
     folder = dic.get("FOLDER_SAVE", configuration.carpeta)
     carpeta = "%s/%s.odt" % (folder, name)
 
-    path = SelectFiles.salvaFichero(owner, _("File to save"), carpeta, "%s ODT (*.odt)" % _("File"), True)
+    path = SelectFiles.salvaFichero(owner, _("File to save"), carpeta, "odt", True)
     if path:
         dic["FOLDER_SAVE"] = os.path.dirname(path)
         configuration.write_variables(key_var, dic)

@@ -57,7 +57,7 @@ class WorkTranslate(object):
                 self.last_50.append(english_text)
 
         valor = self.dic_lucas.get(english_text, english_text)
-        return valor[: valor.index("||")] if "||" in valor else valor
+        return valor[: valor.index("||")].strip() if "||" in valor else valor
 
     def send_to_wtranslate(self, key, value):
         sql = "INSERT INTO LC_TR (KEY,VALUE) values(?,?)"

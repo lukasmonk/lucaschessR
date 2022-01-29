@@ -693,6 +693,7 @@ class Procesador:
         self.reiniciar()
 
     def reiniciar(self):
+        self.main_window.final_processes()
         self.main_window.accept()
         QTUtil.salirAplicacion(OUT_REINIT)
 

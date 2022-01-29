@@ -68,6 +68,8 @@ mate_en_dos = 175522
 
 runSound = None
 
+translations = None
+
 
 def relative_root(path):
     try:
@@ -82,7 +84,7 @@ def relative_root(path):
 
 
 BASE_VERSION = "B"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R2.pre-release.2"
+VERSION = "R2.pre-release.2.1"
 DEBUG = False
 DEBUG_ENGINE = False
 

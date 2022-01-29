@@ -741,7 +741,7 @@ class Board(QtWidgets.QGraphicsView):
         liKeys.append((None, None))
         liKeys.append((_("ALT") + " L", _("Open position in LiChess")))
         liKeys.append((None, None))
-        liKeys.append(("F11", _("Show in full screen")))
+        liKeys.append(("F11", _("Full screen On/Off")))
         liKeys.append(("F12", _("Minimize to the tray icon")))
 
         rondo = QTVarios.rondoPuntos()

@@ -94,7 +94,8 @@ elif Code.is_windows:
         )
         return resp[0] if resp else None
 
-    def salvaFichero(main_window, titulo, carpeta, filtro, siConfirmarSobreescritura=True):
+    def salvaFichero(main_window, titulo, carpeta, extension, siConfirmarSobreescritura=True):
+        titulo, filtro = _lfTituloFiltro(extension, titulo)
         if siConfirmarSobreescritura:
             resp = QtWidgets.QFileDialog.getSaveFileName(main_window, titulo, carpeta, filtro)
         else:
