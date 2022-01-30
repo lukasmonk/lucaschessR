@@ -38,12 +38,12 @@ from io import BytesIO
 from PIL import Image
 import sortedcontainers
 import audioop
-import pyaudio
 import psutil
-from PySide2 import QtCore, QtGui, QtWidgets, QtSvg
+from PySide2 import QtCore, QtGui, QtWidgets, QtSvg, QtMultimedia
 import chardet.universaldetector
 import chess
 from chess import gaviota, engine, pgn, svg
+import polib
 
 import marshal
 
