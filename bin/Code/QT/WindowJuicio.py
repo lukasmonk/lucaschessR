@@ -43,7 +43,7 @@ class WJuicio(LCDialog.LCDialog):
         config_board = manager.configuration.config_board("JUICIO", 32)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.set_side_bottom(position.is_white)
+        self.board.ponerPiezasAbajo(position.is_white)
 
         liMas = ((_("Close"), "close", Iconos.AceptarPeque()),)
         lyBM, tbBM = QTVarios.lyBotonesMovimiento(self, "", siLibre=False, icon_size=24, siMas=manager.continueTt, liMasAcciones=liMas)
@@ -224,15 +224,15 @@ class WJuicio(LCDialog.LCDialog):
             QtCore.QTimer.singleShot(1000, self.mueveTiempoWork)
 
     def mueveMas(self):
-        mrm = self.manager.analyze_state()
+        mrm = self.manager.analizaEstado()
 
         rmUsuN, pos = mrm.buscaRM(self.rmUsu.movimiento())
         if rmUsuN is None:
             um = QTUtil2.analizando(self)
-            self.manager.analyze_end()
+            self.manager.analizaFinal()
             rmUsuN = self.xengine.valora(self.position, self.rmUsu.from_sq, self.rmUsu.to_sq, self.rmUsu.promotion)
             mrm.agregaRM(rmUsuN)
-            self.manager.analyze_begin()
+            self.manager.analizaInicio()
             um.final()
 
         self.rmUsu = rmUsuN
@@ -240,10 +240,10 @@ class WJuicio(LCDialog.LCDialog):
         rmObjN, pos = mrm.buscaRM(self.rmObj.movimiento())
         if rmObjN is None:
             um = QTUtil2.analizando(self)
-            self.manager.analyze_end()
+            self.manager.analizaFinal()
             rmObjN = self.xengine.valora(self.position, self.rmObj.from_sq, self.rmObj.to_sq, self.rmObj.promotion)
             pos = mrm.agregaRM(rmObjN)
-            self.manager.analyze_begin()
+            self.manager.analizaInicio()
             um.final()
 
         self.rmObj = rmObjN

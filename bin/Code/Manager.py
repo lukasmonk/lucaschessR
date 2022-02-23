@@ -55,7 +55,7 @@ from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil2, QTUtil, SelectFiles
 from Code.QT import QTVarios
-from Code.QT import WReplay
+from Code.QT import Replay
 from Code.QT import WindowArbol
 from Code.QT import WindowArbolBook
 from Code.QT import WindowSavePGN
@@ -377,8 +377,8 @@ class Manager:
             self.configuration.x_show_effects = ant
             self.board.set_position(move.position)
 
-    def move_the_pieces(self, liMovs, is_rival=False):
-        if is_rival and self.configuration.x_show_effects:
+    def move_the_pieces(self, liMovs, timed_movement=False):
+        if timed_movement and self.configuration.x_show_effects:
 
             rapidez = self.configuration.pieces_speed_porc()
             cpu = self.procesador.cpu
@@ -430,6 +430,7 @@ class Manager:
                     self.board.muevePieza(movim[1], movim[2])
                 elif movim[0] == "c":
                     self.board.cambiaPieza(movim[1], movim[2])
+
         # Aprovechamos que esta operacion se hace en cada move
         self.atajosRatonReset()
 
@@ -442,12 +443,7 @@ class Manager:
         row, column = self.main_window.pgnPosActual()
         pos_move, move = self.pgn.move(row, column.key)
 
-        if (
-            self.main_window.siCapturas
-            or self.main_window.siInformacionPGN
-            or self.kibitzers_manager.some_working()
-            or self.configuration.x_show_bestmove
-        ):
+        if self.main_window.siCapturas or self.main_window.siInformacionPGN or self.kibitzers_manager.some_working():
             if move:
                 dic = move.position.capturas_diferencia()
                 if move.analysis and self.configuration.x_show_bestmove:
@@ -491,13 +487,14 @@ class Manager:
         if column.key == "NUMBER":
             pos_move -= 1
         game_run = self.game.copy_raw(pos_move)
-        self.kibitzers_manager.put_game(game_run, self.board.is_white_bottom, not all_kibitzers)
+        self.kibitzers_manager.put_game(game_run, not all_kibitzers)
 
     def put_pieces_bottom(self, is_white):
-        self.board.set_side_bottom(is_white)
+        self.board.ponerPiezasAbajo(is_white)
 
     def remove_hints(self, siTambienTutorAtras=True, siQuitarAtras=True):
         self.main_window.remove_hints(siTambienTutorAtras, siQuitarAtras)
+        self.is_tutor_enabled = False
         self.set_activate_tutor(False)
 
     def ponAyudas(self, hints, siQuitarAtras=True):
@@ -576,7 +573,7 @@ class Manager:
         if self.configuration.x_sound_move:
             if len(self.game):
                 move = self.game.move(-1)
-                self.runSound.play_list(move.listaSonidos())
+                self.runSound.playLista(move.listaSonidos(), siEsperar=True)
         elif self.configuration.x_sound_beep:
             self.runSound.playBeep()
 
@@ -601,13 +598,13 @@ class Manager:
             RS_WIN_OPPONENT_TIME: "GANARIVALTIEMPO",
         }
         if resfinal in dic:
-            self.runSound.play_key(dic[resfinal])
+            self.runSound.playClave(dic[resfinal])
 
-    def beepResultado(self, beep_result):
-        if beep_result:
+    def beepResultado(self, beep):
+        if beep:
             if not self.configuration.x_sound_results:
                 return
-            self.runSound.play_key(beep_result)
+            self.runSound.playClave(beep)
 
     def pgnRefresh(self, is_white):
         self.main_window.pgnRefresh(is_white)
@@ -874,7 +871,7 @@ class Manager:
             self.is_analyzed_by_tutor = False
 
             if self.game_type == GT_AGAINST_ENGINE:
-                self.analyze_begin()
+                self.analizaInicio()
 
     def is_finished(self):
         return self.game.is_finished()
@@ -903,10 +900,11 @@ class Manager:
                 self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, 0, must_save=False
             )
 
-    def analize_position(self, row, key):
+    def analizaPosicion(self, row, key):
         if row < 0:
             return
 
+        # is_shift, is_control, is_alt = QTUtil.kbdPulsado() # Antes de que analice
         move, is_white, siUltimo, tam_lj, pos_jg = self.dameJugadaEn(row, key)
         if not move:
             return
@@ -934,15 +932,17 @@ class Manager:
             else:
                 max_recursion = 9999
         if move.analysis is None:
-            siCancelar = self.xanalyzer.mstime_engine > 5000 or self.xanalyzer.depth_engine > 10
+            siCancelar = self.xanalyzer.mstime_engine > 5000 or self.xanalyzer.depth_engine > 5
             mens = _("Analyzing the move....")
-            self.main_window.base.show_message(_("Analyzing the move...."), siCancelar)
-            self.main_window.base.tb.setDisabled(True)
+            me = QTUtil2.mensEspera.start(
+                self.main_window, mens, physical_pos="ad", siCancelar=siCancelar, titCancelar=_("Stop"), siParentNone=True
+            )
+            self.main_window.setDisabled(True)
             if siCancelar:
                 ya_cancelado = [False]
 
                 def test_me(rm):
-                    if self.main_window.base.is_canceled():
+                    if me.cancelado():
                         if not ya_cancelado[0]:
                             self.xanalyzer.stop()
                             ya_cancelado[0] = True
@@ -950,9 +950,7 @@ class Manager:
                         tm = rm.time
                         if tm:
                             tm /= 1000
-                        self.main_window.base.change_message(
-                            '%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm)
-                        )
+                        me.label('%s\n%s: %d %s: %.01f"' % (mens, _("Depth"), rm.depth, _("Time"), tm))
                     return True
 
                 self.xanalyzer.set_gui_dispatch(test_me)
@@ -960,8 +958,8 @@ class Manager:
                 self.game, pos_jg, self.xtutor.mstime_engine, self.xtutor.depth_engine
             )
             move.analysis = mrm, pos
-            self.main_window.base.tb.setDisabled(False)
-            self.main_window.base.hide_message()
+            self.main_window.setDisabled(False)
+            me.final()
 
         Analysis.show_analysis(self.procesador, self.xtutor, move, self.board.is_white_bottom, max_recursion, pos_jg)
         self.put_view()
@@ -1001,13 +999,13 @@ class Manager:
             self.refresh()
 
     def replay(self):
-        resp = WReplay.param_replay(self.configuration, self.main_window)
+        resp = Replay.param_replay(self.configuration, self.main_window)
         if resp is None:
             return
 
-        seconds, if_start, if_pgn, if_beep, seconds_before = resp
+        seconds, if_start, if_pgn, if_beep = resp
 
-        self.xpelicula = WReplay.Replay(self, seconds, if_start, if_pgn, if_beep, seconds_before)
+        self.xpelicula = Replay.Replay(self, seconds, if_start, if_pgn, if_beep)
 
     def ponRutinaAccionDef(self, rutina):
         self.xRutinaAccionDef = rutina
@@ -1124,7 +1122,6 @@ class Manager:
 
     def sigueHumano(self):
         self.human_is_playing = True
-        self.check_boards_setposition()
         self.activate_side(self.game.last_position.is_white)
         QTUtil.refresh_gui()
 
@@ -1254,24 +1251,18 @@ class Manager:
 
         # Vista
         menuVista = menu.submenu(_("Show/hide"), Iconos.Vista())
-        menuVista.opcion("vista_pgn", _("PGN information"), siChecked=self.configuration.x_info_activate)
+        menuVista.opcion("vista_pgn", _("PGN information"), Iconos.InformacionPGNUno())
         menuVista.separador()
-        menuVista.opcion("vista_capturas", _("Captured material"), siChecked=self.configuration.x_captures_activate)
+        menuVista.opcion("vista_capturas", _("Captured material"), Iconos.Capturas())
         menuVista.separador()
-        menuVista.opcion(
-            "vista_bestmove",
-            _("Arrow with the best move when there is an analysis"),
-            siChecked=self.configuration.x_show_bestmove,
-        )
+        menuVista.opcion("vista_bestmove", _("Arrow with the best move when there is an analysis"), Iconos.Flechas())
         menu.separador()
 
         # DGT
         dboard = self.configuration.x_digital_board
         if dboard:
             menu.opcion(
-                "dgt",
-                _("Disable %s board") % dboard if DGT.eboard_is_on() else _("Enable %s board") % dboard,
-                Code.DGT.icon_eboard(),
+                "dgt", _("Disable %s board") % dboard if DGT.eboard_is_on() else _("Enable %s board") % dboard, Code.DGT.icon_eboard()
             )
             menu.separador()
 
@@ -1434,6 +1425,26 @@ class Manager:
 
         siJugadas = len(self.game) > 0
 
+        # Mas Opciones
+        if liMasOpciones:
+            submenu = menu
+            for key, label, icono in liMasOpciones:
+                if label is None:
+                    if icono is None:
+                        # liMasOpciones.append((None, None, None))
+                        submenu.separador()
+                    else:
+                        # liMasOpciones.append((None, None, True))  # Para salir del submenu
+                        submenu = menu
+                elif key is None:
+                    # liMasOpciones.append((None, titulo, icono))
+                    submenu = menu.submenu(label, icono)
+
+                else:
+                    # liMasOpciones.append((key, titulo, icono))
+                    submenu.opcion(key, label, icono)
+            menu.separador()
+
         # Grabar
         icoGrabar = Iconos.Grabar()
         icoFichero = Iconos.GrabarFichero()
@@ -1523,27 +1534,6 @@ class Manager:
             menu.separador()
             menu.opcion("arbol", _("Moves tree"), Iconos.Arbol())
 
-        # Mas Opciones
-        if liMasOpciones:
-            menu.separador()
-            submenu = menu
-            for key, label, icono in liMasOpciones:
-                if label is None:
-                    if icono is None:
-                        # liMasOpciones.append((None, None, None))
-                        submenu.separador()
-                    else:
-                        # liMasOpciones.append((None, None, True))  # Para salir del submenu
-                        submenu = menu
-                elif key is None:
-                    # liMasOpciones.append((None, titulo, icono))
-                    submenu = menu.submenu(label, icono)
-
-                else:
-                    # liMasOpciones.append((key, titulo, icono))
-                    submenu.opcion(key, label, icono)
-            menu.separador()
-
         resp = menu.lanza()
 
         if not resp:
@@ -1581,9 +1571,7 @@ class Manager:
         elif resp.startswith("vol"):
             accion = resp[3:]
             if accion == "fichero":
-                resp = SelectFiles.salvaFichero(
-                    self.main_window, _("File to save"), self.configuration.x_save_folder, "png", False
-                )
+                resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, "png", False)
                 if resp:
                     self.board.save_as_img(resp, "png")
 
@@ -1700,9 +1688,7 @@ class Manager:
         dato = self.listado("fen")
         if siFichero:
             extension = "fns"
-            resp = SelectFiles.salvaFichero(
-                self.main_window, _("File to save"), self.configuration.x_save_folder, extension, False
-            )
+            resp = SelectFiles.salvaFichero(self.main_window, _("File to save"), self.configuration.x_save_folder, extension, False)
             if resp:
                 try:
 
@@ -1999,7 +1985,7 @@ class Manager:
                 self.main_window.pgnColocate(row, is_white)
                 self.put_view()
                 link_variation_pressed("%d|%d|0" % (num_var_move, len(var_move.variations) - 1))
-                self.kibitzers_manager.put_game(game_var, self.board.is_white_bottom)
+                self.kibitzers_manager.put_game(game_var)
         else:
             # si tiene mas movimientos se check si coincide con el siguiente
             if len(variation) > num_var_move + 1:
@@ -2021,7 +2007,7 @@ class Manager:
                 link_variation_pressed(
                     "%s|%d|%d|%d" % (cvariation_move, (num_var_move + 1), len(var_move.variations) - 1, 0)
                 )
-                self.kibitzers_manager.put_game(game_var, self.board.is_white_bottom)
+                self.kibitzers_manager.put_game(game_var)
 
             # si no tiene mas movimientos se añade al final
             else:
@@ -2033,4 +2019,4 @@ class Manager:
                 variation.add_move(new_move)
                 cvariation_move = "|".join([cnum for cnum in self.board.variation_history.split("|")][:-1])
                 link_variation_pressed("%s|%d" % (cvariation_move, (num_var_move + 1)))
-                self.kibitzers_manager.put_game(variation, self.board.is_white_bottom)
+                self.kibitzers_manager.put_game(variation)

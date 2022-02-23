@@ -5,6 +5,7 @@ from Code.About import About
 from Code.CompetitionWithTutor import CompetitionWithTutor
 from Code.QT import Colocacion
 from Code.QT import Controles
+from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
@@ -273,3 +274,25 @@ class WNumEntrenamiento(QtWidgets.QDialog):
         self.number = self.ed.value()
         self.accept()
 
+
+def numPosicion(w_parent, titulo, nFEN, pos, salta, tipo):
+    li_gen = [FormLayout.separador]
+
+    label = "%s (1..%d)" % (_("Select position"), nFEN)
+    li_gen.append((FormLayout.Spinbox(label, 1, nFEN, 50), pos))
+
+    li_gen.append(FormLayout.separador)
+
+    li = [(_("Sequential"), "s"), (_("Random"), "r"), (_("Random with same sequence based on position"), "rk")]
+    li_gen.append((FormLayout.Combobox(_("Type"), li), tipo))
+
+    li_gen.append(FormLayout.separador)
+
+    li_gen.append((_("Jump to the next after solving") + ":", salta))
+
+    resultado = FormLayout.fedit(li_gen, title=titulo, parent=w_parent, anchoMinimo=200, icon=Iconos.Entrenamiento())
+    if resultado:
+        position, tipo, jump = resultado[1]
+        return position, tipo, jump
+    else:
+        return None

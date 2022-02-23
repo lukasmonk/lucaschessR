@@ -30,8 +30,6 @@ class RunEngine:
             self.put_line = self.put_line_base
             self.xstdout_thread = self.xstdout_thread_base
 
-        self.end_time_humanize = None
-
         self.name = name
 
         self.ponder = False
@@ -148,14 +146,6 @@ class RunEngine:
                 if not line:
                     break
                 line = str(line, "latin-1", "ignore")
-                if self.end_time_humanize:
-                    if "bestmove" in line:
-                        while time.time() < self.end_time_humanize and self.working:
-                            time.sleep(0.1)
-                            lock.acquire()
-                            self.liBuffer.append("info string humanizing")
-                            lock.release()
-                        self.end_time_humanize = None
                 lock.acquire()
                 self.liBuffer.append(line)
                 if self.direct_dispatch:
@@ -177,14 +167,6 @@ class RunEngine:
                 if not line:
                     break
                 line = str(line, "latin-1", "ignore")
-                if self.end_time_humanize:
-                    if "bestmove" in line:
-                        while time.time() < self.end_time_humanize and self.working:
-                            time.sleep(0.1)
-                            lock.acquire()
-                            self.liBuffer.append("info string humanizing")
-                            lock.release()
-                        self.end_time_humanize = None
                 prlk(self.name, line)
                 lock.acquire()
                 self.liBuffer.append(line)
@@ -603,12 +585,6 @@ class RunEngine:
         self.working = True
         self.put_line(line)
 
-    def set_humanize(self, movetime):
-        self.end_time_humanize = time.time() + movetime
-
-    def not_humanize(self):
-        self.end_time_humanize = None
-
     def play_bestmove_time(self, play_return, game, time_white, time_black, inc_time_move):
         env = "go wtime %d btime %d" % (time_white, time_black)
         if inc_time_move:
@@ -646,21 +622,92 @@ class MaiaEngine(RunEngine):
         dic_nodes = {1100: 1, 1200: 3, 1300: 6, 1400: 16, 1500: 39, 1600: 98, 1700: 244, 1800: 610, 1900: 1526}
         self.nodes = dic_nodes.get(level, 1)
 
-    def play_bestmove_time(self, play_return, game, time_white, time_black, inc_time_move):
-        if self.test_book(game):
-            play_return(self.mrm)
-            return
+    def simulate_time(self, ms_time):
+        if ms_time and ms_time > 0:
+            tini = time.time()
+            while not (self.stopping or (time.time() - tini) * 1000 > ms_time):
+                QtCore.QCoreApplication.processEvents()
+                time.sleep(0.1)
+        self.stopping = False
+
+    def seek_bestmove(self, max_time, max_depth, is_savelines):
+        tini = time.time()
+        self.stopping = False
+        env = "go nodes %d" % self.nodes
+        ms_time = 10000
+        if max_time:
+            ms_time = max_time + 3000
+        elif max_depth:
+            ms_time = int(max_depth * ms_time / 3.0)
+
+        self.reset()
+        if is_savelines:
+            self.mrm.save_lines()
+        self.mrm.setTimeDepth(max_time, max_depth)
+
+        self.work_bestmove(env, ms_time)
+        if max_time:
+            self.simulate_time(max_time - (time.time() - tini) * 1000)
+
+        self.mrm.ordena()
+
+        return self.mrm
+
+    def seek_bestmove_time(self, time_white, time_black, inc_time_move):
+        tini = time.time()
+        self.stopping = False
         env = "go nodes %d" % self.nodes
         max_time = time_white if self.is_white else time_black
-        self.play_with_return(play_return, game, env, max_time, None)
+
+        self.reset()
+        self.mrm.setTimeDepth(max_time, None)
+
+        self.work_bestmove(env, max_time)
+
+        if time_white > 60000 and time_black > 60000:
+            self.simulate_time(min(time_white / 40, random.randint(1000, 15000)) - (time.time() - tini) * 1000)
+
+        self.mrm.ordena()
+        return self.mrm
+
+    def play_bestmove_time(self, play_return, game, time_white, time_black, inc_time_move):
+        self.stopping = False
+        env = "go nodes %d" % self.nodes
+        max_time = time_white if self.is_white else time_black
+        if time_white > 60000 and time_black > 60000:
+            time_simulate = min(time_white / 40, random.randint(1000, 15000))
+        else:
+            time_simulate = 0
+        self.play_with_return_maia(play_return, game, env, max_time, None, time_simulate)
 
     def play_bestmove_game(self, play_return, game, max_time, max_depth):
-        if self.test_book(game):
-            play_return(self.mrm)
-            return
+        self.stopping = False
         env = "go nodes %d" % self.nodes
-        self.play_with_return(play_return, game, env, max_time, max_depth)
+        time_simulate = max_time
+        self.play_with_return_maia(play_return, game, env, max_time, max_depth, time_simulate)
 
+    def play_with_return_maia(self, play_return, game, line, max_time, max_depth, time_simulate):
+        self.reset()
+        if self.test_book(game):
+            if time_simulate:
+                time_simulate /= 3
+        else:
+            self.mrm.setTimeDepth(max_time, 1)
+            self.set_game_position(game)
+            self.work_bestmove(line, 25000)
+            self.mrm.ordena()
+        self.simulate_time(time_simulate)
+        play_return(self.mrm)
+
+    def put_line_debug(self, line: str):
+        if line == "stop":
+            self.stopping = True
+        RunEngine.put_line_debug(self, line)
+
+    def put_line_base(self, line: str):
+        if line == "stop":
+            self.stopping = True
+        RunEngine.put_line_base(self, line)
 
     def test_book(self, game):
         if len(game) < 30:

@@ -55,6 +55,7 @@ def beep():
     QtWidgets.QApplication.beep()
 
 
+
 def backgroundGUI():
     """
     Background por defecto del GUI
@@ -66,13 +67,7 @@ def backgroundGUIlight(factor):
     """
     Background por defecto del GUI
     """
-    return (
-        QtWidgets.QApplication.palette()
-        .brush(QtGui.QPalette.Active, QtGui.QPalette.Window)
-        .color()
-        .light(factor)
-        .name()
-    )
+    return QtWidgets.QApplication.palette().brush(QtGui.QPalette.Active, QtGui.QPalette.Window).color().light(factor).name()
 
 
 def refresh_gui():
@@ -222,3 +217,5 @@ class EstadoWindow:
         self.maximizado = x == QtCore.Qt.WindowMaximized
         self.fullscreen = x == QtCore.Qt.WindowFullScreen
         self.active = x == QtCore.Qt.WindowActive
+
+

@@ -416,7 +416,7 @@ class WPotenciaBase(LCDialog.LCDialog):
 
         self.ghistorico.gotop()
 
-    def grid_doubleclick_header(self, grid, o_column):
+    def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
         if key in ("FECHA", "SCORE", "REF"):
             self.historico.pon_orden(key)
@@ -570,7 +570,7 @@ class WPotencia(LCDialog.LCDialog):
 
         self.board = Board.BoardEstatico(self, config_board)
         self.board.crea()
-        self.board.set_side_bottom(cp.is_white)
+        self.board.ponerPiezasAbajo(cp.is_white)
         self.board.set_position(cp)
 
         # Rotulo informacion
@@ -594,7 +594,7 @@ class WPotencia(LCDialog.LCDialog):
         li_acciones = (
             (_("Close"), Iconos.MainMenu(), self.terminar),
             (_("Cancel"), Iconos.Cancelar(), self.cancelar),
-            (_("Verify"), Iconos.Check(), self.comprobar),
+            (_("Check"), Iconos.Check(), self.comprobar),
         )
         self.tb = QTVarios.LCTB(self, li_acciones)
 

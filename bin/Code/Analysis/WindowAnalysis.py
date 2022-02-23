@@ -243,7 +243,7 @@ class WAnalisis(LCDialog.LCDialog):
 
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.set_side_bottom(is_white)
+        self.board.ponerPiezasAbajo(is_white)
 
         self.lb_engine = Controles.LB(self).align_center()
         self.lb_time = Controles.LB(self).align_center()

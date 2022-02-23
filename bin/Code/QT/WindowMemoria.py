@@ -119,7 +119,7 @@ class WMemoria(LCDialog.LCDialog):
         li_acciones = (
             (_("Start"), Iconos.Empezar(), "empezar"),
             (_("Continue"), Iconos.Pelicula_Seguir(), "seguir"),
-            (_("Verify"), Iconos.Check(), "comprobar"),
+            (_("Check"), Iconos.Check(), "comprobar"),
             (_("Target"), Iconos.Verde32(), "objetivo"),
             (_("Wrong"), Iconos.Rojo32(), "nuestro"),
             (_("Repeat"), Iconos.Pelicula_Repetir(), "repetir"),
@@ -268,7 +268,7 @@ class WMemoria(LCDialog.LCDialog):
         self.rotuloDispone1.show()
         self.gbTiempo.show()
 
-        self.pending_time = self.seconds
+        self.tiempoPendiente = self.seconds
         self.start_clock()
 
     def seguir(self):
@@ -363,12 +363,12 @@ class WMemoria(LCDialog.LCDialog):
         self.empezar()
 
     def reloj(self):
-        self.pending_time -= 1
+        self.tiempoPendiente -= 1
 
         self.rotuloDispone.set_text(
-            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.pending_time), str(self.nivel + 3))
+            _X(_("You have %1 seconds to remember the position of %2 pieces"), str(self.tiempoPendiente), str(self.nivel + 3))
         )
-        if self.pending_time == 0:
+        if self.tiempoPendiente == 0:
             self.seguir()
 
     def start_clock(self):

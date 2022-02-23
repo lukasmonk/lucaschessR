@@ -45,7 +45,7 @@ def read_engines(folder_engines):
     cm.ordenUCI("Threads", "2")
     cm.ponMultiPV(20, 218)
 
-    mas("alouette", "Roland Chastain", "0.1.4", "https://gitlab.com/rchastain/alouette", "Alouette-0.1.4", 689)
+    mas("alouette", "Roland Chastain", "0.1.5", "https://gitlab.com/rchastain/alouette", "Alouette-0.1.5", 689)
 
     mas("amoeba", "Richard Delorme", "2.6", "https://github.com/abulmo/amoeba", "Amoeba-2.6", 2911)
 

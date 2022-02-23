@@ -7,7 +7,6 @@ from Code.QT import Colocacion
 from Code.QT import Iconos
 from Code.QT import LCDialog
 from Code.QT import QTUtil
-from Code.Translations import WorkTranslate
 
 
 class MainWindow(LCDialog.LCDialog):
@@ -57,29 +56,26 @@ class MainWindow(LCDialog.LCDialog):
 
         ctrl1 = QtWidgets.QShortcut(self)
         ctrl1.setKey(QtGui.QKeySequence("Ctrl+1"))
-        ctrl1.activated.connect(self.pressed_shortcut_Ctrl1)
+        ctrl1.activated.connect(self.pulsadoShortcutCtrl1)
 
         ctrlF10 = QtWidgets.QShortcut(self)
         ctrlF10.setKey(QtGui.QKeySequence("Ctrl+0"))
-        ctrlF10.activated.connect(self.pressed_shortcut_Ctrl0)
+        ctrlF10.activated.connect(self.pulsadoShortcutCtrl0)
 
         F11 = QtWidgets.QShortcut(self)
         F11.setKey(QtGui.QKeySequence("F11"))
-        F11.activated.connect(self.pressed_shortcut_F11)
+        F11.activated.connect(self.pulsadoShortcutF11)
         self.activadoF11 = False
-        self.previous_f11_maximized = False
 
         if QtWidgets.QSystemTrayIcon.isSystemTrayAvailable():
             F12 = QtWidgets.QShortcut(self)
             F12.setKey(QtGui.QKeySequence("F12"))
-            F12.activated.connect(self.pressed_shortcut_F12)
+            F12.activated.connect(self.pulsadoShortcutF12)
             self.trayIcon = None
 
         self.resizing = None
 
         self.cursor_pensado = False
-
-        self.work_translate = None
 
     def set_notify(self, routine):
         if self.signal_routine_connected:
@@ -92,9 +88,10 @@ class MainWindow(LCDialog.LCDialog):
         self.signal_notify.emit()
 
     def closeEvent(self, event):  # Cierre con X
-        self.final_processes()
+        self.procesosFinales()
         if not self.manager.finalX0():
             event.ignore()
+
 
     def onTopWindow(self):
         self.onTop = not self.onTop
@@ -113,7 +110,7 @@ class MainWindow(LCDialog.LCDialog):
         self.accept()
         self.manager.stop_engines()
 
-    def pressed_shortcut_F12(self):
+    def pulsadoShortcutF12(self):
         if not self.trayIcon:
             restoreAction = QtWidgets.QAction(Iconos.PGN(), _("Show"), self, triggered=self.restauraTrayIcon)
             quitAction = QtWidgets.QAction(Iconos.Terminar(), _("Quit"), self, triggered=self.quitTrayIcon)
@@ -124,7 +121,7 @@ class MainWindow(LCDialog.LCDialog):
 
             self.trayIcon = QtWidgets.QSystemTrayIcon(self)
             self.trayIcon.setContextMenu(trayIconMenu)
-            self.trayIcon.setIcon(Iconos.Aplicacion64())
+            self.trayIcon.setIcon(Iconos.Otros())  # Aplicacion())
             self.trayIcon.activated.connect(self.activateTrayIcon)
             self.trayIcon.hide()
 
@@ -132,26 +129,19 @@ class MainWindow(LCDialog.LCDialog):
             self.trayIcon.show()
             self.hide()
 
-    def pressed_shortcut_F11(self):
+    def pulsadoShortcutF11(self):
         self.activadoF11 = not self.activadoF11
         if self.activadoF11:
-            if self.siInformacionPGN:
-                self.informacionPGN.save_width()
             self.showFullScreen()
         else:
             self.showNormal()
-            if self.siInformacionPGN:
-                self.informacionPGN.restore_width()
 
-    def final_processes(self):
+    def procesosFinales(self):
         if Code.dgt:
             DGT.desactivar()
 
-        self.board.close_visual_script()
+        self.board.cierraGuion()
         self.board.terminar()
-
-        if self.work_translate:
-            self.work_translate.close()
 
     def set_manager_active(self, manager):
         self.manager = manager
@@ -167,22 +157,11 @@ class MainWindow(LCDialog.LCDialog):
         if self.board.siMaximizado():
             self.showMaximized()
         else:
-            self.xrestore_video()
+            self.restore_video()
             self.ajustaTam()
             self.show()
 
         self.ponTitulo()
-
-    def save_width_piece(self):
-        ct = self.board.config_board
-        if ct.anchoPieza() != 1000:
-            dic = Code.configuration.read_variables("WIDTH_PIEZES")
-            dic["WIDTH_PIEZE_MAIN"] = ct.anchoPieza()
-            Code.configuration.write_variables("WIDTH_PIEZES", dic)
-
-    def restore_width_pieze(self):
-        dic = Code.configuration.read_variables("WIDTH_PIEZES")
-        return dic.get("WIDTH_PIEZE_MAIN")
 
     def changeEvent(self, event):
         QtWidgets.QWidget.changeEvent(self, event)
@@ -192,28 +171,35 @@ class MainWindow(LCDialog.LCDialog):
         nue = QTUtil.EstadoWindow(self.windowState())
         ant = QTUtil.EstadoWindow(event.oldState())
 
+        ct = self.board.config_board
+
         if getattr(self.manager, "siPresentacion", False):
             self.manager.presentacion(False)
 
         if nue.fullscreen:
-            self.previous_f11_maximized = ant.maximizado
             self.base.tb.hide()
             self.board.siF11 = True
-            self.save_width_piece()
+            self.antiguoAnchoPieza = 1000 if ant.maximizado else ct.anchoPieza()
             self.board.maximizaTam(True)
         else:
             if ant.fullscreen:
                 self.base.tb.show()
-                self.board.normalTam(self.restore_width_pieze())
+                self.board.normalTam(self.antiguoAnchoPieza)
                 self.ajustaTam()
-                if self.previous_f11_maximized:
+                if self.antiguoAnchoPieza == 1000:
                     self.setWindowState(QtCore.Qt.WindowMaximized)
             elif nue.maximizado:
-                self.save_width_piece()
+                self.antiguoAnchoPieza = ct.anchoPieza()
                 self.board.maximizaTam(False)
             elif ant.maximizado:
-                self.board.normalTam(self.restore_width_pieze())
+                if not self.antiguoAnchoPieza or self.antiguoAnchoPieza == 1000:
+                    self.antiguoAnchoPieza = self.board.calculaAnchoMXpieza()
+                self.board.normalTam(self.antiguoAnchoPieza)
                 self.ajustaTam()
+                # ct.anchoPieza(self.antiguoAnchoPieza)
+                # ct.guardaEnDisco()
+                # self.board.set_width()
+                # self.ajustaTam()
 
     def show_variations(self, titulo):
         flags = (
@@ -327,8 +313,6 @@ class MainWindow(LCDialog.LCDialog):
     def activaCapturas(self, siActivar=None):
         if siActivar is None:
             self.siCapturas = not self.siCapturas
-            Code.configuration.x_captures_activate = self.siCapturas
-            Code.configuration.graba()
         else:
             self.siCapturas = siActivar
         self.base.lb_capt_white.setVisible(self.siCapturas)
@@ -337,20 +321,16 @@ class MainWindow(LCDialog.LCDialog):
     def activaInformacionPGN(self, siActivar=None):
         if siActivar is None:
             self.siInformacionPGN = not self.siInformacionPGN
-            Code.configuration.x_info_activate = self.siInformacionPGN
-            Code.configuration.graba()
         else:
             self.siInformacionPGN = siActivar
-
-        self.informacionPGN.activa(self.siInformacionPGN)
+        self.informacionPGN.setVisible(self.siInformacionPGN)
+        self.ajustaTamH()
         sizes = self.informacionPGN.splitter.sizes()
         for n, size in enumerate(sizes):
             if size == 0:
                 sizes[n] = 100
                 self.informacionPGN.splitter.setSizes(sizes)
                 break
-        if not self.siInformacionPGN:
-            self.ajustaTamH()
 
     def ponCapturas(self, dic):
         self.base.put_captures(dic)
@@ -365,11 +345,11 @@ class MainWindow(LCDialog.LCDialog):
     def ponDatosReloj(self, bl, rb, ng, rn):
         self.base.ponDatosReloj(bl, rb, ng, rn)
 
-    def set_clock_white(self, tm, tm2):
-        self.base.set_clock_white(tm, tm2)
+    def ponRelojBlancas(self, tm, tm2):
+        self.base.ponRelojBlancas(tm, tm2)
 
-    def set_clock_black(self, tm, tm2):
-        self.base.set_clock_black(tm, tm2)
+    def ponRelojNegras(self, tm, tm2):
+        self.base.ponRelojNegras(tm, tm2)
 
     def change_player_labels(self, bl, ng):
         self.base.change_player_labels(bl, ng)
@@ -394,11 +374,11 @@ class MainWindow(LCDialog.LCDialog):
             cNivel = _("Level")
         self.base.columnas60(siPoner, cNivel)
 
-    def pressed_shortcut_Ctrl1(self):
+    def pulsadoShortcutCtrl1(self):
         if self.manager and hasattr(self.manager, "control1"):
             self.manager.control1()
 
-    def pressed_shortcut_Ctrl0(self):
+    def pulsadoShortcutCtrl0(self):
         if self.manager and hasattr(self.manager, "control0"):
             self.manager.control0()
 
@@ -462,28 +442,5 @@ class MainWindow(LCDialog.LCDialog):
                     sps = [1, 1]
             dic["SP_%s" % name] = sps
 
-        dic["WINFO_WIDTH"] = self.informacionPGN.width_saved
-        dic["WINFOPARENT_WIDTH"] = self.informacionPGN.parent_width_saved
-
         Code.configuration.save_video(self.key_video, dic)
         return dic
-
-    def xrestore_video(self):
-        if self.restore_video():
-            dic = self.restore_dicvideo()
-            self.informacionPGN.width_saved = dic.get("WINFO_WIDTH")
-            self.informacionPGN.parent_width_saved = dic.get("WINFOPARENT_WIDTH")
-
-    def check_translated_help_mode(self):
-        if not Code.configuration.x_translation_mode:
-            return
-
-        self.work_translate = WorkTranslate.launch_wtranslation()
-
-        QtCore.QTimer.singleShot(3000, self.check_translated_received)
-
-    def check_translated_received(self):
-        salto = 500 if self.work_translate.pending_commit else 1000
-
-        if self.work_translate.check_commits():
-            QtCore.QTimer.singleShot(salto, self.check_translated_received)

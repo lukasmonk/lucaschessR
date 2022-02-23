@@ -654,7 +654,7 @@ class InfoMove(QtWidgets.QWidget):
         self.main_window = self
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.set_side_bottom(is_white_bottom)
+        self.board.ponerPiezasAbajo(is_white_bottom)
 
         btInicio = Controles.PB(self, "", self.start).ponIcono(Iconos.MoverInicio())
         btAtras = Controles.PB(self, "", self.atras).ponIcono(Iconos.MoverAtras())

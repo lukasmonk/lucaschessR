@@ -9,7 +9,7 @@ class WMate15(LCDialog.LCDialog):
     def __init__(self, procesador):
         configuration = procesador.configuration
         path = configuration.file_mate15()
-        title = _X(_("Mate in %1"), "1½")
+        title = _("Mate in 1½")
         icon = Iconos.Mate15()
         extconfig = "mate15"
         self.db = Mate15.DBMate15(path)

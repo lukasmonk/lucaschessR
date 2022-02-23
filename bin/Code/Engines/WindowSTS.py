@@ -762,7 +762,7 @@ class WUnSTS(LCDialog.LCDialog):
         test = int(column[1:])
         return self.sts.donePoints(work, test)
 
-    def grid_doubleclick_header(self, grid, oCol):
+    def grid_doble_clickCabecera(self, grid, oCol):
         if oCol.key != "POS":
             self.sts.ordenWorks(oCol.key)
             self.sts.save()

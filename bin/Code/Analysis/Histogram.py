@@ -1,5 +1,4 @@
 import os
-import math
 
 from PySide2 import QtCore, QtGui, QtWidgets
 
@@ -11,26 +10,16 @@ from Code.QT import QTVarios
 from Code.QT import SelectFiles
 
 
-def escala_logaritmica(total_height, score):
-    # Convertimos 0...30 en 0...10
-    # La mitad de altura = 10
-    assert -30 <= score <= 30
-    v = 6.705 * math.log10(abs(score) + 1.0)
-    mid = total_height / 2
-    factor = 1.0 if score < 0 else -1.0
-    return -(mid - v * mid * factor / 10)
-
-
 class HSerie:
     def __init__(self):
         self.liPoints = []
-        self.minimum = -30.0
-        self.maximum = +30.0
+        self.minimum = -5.0
+        self.maximum = +5.0
         self.qcolor = {True: QtGui.QColor("#DACA99"), False: QtGui.QColor("#83C5F8")}
 
         # Elo para que 3400 - 1000 esten en los limites interiores
-        self.maximum_elo = 3600
-        self.minimum_elo = 0
+        self.maximum_elo = 4200
+        self.minimum_elo = 200
 
     def addPoint(self, hpoint):
         hpoint.setGridPos(len(self.liPoints))
@@ -56,6 +45,7 @@ class HSerie:
         self.factor = sz_height * 1.0 / ntotal_y
         ntotal_y_elo = self.maximum_elo - self.minimum_elo
         self.factor_elo = sz_height * 1.0 / ntotal_y_elo
+        nmedia_y = ntotal_y / 2
         firstmove = self.firstmove()
         self.step = sz_width * 1.0 / self.steps()
         nmedia_x = len(self.liPoints) / 2
@@ -64,8 +54,7 @@ class HSerie:
             dr = ("s" if point.value > 0 else "n") + ("e" if npoint < nmedia_x else "w")
             point.set_dir_tooltip(dr)
             rx = (point.nummove - firstmove) * self.step - sz_left
-            ry = escala_logaritmica(sz_height, point.rvalue)
-
+            ry = -(point.rvalue + nmedia_y) * self.factor
             ry_elo = -(point.elo - self.minimum_elo) * self.factor_elo
             point.set_rxy(rx, ry, ry_elo)
 
@@ -318,49 +307,47 @@ class Histogram(QtWidgets.QGraphicsView):
         painter.setPen(QtGui.QColor("#545454"))
         align_right = QtCore.Qt.AlignRight
         h = 12
-        x = left - 10
         w = 24
+        coord = [-3.0, -1.5, 0.0, +1.5, +3.0]
+        plant = "%+0.1f"
+
+        x = left - 31
         if self.si_values:
-            coord = [-15, -8, -4, -2, -0.8, 0, 0.8, +2, +4, +8, +15]
-            plant = "%+0.1f"
             for d in coord:
-                y = escala_logaritmica(height, d) - height / 42
-                painter.drawText(x - 30, y, w + 10, h, align_right, plant % d)
-
-            # Linea de referencia en la mitad-horizontal
-            painter.setPen(QtCore.Qt.black)
-            t = top + height * 0.50
-            painter.drawLine(left, t, right, t)
-
-            # Lineas referencia horizontal
-            painter.setPen(QtGui.QColor("#D9D9D9"))
-            for pos, d in enumerate(coord):
-                if d:
-                    t = escala_logaritmica(height, d)
-                    painter.drawLine(left, t, right, t)
-
+                y = bottom - height / 2 - d * serie.factor - h / 2
+                painter.drawText(x, y, w, h, align_right, plant % d)
         else:
-            coord = range(0, 3800, 200)
+            coord[4] = +3.25  # 3500 = max = 1300/400
             for n, d in enumerate(coord):
-                y = bottom - height * d / 3600 - height / 42
-                rot = str(d)
-                painter.drawText(x - 120, y, w + 100, h, align_right, rot)
-            # pen = painter.pen()
-            # pen.setWidth(4)
-            # pen.setColor(QtCore.Qt.darkGreen)
-            # painter.setPen(pen)
-            # y = bottom - height * self.elo_medio / 3600
-            # painter.drawLine(left, y, right, y)
-            # painter.drawText(
-            #     right + 5, y - height / 42, 500, h * 2, QtCore.Qt.AlignLeft, "%d %s" % (self.elo_medio, _("Average"))
-            # )
+                y = bottom - height / 2 - d * serie.factor - h / 2
+                if n == 0:
+                    rot = _("Min elo")
+                elif n == 4:
+                    rot = _("Max elo")
+                else:
+                    d = int(1000 + 600 * (d * 2 + 6) / 3)
+                    rot = str(d)
+                painter.drawText(x - 100, y, w + 100, h, align_right, rot)
+            pen = painter.pen()
+            pen.setWidth(4)
+            pen.setColor(QtCore.Qt.darkGreen)
+            painter.setPen(pen)
+            d = (self.elo_medio - 1000) / 400.0 - 3.0
+            y = bottom - height / 2 - d * serie.factor
+            painter.drawLine(left, y, right, y)
+            painter.drawText(right + 5, y - h / 2, 500, h * 2, QtCore.Qt.AlignLeft, "%d %s" % (self.elo_medio, _("Average")))
 
-            # Lineas referencia horizontal
-            painter.setPen(QtGui.QColor("#D9D9D9"))
-            for pos, d in enumerate(coord):
-                if d:
-                    t = bottom - height * d / 3600
-                    painter.drawLine(left, t, right, t)
+        # Linea de referencia en la mitad-horizontal
+        painter.setPen(QtCore.Qt.black)
+        t = top + height * 0.50
+        painter.drawLine(left, t, right, t)
+
+        # Lineas referencia horizontal
+        painter.setPen(QtGui.QColor("#D9D9D9"))
+        for d in coord:
+            if d:
+                t = bottom - height / 2 - d * serie.factor
+                painter.drawLine(left, t, right, t)
 
         # Barras de los puntos perdidos
         if self.owner.valorShowLostPoints():
@@ -380,32 +367,18 @@ class Histogram(QtWidgets.QGraphicsView):
         # Lineas que unen los puntos
         pen = painter.pen()
         pen.setWidth(4)
-        if self.si_values:
-            for is_white in (True, False):
-                pen.setColor(serie.qcolor[is_white])
-                painter.setPen(pen)
-                for p, p1 in serie.lines():
-                    if p.is_white == is_white:
+        for is_white in (True, False):
+            pen.setColor(serie.qcolor[is_white])
+            painter.setPen(pen)
+            for p, p1 in serie.lines():
+                if p.is_white == is_white:
+                    if self.si_values:
                         ry = p.ry
                         ry1 = p1.ry
-                        painter.drawLine(p.rx + 1, ry, p1.rx, ry1)
-
-        else:
-            for is_white in (True, False):
-                pen.setColor(serie.qcolor[is_white])
-                painter.setPen(pen)
-                previous = None
-                next1 = None
-                for p, p1 in serie.lines():
-                    if p.is_white == is_white:
-                        if previous:
-                            painter.drawLine(previous.rx + 1, previous.ry_elo, p.rx, p.ry_elo)
-                        previous = p
-                    if p1:
-                        next1 = p1
-
-                if next1 and next1.is_white == is_white:
-                    painter.drawLine(previous.rx + 1, previous.ry_elo, next1.rx, next1.ry_elo)
+                    else:
+                        ry = p.ry_elo
+                        ry1 = p1.ry_elo
+                    painter.drawLine(p.rx + 1, ry, p1.rx, ry1)
 
         painter.setBrush(QtGui.QBrush())
 
@@ -516,10 +489,8 @@ def genHistograms(game):
                 tooltip += " ?%0.02f" % lostp
             else:
                 tooltip += "!"
-
-            avg = move.elo_avg
-            tooltip += " (%d)" % avg
-            hp = HPoint(nj, pts, lostp, lostp_abs, tooltip, avg)
+            tooltip += " (%d)" % move.elo
+            hp = HPoint(nj, pts, lostp, lostp_abs, tooltip, move.elo)
             hgame.addPoint(hp)
             if is_white:
                 hwhite.addPoint(hp.clone())

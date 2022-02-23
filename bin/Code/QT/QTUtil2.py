@@ -554,6 +554,15 @@ def message_error_control(owner, mens, control):
     message(owner, mens, titulo=_("Error"), pixmap=Iconos.pmCancelar(), px=px, py=py)
 
 
+def message_in_point(owner, mens, titulo, point):
+    if titulo is None:
+        titulo = _("Information")
+    dif = 5
+    px = point.x() + dif
+    py = point.x() + dif
+    message(owner, mens, titulo=titulo, pixmap=Iconos.pmInformacion(), px=px, py=py)
+
+
 def message_bold(owner, mens, titulo=None):
     message(owner, mens, titulo=titulo, si_bold=True)
 

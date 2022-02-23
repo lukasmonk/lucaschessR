@@ -30,15 +30,15 @@ class Manager:
         for ipc_kibitzer in self.li_activos:
             ipc_kibitzer.stop()
 
-    def put_game(self, game, is_white_bottom, only_last=False):
+    def put_game(self, game, only_last=False):
         if self.li_activos:
             if only_last:
-                self.li_activos[-1].put_game(game, is_white_bottom)
+                self.li_activos[-1].put_game(game)
             else:
                 li_closed = []
                 for n, ipc_kibitzer in enumerate(self.li_activos):
                     if ipc_kibitzer.working():
-                        ipc_kibitzer.put_game(game, is_white_bottom)
+                        ipc_kibitzer.put_game(game)
                     else:
                         li_closed.append(n)
                 if li_closed:
@@ -91,11 +91,10 @@ class IPCKibitzer:
             return False
         return self.popen.poll() is None
 
-    def put_game(self, game, is_white_bottom):
+    def put_game(self, game):
         orden = Orden()
         orden.key = KIBRUN_GAME
         orden.dv["GAME"] = game.save()
-        orden.dv["IS_WHITE_BOTTOM"] = is_white_bottom
         self.escribe(orden)
 
     def stop(self):

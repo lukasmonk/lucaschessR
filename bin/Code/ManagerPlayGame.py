@@ -129,7 +129,7 @@ class ManagerPlayGame(Manager.Manager):
         self.board.set_position(self.game.first_position)
         self.pgnRefresh(True)
         self.check_boards_setposition()
-        self.analyze_end()
+        self.analizaFinal()
 
         self.play_next_move()
 
@@ -145,12 +145,12 @@ class ManagerPlayGame(Manager.Manager):
                     return mrm
         return None
 
-    def analyze_begin(self):
+    def analizaInicio(self):
         if not self.is_finished():
             self.xanalyzer.ac_inicio(self.game)
             self.siAnalizando = True
 
-    def analyze_minimum(self, pvUsu, pvObj):
+    def analizaMinimo(self, pvUsu, pvObj):
         mrmActual = self.xanalyzer.ac_estado()
         mrm = self.validoMRM(pvUsu, pvObj, mrmActual)
         if mrm:
@@ -158,12 +158,12 @@ class ManagerPlayGame(Manager.Manager):
         self.mrm = copy.deepcopy(self.xanalyzer.ac_minimo(self.minTiempo, False))
         return self.mrm
 
-    def analyze_state(self):
+    def analizaEstado(self):
         self.xanalyzer.engine.ac_lee()
         self.mrm = copy.deepcopy(self.xanalyzer.ac_estado())
         return self.mrm
 
-    def analyze_end(self):
+    def analizaFinal(self):
         if self.siAnalizando:
             self.siAnalizando = False
             self.xanalyzer.ac_final(-1)
@@ -201,7 +201,7 @@ class ManagerPlayGame(Manager.Manager):
         else:
             self.human_is_playing = True
             self.thinking(True)
-            self.analyze_begin()
+            self.analizaInicio()
             self.activate_side(is_white)
             self.thinking(False)
             self.iniTiempo = time.time()
@@ -246,7 +246,7 @@ class ManagerPlayGame(Manager.Manager):
             um = QTUtil2.analizando(self.main_window)
             pvUsu = jgUsu.movimiento()
             pvObj = jgObj.movimiento()
-            mrm = self.analyze_minimum(pvUsu, pvObj)
+            mrm = self.analizaMinimo(pvUsu, pvObj)
             position = self.game.last_position
 
             rmUsu, nada = mrm.buscaRM(pvUsu)
@@ -288,7 +288,7 @@ class ManagerPlayGame(Manager.Manager):
             )
             self.ponPuntos()
 
-        self.analyze_end()
+        self.analizaFinal()
 
         self.add_move(True, analysis, comment)
         self.play_next_move()

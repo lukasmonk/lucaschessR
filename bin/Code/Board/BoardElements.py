@@ -221,6 +221,7 @@ class PiezaSC(BloqueSC):
     def mousePressEvent(self, event):
         if self.dragable:
             self.ini_pos = event.scenePos()
+
             self.setZValue(ZVALUE_PIECE_MOVING)
             self.setCursor(QtCore.Qt.ClosedHandCursor)
             if self.dispatchMove:

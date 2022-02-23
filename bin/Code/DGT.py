@@ -9,7 +9,6 @@ DGT_ON = "DGT.ON"
 
 
 def activate_according_on_off(dispatch):
-    # prln("activate")
     if eboard_is_on():
         if Code.dgt is None:
             if activar():
@@ -27,23 +26,19 @@ def activate_according_on_off(dispatch):
 
 
 def eboard_is_on():
-    # prln("eboard_is_on")
     return Util.exist_file(DGT_ON)
 
 
 def ponON():
-    # prln("ponON")
     with open(DGT_ON, "wb") as f:
         f.write(b"act")
 
 
 def ponOFF():
-    # prln("ponOFF")
     Util.remove_file(DGT_ON)
 
 
 def cambiarON_OFF():
-    # prln("cambiarON_OFF")
     if eboard_is_on():
         Util.remove_file(DGT_ON)
     else:
@@ -51,7 +46,6 @@ def cambiarON_OFF():
 
 
 def envia(quien, dato):
-    # prln(quien, dato)
     # log("[envia: %s] : %s [%s]"%(str(quien), str(dato), str(Code.dgtDispatch)))
     if Code.dgtDispatch:
         return Code.dgtDispatch(quien, dato)
@@ -59,7 +53,6 @@ def envia(quien, dato):
 
 
 def set_position(game):
-    # prln("set position")
     if Code.dgt:
         if (Code.configuration.x_digital_board == "DGT") or (
             Code.configuration.x_digital_board == "Novag UCB" and Code.configuration.x_digital_board_version == 0
@@ -70,7 +63,6 @@ def set_position(game):
 
 
 def quitarDispatch():
-    # prln("quitar dispatch")
     Code.dgtDispatch = None
 
 
@@ -87,32 +79,27 @@ def log(cad):
 
 
 def registerStatusFunc(dato):
-    # prln("registerStatusFunc", dato)
     envia("status", dato)
     return 1
 
 
 def registerScanFunc(dato):
-    # prln("registerScanFunc", dato)
     envia("scan", _dgt2fen(dato))
     return 1
 
 
 def registerStartSetupFunc():
-    # prln("registerStartSetupFunc")
     Code.dgt.setupBoard = True
     return 1
 
 
 def registerStableBoardFunc(dato):
-    # prln("registerStableBoardFunc", dato)
     if Code.dgt.setupBoard:
         envia("stableBoard", _dgt2fen(dato))
     return 1
 
 
 def registerStopSetupWTMFunc(dato):
-    # prln("registerStopSetupWTMFunc", dato)
     if Code.dgt.setupBoard:
         envia("stopSetupWTM", _dgt2fen(dato))
         Code.dgt.setupBoard = False
@@ -120,7 +107,6 @@ def registerStopSetupWTMFunc(dato):
 
 
 def registerStopSetupBTMFunc(dato):
-    # prln("registerStopSetupBTMFunc", dato)
     if Code.dgt.setupBoard:
         envia("stopSetupBTM", _dgt2fen(dato))
         Code.dgt.setupBoard = False
@@ -128,27 +114,22 @@ def registerStopSetupBTMFunc(dato):
 
 
 def registerWhiteMoveInputFunc(dato):
-    # prln("registerWhiteMoveInputFunc", dato)
     return envia("whiteMove", _dgt2pv(dato))
 
 
 def registerBlackMoveInputFunc(dato):
-    # prln("registerBlackMoveInputFunc", dato)
     return envia("blackMove", _dgt2pv(dato))
 
 
 def registerWhiteTakeBackFunc():
-    # prln("registerWhiteTakeBackFunc")
     return envia("whiteTakeBack", True)
 
 
 def registerBlackTakeBackFunc():
-    # prln("registerBlackTakeBackFunc")
     return envia("blackTakeBack", True)
 
 
 def activar():
-    # prln("activar")
     dgt = None
     if Code.is_linux:
         functype = ctypes.CFUNCTYPE
@@ -173,9 +154,9 @@ def activar():
                 QTUtil2.message(
                     None,
                     """It is not possible to install the driver for the board, one way to solve the problem is to install the libraries:
-sudo apt install libqt5pas1
-or
-sudo dnf install qt5pas-devel""",
+ sudo apt install libqt5pas1
+ or
+ sudo dnf install qt5pas-devel""",
                 )
 
     else:
@@ -193,6 +174,8 @@ sudo dnf install qt5pas-devel""",
                     path_dll = os.path.join(path, "DGTEBDLL.dll")
                 elif Code.configuration.x_digital_board == "DGT-gon":
                     path_dll = os.path.join(path, "DGT_DLL.dll")
+                elif Code.configuration.x_digital_board == "Pegasus":
+                    path_dll = os.path.join(path, "PEG_DLL.dll")
                 elif Code.configuration.x_digital_board == "Certabo":
                     path_dll = os.path.join(path, "CER_DLL.dll")
                 elif Code.configuration.x_digital_board == "Millennium":
@@ -208,6 +191,8 @@ sudo dnf install qt5pas-devel""",
                 pass
     if dgt is None:
         return False
+
+    # log( "activar" )
 
     Code.dgt = dgt
 
@@ -301,7 +286,6 @@ sudo dnf install qt5pas-devel""",
 
 
 def desactivar():
-    # prln("desactivar")
     if Code.dgt:
         # log( "desactivar" )
         hideDialog()
@@ -314,14 +298,12 @@ def desactivar():
 
 
 def showDialog():
-    # prln("showdialog")
     if Code.dgt:
         dgt = Code.dgt
         dgt._DGTDLL_ShowDialog(ctypes.c_int(1))
 
 
 def hideDialog():
-    # prln("hidedialog")
     if Code.dgt:
         dgt = Code.dgt
         dgt._DGTDLL_HideDialog(ctypes.c_int(1))
@@ -334,7 +316,6 @@ def writeDebug(activar):
 
 
 def writePosition(cposicion):
-    # prln("writePosition", cposicion)
     if Code.dgt:
         Code.dgt.allowHumanTB = False
         # log( "Enviado a la DGT" + cposicion )
@@ -343,12 +324,14 @@ def writePosition(cposicion):
 
 
 def writeClocks(wclock, bclock):
-    # prln("writeclocks")
     if Code.dgt:
         if (Code.configuration.x_digital_board == "DGT") or (Code.configuration.x_digital_board == "DGT-gon"):
             # log( "WriteClocks: W-%s B-%s"%(str(wclock), str(bclock)) )
             dgt = Code.dgt
             dgt._DGTDLL_SetNRun(wclock.encode(), bclock.encode(), 0)
+
+
+# Utilidades para la trasferencia de datos
 
 
 def _dgt2fen(datobyte):
@@ -397,6 +380,73 @@ def _dgt2pv(datobyte):
         return dato[1:3] + dato[4:6] + dato[3].lower()
 
     return dato[1:3] + dato[4:6]
+
+
+# Lo mismo, de otra forma
+
+
+# def xdgt2fen(xdgt):
+#     liD = xdgt.split(" ")
+#     dgt = liD[0]
+#
+#     li = []
+#     num = 0
+#     for c in dgt:
+#         if c.isdigit():
+#             num = num * 10 + int(c)
+#         else:
+#             if num:
+#                 li.append((1, num))
+#                 num = 0
+#             li.append((0, c))
+#     if num:
+#         li.append((1, num))
+#     lir = []
+#     act = ""
+#     pte = 8
+#     for tp, v in li:
+#         if tp == 1:
+#             while v >= pte:
+#                 act += str(pte)
+#                 lir.append(act)
+#                 v -= pte
+#                 act = ""
+#                 pte = 8
+#             if v:
+#                 act += str(v)
+#                 pte -= v
+#         else:
+#             act += v
+#             pte -= 1
+#         if pte == 0:
+#             lir.append(act)
+#             act = ""
+#             pte = 8
+#     if pte and len(lir) == 7:
+#         act += str(pte)
+#         lir.append(act)
+#     liD[0] = "/".join(lir)
+#     return " ".join(liD)
+
+
+# def fen2xdgt(fen):
+#     li = fen.split(" ")
+#     x0 = li[0]
+#     li0 = x0.replace("/", "")
+#     resp = ""
+#     num = 0
+#     for c in li0:
+#         if c.isdigit():
+#             num += int(c)
+#         else:
+#             if num:
+#                 resp += str(num)
+#                 num = 0
+#             resp += c
+#     if num:
+#         resp += str(num)
+#     li[0] = resp
+#     return " ".join(li)
 
 
 def icon_eboard():

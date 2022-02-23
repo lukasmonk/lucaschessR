@@ -727,33 +727,69 @@ class Game:
                 sumelos[std] += move.elo * move.elo_factor
                 factormoves[std] += move.elo_factor
 
-                ############### Calc averages
-                xtopes = {}
-                xelos = {}
-                for std in (OPENING, MIDDLEGAME, ENDGAME):
-                    sume = sumelos[std]
-                    numf = factormoves[std]
-                    tope = xtopes[std] = perfomance.limit(verybad_moves[std], bad_moves[std], nummoves[std])
-                    if numf:
-                        xelos[std] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
-                    else:
-                        xelos[std] = 0
+        topes = {}
+        elos = {}
+        for std in (OPENING, MIDDLEGAME, ENDGAME):
+            sume = sumelos[std]
+            numf = factormoves[std]
+            tope = topes[std] = perfomance.limit(verybad_moves[std], bad_moves[std], nummoves[std])
+            if numf:
+                elos[std] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
+            else:
+                elos[std] = 0
 
-                sume = 0
-                numf = 0
-                tope = perfomance.limit_max
-                for std in (OPENING, MIDDLEGAME, ENDGAME):
-                    sume += sumelos[std]
-                    numf += factormoves[std]
-                    if xtopes[std] < tope:
-                        tope = xtopes[std]
+        sume = 0
+        numf = 0
+        tope = perfomance.limit_max
+        for std in (OPENING, MIDDLEGAME, ENDGAME):
+            sume += sumelos[std]
+            numf += factormoves[std]
+            if topes[std] < tope:
+                tope = topes[std]
 
-                if numf:
-                    move.elo_avg = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
+        if numf:
+            elos[ALLGAME] = int((sume * 1.0 / numf) * tope / perfomance.limit_max)
+        else:
+            elos[ALLGAME] = 0
+
+        return elos
+
+    def calc_elo_colorFORM(self, perfomance, is_white):
+        bad_moves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        verybad_moves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        nummoves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        sumelos = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        factormoves = {OPENING: 0, MIDDLEGAME: 0, ENDGAME: 0}
+        last = OPENING
+        for move in self.li_moves:
+            if move.analysis:
+                if move.is_white() != is_white:
+                    continue
+                if last == ENDGAME:
+                    std = ENDGAME
                 else:
-                    move.elo_avg = 0
-
-                ###############
+                    if move.is_book:
+                        std = OPENING
+                    else:
+                        std = MIDDLEGAME
+                        material = move.position_before.valor_material()
+                        if material < 15:
+                            std = ENDGAME
+                        else:
+                            pzW, pzB = move.position_before.numPiezasWB()
+                            if pzW < 3 and pzB < 3:
+                                std = ENDGAME
+                move.stateOME = std
+                last = std
+                move.elo = calc_formula_elo(move)
+                # move.calc_elo(perfomance)
+                if move.bad_move:
+                    bad_moves[std] += 1
+                elif move.verybad_move:
+                    verybad_moves[std] += 1
+                nummoves[std] += 1
+                sumelos[std] += move.elo * 1.0
+                factormoves[std] += 1.0
 
         topes = {}
         elos = {}
@@ -786,6 +822,7 @@ class Game:
         for move in self.li_moves:
             move.is_book = False
         if self.siFenInicial():
+
             ap = Opening.OpeningPol(999)
             for move in self.li_moves:
                 move.is_book = ap.check_human(move.position_before.fen(), move.from_sq, move.to_sq)
@@ -814,7 +851,7 @@ class Game:
 
         elos = {}
         for is_white in (True, False):
-            elos[is_white] = self.calc_elo_color(configuration.perfomance, is_white)
+            elos[is_white] = self.calc_elo_colorFORM(configuration.perfomance, is_white)
 
         elos[None] = {}
         for std in (OPENING, MIDDLEGAME, ENDGAME, ALLGAME):
@@ -944,21 +981,6 @@ class Game:
         self.first_position = move0.position
         fen_inicial = self.first_position.fen()
         self.set_tag("FEN", fen_inicial)
-
-    def average_mstime_user(self, num):
-        # solo se pregunta cuando le toca jugar al usuario
-        is_white = self.last_position.is_white
-        li = [move.time_ms for move in self.li_moves if move.is_white() == is_white and move.time_ms > 0]
-        if len(li) > 0:
-            li = li[-num:]
-            return sum(li)/len(li)
-        else:
-            return 0
-
-
-
-
-
 
 
 def pv_san(fen, pv):

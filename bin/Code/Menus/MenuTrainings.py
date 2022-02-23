@@ -4,7 +4,7 @@ import shutil
 
 import Code
 from Code import ManagerFindAllMoves
-from Code.Endings import ManagerMate
+from Code import ManagerMate
 from Code import Memory
 from Code import Util
 from Code.Base.Constantes import (
@@ -15,26 +15,26 @@ from Code.Base.Constantes import (
     GT_TURN_ON_LIGHTS,
     GT_TACTICS,
 )
-from Code.CompetitionWithTutor import CompetitionWithTutor
+from Code.CompetitionWithTutor import CompetitionWithTutor, WCompetitionWithTutor
 from Code.Coordinates import WCoordinatesBlocks, WCoordinatesBasic
 from Code.CountsCaptures import WCountsCaptures
 from Code.Expeditions import WindowEverest
 from Code.GM import ManagerGM, WindowGM
 from Code.Mate15 import WMate15
 from Code.QT import Controles
-from Code.QT import FormLayout
 from Code.QT import Iconos
 from Code.QT import QTUtil2
 from Code.QT import QTVarios
+from Code.TrainBMT import WindowBMT
 from Code.QT import WindowDailyTest
 from Code.QT import WindowHorses
+from Code.QT import WindowLearnPGN
 from Code.QT import WindowPotencia
 from Code.QT import WindowPuente
 from Code.QT import WindowVisualiza
 from Code.Resistence import Resistance, ManagerResistance, WindowResistance
 from Code.SQL import UtilSQL
 from Code.Tactics import Tactics, ManagerTactics, WindowTactics
-from Code.TrainBMT import WindowBMT
 from Code.Translations import TrListas
 from Code.TurnOnLights import ManagerTurnOnLights, WindowTurnOnLights
 from Code.TurnOnLights import TurnOnLights
@@ -213,7 +213,7 @@ class MenuTrainings:
 
         menu_games.separador()
         menu2 = menu_games.submenu(_("Learn a game"), Iconos.School())
-        xopcion(menu2, "learnGame", _("Memorizing their moves"), Iconos.LearnGame())
+        xopcion(menu2, "learnPGN", _("Memorizing their moves"), Iconos.LearnGame())
         menu2.separador()
         xopcion(menu2, "playGame", _("Playing against"), Iconos.Law())
 
@@ -231,23 +231,17 @@ class MenuTrainings:
         dicTraining = TrListas.dicTraining()
 
         def trTraining(txt):
-            return dicTraining.get(txt, _F(txt))
+            return dicTraining.get(txt, txt)
 
         def menu_tacticas(submenu, tipo, carpeta_base, lista):
             if os.path.isdir(carpeta_base):
-                entry: os.DirEntry
                 for entry in os.scandir(carpeta_base):
                     if entry.is_dir():
                         carpeta = entry.path
                         ini = os.path.join(carpeta, "Config.ini")
                         if os.path.isfile(ini):
                             name = entry.name
-                            xopcion(
-                                submenu,
-                                "tactica|%s|%s|%s|%s" % (tipo, name, carpeta, ini),
-                                trTraining(name),
-                                nico.otro(),
-                            )
+                            xopcion(submenu, "tactica|%s|%s|%s|%s" % (tipo, name, carpeta, ini), trTraining(name), nico.otro())
                             menu_t.separador()
                             lista.append((carpeta, name))
                         else:
@@ -310,7 +304,7 @@ class MenuTrainings:
             menu1.separador()
         menu_endings.separador()
 
-        xopcion(menu_endings, "15mate", _X(_("Mate in %1"), "1½"), Iconos.Mate15())
+        xopcion(menu_endings, "15mate", _("Mate in 1½"), Iconos.Mate15())
         menu_endings.separador()
 
         xopcion(menu_endings, "endings_gtb", _("Endings with Gaviota Tablebases"), Iconos.Finales())
@@ -427,55 +421,53 @@ class MenuTrainings:
                     um = self.procesador.unMomento()
                     entreno = os.path.realpath(resp[3:])
                     titentreno = os.path.basename(entreno)[:-4]
+                    # if "/" in entreno:
+                    #     dicTraining = TrListas.dicTraining()
+                    #     titentreno = ""
+                    #     for x in entreno[:-4].split("/")[1:]:
+                    #         titentreno += dicTraining.get(x, x) + "/"
+                    #     titentreno = titentreno[:-1]
                     with Util.OpenCodec(entreno) as f:
                         todo = f.read().strip()
-                    liEntrenamientos = [(linea, pos) for pos, linea in enumerate(todo.split("\n"), 1)]
+                    liEntrenamientos = [(linea, pos) for pos, linea in enumerate(todo.split("\n"),1)]
                     nPosiciones = len(liEntrenamientos)
                     um.final()
                     if nPosiciones == 0:
                         return
-                    db = UtilSQL.DictSQL(self.configuration.file_trainings)
-                    data = db[entreno]
-                    if type(data) != dict:
-                        data = {}
-                    posUltimo = data.get("POSULTIMO", 1)
-                    jump = data.get("SALTA", False)
-                    tipo = data.get("TYPE", "s")
-                    advanced = data.get("ADVANCED", False)
-                    tutor_active = data.get("TUTOR_ACTIVE", True)
-                    resp = params_training_position(
-                        self.procesador.main_window,
-                        titentreno,
-                        nPosiciones,
-                        posUltimo,
-                        jump,
-                        tutor_active,
-                        tipo,
-                        advanced,
-                    )
-                    if resp is None:
-                        db.close()
-                        return
-                    pos, tipo, tutor_active, jump, advanced = resp
-                    db[entreno] = {
-                        "POSULTIMO": pos,
-                        "SALTA": jump,
-                        "TYPE": tipo,
-                        "ADVANCED": advanced,
-                        "TUTOR_ACTIVE": tutor_active,
-                    }
-                    db.close()
-                    if tipo.startswith("r"):
-                        if tipo == "rk":
-                            random.seed(pos)
-                        random.shuffle(liEntrenamientos)
+                    elif nPosiciones == 1:
                         pos = 1
-                    self.procesador.entrenaPos(
-                        pos, nPosiciones, titentreno, liEntrenamientos, entreno, tutor_active, jump, advanced
-                    )
+                        jump = False
+                        db = UtilSQL.DictSQL(self.configuration.file_trainings)
+                        data = db[entreno]
+                        if type(data) != dict:
+                            data = {}
+                        db.close()
+                    else:
+                        db = UtilSQL.DictSQL(self.configuration.file_trainings)
+                        data = db[entreno]
+                        if type(data) != dict:
+                            data = {}
+                        posUltimo = data.get("POSULTIMO", 1)
+                        jump = data.get("SALTA", False)
+                        tipo = data.get("TYPE", "s")
+                        resp = WCompetitionWithTutor.numPosicion(
+                            self.procesador.main_window, titentreno, nPosiciones, posUltimo, jump, tipo
+                        )
+                        if resp is None:
+                            db.close()
+                            return
+                        pos, tipo, jump = resp
+                        db[entreno] = {"POSULTIMO": pos, "SALTA": jump, "TYPE": tipo}
+                        db.close()
+                        if tipo.startswith("r"):
+                            if tipo == "rk":
+                                random.seed(pos)
+                            random.shuffle(liEntrenamientos)
+                            pos = 1
+                    self.procesador.entrenaPos(pos, nPosiciones, titentreno, liEntrenamientos, entreno, jump)
 
-                elif resp == "learnGame":
-                    self.procesador.learn_game()
+                elif resp == "learnPGN":
+                    self.learnPGN()
 
                 elif resp == "playGame":
                     self.procesador.play_game()
@@ -638,6 +630,10 @@ class MenuTrainings:
             self.procesador.manager = ManagerResistance.ManagerResistance(self.procesador)
             self.procesador.manager.start(resistance, numEngine, key)
 
+    def learnPGN(self):
+        w = WindowLearnPGN.WLearnBase(self.procesador)
+        w.exec_()
+
     def everest(self):
         WindowEverest.everest(self.procesador)
 
@@ -673,9 +669,7 @@ class MenuTrainings:
         else:
             return
 
-        resp = WindowTurnOnLights.windowTurnOnLigths(
-            self.procesador, name, title, icono, folder, li_tam_blocks, one_line
-        )
+        resp = WindowTurnOnLights.windowTurnOnLigths(self.procesador, name, title, icono, folder, li_tam_blocks, one_line)
         if resp:
             num_theme, num_block, tol = resp
             self.procesador.game_type = GT_TURN_ON_LIGHTS
@@ -726,33 +720,3 @@ def selectOneFNS(owner, procesador):
     td.menu(menu, xopcion)
     resp = menu.lanza()
     return resp if resp is None else Util.relative_path(resp[3:])
-
-
-def params_training_position(w_parent, titulo, nFEN, pos, salta, tutor_active, tipo, advanced):
-    form = FormLayout.FormLayout(w_parent, titulo, Iconos.Entrenamiento(), anchoMinimo=200)
-
-    form.separador()
-    label = "%s (1..%d)" % (_("Select position"), nFEN)
-    form.spinbox(label, 1, nFEN, 50, pos)
-
-    form.separador()
-    li = [(_("Sequential"), "s"), (_("Random"), "r"), (_("Random with same sequence based on position"), "rk")]
-    form.combobox(_("Type"), li, tipo)
-
-    form.separador()
-    form.checkbox(_("Tutor initially active"), tutor_active)
-
-    form.separador()
-    form.checkbox(_("Jump to the next after solving"), salta)
-
-    form.separador()
-    form.checkbox(_("Advanced mode"), advanced)
-
-    form.apart_simple_np(_("This advanced mode applies only to positions<br>with a solution included in the file"))
-
-    resultado = form.run()
-    if resultado:
-        position, tipo, tutor_active, jump, advanced = resultado[1]
-        return position, tipo, tutor_active, jump, advanced
-    else:
-        return None

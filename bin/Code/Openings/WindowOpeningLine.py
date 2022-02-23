@@ -1202,7 +1202,7 @@ class WLines(LCDialog.LCDialog):
         self.glines.goto(row, ncol)
         self.glines.refresh()
 
-    def final_processes(self):
+    def procesosFinales(self):
         board = self.pboard.board
         board.dbVisual.saveMoviblesBoard(board)
         self.dbop.setconfig("WHITEBOTTOM", board.is_white_bottom)
@@ -1212,11 +1212,11 @@ class WLines(LCDialog.LCDialog):
         self.procesador.stop_engines()
 
     def terminar(self):
-        self.final_processes()
+        self.procesosFinales()
         self.accept()
 
     def closeEvent(self, event):
-        self.final_processes()
+        self.procesosFinales()
 
     def player_has_moved(self, game):
         # Estamos en la misma linea ?

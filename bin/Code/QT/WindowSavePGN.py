@@ -372,6 +372,32 @@ class WSave(LCDialog.LCDialog):
         body = self.em_body.texto().strip()
         if not body:
             body = "*"
+        elif self.chb_remove_c_v.isChecked():
+            lic = []
+            npar = 0
+            nkey = 0
+            for c in body:
+                if nkey:
+                    if c == "}":
+                        nkey -= 1
+                    elif c == "{":
+                        nkey += 1
+                    continue
+                if npar:
+                    if c == ")":
+                        npar -= 1
+                    elif c == "(":
+                        npar += 1
+                    continue
+                if c == "{":
+                    nkey += 1
+                    continue
+                if c == "(":
+                    npar += 1
+                    continue
+                lic.append(c)
+            body = "".join(lic)
+
         pgn += "\n%s\n" % body
         if "\r\n" in pgn:
             pgn = pgn.replace("\r\n", "\n")

@@ -86,35 +86,7 @@ class ManagerTactics(Manager.Manager):
         self.reiniciando = False
 
         self.num_bad_tries = 0
-        if self.tactic.advanced:
-            self.board.showCoordenadas(False)
-
-            self.ini_clock = time.time()
-            self.wsolve = self.main_window.base.wsolve
-            self.wsolve.set_game(self.game_obj, self.advanced_return)
-
-        else:
-            self.play_next_move()
-
-    def advanced_return(self, solved):
-        self.tactic.masSegundos(time.time()-self.ini_clock)
-        self.wsolve.hide()
-        self.board.showCoordenadas(True)
-        more_errors = self.wsolve.errors
-        more_helps = self.wsolve.helps
-        if more_errors > 0 or more_helps > 0:
-            self.put_penalization()
-        if solved:
-            for move in self.game_obj.li_moves:
-                self.game.add_move(move)
-            self.goto_end()
-            self.pgnRefresh(self.human_side)
-            self.end_line()
-
-        else:
-            self.tactic.advanced = False
-            self.tactic.set_advanced(False)
-            self.play_next_move()
+        self.play_next_move()
 
     def set_toolbar(self, modo):
         li_opciones = [TB_CLOSE, TB_REINIT, TB_CONFIG]
@@ -146,22 +118,10 @@ class ManagerTactics(Manager.Manager):
                 liMasOpciones = [("lmo_stop", _("Stop after solving"), Iconos.Stop())]
             else:
                 liMasOpciones = [("lmo_jump", _("Jump to the next after solving"), Iconos.Jump())]
-            liMasOpciones.append((None, None, None))
-            if self.tactic.advanced:
-                txt = _("Disable")
-                ico = Iconos.Remove1()
-            else:
-                txt = _("Enable")
-                ico = Iconos.Add()
-            liMasOpciones = [("lmo_advanced", "%s: %s" % (txt, _("Advanced mode")), ico)]
             resp = self.configurar(siSonidos=True, siCambioTutor=False, liMasOpciones=liMasOpciones)
             if resp in ("lmo_stop", "lmo_jump"):
                 self.with_automatic_jump = resp == "lmo_jump"
                 self.tactic.set_automatic_jump(self.with_automatic_jump)
-            elif resp == "lmo_advanced":
-                self.tactic.advanced = not self.tactic.advanced
-                self.tactic.set_advanced(self.tactic.advanced)
-                self.reinicia()
 
         elif key == TB_REINIT:
             self.reinicia()
@@ -196,7 +156,6 @@ class ManagerTactics(Manager.Manager):
             self.start(self.tactic)
 
     def end_game(self):
-        self.board.showCoordenadas(True)
         self.procesador.start()
         self.procesador.entrenamientos.entrenaTactica(self.tactic)
 

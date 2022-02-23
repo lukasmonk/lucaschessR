@@ -48,7 +48,7 @@ class DBPlayGame(UtilSQL.DictSQL):
         self.__delitem__(self.regKeys[num])
         self.regKeys = self.keys(True, True)
 
-    def remove_list(self, li):
+    def borraLista(self, li):
         li.sort()
         li.reverse()
         for x in li:
@@ -170,7 +170,7 @@ class WPlayGameBase(LCDialog.LCDialog):
         li = self.grid.recnosSeleccionados()
         if len(li) > 0:
             if QTUtil2.pregunta(self, _("Do you want to delete all selected records?")):
-                self.db.remove_list(li)
+                self.db.borraLista(li)
         self.grid.gotop()
         self.grid.refresh()
 

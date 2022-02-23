@@ -149,8 +149,6 @@ class BoxRooms:
 class Configuration:
     def __init__(self, user):
 
-        Code.configuration = self
-
         self.carpetaBase = active_folder()
 
         self.carpetaUsers = os.path.join(self.carpetaBase, "users")
@@ -272,6 +270,8 @@ class Configuration:
         self.x_captures_showall = True
         self.x_counts_showall = True
 
+        self.x_show_version11 = False
+
         self.palette = {}
 
         self.perfomance = Performance()
@@ -286,17 +286,6 @@ class Configuration:
         self.tutor = self.buscaTutor(self.tutor_inicial)
         if self.tutor.key != self.x_tutor_clave:
             self.x_tutor_clave = self.tutor.key
-
-        self.x_translation_mode = False
-
-    def carpeta_translations(self):
-        folder = os.path.join(self.carpetaBase, "Translations")
-        if not os.path.isdir(folder):
-            Util.create_folder(folder)
-        return folder
-
-    def carpeta_sounds(self):
-        return os.path.join(self.carpeta, "Sounds")
 
     def relee_engines(self):
         self.dic_engines = OSEngines.read_engines(Code.folder_engines)
@@ -453,9 +442,6 @@ class Configuration:
     def file_play_game(self):
         return "%s/PlayGame.db" % self.carpeta_results
 
-    def file_learn_game(self):
-         return "%s/LearnPGN.db" % self.carpeta_results
-
     def file_gms(self):
         return "%s/gm.pke" % self.carpeta_config
 
@@ -494,6 +480,7 @@ class Configuration:
         self.ficheroBoxing = "%s/boxing.pk" % self.carpeta_results
         self.file_trainings = "%s/trainings.pk" % self.carpeta_results
         self.ficheroHorses = "%s/horses.db" % self.carpeta_results
+        self.ficheroLearnPGN = "%s/LearnPGN.db" % self.carpeta_results
         self.ficheroAlbumes = "%s/albumes.pkd" % self.carpeta_results
         self.ficheroPuntuaciones = "%s/hpoints.pkd" % self.carpeta_results
         self.ficheroAnotar = "%s/anotar.db" % self.carpeta_config
@@ -642,7 +629,7 @@ class Configuration:
             if x.endswith(".pon"):
                 os.remove("../%s" % x)
                 self.x_translator = x[:2]
-        self.load_translation()
+        self.releeTRA()
 
         TrListas.ponPiecesLNG(self.x_pgn_english or self.translator() == "en")
 
@@ -673,23 +660,8 @@ class Configuration:
         file = os.path.join(self.carpeta_config, "Favoritos.pkd")
         Util.save_pickle(file, lista)
 
-    def load_translation(self):
-        dlang = Code.path_resource("Locale")
-        fini = os.path.join(dlang, self.x_translator, "lang.ini")
-        if not os.path.isfile(fini):
-            self.x_translator = "en"
+    def releeTRA(self):
         Translate.install(self.x_translator)
-
-    def list_translations(self):
-        li = []
-        dlang = Code.path_resource("Locale")
-        for uno in Util.listdir(dlang):
-            fini = os.path.join(dlang, uno.name, "lang.ini")
-            if os.path.isfile(fini):
-                dic = Util.ini_dic(fini)
-                li.append((uno.name, dic["NAME"], int(dic["%"]), dic["AUTHOR"]))
-        li = sorted(li, key=lambda lng: lng[0])
-        return li
 
     def eloActivo(self):
         return self.x_elo
@@ -721,8 +693,16 @@ class Configuration:
     def ponLichessActivo(self, elo):
         self.x_lichess = elo
 
-    def po_saved(self):
-        return os.path.join(self.carpeta_translations(), "%s.po" % self.x_translator)
+    def list_translations(self):
+        li = []
+        dlang = Code.path_resource("Locale")
+        for uno in Util.listdir(dlang):
+            fini = os.path.join(dlang, uno.name, "lang.ini")
+            if os.path.isfile(fini):
+                dic = Util.ini_dic(fini)
+                li.append((uno.name, dic["NAME"], int(dic["%"]), dic["AUTHOR"]))
+        li = sorted(li, key=lambda lng: lng[0])
+        return li
 
     def listaMotoresInternos(self):
         li = [cm for k, cm in self.dic_engines.items() if not cm.siExterno]
@@ -788,19 +768,11 @@ class Configuration:
         dirTmp = os.path.join(self.carpeta, "tmp")
         return Util.temporary_file(dirTmp, extension)
 
-    def clean_tmp_folder(self):
+    def limpiaTemporal(self):
         try:
-            def remove_folder(folder, root):
-                if "UserData" in folder and "tmp" in folder:
-                    entry: os.DirEntry
-                    for entry in Util.listdir(folder):
-                        if entry.is_dir():
-                            remove_folder(entry.path, False)
-                        elif entry.is_file():
-                            Util.remove_file(entry.path)
-                    if not root:
-                        os.rmdir(folder)
-            remove_folder(self.carpetaTemporal(), True)
+            dirTmp = os.path.join(self.carpeta, "tmp")
+            for entry in Util.listdir(dirTmp):
+                Util.remove_file(entry.path)
         except:
             pass
 
@@ -830,7 +802,6 @@ class Configuration:
         # "WBG_MOVES":
         # "DBSUMMARY":
         # "DATABASE"
-        # "PATH_PO"
 
     def write_variables(self, nomVar, dicValores):
         db = UtilSQL.DictSQL(self.ficheroVariables)

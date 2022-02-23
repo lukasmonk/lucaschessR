@@ -47,11 +47,10 @@ SPINBOX, COMBOBOX, COLORBOX, DIAL, EDITBOX, FICHERO, CARPETA, FONTCOMBOBOX, CHSP
 
 
 class FormLayout:
-    def __init__(self, parent, title, icon, with_default=False, anchoMinimo=None, dispatch=None, font_txt=None):
+    def __init__(self, parent, title, icon, with_default=False, anchoMinimo=None, dispatch=None):
         self.parent = parent
         self.title = title
         self.icon = icon
-        self.font_txt = font_txt
         self.with_default = with_default
         self.anchoMinimo = anchoMinimo
         self.dispatch = dispatch
@@ -116,9 +115,6 @@ class FormLayout:
     def apart_simple_np(self, title):
         self.li_gen.append((None, "$" + title))
 
-    def apart_nothtml_np(self, title):
-        self.li_gen.append((None, "@|" + title))
-
     def add_tab(self, title):
         self.li_tabs.append((self.li_gen, title, ""))
         self.li_gen = []
@@ -134,7 +130,6 @@ class FormLayout:
             icon=self.icon,
             if_default=self.with_default,
             dispatch=self.dispatch,
-            font=self.font_txt
         )
 
     def __enter__(self):
@@ -537,10 +532,6 @@ class FormWidget(QtWidgets.QWidget):
             elif label is None:
                 if value.startswith("$"):
                     lb = Controles.LB(self, value[1:])
-                elif value.startswith("@|"):
-                    lb = Controles.LB(self, value[2:])
-                    lb.setTextFormat(QtCore.Qt.PlainText)
-                    lb.setWordWrap(True)
                 else:
                     lb = Controles.LB(self, QTUtil2.resalta(value, 3))
                 self.formlayout.addRow(lb)
@@ -841,7 +832,7 @@ class FormDialog(QtWidgets.QDialog):
         return self.accion, self.data
 
 
-def fedit(data, title="", comment="", icon=None, parent=None, if_default=False, anchoMinimo=None, dispatch=None, font=None):
+def fedit(data, title="", comment="", icon=None, parent=None, if_default=False, anchoMinimo=None, dispatch=None):
     """
     Create form dialog and return result
     (if Cancel button is pressed, return None)
@@ -865,8 +856,6 @@ def fedit(data, title="", comment="", icon=None, parent=None, if_default=False, 
           * the other elements can be couples (key, value) or only values
     """
     dialog = FormDialog(data, title, comment, icon, parent, if_default, dispatch)
-    if font:
-        dialog.setFont(font)
     if anchoMinimo:
         dialog.setMinimumWidth(anchoMinimo)
     if dialog.exec_():

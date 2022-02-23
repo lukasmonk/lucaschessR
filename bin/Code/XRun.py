@@ -12,5 +12,4 @@ def run_lucas(*args):
     else:
         li.append("LucasR.exe" if Code.is_windows else "./LucasR")
     li.extend(args)
-
     return subprocess.Popen(li)

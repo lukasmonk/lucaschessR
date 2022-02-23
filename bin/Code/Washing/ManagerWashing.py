@@ -590,7 +590,7 @@ class ManagerWashingCreate(Manager.Manager):
 
     def juegaHumano(self, is_white):
         self.human_is_playing = True
-        self.analyze_begin()
+        self.analizaInicio()
         self.timekeeper.start()
         self.activate_side(is_white)
 
@@ -613,7 +613,7 @@ class ManagerWashingCreate(Manager.Manager):
         else:
             Manager.Manager.rutinaAccionDef(self, key)
 
-    def analyze_begin(self):
+    def analizaInicio(self):
         self.siAnalizando = False
         self.is_analyzed_by_tutor = False
         if self.continueTt:
@@ -633,7 +633,7 @@ class ManagerWashingCreate(Manager.Manager):
                     if mrm:
                         QtCore.QTimer.singleShot(1000, self.analizaSiguiente)
 
-    def analyze_end(self):
+    def analizaFinal(self):
         estado = self.siAnalizando
         self.siAnalizando = False
         if self.is_analyzed_by_tutor:
@@ -651,7 +651,7 @@ class ManagerWashingCreate(Manager.Manager):
             self.xtutor.ac_final(-1)
 
     def sigueHumanoAnalisis(self):
-        self.analyze_begin()
+        self.analizaInicio()
         Manager.Manager.sigueHumano(self)
 
     def player_has_moved(self, from_sq, to_sq, promotion=""):
@@ -673,7 +673,7 @@ class ManagerWashingCreate(Manager.Manager):
             else:
                 self.opening = None
 
-        self.analyze_end()  # tiene que acabar siempre
+        self.analizaFinal()  # tiene que acabar siempre
         if not is_selected:
             rmUser, n = self.mrmTutor.buscaRM(movimiento)
             if not rmUser:
@@ -804,7 +804,7 @@ class ManagerWashingCreate(Manager.Manager):
         else:
             self.cancelGame()
 
-    def analize_position(self, row, key):
+    def analizaPosicion(self, row, key):
         if self.state != ST_ENDGAME:
             return
-        Manager.Manager.analize_position(self, row, key)
+        Manager.Manager.analizaPosicion(self, row, key)

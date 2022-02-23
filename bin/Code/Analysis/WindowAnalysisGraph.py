@@ -108,7 +108,7 @@ class WAnalisisGraph(LCDialog.LCDialog):
         config_board = Code.configuration.config_board("ANALISISGRAPH", 48)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.set_side_bottom(alm.is_white_bottom)
+        self.board.ponerPiezasAbajo(alm.is_white_bottom)
         self.board.dispatchSize(self.boardSizeChanged)
 
         # self.capturas = WCapturas.CapturaLista(self, self.board)
@@ -116,7 +116,7 @@ class WAnalisisGraph(LCDialog.LCDialog):
         # .control(self.capturas)
 
         self.rbShowValues = Controles.RB(self, _("Values"), rutina=self.cambiadoShow).activa(True)
-        self.rbShowElo = Controles.RB(self, _("Elo average"), rutina=self.cambiadoShow)
+        self.rbShowElo = Controles.RB(self, _("Elo performance"), rutina=self.cambiadoShow)
         self.chbShowLostPoints = Controles.CHB(self, _("Show pawns lost"), self.getShowLostPoints()).capture_changes(
             self, self.showLostPointsChanged
         )

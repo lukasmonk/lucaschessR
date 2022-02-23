@@ -341,7 +341,7 @@ class AnalisisVariations:
     def analysis_move(self, new_move):
         me = QTUtil2.mensEspera.start(self.w, _("Analyzing the move...."))
 
-        secs = self.w.get_seconds()
+        secs = self.w.dameSegundos()
         self.rm = self.xtutor.analizaVariation(new_move, secs * 1000, self.is_white)
         me.final()
 

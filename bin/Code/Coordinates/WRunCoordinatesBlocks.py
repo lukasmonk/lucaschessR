@@ -85,7 +85,7 @@ class WRunCoordinatesBlocks(LCDialog.LCDialog):
 
     def new_try(self):
         is_white = self.coordinates.new_try()
-        self.board.set_side_bottom(is_white)
+        self.board.ponerPiezasAbajo(is_white)
         self.board.set_position(self.cp_initial)
         self.lb_active_score_k.set_text(_("Active score") + ":")
         self.current_score = 0
@@ -94,7 +94,7 @@ class WRunCoordinatesBlocks(LCDialog.LCDialog):
         QtCore.QTimer.singleShot(1000, self.comprueba_time)
 
     def show_data(self):
-        self.board.set_side_bottom(self.coordinates.current_side())
+        self.board.ponerPiezasAbajo(self.coordinates.current_side())
         self.board.set_position(self.cp_initial)
         self.lb_block.set_text("%d/%d" % (self.coordinates.current_block + 1, self.coordinates.num_blocks()))
         self.lb_try.set_text("%d" % self.coordinates.current_try_in_block)

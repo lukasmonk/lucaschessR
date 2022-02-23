@@ -4,7 +4,7 @@ El grid es un TableView de QT.
 Realiza llamadas a rutinas de la ventana donde esta ante determinados eventos, o en determinadas situaciones,
 siempre que la rutina se haya definido en la ventana:
 
-    - grid_doubleclick_header : ante un doble click en la head, normalmente se usa para la reordenacion de la tabla por la column pulsada.
+    - grid_doble_clickCabecera : ante un doble click en la head, normalmente se usa para la reordenacion de la tabla por la column pulsada.
     - grid_tecla_pulsada : al pulsarse una tecla, llama a esta rutina, para que pueda usarse por ejemplo en busquedas.
     - grid_tecla_control : al pulsarse una tecla de control, llama a esta rutina, para que pueda usarse por ejemplo en busquedas.
     - grid_doble_click : en el caso de un doble click en un registro, se hace la llamad a esta rutina
@@ -421,17 +421,17 @@ class Grid(QtWidgets.QTableView):
         """
         Se gestiona este evento, ante la posibilidad de que la ventana quiera controlar,
         los doble clicks sobre la head , normalmente para cambiar el orden de la column,
-        llamando a la rutina correspondiente si existe (grid_doubleclick_header) y con el
+        llamando a la rutina correspondiente si existe (grid_doble_clickCabecera) y con el
         argumento del objeto column
         """
-        if hasattr(self.w_parent, "grid_doubleclick_header"):
-            self.w_parent.grid_doubleclick_header(self, self.oColumnasR.column(numColumna))
+        if hasattr(self.w_parent, "grid_doble_clickCabecera"):
+            self.w_parent.grid_doble_clickCabecera(self, self.oColumnasR.column(numColumna))
 
     def mouseCabecera(self, numColumna):
         """
         Se gestiona este evento, ante la posibilidad de que la ventana quiera controlar,
         los doble clicks sobre la head , normalmente para cambiar el orden de la column,
-        llamando a la rutina correspondiente si existe (grid_doubleclick_header) y con el
+        llamando a la rutina correspondiente si existe (grid_doble_clickCabecera) y con el
         argumento del objeto column
         """
         if hasattr(self.w_parent, "grid_pulsada_cabecera"):

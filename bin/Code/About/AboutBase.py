@@ -485,6 +485,7 @@ class ThanksTo:
         li = (
             (_("Programming language"), "Python 3.7", "http://www.python.org/"),
             (_("GUI"), "PySide2", "https://wiki.qt.io/Qt_for_Python"),
+            ("PyAudio", "PyAudio v0.2.11 - MIT License", "http://people.csail.mit.edu/hubert/pyaudio/"),
             ("psutil", _X(_("Created by %1"), "Giampaolo Rodola"), "http://code.google.com/p/psutil/"),
             ("chardet", _X(_("Created by %1"), "Ian Cordasco"), "https://github.com/chardet/chardet"),
             (
@@ -503,7 +504,6 @@ class ThanksTo:
             ("formlayout", _X(_("Created by %1"), "Pierre Raybaut"), "https://github.com/PierreRaybaut/formlayout"),
             ("sortedcontainers", _X(_("Created by %1"), "Grant Jenks"), "http://www.grantjenks.com/docs/sortedcontainers/"),
             ("lichess-puzzler", _X(_("Created by %1"), "Thibault Duplessis"), "https://github.com/ornicar/lichess-puzzler"),
-            ("polib", "David Jean Louis and others", "https://github.com/izimobil/polib"),
         )
         txt = self.table_ini()
 

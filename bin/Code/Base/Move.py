@@ -136,8 +136,12 @@ class Move:
         return self.from_sq + self.to_sq + self.promotion
 
     def pgn_translated(self):
-        d_conv = TrListas.dConv()
-        li = [d_conv.get(c, c) for c in self.pgnBase]
+        dConv = TrListas.dConv()
+        li = []
+        for c in self.pgnBase:
+            if c in dConv:
+                c = dConv[c]
+            li.append(c)
         return "".join(li)
 
     def pgnFigurinesSP(self):

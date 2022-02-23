@@ -50,9 +50,7 @@ class ManagerEntPos(Manager.Manager):
         db[self.entreno] = data
         db.close()
 
-    def start(
-        self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled, is_automatic_jump, advanced
-    ):
+    def start(self, pos_training, num_trainings, title_training, li_trainings, is_tutor_enabled=None, is_automatic_jump=False):
         if hasattr(self, "reiniciando"):
             if self.reiniciando:
                 return
@@ -67,12 +65,10 @@ class ManagerEntPos(Manager.Manager):
         self.title_training = title_training
         self.li_trainings = li_trainings
         self.is_automatic_jump = is_automatic_jump
-        self.advanced = advanced
 
         self.li_histo = [self.pos_training]
 
         self.hints = 99999
-        self.ponAyudas(self.hints)
 
         linea, self.pos_training_origin = self.li_trainings[self.pos_training - 1]
         self.line_fns = FNSLine.FNSLine(linea)
@@ -111,9 +107,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.ayudas_iniciales = 0
 
-        li_options = [TB_CLOSE, TB_HELP, TB_CHANGE, TB_REINIT]
-        if not self.advanced:
-            li_options.append(TB_TAKEBACK)
+        li_options = [TB_CLOSE, TB_HELP, TB_CHANGE, TB_REINIT, TB_TAKEBACK]
         li_options.append(TB_PGN_LABELS)
         li_options.extend((TB_CONFIG, TB_UTILITIES))
         if self.num_trainings > 1:
@@ -132,9 +126,7 @@ class ManagerEntPos(Manager.Manager):
             titulo += "<br>%s" % self.line_fns.label
         self.set_label1(titulo)
         if pos_training != self.pos_training_origin:
-            self.set_label2(
-                "%s: %d\n %d / %d" % (_("Original position"), self.pos_training_origin, pos_training, num_trainings)
-            )
+            self.set_label2("%s: %d\n %d / %d" % (_("Original position"), self.pos_training_origin, pos_training, num_trainings))
         else:
             self.set_label2("%d / %d" % (pos_training, num_trainings))
         self.pgnRefresh(True)
@@ -162,28 +154,7 @@ class ManagerEntPos(Manager.Manager):
         self.reiniciando = False
         self.is_rival_thinking = False
         self.is_analyzing = False
-        self.current_helps = 0
-
-        if self.is_playing_gameobj() and self.advanced:
-            self.board.showCoordenadas(False)
-            self.wsolve = self.main_window.base.wsolve
-            self.wsolve.set_game(self.game_obj, self.advanced_return)
-
-        else:
-            self.play_next_move()
-
-    def advanced_return(self, solved):
-        self.wsolve.hide()
-        self.board.showCoordenadas(True)
-        if solved:
-            for move in self.game_obj.li_moves:
-                self.game.add_move(move)
-            self.goto_end()
-            self.lineaTerminadaOpciones()
-
-        else:
-            self.advanced = False
-            self.play_next_move()
+        self.play_next_move()
 
     def run_action(self, key):
         if key == TB_CLOSE:
@@ -196,18 +167,7 @@ class ManagerEntPos(Manager.Manager):
             self.reiniciar()
 
         elif key == TB_CONFIG:
-            if self.advanced:
-                txt = _("Disable")
-                ico = Iconos.Remove1()
-            else:
-                txt = _("Enable")
-                ico = Iconos.Add()
-
-            liMasOpciones = [("lmo_advanced", "%s: %s" % (txt, _("Advanced mode")), ico)]
-            resp = self.configurar(siSonidos=True, siCambioTutor=True, liMasOpciones=liMasOpciones)
-            if resp == "lmo_advanced":
-                self.advanced = not self.advanced
-                self.reiniciar()
+            self.configurar(siSonidos=True, siCambioTutor=True)
 
         elif key == TB_CHANGE:
             self.ent_otro()
@@ -241,9 +201,7 @@ class ManagerEntPos(Manager.Manager):
             Manager.Manager.rutinaAccionDef(self, key)
 
     def help(self):
-        if self.advanced:
-            self.wsolve.help()
-        elif self.is_playing_gameobj():
+        if self.is_playing_gameobj():
             move_obj = self.game_obj.move(self.pos_obj)
             self.current_helps += 1
             if self.current_helps == 1:
@@ -257,19 +215,12 @@ class ManagerEntPos(Manager.Manager):
         if self.is_analyzing:
             self.xtutor.stop()
         self.start(
-            self.pos_training,
-            self.num_trainings,
-            self.title_training,
-            self.li_trainings,
-            self.is_tutor_enabled,
-            self.is_automatic_jump,
-            self.advanced,
+            self.pos_training, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump
         )
 
     def ent_siguiente(self, tipo):
-        if not self.advanced:
-            if not (self.human_is_playing or self.state == ST_ENDGAME):
-                return
+        if not (self.human_is_playing or self.state == ST_ENDGAME):
+            return
         pos = self.pos_training + (+1 if tipo == TB_NEXT else -1)
         if pos > self.num_trainings:
             pos = 1
@@ -277,13 +228,7 @@ class ManagerEntPos(Manager.Manager):
             pos = self.num_trainings
         self.analiza_stop()
         self.start(
-            pos,
-            self.num_trainings,
-            self.title_training,
-            self.li_trainings,
-            self.is_tutor_enabled,
-            self.is_automatic_jump,
-            self.advanced,
+            pos, self.num_trainings, self.title_training, self.li_trainings, self.is_tutor_enabled, self.is_automatic_jump
         )
 
     def control_teclado(self, nkey, modifiers):
@@ -304,7 +249,6 @@ class ManagerEntPos(Manager.Manager):
         ]
 
     def end_game(self):
-        self.board.showCoordenadas(True)
         self.procesador.start()
 
     def final_x(self):
@@ -350,8 +294,7 @@ class ManagerEntPos(Manager.Manager):
             self.piensa_rival()
 
         else:
-            is_obj = self.is_playing_gameobj()
-            self.pon_help(is_obj)
+            self.pon_help(self.is_playing_gameobj())
             self.piensa_humano(is_white)
 
     def piensa_humano(self, is_white):
@@ -361,7 +304,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.human_is_playing = True
         self.activate_side(is_white)
-        self.analyze_begin()
+        self.analizaInicio()
 
     def piensa_rival(self):
         self.human_is_playing = False
@@ -396,7 +339,7 @@ class ManagerEntPos(Manager.Manager):
 
         self.play_next_move()
 
-    def analyze_begin(self):
+    def analizaInicio(self):
         self.is_analyzing = False
         self.is_analyzed_by_tutor = False
         if not self.is_tutor_enabled:
@@ -411,7 +354,7 @@ class ManagerEntPos(Manager.Manager):
             else:
                 self.xtutor.ac_inicio_limit(self.game)
 
-    def analyze_end(self, is_mate=False):
+    def analizaFinal(self, is_mate=False):
         if self.is_playing_gameobj():
             return
         if not self.is_tutor_enabled:
@@ -478,7 +421,7 @@ class ManagerEntPos(Manager.Manager):
         if not move:
             return False
 
-        self.analyze_end(move.is_mate)  # tiene que acabar siempre
+        self.analizaFinal(move.is_mate)  # tiene que acabar siempre
         a1h8 = move.movimiento()
         ok = False
         if self.is_playing_gameobj():
@@ -499,7 +442,7 @@ class ManagerEntPos(Manager.Manager):
 
         if not ok:
             is_mate = move.is_mate
-            self.analyze_end(is_mate)  # tiene que acabar siempre
+            self.analizaFinal(is_mate)  # tiene que acabar siempre
             if self.is_tutor_enabled:
                 if not self.is_analyzed_by_tutor:
                     self.analizaTutor(True)
@@ -512,9 +455,7 @@ class ManagerEntPos(Manager.Manager):
                             from_sq = tutor.from_sq
                             to_sq = tutor.to_sq
                             promotion = tutor.promotion
-                            si_bien, mens, move_tutor = Move.get_game_move(
-                                self.game, self.game.last_position, from_sq, to_sq, promotion
-                            )
+                            si_bien, mens, move_tutor = Move.get_game_move(self.game, self.game.last_position, from_sq, to_sq, promotion)
                             if si_bien:
                                 move = move_tutor
 
@@ -553,9 +494,7 @@ class ManagerEntPos(Manager.Manager):
         self.refresh()
 
     def ent_otro(self):
-        pos = WCompetitionWithTutor.edit_training_position(
-            self.main_window, self.title_training, self.num_trainings, pos=self.pos_training
-        )
+        pos = WCompetitionWithTutor.edit_training_position(self.main_window, self.title_training, self.num_trainings, pos=self.pos_training)
         if pos is not None:
             self.pos_training = pos
             self.reiniciar()

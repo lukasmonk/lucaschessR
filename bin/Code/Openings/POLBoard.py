@@ -66,14 +66,14 @@ class BoardLines(QtWidgets.QWidget):
         config_board = configuration.config_board("POSLINES", 32)
         self.board = Board.Board(self, config_board)
         self.board.crea()
-        self.board.set_side_bottom(True)
+        self.board.ponerPiezasAbajo(True)
         self.board.set_dispatcher(self.player_has_moved)
         self.board.dispatchSize(self.ajustaAncho)
         self.board.dbvisual_set_file(self.dbop.nom_fichero)
         self.board.dbvisual_set_show_allways(True)
         self.board.dbvisual_set_save_allways(True)
 
-        self.board.set_side_bottom(self.dbop.getconfig("WHITEBOTTOM", True))
+        self.board.ponerPiezasAbajo(self.dbop.getconfig("WHITEBOTTOM", True))
 
         self.dbop.setdbVisual_Board(self.board)  # To close
 
@@ -84,9 +84,8 @@ class BoardLines(QtWidgets.QWidget):
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siTiempo=True, siLibre=False, icon_size=24)
 
         self.lbPGN = LBKey(self).set_wrap()
-        self.lbPGN.setAlignment(QtCore.Qt.AlignTop)
         self.lbPGN.setStyleSheet(
-            "QLabel{ border-style: groove; border-width: 1px; border-color: LightSlateGray; padding-right: 18px;}"
+            "QLabel{ border-style: groove; border-width: 2px; border-color: LightSlateGray; padding: 8px;}"
         )
         self.lbPGN.ponFuente(tipo_letra)
         self.lbPGN.setOpenExternalLinks(False)
@@ -95,17 +94,6 @@ class BoardLines(QtWidgets.QWidget):
             self.colocatePartida(int(txt))
 
         self.lbPGN.linkActivated.connect(muestraPos)
-
-        scroll = QtWidgets.QScrollArea()
-        scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(True)
-        scroll.setFrameStyle(QtWidgets.QFrame.NoFrame)
-
-        # ly = Colocacion.V().control(self.lbPGN).margen(0)
-        # w_pgn = QtWidgets.QWidget()
-        # w_pgn.setLayout(ly)
-        scroll.setWidget(self.lbPGN)
-        scroll.setMaximumHeight(configuration.x_pgn_fontpoints*6)
 
         self.with_figurines = configuration.x_pgn_withfigurines
 
@@ -142,7 +130,7 @@ class BoardLines(QtWidgets.QWidget):
         # Comentario
         self.emComentario = Controles.EM(self, siHTML=False).capturaCambios(self.cambiadoComentario)
         self.emComentario.ponFuente(tipo_letra)
-        self.emComentario.altoMinimo(2 * configuration.x_pgn_rowheight)
+        self.emComentario.altoFijo(5 * configuration.x_pgn_rowheight)
         lyVal = Colocacion.H().control(self.cbValoracion).control(self.cbVentaja)
         lyEd = Colocacion.V().otro(lyVal).control(self.emComentario)
 
@@ -151,7 +139,7 @@ class BoardLines(QtWidgets.QWidget):
 
         lyt = Colocacion.H().relleno().control(self.board).relleno()
 
-        lya = Colocacion.H().relleno().control(scroll).relleno()
+        lya = Colocacion.H().relleno().control(self.lbPGN).relleno()
 
         layout = Colocacion.V()
         layout.otro(lyt)
@@ -159,7 +147,7 @@ class BoardLines(QtWidgets.QWidget):
         layout.otro(lya)
         layout.otro(lyEd)
         layout.control(self.lb_opening)
-        layout.margen(0)
+        layout.relleno().margen(0)
         self.setLayout(layout)
 
         self.ajustaAncho()

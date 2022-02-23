@@ -14,7 +14,7 @@ O el comercial Chessbase
 http://chessbase-shop.com/es
 
 Vull agrair la molta gent que publica informació sobre programació de mòduls d'anàlisi d'escacs a internet, especialment http://chessprogramming.wikispaces.com/, http://talkchess.com!
-També fer menció especial a mòduls de codi obert que son molt instructius, com Stockfish, Crafty, Protector, Discocheck, Gull...
+També fer menció especial a mòduls de codi obert que son molt instructius, com Stockfish, Crafty, Protector, Discocheck, Gull, Texel...
 
 
 Versions

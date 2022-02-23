@@ -69,7 +69,7 @@ class WManualSave(LCDialog.LCDialog):
         conf_board = self.configuration.config_board("MANUALSAVE", 32)
         self.board = Board.Board(self, conf_board)
         self.board.crea()
-        self.board.set_side_bottom(True)
+        self.board.ponerPiezasAbajo(True)
         ##
         lybt, bt = QTVarios.lyBotonesMovimiento(self, "", siLibre=False, icon_size=24, siTiempo=False)
         ##

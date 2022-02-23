@@ -305,7 +305,7 @@ class WPuenteBase(LCDialog.LCDialog):
 
         self.ghistorico.gotop()
 
-    def grid_doubleclick_header(self, grid, o_column):
+    def grid_doble_clickCabecera(self, grid, o_column):
         self.historico.put_order(o_column.key)
         self.ghistorico.gotop()
         self.ghistorico.refresh()
@@ -414,14 +414,14 @@ class WPuente(LCDialog.LCDialog):
         is_white = cpIni.is_white
         self.boardIni = Board.BoardEstatico(self, config_board)
         self.boardIni.crea()
-        self.boardIni.set_side_bottom(is_white)
+        self.boardIni.ponerPiezasAbajo(is_white)
         self.boardIni.set_position(cpIni)
 
         cpFin = Position.Position()
         cpFin.read_fen(fenFin)
         self.boardFin = Board.BoardEstatico(self, config_board)
         self.boardFin.crea()
-        self.boardFin.set_side_bottom(is_white)  # esta bien
+        self.boardFin.ponerPiezasAbajo(is_white)  # esta bien
         self.boardFin.set_position(cpFin)
 
         # Rotulo informacion
@@ -444,7 +444,7 @@ class WPuente(LCDialog.LCDialog):
 
         # Botones
         f = Controles.TipoLetra(puntos=12, peso=75)
-        self.btComprobar = Controles.PB(self, _("Verify"), self.comprobar, plano=False).ponIcono(Iconos.Check(), icon_size=32).ponFuente(f)
+        self.btComprobar = Controles.PB(self, _("Check"), self.comprobar, plano=False).ponIcono(Iconos.Check(), icon_size=32).ponFuente(f)
         self.btSeguir = (
             Controles.PB(self, _("Continue"), self.seguir, plano=False).ponIcono(Iconos.Pelicula_Seguir(), icon_size=32).ponFuente(f)
         )
@@ -536,12 +536,12 @@ class WPuente(LCDialog.LCDialog):
         cpIni = Position.Position()
         cpIni.read_fen(fenIni)
         is_white = cpIni.is_white
-        self.boardIni.set_side_bottom(is_white)
+        self.boardIni.ponerPiezasAbajo(is_white)
         self.boardIni.set_position(cpIni)
 
         cpFin = Position.Position()
         cpFin.read_fen(fenFin)
-        self.boardFin.set_side_bottom(is_white)  # esta bien
+        self.boardFin.ponerPiezasAbajo(is_white)  # esta bien
         self.boardFin.set_position(cpFin)
 
         # Rotulo informacion

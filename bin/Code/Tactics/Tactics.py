@@ -231,8 +231,6 @@ class Tactic:
         if "COMMON" in self.tactics.dic:
             self.read_dic(self.tactics.dic["COMMON"])
 
-        self.advanced = False
-
         self.read_dic(self.tactics.dic[self.name])
         self.leeDatos()
 
@@ -307,8 +305,6 @@ class Tactic:
                     f = li[0]
                     w = int(li[1])
                 self.filesw.append((f, w, d, h))  # file, weight,from,to
-
-        self.advanced = dic.get("ADVANCED", False)
 
     def dbdatos(self):
         return UtilSQL.DictSQL(self.path_db, tabla=self.name)
@@ -495,7 +491,6 @@ class Tactic:
                 "PENALIZATION": self.penalization,
                 "REINFORCEMENT_ERRORS": self.reinforcement_errors,
                 "REINFORCEMENT_CYCLES": self.reinforcement_cycles,
-                "ADVANCED": self.advanced,
             }
             li_histo.insert(0, dicActual)
             db["HISTO"] = li_histo
@@ -517,11 +512,6 @@ class Tactic:
     def set_automatic_jump(self, siSalto):
         with self.dbdatos() as db:
             db["AUTOJUMP"] = siSalto
-
-    def set_advanced(self, enable):
-        with self.dbdatos() as db:
-            db["ADVANCED"] = enable
-
 
     def current_position(self):
         with self.dbdatos() as db:

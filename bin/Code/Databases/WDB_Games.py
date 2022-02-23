@@ -26,7 +26,6 @@ from Code.QT import QTUtil2
 from Code.QT import QTVarios
 from Code.QT import SelectFiles
 from Code.QT import WindowPlayGame
-from Code.QT import WindowLearnGame
 from Code.QT import WindowSavePGN
 from Code.SQL import UtilSQL
 from Code.Themes import WDB_Theme_Analysis
@@ -126,13 +125,9 @@ class WGames(QtWidgets.QWidget):
 
     def tw_train(self):
         menu = QTVarios.LCMenu(self)
-        submenu = menu.submenu(_("Learn a game"), Iconos.School())
-        submenu.opcion(self.tw_memorize, _("Memorizing their moves"), Iconos.LearnGame())
-        submenu.separador()
-        submenu.opcion(self.tw_play_against, _("Playing against"), Iconos.Law())
-        menu.separador()
         menu.opcion(self.tw_play_against, _("Play against a game"), Iconos.Law())
         menu.separador()
+        # if self.dbGames.has_positions():
         menu.opcion(self.tw_uti_tactic, _("Create tactics training"), Iconos.Tacticas())
         menu.separador()
         eti = _("Play like a Grandmaster")
@@ -146,34 +141,19 @@ class WGames(QtWidgets.QWidget):
     def tw_play_against(self):
         li = self.grid.recnosSeleccionados()
         if li:
+            recno = li[0]
+            game = self.dbGames.read_game_recno(recno)
+            h = hash(game.xpv())
             dbPlay = WindowPlayGame.DBPlayGame(self.configuration.file_play_game())
-            for recno in li:
-                game = self.dbGames.read_game_recno(recno)
-                h = hash(game.xpv())
+            recplay = dbPlay.recnoHash(h)
+            if recplay is None:
+                reg = {"GAME": game.save()}
+                dbPlay.appendHash(h, reg)
                 recplay = dbPlay.recnoHash(h)
-                if recplay is None:
-                    reg = {"GAME": game.save()}
-                    dbPlay.appendHash(h, reg)
-                    recplay = dbPlay.recnoHash(h)
             dbPlay.close()
 
-            if len(li) == 1:
-                self.wb_database.tw_terminar()
-                self.procesador.play_game_show(recplay)
-
-    def tw_memorize(self):
-        li = self.grid.recnosSeleccionados()
-        if li:
-            db = WindowLearnGame.DBLearnGame(self.configuration.file_learn_game())
-            li.sort(reverse=True)
-            for recno in li:
-                game = self.dbGames.read_game_recno(recno)
-                reg = {"GAME": game.save()}
-                db.append(reg)
-            db.close()
-
             self.wb_database.tw_terminar()
-            self.procesador.learn_game()
+            self.procesador.play_game_show(recplay)
 
     def lista_columnas(self):
         dcabs = self.dbGames.read_config("dcabs", DBgames.drots.copy())
@@ -276,7 +256,7 @@ class WGames(QtWidgets.QWidget):
         else:
             self.tw_edit()
 
-    def grid_doubleclick_header(self, grid, col):
+    def grid_doble_clickCabecera(self, grid, col):
         li_order = self.dbGames.get_order()
         key = col.key
         if key in ("__num__"):
@@ -841,7 +821,7 @@ class WGames(QtWidgets.QWidget):
 
             form.edit_np(
                 '<div align="right">%s:<br>%s</div>'
-                % (_("Only player moves"), _("(You can add multiple aliases separated by ; and wildcards with *)")),
+                % (_("Only player moves"), _("(You can add multiple aliases separated by ; and wildcards with * )")),
                 player,
             )
             form.separador()
@@ -872,7 +852,7 @@ class WGames(QtWidgets.QWidget):
             name, player, selected, side, result = li_gen
 
             if not name:
-                QTUtil2.message_error(self, _("Name missing"))
+                QTUtil2.message_error(self, _("Name is missing"))
                 continue
 
             name = Util.valid_filename(name)

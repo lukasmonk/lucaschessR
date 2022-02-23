@@ -29,11 +29,6 @@ elif n_args >= 2:
 
         Code.Kibitzers.RunKibitzer.run(sys.argv[2])
 
-    elif arg == "-translate":
-        import Code.Translations.RunTranslate
-
-        Code.Translations.RunTranslate.run_wtranslation(sys.argv[2])
-
     elif arg == "-tournament":
         import Code.Tournaments.RunTournament
 

@@ -6,7 +6,6 @@ from Code.Base.Constantes import (
     ST_ENDGAME,
     ST_PLAYING,
     TB_CLOSE,
-    TB_EBOARD,
     TB_REINIT,
     TB_CONFIG,
     TB_CANCEL,
@@ -47,7 +46,6 @@ class ManagerAnotar(Manager.Manager):
         self.si_terminar = False
         self.main_window.pon_toolbar((TB_CLOSE,))
         self.main_window.show_option_toolbar(TB_CLOSE, False)
-        self.main_window.show_option_toolbar(TB_EBOARD, False)
         self.informacion_activable = False
         self.main_window.activaInformacionPGN(False)
         self.main_window.activaJuego(False, False, siAyudas=False)

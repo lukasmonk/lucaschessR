@@ -234,7 +234,7 @@ class ManagerFideFics(Manager.Manager):
 
         return False
 
-    def analyze_begin(self):
+    def analizaInicio(self):
         if not self.is_finished():
             if self.continueTt:
                 self.xtutor.ac_inicio(self.game)
@@ -242,16 +242,16 @@ class ManagerFideFics(Manager.Manager):
                 self.xtutor.ac_inicio_limit(self.game)
             self.siAnalizando = True
 
-    def analyze_state(self):
+    def analizaEstado(self):
         self.xtutor.engine.ac_lee()
         self.mrm = copy.deepcopy(self.xtutor.ac_estado())
         return self.mrm
 
-    def analyze_minimum(self, minTime):
+    def analizaMinimo(self, minTime):
         self.mrm = copy.deepcopy(self.xtutor.ac_minimo(minTime, False))
         return self.mrm
 
-    def analyze_end(self):
+    def analizaFinal(self):
         if self.siAnalizando:
             self.siAnalizando = False
             self.xtutor.ac_final(-1)
@@ -288,7 +288,7 @@ class ManagerFideFics(Manager.Manager):
 
             self.human_is_playing = True
             self.thinking(True)
-            self.analyze_begin()
+            self.analizaInicio()
             self.activate_side(is_white)
             self.thinking(False)
 
@@ -337,23 +337,23 @@ class ManagerFideFics(Manager.Manager):
         if siAnalizaJuez:
             um = QTUtil2.analizando(self.main_window)
             if not self.continueTt:
-                self.analyze_begin()
-            mrm = self.analyze_minimum(5000)
+                self.analizaInicio()
+            mrm = self.analizaMinimo(5000)
             position = self.game.last_position
 
             rmUsu, nada = mrm.buscaRM(jgUsu.movimiento())
             if rmUsu is None:
-                self.analyze_end()
+                self.analizaFinal()
                 rmUsu = self.xtutor.valora(position, jgUsu.from_sq, jgUsu.to_sq, jgUsu.promotion)
                 mrm.agregaRM(rmUsu)
-                self.analyze_begin()
+                self.analizaInicio()
 
             rmObj, posObj = mrm.buscaRM(jgObj.movimiento())
             if rmObj is None:
-                self.analyze_end()
+                self.analizaFinal()
                 rmObj = self.xtutor.valora(position, jgObj.from_sq, jgObj.to_sq, jgObj.promotion)
                 posObj = mrm.agregaRM(rmObj)
-                self.analyze_begin()
+                self.analizaInicio()
 
             analysis = mrm, posObj
             um.final()
@@ -388,7 +388,7 @@ class ManagerFideFics(Manager.Manager):
                 comentarioPuntos,
             )
 
-        self.analyze_end()
+        self.analizaFinal()
 
         self.add_move(True, comment, analysis)
         self.play_next_move()
@@ -482,7 +482,7 @@ class ManagerFideFics(Manager.Manager):
 
     def takeback(self):
         if len(self.game) > 2:
-            self.analyze_end()
+            self.analizaFinal()
             ndel = self.game.anulaUltimoMovimiento(self.human_side)
             self.game.assign_opening()
             self.posJugadaObj -= ndel

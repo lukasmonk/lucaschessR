@@ -72,7 +72,7 @@ class Position:
         if nli < 6:
             lid = ["w", "-", "-", "0", "1"]
             li.extend(lid[nli - 1 :])
-        position, color, self.castles, self.en_passant, mp, move = li
+        position, color, self.castles, self.en_passant, mp, move = li[:6]
 
         self.is_white = color == "w"
         self.num_moves = int(move)
@@ -100,8 +100,8 @@ class Position:
     def set_lce(self):
         return FasterCode.set_fen(self.fen())
 
-    def get_exmoves(self):
-        self.set_lce()
+    @staticmethod
+    def get_exmoves():
         return FasterCode.get_exmoves()
 
     def fenBase(self):

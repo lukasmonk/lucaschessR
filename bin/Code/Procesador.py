@@ -74,10 +74,10 @@ from Code.QT import WindowManualSave
 from Code.QT import WindowPlayGame
 from Code.QT import WindowSingularM
 from Code.QT import WindowWorkMap
-from Code.QT import WindowLearnGame
 from Code.Routes import Routes, WindowRoutes, ManagerRoutes
 from Code.Sound import WindowSonido
 from Code.Tournaments import WTournaments
+from Code.Version11 import Version11
 from Code.Washing import ManagerWashing, WindowWashing
 
 
@@ -116,12 +116,12 @@ class Procesador:
 
         self.configuration = Configuration.Configuration(user)
         self.configuration.start()
+        Code.configuration = self.configuration
         Code.procesador = self
-        Code.runSound.read_sounds()
         OpeningsStd.reset()
 
-        if len(sys.argv) == 1:  # si no no funcionan los kibitzers en linux
-            self.configuration.clean_tmp_folder()
+        if len(sys.argv) == 1:  # si no nofuncionan los kibitzers en linux
+            self.configuration.limpiaTemporal()
 
         # Tras crear configuración miramos si hay Adjournments
         self.test_opcion_Adjournments()
@@ -167,7 +167,6 @@ class Procesador:
         self.main_window = MainWindow.MainWindow(self)
         self.main_window.set_manager_active(self)  # antes que muestra
         self.main_window.muestra()
-        self.main_window.check_translated_help_mode()
         self.kibitzers_manager = KibitzersManager.Manager(self)
 
         self.board = self.main_window.board
@@ -251,7 +250,7 @@ class Procesador:
         self.siPresentacion = siEmpezar
         if not siEmpezar:
             self.cpu.stop()
-            self.board.set_side_bottom(True)
+            self.board.ponerPiezasAbajo(True)
             self.board.activaMenuVisual(True)
             self.board.set_position(self.posicionInicial)
             self.board.setToolTip("")
@@ -492,7 +491,7 @@ class Procesador:
                 minMinutos=1,
                 minSegundos=0,
                 maxMinutos=999,
-                max_seconds=999,
+                maxSegundos=999,
                 default_minutes=default_minutes,
                 default_seconds=default_seconds,
             )
@@ -528,7 +527,7 @@ class Procesador:
         if key == TB_QUIT:
             if hasattr(self, "cpu"):
                 self.cpu.stop()
-            self.main_window.final_processes()
+            self.main_window.procesosFinales()
             self.main_window.accept()
 
         elif key == TB_PLAY:
@@ -693,7 +692,6 @@ class Procesador:
         self.reiniciar()
 
     def reiniciar(self):
-        self.main_window.final_processes()
         self.main_window.accept()
         QTUtil.salirAplicacion(OUT_REINIT)
 
@@ -774,6 +772,13 @@ class Procesador:
             self.aperturaspers()
         elif resp == "openings":
             self.openings()
+
+        elif resp.startswith("version11"):
+            self.version11(resp[10:])
+
+    def version11(self, tipo):
+        b = Version11.Version11(self)
+        b.run(tipo)
 
     def openings(self):
         dicline = WindowOpeningLines.openingLines(self)
@@ -984,7 +989,7 @@ class Procesador:
             texto = texto.strip()
             if not texto.startswith("["):
                 texto = '[Event "%s"]\n\n %s' % (_("Paste PGN"), texto)
-            with open(path, "wt", encoding="utf-8", errors="ignore") as q:
+            with open(path, "wt") as q:
                 q.write(texto)
             self.read_pgn(path)
 
@@ -1050,10 +1055,10 @@ class Procesador:
         self.manager = ManagerSolo.ManagerSolo(self)
         self.manager.start()
 
-    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, with_tutor, jump, advanced):
+    def entrenaPos(self, position, nPosiciones, titentreno, liEntrenamientos, entreno, jump):
         self.manager = ManagerEntPos.ManagerEntPos(self)
         self.manager.set_training(entreno)
-        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, with_tutor, jump, advanced)
+        self.manager.start(position, nPosiciones, titentreno, liEntrenamientos, is_automatic_jump=jump)
 
     def playRoute(self, route):
         if route.state == Routes.BETWEEN:
@@ -1095,10 +1100,6 @@ class Procesador:
                 self.manager = ManagerPlayGame.ManagerPlayGame(self)
                 self.manager.start(w.recno, is_white)
         db.close()
-
-    def learn_game(self):
-        w = WindowLearnGame.WLearnBase(self)
-        w.exec_()
 
     def showTurnOnLigths(self, name):
         self.entrenamientos.turn_on_lights(name)

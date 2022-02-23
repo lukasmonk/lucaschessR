@@ -404,7 +404,7 @@ class WPlay(LCDialog.LCDialog):
         cp = Position.Position()
         cp.read_fen(fen)
         cp.legal()
-        self.board.set_side_bottom(cp.is_white)
+        self.board.ponerPiezasAbajo(cp.is_white)
         self.board.set_position(cp)
 
         mens = ""

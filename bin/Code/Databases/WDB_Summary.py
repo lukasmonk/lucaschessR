@@ -114,7 +114,7 @@ class WSummary(QtWidgets.QWidget):
             self.wdb_analysis.close()
             self.wdb_analysis = None
 
-    def grid_doubleclick_header(self, grid, o_column):
+    def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
 
         if key == "analysis":
@@ -454,7 +454,7 @@ class WSummaryBase(QtWidgets.QWidget):
         )
         self.qtColorTotales = QTUtil.qtColorRGB(170, 170, 170)
 
-    def grid_doubleclick_header(self, grid, o_column):
+    def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
 
         if key == "move":

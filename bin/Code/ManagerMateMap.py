@@ -198,11 +198,11 @@ class ManagerMateMap(Manager.Manager):
         self.human_is_playing = False
         self.state = ST_ENDGAME
 
-        mensaje, beep_result, player_win = self.game.label_resultado_player(self.human_side)
+        mensaje, beep, player_win = self.game.label_resultado_player(self.human_side)
 
         self.player_win = player_win
 
-        self.beepResultado(beep_result)
+        self.beepResultado(beep)
         mensaje = _("Game ended")
         if player_win:
             mensaje = _("Congratulations you have won %s.") % self.workmap.nameAim()
@@ -213,6 +213,6 @@ class ManagerMateMap(Manager.Manager):
         self.disable_all()
         self.refresh()
 
-    def analize_position(self, row, key):
+    def analizaPosicion(self, row, key):
         if self.player_win:
-            Manager.Manager.analize_position(self, row, key)
+            Manager.Manager.analizaPosicion(self, row, key)

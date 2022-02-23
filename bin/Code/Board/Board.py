@@ -740,9 +740,6 @@ class Board(QtWidgets.QGraphicsView):
 
         liKeys.append((None, None))
         liKeys.append((_("ALT") + " L", _("Open position in LiChess")))
-        liKeys.append((None, None))
-        liKeys.append(("F11", _("Full screen On/Off")))
-        liKeys.append(("F12", _("Minimize to the tray icon")))
 
         rondo = QTVarios.rondoPuntos()
         menu = QTVarios.LCMenu(self)
@@ -765,7 +762,7 @@ class Board(QtWidgets.QGraphicsView):
         menu.separador()
         menu.opcion("pieces", _("Pieces"), self.piezas.icono("K"))
         menu.separador()
-        if not self.main_window.isMaximized():
+        if not self.siMaximizado():
             menu.opcion("size", _("Change board size"), Iconos.ResizeBoard())
             menu.separador()
 
@@ -862,7 +859,7 @@ class Board(QtWidgets.QGraphicsView):
         else:
             return False
 
-    def close_visual_script(self):
+    def cierraGuion(self):
         if self.guion is not None:
             self.guion.cierraPizarra()
             self.guion.cerrado = True
@@ -870,7 +867,7 @@ class Board(QtWidgets.QGraphicsView):
 
     def lanzaGuion(self):
         if self.guion is not None:
-            self.close_visual_script()
+            self.cierraGuion()
         else:
             self.guion = TabVisual.Guion(self)
             self.guion.recupera()
@@ -1317,7 +1314,7 @@ class Board(QtWidgets.QGraphicsView):
 
     def set_last_position(self, position):
         self.init_kb_buffer()
-        self.close_visual_script()
+        self.cierraGuion()
         self.last_position = position
         if self.siDirectorIcon or self.dbVisual.show_allways():
             fenm2 = position.fenm2()
@@ -1914,7 +1911,7 @@ class Board(QtWidgets.QGraphicsView):
         self.liFlechas = []
         self.update()
 
-    def set_side_bottom(self, is_white_bottom):
+    def ponerPiezasAbajo(self, is_white_bottom):
         if self.is_white_bottom == is_white_bottom:
             return
         self.is_white_bottom = is_white_bottom
@@ -2111,7 +2108,7 @@ class Board(QtWidgets.QGraphicsView):
             self.rotaBoard()
 
     def rotaBoard(self):
-        self.set_side_bottom(not self.is_white_bottom)
+        self.ponerPiezasAbajo(not self.is_white_bottom)
         if self.flechaSC:
             # self.put_arrow_sc( self.ultMovFlecha[0], self.ultMovFlecha[1])
             self.resetFlechaSC()

@@ -151,7 +151,7 @@ class WHorsesBase(LCDialog.LCDialog):
 
         self.ghistorico.gotop()
 
-    def grid_doubleclick_header(self, grid, o_column):
+    def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
         if key in ("FECHA", "MOVES", "HINTS"):
             self.historico.put_order(key)
@@ -240,7 +240,7 @@ class WHorses(LCDialog.LCDialog):
 
     def reset(self):
         self.preparaTest()
-        self.board.set_side_bottom(True)
+        self.board.ponerPiezasAbajo(True)
         self.board.set_position(self.cpInicial)
         self.board.remove_arrows()
         self.min_moves = 0

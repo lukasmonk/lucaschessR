@@ -70,7 +70,6 @@ from Code.QT import Grid
 from Code.QT import Iconos
 from Code.QT import QTUtil
 from Code.QT import QTUtil2
-from Code.MainWindow import WindowSolve
 
 
 class WBase(QtWidgets.QWidget):
@@ -100,7 +99,7 @@ class WBase(QtWidgets.QWidget):
 
         self.li_hide_replay = []
 
-        ly_ai = Colocacion.H().relleno().otroi(ly_t).otroi(ly_bi).relleno().margen(0)
+        ly_ai = Colocacion.H().relleno(1).otroi(ly_t).otroi(ly_bi).relleno(1).margen(0)
         ly = Colocacion.V().control(self.tb).relleno().otro(ly_ai).relleno().margen(2)
 
         self.setLayout(ly)
@@ -125,32 +124,7 @@ class WBase(QtWidgets.QWidget):
 
         self.dic_toolbar = {}
 
-        dic_opciones = self.dic_opciones_tb()
-        if self.configuration.x_digital_board:
-            dic_opciones[TB_EBOARD] = ["%s/%s" % (_("Enable"), _("Disable")), DGT.icon_eboard()]
-
-        cf = self.manager.configuration
-        peso = 75 if cf.x_tb_bold else 50
-        puntos = cf.x_tb_fontpoints
-        font = Controles.TipoLetra(puntos=puntos, peso=peso)
-
-        for key, (titulo, icono) in dic_opciones.items():
-            accion = QtWidgets.QAction(titulo, None)
-            accion.setIcon(icono)
-            accion.setIconText(titulo)
-            accion.setFont(font)
-            accion.triggered.connect(self.run_action)
-            accion.key = key
-            self.dic_toolbar[key] = accion
-
-    def translate_again_tb(self):
-        dic_opciones = self.dic_opciones_tb()
-        for key, action in self.dic_toolbar.items():
-            if key in dic_opciones:
-                action.setIconText(dic_opciones[key][0])
-
-    def dic_opciones_tb(self):
-        return {
+        dic_opciones = {
             TB_PLAY: (_("Play"), Iconos.Libre()),
             TB_COMPETE: (_("Compete"), Iconos.NuevaPartida()),
             TB_TRAIN: (_("Train"), Iconos.Entrenamiento()),
@@ -172,7 +146,7 @@ class WBase(QtWidgets.QWidget):
             TB_QUIT: (_("Quit"), Iconos.FinPartida()),
             TB_PASTE_PGN: (_("Paste PGN"), Iconos.Pegar()),
             TB_READ_PGN: (_("Read PGN file"), Iconos.Fichero()),
-            TB_PGN_LABELS: (_("PGN labels"), Iconos.InformacionPGN()),
+            TB_PGN_LABELS: (_("PGN Labels"), Iconos.InformacionPGN()),
             TB_OTHER_GAME: (_("Other game"), Iconos.FicheroRepite()),
             TB_MY_GAMES: (_("My games"), Iconos.NuestroFichero()),
             TB_DRAW: (_("Draw"), Iconos.Tablas()),
@@ -201,6 +175,22 @@ class WBase(QtWidgets.QWidget):
             TB_SEND: (_("Send"), Iconos.Enviar()),
             TB_STOP: (_("Play now"), Iconos.Stop()),
         }
+        if self.configuration.x_digital_board:
+            dic_opciones[TB_EBOARD] = ["%s/%s"%(_("Enable"),_("Disable")), DGT.icon_eboard()]
+
+        cf = self.manager.configuration
+        peso = 75 if cf.x_tb_bold else 50
+        puntos = cf.x_tb_fontpoints
+        font = Controles.TipoLetra(puntos=puntos, peso=peso)
+
+        for key, (titulo, icono) in dic_opciones.items():
+            accion = QtWidgets.QAction(titulo, None)
+            accion.setIcon(icono)
+            accion.setIconText(titulo)
+            accion.setFont(font)
+            accion.triggered.connect(self.run_action)
+            accion.key = key
+            self.dic_toolbar[key] = accion
 
     def lanzaAtajos(self):
         if self.conAtajos:
@@ -278,7 +268,7 @@ class WBase(QtWidgets.QWidget):
         self.lb_capt_black.setStyleSheet(style)
 
         # Relojes
-        f = Controles.TipoLetra(puntos=26, peso=500)
+        f = Controles.TipoLetra("Arial Black" if Code.is_windows else Code.font_mono, puntos=26, peso=500)
 
         def lbReloj():
             lb = (
@@ -307,12 +297,6 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo3.setStyleSheet("*{ border: 1px solid darkgray }")
         self.lbRotulo3.altoFijo(48)
 
-        # Rotulo de mensajes de trabajo con un cancelar
-        self.wmessage = WMessage(self)
-
-        # Modo avanzado en tácticas
-        self.wsolve = WindowSolve.WSolve(self)
-
         # Lo escondemos
         self.lb_player_white.hide()
         self.lb_player_black.hide()
@@ -327,8 +311,6 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo1.hide()
         self.lbRotulo2.hide()
         self.lbRotulo3.hide()
-        self.wsolve.hide()
-        self.wmessage.hide()
 
         # Layout
 
@@ -344,9 +326,9 @@ class WBase(QtWidgets.QWidget):
         ly_abajo.setSizeConstraint(ly_abajo.SetFixedSize)
         ly_abajo.otro(ly_capturas)
         ly_abajo.control(self.bt_active_tutor)
-        ly_abajo.control(self.lbRotulo1).control(self.lbRotulo2).control(self.lbRotulo3).control(self.wmessage)
+        ly_abajo.control(self.lbRotulo1).control(self.lbRotulo2).control(self.lbRotulo3)
 
-        ly_v = Colocacion.V().otro(ly_color).control(self.wsolve).control(self.pgn)
+        ly_v = Colocacion.V().otro(ly_color).control(self.pgn)
         ly_v.otro(ly_abajo)
 
         return ly_v
@@ -358,9 +340,7 @@ class WBase(QtWidgets.QWidget):
         self.conAtajos = conAtajos
 
         self.tb.clear()
-        if (
-            TB_CLOSE in li_acciones or TB_RESIGN in li_acciones or TB_CANCEL in li_acciones
-        ) and self.configuration.x_digital_board:
+        if (TB_CLOSE in li_acciones or TB_RESIGN in li_acciones or TB_CANCEL in li_acciones) and self.configuration.x_digital_board:
             li_acciones = list(li_acciones)
             if TB_CONFIG in li_acciones:
                 pos = li_acciones.index(TB_CONFIG)
@@ -432,7 +412,7 @@ class WBase(QtWidgets.QWidget):
     def grid_doble_click(self, grid, row, column):
         if column.key == "NUMBER":
             return
-        self.manager.analize_position(row, column.key)
+        self.manager.analizaPosicion(row, column.key)
 
     def grid_pulsada_cabecera(self, grid, column):
         col_white = self.pgn.o_columns.column(1)
@@ -565,7 +545,7 @@ class WBase(QtWidgets.QWidget):
             row, column = self.pgn.current_position()
             if column.key != "NUMBER":
                 if hasattr(self.manager, "analizaPosicion"):
-                    self.manager.analize_position(row, column.key)
+                    self.manager.analizaPosicion(row, column.key)
         else:
             if hasattr(self.manager, "control_teclado"):
                 self.manager.control_teclado(tecla, modifiers)
@@ -585,8 +565,6 @@ class WBase(QtWidgets.QWidget):
         self.lbRotulo3.setVisible(False)
         self.lb_capt_white.setVisible(False)
         self.lb_capt_black.setVisible(False)
-        self.wsolve.setVisible(False)
-        self.wmessage.setVisible(False)
 
         self.lb_player_white.setVisible(siReloj)
         self.lb_player_black.setVisible(siReloj)
@@ -607,8 +585,6 @@ class WBase(QtWidgets.QWidget):
             self.lb_player_black,
             self.lb_clock_white,
             self.lb_clock_black,
-            self.wsolve,
-            self.wmessage
         ):
             if control.isVisible():
                 self.li_hide_replay.append(control)
@@ -639,8 +615,6 @@ class WBase(QtWidgets.QWidget):
                 self.lb_capt_white,
                 self.lb_capt_black,
                 self.parent.informacionPGN,
-                self.wsolve,
-                self.wmessage
             ):
                 if widget.isVisible():
                     nonDistract.append(widget)
@@ -648,8 +622,8 @@ class WBase(QtWidgets.QWidget):
         return nonDistract
 
     def ponDatosReloj(self, bl, rb, ng, rn):
-        self.set_clock_white(rb, "00:00")
-        self.set_clock_black(rn, "00:00")
+        self.ponRelojBlancas(rb, "00:00")
+        self.ponRelojNegras(rn, "00:00")
         self.change_player_labels(bl, ng)
 
     def change_player_labels(self, bl, ng):
@@ -741,56 +715,15 @@ class WBase(QtWidgets.QWidget):
 
         return get(self.lbRotulo1), get(self.lbRotulo2), get(self.lbRotulo3)
 
-    def set_clock_white(self, tm, tm2):
+    def ponRelojBlancas(self, tm, tm2):
         if tm2 is not None:
             tm += '<br><FONT SIZE="-4">' + tm2
         self.lb_clock_white.set_text(tm)
 
-    def set_clock_black(self, tm, tm2):
+    def ponRelojNegras(self, tm, tm2):
         if tm2 is not None:
             tm += '<br><FONT SIZE="-4">' + tm2
         self.lb_clock_black.set_text(tm)
 
-    def show_message(self, txt, with_cancel):
-        self.wmessage.set_message(txt, with_cancel)
-        self.wmessage.show()
-
-    def change_message(self, txt):
-        self.wmessage.change_message(txt)
-        self.wmessage.show()
-
-    def hide_message(self):
-        self.wmessage.hide()
-
-    def is_canceled(self):
-        QTUtil.refresh_gui()
-        return self.wmessage.canceled
-
-
-class WMessage(QtWidgets.QWidget):
-    def __init__(self, owner):
-        QtWidgets.QWidget.__init__(self, owner)
-
-        self.lb_message = Controles.LB(self).ponTipoLetra(puntos=11, peso=400)
-        self.lb_message.setStyleSheet("background-color: #1f497d; color: #FFFFFF;padding: 16px;")
-
-        self.bt_cancel = Controles.PB(self, _("Cancel"), self.cancel, False)
-        self.canceled = False
-        layout = Colocacion.V().control(self.lb_message).controlc(self.bt_cancel)
-        self.setLayout(layout)
-
-    def set_message(self, message, with_cancel):
-        self.lb_message.setText(message)
-        if with_cancel:
-            self.canceled = False
-            self.bt_cancel.show()
-        else:
-            self.bt_cancel.hide()
-
-    def change_message(self, message):
-        self.lb_message.setText(message)
-
-    def cancel(self):
-        self.canceled = True
-        self.bt_cancel.setText(_("Canceled"))
-
+    # def creaCapturas(self):
+    #     self.capturas = WCapturas.CapturaLista(self, self.board)

@@ -68,8 +68,6 @@ mate_en_dos = 175522
 
 runSound = None
 
-translations = None
-
 
 def relative_root(path):
     try:
@@ -83,18 +81,16 @@ def relative_root(path):
     return path
 
 
-BASE_VERSION = "B"  # Para el control de updates que necesitan reinstalar entero
-VERSION = "R2.pre-release.2.1"
+BASE_VERSION = "A"  # Para el control de updates que necesitan reinstalar entero
+VERSION = "R 1.30d"
 DEBUG = False
 DEBUG_ENGINE = False
 
 if DEBUG:
-    import traceback
     import builtins
-    import sys
-    import time
 
     def prlk(*x):
+        import sys
 
         lx = len(x) - 1
 
@@ -103,11 +99,9 @@ if DEBUG:
             if n < lx:
                 sys.stdout.write(" ")
 
-    def prln(*x):
-        prlk(*x)
-        sys.stdout.write("\n")
-
     def stack(si_previo=False):
+        import traceback
+
         if si_previo:
             prlk("-" * 80 + "\n")
             prlk(traceback.format_stack())
@@ -118,7 +112,9 @@ if DEBUG:
     builtins.__dict__["stack"] = stack
     builtins.__dict__["prlk"] = prlk
 
-    prlk("Modo debug PYLCR2\n")
+    prlk("Modo debug\n")
+
+    import time
 
     def xpr(name, line):
         t = time.time()
@@ -135,4 +131,3 @@ if DEBUG:
         xpr("", "Modo debug engine")
 
     builtins.__dict__["xpr"] = xpr
-    builtins.__dict__["prln"] = prln

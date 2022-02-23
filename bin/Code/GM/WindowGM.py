@@ -637,7 +637,7 @@ class WImportar(LCDialog.LCDialog):
     def grid_color_fondo(self, grid, row, col):
         return self.qtColor[self.li_gm[row]["WM"]]
 
-    def grid_doubleclick_header(self, grid, oCol):
+    def grid_doble_clickCabecera(self, grid, oCol):
         cab, si_rev = self.last_order
         col_clave = oCol.key
         key = lambda x: str(x[col_clave])
@@ -763,7 +763,7 @@ class SelectGame(LCDialog.LCDialog):
     def grid_doble_click(self, grid, row, column):
         self.aceptar()
 
-    def grid_doubleclick_header(self, grid, o_column):
+    def grid_doble_clickCabecera(self, grid, o_column):
         key = o_column.key
 
         self.liRegs = sorted(self.liRegs, key=lambda x: x[key].upper())

@@ -14,7 +14,7 @@ or Chessbase
 http://chessbase-shop.com/
 
 I wish to thank many people that publish information about chess engines programming in Internet, especially http://chessprogramming.wikispaces.com/, http://talkchess.com!
-Also make special mention of open source modules that are very instructive, as for example Stockfish, Crafty, Protector, Discocheck, Gull...
+Also make special mention of open source modules that are very instructive, as for example Stockfish, Crafty, Protector, Discocheck, Gull, Texel...
 
 
 Versions

@@ -16,15 +16,13 @@ class Information(QtWidgets.QWidget):
 
         self.move = None
         self.game = None
-        self.width_saved = None
-        self.parent_width_saved = None
 
         configuration = Code.configuration
 
         puntos = configuration.x_pgn_fontpoints
 
         font = Controles.TipoLetra(puntos=puntos)
-        font7 = Controles.TipoLetra(puntos=8)
+        font7 = Controles.TipoLetra(puntos=7)
         font_bold = Controles.TipoLetra(puntos=puntos, peso=75)
 
         self.themes = Themes.Themes()
@@ -38,18 +36,10 @@ class Information(QtWidgets.QWidget):
         self.w_rating = QtWidgets.QWidget(self)
         ly_rating = Colocacion.V().margen(0)
 
-        self.lb_cpws_lost = Controles.LB(self).ponFuente(font7)
+        self.lb_cpws_lost = Controles.LB(self).ponFuente(font7).set_wrap()
         self.lb_cpws_lost.hide()
         self.lb_cpws_lost.setStyleSheet("*{ border: 1px solid lightgray; padding:1px; background: #f7f2f0}")
-        sp = QtWidgets.QSizePolicy()
-        sp.setHorizontalPolicy(QtWidgets.QSizePolicy.Expanding)
-        self.lb_cpws_lost.setSizePolicy(sp)
-
-        self.lb_time = Controles.LB(self).ponFuente(font7).set_wrap().align_right().anchoFijo(42)
-        self.lb_time.hide()
-        self.lb_time.setStyleSheet("*{ border: 1px solid lightgray; padding:1px; background: #a7f2f5}")
-        ly_pw_tm = Colocacion.H().control(self.lb_cpws_lost).espacio(-8).controld(self.lb_time)
-        ly_rating.otro(ly_pw_tm)
+        ly_rating.control(self.lb_cpws_lost)
 
         li_acciones = [(_("Rating"), Iconos.Mas(), self.edit_rating), None, (_("Theme"), Iconos.MasR(), self.edit_theme)]
         tb = QTVarios.LCTB(self, li_acciones, icon_size=16, style=QtCore.Qt.ToolButtonTextBesideIcon)
@@ -112,33 +102,13 @@ class Information(QtWidgets.QWidget):
         visible = False
         if self.move:
             cpws_lost = self.move.get_points_lost()
-            if (cpws_lost is not None and cpws_lost > 0):
+            if cpws_lost is not None and cpws_lost > 0:
                 analysis_depth = self.move.analysis[0].li_rm[0].depth
-                str_cpws_lost = "%.02f %s (%s %s)" % (cpws_lost / 100.0, _("pws lost"), _("Depth"), analysis_depth)
+                str_cpws_lost = "%.02f %s (%s %s)" % (cpws_lost / 100.0, _("pawns lost"), _("Depth"), analysis_depth)
                 # str_cpws_lost = "%.02f (^%s)" % (cpws_lost / 100.0, analysis_depth)
                 self.lb_cpws_lost.set_text(str_cpws_lost)
                 visible = True
         self.lb_cpws_lost.setVisible(visible)
-
-    def show_time(self):
-        visible = False
-        if self.move:
-            time_ms = self.move.time_ms
-            if time_ms:
-                time_scs = time_ms / 1000
-                if time_scs >= 60.0:
-                    minutes = int(time_scs//60)
-                    scs = int(time_scs - minutes*60)
-                    str_time = "%d' %d\"" % (minutes, scs)
-                elif time_scs >= 10.0:
-                    str_time = "%.01f\"" % time_scs
-                elif time_scs < 1.0:
-                    str_time = "%.03f\"" % time_scs
-                else:
-                    str_time = "%.02f\"" % time_scs
-                self.lb_time.set_text(str_time)
-                visible = True
-        self.lb_time.setVisible(visible)
 
     def edit_rating(self, event=None):
         if event:
@@ -173,7 +143,6 @@ class Information(QtWidgets.QWidget):
         self.show_themes()
         self.show_rating()
         self.show_cpws_lost()
-        self.show_time()
         if is_move:
             self.gb_comments.set_text(_("Comments"))
             if opening:
@@ -216,29 +185,6 @@ class Information(QtWidgets.QWidget):
                     li.append(v)
             self.move.li_nags = li
             self.set_nags(li)
-
-    def resizeEvent(self, event):
-        if self.isVisible() and not self.w_parent.isMaximized():
-            self.width_saved = self.width()
-            self.parent_width_saved = self.w_parent.width()
-
-    def save_width(self):
-        self.saved_width = self.width_saved, self.parent_width_saved
-
-    def restore_width(self):
-        self.width_saved, self.parent_width_saved = self.saved_width
-        if self.isVisible():
-            self.activa(True)
-
-    def activa(self, to_activate):
-        if to_activate:
-            if not self.w_parent.isMaximized():
-                if self.width_saved:
-                    self.w_parent.resize(self.parent_width_saved, self.w_parent.height())
-                    self.resize(self.width_saved, self.height())
-            self.show()
-        else:
-            self.hide()
 
 
 class WVariations(QtWidgets.QWidget):
@@ -303,7 +249,7 @@ class WVariations(QtWidgets.QWidget):
 
         if variation is not None:
             manager = self.owner.w_parent.manager
-            manager.kibitzers_manager.put_game(variation.copia(num_var_move), board.is_white_bottom)
+            manager.kibitzers_manager.put_game(variation.copia(num_var_move))
 
     def link_variation_edit(self, num_variation):
         self.edit(num_variation)

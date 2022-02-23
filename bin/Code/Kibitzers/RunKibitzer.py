@@ -3,6 +3,7 @@ import time
 
 from PySide2 import QtWidgets
 
+import Code
 from Code import Util
 from Code.Base import Game
 from Code.Base.Constantes import (
@@ -79,6 +80,7 @@ class CPU:
             self.configuration = Configuration.Configuration(user)
             self.configuration.lee()
             self.configuration.leeConfBoards()
+            Code.configuration = self.configuration
             OpeningsStd.reset()
 
             kibitzers = Kibitzers.Kibitzers()
@@ -104,8 +106,6 @@ class CPU:
         elif key == KIBRUN_GAME:
             game = Game.Game()
             game.restore(orden.dv["GAME"])
-            if hasattr(self.ventana, "board"):
-                self.ventana.board.set_side_bottom(orden.dv["IS_WHITE_BOTTOM"])
             if self.kibitzer.pointofview == KIB_BEFORE_MOVE:
                 game.anulaSoloUltimoMovimiento()
             if self.tipo == KIB_THREATS:
@@ -133,7 +133,7 @@ class CPU:
         app.setStyle(QtWidgets.QStyleFactory.create(self.configuration.x_style))
         QtWidgets.QApplication.setPalette(QtWidgets.QApplication.style().standardPalette())
 
-        self.configuration.load_translation()
+        self.configuration.releeTRA()
 
         if self.tipo == KIB_BESTMOVE:
             self.ventana = WKibEngine.WKibEngine(self)

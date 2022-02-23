@@ -4,8 +4,6 @@
 import os
 import random
 
-import FasterCode
-
 from Code.Base import Position
 from Code import Util
 import Code
@@ -240,7 +238,7 @@ class Book:
             listaJugadas.append((from_sq, to_sq, promotion, "%-5s -%7.02f%% -%7d" % (pgn, pc, w), 1.0 * w / maxim))
         return listaJugadas
 
-    def almListaJugadas(self, fen, extended=False):
+    def almListaJugadas(self, fen):
         li = self.book.lista(self.path, fen)
         position = Position.Position()
         position.read_fen(fen)
@@ -254,11 +252,9 @@ class Book:
                 maxim = w
 
         listaJugadas = []
-        st_pvs_included = set()
         for entry in li:
             alm = Util.Record()
             pv = alm.pv = entry.pv()
-            st_pvs_included.add(pv.lower())
             w = entry.weight
             alm.from_sq, alm.to_sq, alm.promotion = pv[:2], pv[2:4], pv[4:]
             alm.pgn = position.pgn_translated(alm.from_sq, alm.to_sq, alm.promotion)
@@ -267,25 +263,6 @@ class Book:
             alm.porc = "%0.02f%%" % (w * 100.0 / total,) if total else ""
             alm.weight = w
             listaJugadas.append(alm)
-
-        if extended:
-            for exmove in position.get_exmoves():
-                pv = exmove.move()
-                if pv not in st_pvs_included:
-                    FasterCode.set_fen(fen)
-                    from_sq, to_sq, promotion = pv[:2], pv[2:4], pv[4:]
-                    FasterCode.move_pv(from_sq, to_sq, promotion)
-                    new_fen = FasterCode.get_fen()
-                    li = self.book.lista(self.path, new_fen)
-                    if len(li) > 0:
-                        alm = Util.Record()
-                        alm.from_sq, alm.to_sq, alm.promotion = from_sq, to_sq, promotion
-                        alm.pgn = position.pgn_translated(from_sq, to_sq, promotion)
-                        alm.pgnRaw = position.pgn(from_sq, to_sq, promotion)
-                        alm.fen = fen
-                        alm.porc = ""
-                        alm.weight = 0
-                        listaJugadas.append(alm)
 
         return listaJugadas
 

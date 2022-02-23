@@ -1,6 +1,5 @@
 import sys
 
-import Code
 from Code import Util
 from Code.Config import Configuration
 
@@ -22,8 +21,8 @@ class Usuarios:
 
     def include_main(self):
         ok_main = False
-        conf_main = Code.configuration
-        # conf_main.lee()
+        conf_main = Configuration.Configuration("")
+        conf_main.lee()
         for user in self.list_users:
             if user.number == 0:
                 ok_main = True

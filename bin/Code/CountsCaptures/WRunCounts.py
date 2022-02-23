@@ -48,7 +48,7 @@ class WRunCounts(LCDialog.LCDialog):
             (_("Close"), Iconos.MainMenu(), self.terminar),
             None,
             (_("Begin"), Iconos.Empezar(), self.begin),
-            (_("Verify"), Iconos.Check(), self.check),
+            (_("Check"), Iconos.Check(), self.check),
             (_("Continue"), Iconos.Pelicula_Seguir(), self.seguir),
         )
         self.tb = QTVarios.LCTB(self, li_acciones, style=QtCore.Qt.ToolButtonTextBesideIcon, icon_size=32)

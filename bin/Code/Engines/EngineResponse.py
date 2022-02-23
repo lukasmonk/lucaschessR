@@ -1146,6 +1146,9 @@ class MultiEngineResponse:
         nb = mj_pts - rm_pts
         perf = configuration.perfomance
         if nb:
+            if abs(mj_pts) > 200 or abs(rm_pts) > 200:
+                x = abs(mj_pts) if abs(mj_pts) > 200 else abs(rm_pts)
+                nb = nb * 100 / x
             if nb > perf.very_bad_lostp:
                 return VERY_BAD_MOVE, VERY_BAD_MOVE
             elif nb > perf.bad_lostp:

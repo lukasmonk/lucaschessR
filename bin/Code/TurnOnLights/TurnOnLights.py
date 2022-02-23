@@ -417,7 +417,7 @@ def compruebaUweEasy(configuration, name):
     if Util.exist_file(file):
         return
     folderDest = configuration.carpetaTemporal()
-    configuration.clean_tmp_folder()
+    configuration.limpiaTemporal()
     folderOri = Code.path_resource("Trainings", "Tactics by Uwe Auerswald")
     for fich in os.listdir(folderOri):
         if fich.endswith(".fns"):

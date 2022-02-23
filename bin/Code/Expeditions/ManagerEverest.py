@@ -124,7 +124,7 @@ class ManagerEverest(Manager.Manager):
         self.board.set_position(self.game.first_position)
         self.pgnRefresh(True)
         self.check_boards_setposition()
-        self.analyze_end()
+        self.analizaFinal()
         self.terminaNoContinuo()
 
         self.set_label1(self.expedition.label())
@@ -133,7 +133,7 @@ class ManagerEverest(Manager.Manager):
 
     def restart(self, lost_points):
         self.terminaNoContinuo()
-        change_game, is_last, is_last_last = self.expedition.add_try(False, self.vtime, self.puntos)
+        change_game, is_last = self.expedition.add_try(False, self.vtime, self.puntos)
         self.vtime = 0.0
         licoment = []
         if lost_points:
@@ -149,20 +149,20 @@ class ManagerEverest(Manager.Manager):
             w.mostrar()
         return change_game
 
-    def analyze_begin(self):
+    def analizaInicio(self):
         self.xanalyzer.ac_inicio(self.game)
         self.siAnalizando = True
 
-    def analyze_minimum(self, minTime):
+    def analizaMinimo(self, minTime):
         self.mrm = copy.deepcopy(self.xanalyzer.ac_minimo(minTime, False))
         return self.mrm
 
-    def analyze_state(self):
+    def analizaEstado(self):
         self.xanalyzer.engine.ac_lee()
         self.mrm = copy.deepcopy(self.xanalyzer.ac_estado())
         return self.mrm
 
-    def analyze_end(self):
+    def analizaFinal(self):
         if self.siAnalizando:
             self.siAnalizando = False
             self.xanalyzer.ac_final(-1)
@@ -175,8 +175,8 @@ class ManagerEverest(Manager.Manager):
     def analizaNoContinuo(self):
         self.tiempoNoContinuo += 500
         if self.tiempoNoContinuo >= 5000:
-            self.analyze_minimum(5)
-            self.analyze_end()
+            self.analizaMinimo(5)
+            self.analizaFinal()
             self.pendienteNoContinuo = False
         else:
             QtCore.QTimer.singleShot(500, self.analizaNoContinuo)
@@ -184,7 +184,7 @@ class ManagerEverest(Manager.Manager):
     def analizaNoContinuoFinal(self):
         if self.tiempoNoContinuo < 5000:
             um = QTUtil2.analizando(self.main_window)
-            self.analyze_minimum(5000)
+            self.analizaMinimo(5000)
             um.final()
 
     def terminaNoContinuo(self):
@@ -229,7 +229,7 @@ class ManagerEverest(Manager.Manager):
         else:
             self.human_is_playing = True
             self.thinking(True)
-            self.analyze_begin()
+            self.analizaInicio()
             self.activate_side(is_white)
             self.thinking(False)
             self.iniTiempo = time.time()
@@ -282,7 +282,7 @@ class ManagerEverest(Manager.Manager):
             else:
                 if self.continueTt:
                     um = QTUtil2.analizando(self.main_window)
-                    mrm = self.analyze_minimum(3000) if self.continueTt else self.mrm
+                    mrm = self.analizaMinimo(3000) if self.continueTt else self.mrm
                     um.final()
                 else:
                     self.analizaNoContinuoFinal()
@@ -294,10 +294,10 @@ class ManagerEverest(Manager.Manager):
             rmUsu, posUsu = mrm.buscaRM(jgUsu.movimiento())
             if rmUsu is None:
                 um = QTUtil2.analizando(self.main_window)
-                self.analyze_end()
+                self.analizaFinal()
                 rmUsu = self.xanalyzer.valora(position, from_sq, to_sq, promotion)
                 mrm.agregaRM(rmUsu)
-                self.analyze_begin()
+                self.analizaInicio()
                 um.final()
 
             w = WindowJuicio.WJuicio(self, self.xanalyzer, self.nombreObj, position, mrm, rmObj, rmUsu, analysis, is_competitive=False)
@@ -334,7 +334,7 @@ class ManagerEverest(Manager.Manager):
         if not self.continueTt:
             self.terminaNoContinuo()
 
-        self.analyze_end()
+        self.analizaFinal()
 
         self.add_move(True, analysis, comment)
 
